@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, Sparkles, PhoneCall, Crown, ArrowRight, Image as ImageIcon, Info } from 'lucide-react';
+import { Shield, Sparkles, PhoneCall, ArrowRight, Image as ImageIcon, Info } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/authSlice.js';
 
@@ -141,15 +141,6 @@ export const PublicNavbar = () => {
               </Link>
             </>
           )}
-
-          {/* Dedicated Super Admin Quick Crown Link */}
-          <Link
-            to="/admin/login"
-            title="Company Super Admin HQ Portal"
-            className="w-10 h-10 rounded-2xl bg-gradient-to-br from-gold/20 via-gold/10 to-gold/5 border border-gold/40 hover:border-gold text-gold-dark flex items-center justify-center transition-all hover:scale-105 shadow-sm"
-          >
-            <Crown className="w-5 h-5" />
-          </Link>
         </div>
 
       </div>
