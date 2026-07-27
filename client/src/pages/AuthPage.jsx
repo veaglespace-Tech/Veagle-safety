@@ -140,11 +140,11 @@ export const AuthPage = () => {
           </div>
         </div>
 
-        {/* MAIN CARD (PORCELAIN BLUSH LIGHT CARD) */}
-        <div className="glass-card rounded-3xl p-6 sm:p-8 border border-blush-border shadow-xl space-y-6 max-w-2xl mx-auto">
+        {/* MAIN CARD (CARD-ANTIQUE-PINK PORCELAIN CARD) */}
+        <div className="card-antique-pink p-6 sm:p-8 space-y-6 max-w-2xl mx-auto">
           
           {/* TAB SWITCHER */}
-          <div className="flex bg-blush-subtle p-1.5 rounded-2xl border border-blush-border relative">
+          <div className="flex bg-blush-subtle p-1.5 rounded-2xl border border-[#FFCCE1] relative">
             <button
               type="button"
               onClick={() => {
@@ -152,7 +152,7 @@ export const AuthPage = () => {
                 dispatch(clearAuthMessages());
               }}
               className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
-                isLogin ? 'bg-gradient-to-r from-rose to-rose-light text-white shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
+                isLogin ? 'btn-baby-pink' : 'text-tichi-muted hover:text-tichi-text'
               }`}
             >
               SIGN IN
@@ -165,7 +165,7 @@ export const AuthPage = () => {
                 dispatch(clearAuthMessages());
               }}
               className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
-                !isLogin ? 'bg-gradient-to-r from-rose to-rose-light text-white shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
+                !isLogin ? 'btn-baby-pink' : 'text-tichi-muted hover:text-tichi-text'
               }`}
             >
               CREATE ACCOUNT (SIGN UP)
@@ -196,7 +196,7 @@ export const AuthPage = () => {
               <div className="space-y-6 text-xs">
                 
                 {/* SECTION 1: PERSONAL IDENTITY & SECURITY */}
-                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-blush-border">
+                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-[#FFCCE1]">
                   <div className="flex items-center space-x-2 text-rose font-black uppercase text-[11px]">
                     <UserIcon className="w-4 h-4 text-rose" />
                     <span>Section 1: Personal Identity & Security</span>
@@ -212,7 +212,7 @@ export const AuthPage = () => {
                         placeholder="Priya Sharma"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
                       />
                     </div>
                   </div>
@@ -228,7 +228,7 @@ export const AuthPage = () => {
                           placeholder="priya@example.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
                         />
                       </div>
                     </div>
@@ -243,7 +243,7 @@ export const AuthPage = () => {
                           placeholder="+91 98765 43210"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
                         />
                       </div>
                     </div>
@@ -259,7 +259,7 @@ export const AuthPage = () => {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-10 pr-10 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                        className="w-full pl-10 pr-10 py-3 input-antique-pink"
                       />
                       <button
                         type="button"
@@ -273,7 +273,7 @@ export const AuthPage = () => {
                 </div>
 
                 {/* SECTION 2: EMERGENCY PROFILE & HEALTH DATA */}
-                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-blush-border">
+                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-[#FFCCE1]">
                   <div className="flex items-center space-x-2 text-rose font-black uppercase text-[11px]">
                     <Heart className="w-4 h-4 text-rose" />
                     <span>Section 2: Emergency Guardian & Health Data</span>
@@ -287,7 +287,7 @@ export const AuthPage = () => {
                         <select
                           value={bloodGroup}
                           onChange={(e) => setBloodGroup(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text"
+                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
                         >
                           <option value="O+">O Positive (O+)</option>
                           <option value="O-">O Negative (O-)</option>
@@ -311,7 +311,7 @@ export const AuthPage = () => {
                           placeholder="https://ik.imagekit.io/avatar.png"
                           value={profilePhoto}
                           onChange={(e) => setProfilePhoto(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
                         />
                       </div>
                     </div>
@@ -328,7 +328,7 @@ export const AuthPage = () => {
                           placeholder="Mother / Father / Spouse Name"
                           value={emergencyContactName}
                           onChange={(e) => setEmergencyContactName(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/40 bg-white text-tichi-text placeholder-tichi-faint"
+                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
                         />
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export const AuthPage = () => {
                           placeholder="+91 98765 00000"
                           value={emergencyContactPhone}
                           onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/40 bg-white text-tichi-text placeholder-tichi-faint"
+                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
                         />
                       </div>
                     </div>
@@ -357,14 +357,14 @@ export const AuthPage = () => {
                         placeholder="e.g. Asthma patient, Diabetic, Penicillin allergy (Optional for first responders)"
                         value={medicalNotes}
                         onChange={(e) => setMedicalNotes(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                        className="w-full pl-10 pr-4 py-2.5 input-antique-pink"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* SECTION 3: RESIDENTIAL ADDRESS & LOCATION */}
-                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-blush-border">
+                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-[#FFCCE1]">
                   <div className="flex items-center space-x-2 text-rose font-black uppercase text-[11px]">
                     <MapPin className="w-4 h-4 text-rose" />
                     <span>Section 3: Location & Residential Dispatch Address</span>
@@ -380,7 +380,7 @@ export const AuthPage = () => {
                         placeholder="Flat No 402, Lotus Heights, MG Road"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
                       />
                     </div>
                   </div>
@@ -394,7 +394,7 @@ export const AuthPage = () => {
                         placeholder="Pune"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                        className="w-full p-2.5 input-antique-pink"
                       />
                     </div>
 
@@ -406,7 +406,7 @@ export const AuthPage = () => {
                         placeholder="Maharashtra"
                         value={state}
                         onChange={(e) => setState(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                        className="w-full p-2.5 input-antique-pink"
                       />
                     </div>
 
@@ -418,7 +418,7 @@ export const AuthPage = () => {
                         placeholder="India"
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                        className="w-full p-2.5 input-antique-pink"
                       />
                     </div>
 
@@ -429,7 +429,7 @@ export const AuthPage = () => {
                         placeholder="411001"
                         value={pincode}
                         onChange={(e) => setPincode(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-rose/40 bg-white text-tichi-text placeholder-tichi-faint"
+                        className="w-full p-2.5 input-antique-pink"
                       />
                     </div>
                   </div>
@@ -449,7 +449,7 @@ export const AuthPage = () => {
                       placeholder="name@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                      className="w-full pl-10 pr-4 py-3.5 input-antique-pink"
                     />
                   </div>
                 </div>
@@ -464,7 +464,7 @@ export const AuthPage = () => {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-3.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
+                      className="w-full pl-10 pr-10 py-3.5 input-antique-pink"
                     />
                     <button
                       type="button"
@@ -482,7 +482,7 @@ export const AuthPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-rose via-rose-light to-rose text-white font-black py-4 rounded-xl text-xs uppercase tracking-wider shadow-coral-glow hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-2"
+              className="w-full btn-baby-pink py-4 text-xs uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2"
             >
               <span>{isLoading ? 'PROCESSING FORMALITIES...' : isLogin ? 'SIGN IN' : 'REGISTER & PROCEED TO PLAN FORMALITIES'}</span>
               {!isLoading && <ArrowRight className="w-4 h-4" />}
@@ -496,7 +496,7 @@ export const AuthPage = () => {
       {/* STEP 2: EMAIL OTP VERIFICATION MODAL */}
       {showOtpModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="glass-card rounded-3xl p-6 sm:p-8 max-w-md w-full border border-rose/40 space-y-5 text-center shadow-2xl relative bg-white">
+          <div className="card-antique-pink p-6 sm:p-8 max-w-md w-full space-y-5 text-center shadow-2xl relative bg-white">
             
             <div className="w-16 h-16 rounded-2xl bg-rose/10 border border-rose/30 text-rose flex items-center justify-center mx-auto shadow-coral-glow">
               <KeyRound className="w-8 h-8" />
@@ -517,13 +517,13 @@ export const AuthPage = () => {
                 placeholder="123456"
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value)}
-                className="w-full py-4 text-center font-mono text-2xl font-black tracking-[0.5em] rounded-2xl border-2 border-rose/40 bg-blush-subtle text-tichi-text focus:border-rose focus:outline-none"
+                className="w-full py-4 text-center font-mono text-2xl font-black tracking-[0.5em] input-antique-pink focus:border-rose"
               />
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-rose via-rose-light to-rose text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-coral-glow hover:brightness-110 active:scale-98 transition-all"
+                className="w-full btn-baby-pink py-3.5 text-xs uppercase tracking-wider"
               >
                 {isLoading ? 'VERIFYING CODE...' : 'VERIFY & PROCEED TO PLAN FORMALITIES'}
               </button>

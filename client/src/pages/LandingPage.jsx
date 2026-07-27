@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { PublicNavbar } from '../components/layout/PublicNavbar.jsx';
-import { Shield, Sparkles, PhoneCall, Radio, Eye, Lock, Zap, ArrowRight, HeartHandshake, MapPin, BellRing, Award, Users, CheckCircle2 } from 'lucide-react';
+import { Shield, Sparkles, Radio, Zap, ArrowRight, MapPin, BellRing, Award, CheckCircle2 } from 'lucide-react';
 
 export const LandingPage = () => {
   return (
@@ -9,27 +9,26 @@ export const LandingPage = () => {
       <PublicNavbar />
 
       {/* BACKGROUND AMBIENT GLOW MESHES */}
-      <div className="absolute w-[700px] h-[700px] rounded-full bg-rose/10 blur-[150px] top-[-100px] left-[-200px] pointer-events-none" />
-      <div className="absolute w-[700px] h-[700px] rounded-full bg-gold/15 blur-[150px] bottom-[100px] right-[-200px] pointer-events-none" />
+      <div className="absolute w-[750px] h-[750px] rounded-full bg-rose/15 blur-[160px] top-[-120px] left-[-220px] pointer-events-none" />
+      <div className="absolute w-[750px] h-[750px] rounded-full bg-gold/15 blur-[160px] bottom-[80px] right-[-220px] pointer-events-none" />
 
       {/* HERO SECTION */}
       <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 text-center space-y-10">
 
         {/* HERO BADGE */}
-        <div className="inline-flex items-center space-x-2 bg-white/90 border border-rose/30 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest animate-fade-up shadow-sm">
+        <div className="inline-flex items-center space-x-2 bg-white/95 border border-[#FFCCE1] px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest animate-fade-up shadow-sm">
           <Sparkles className="w-4 h-4 text-rose animate-pulse" />
           <span className="text-tichi-text">INDIA'S MOST TRUSTED PERSONAL SAFETY PLATFORM</span>
         </div>
 
-        {/* HERO TITLE (PORCELAIN BLUSH LIGHT THEME) */}
+        {/* HERO TITLE (ANTIQUE-MODERN BABY PINK HEADING) */}
         <div className="space-y-4 max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight space-y-2">
             <span className="text-tichi-text block drop-shadow-sm">
               Sakhi Suraksha SOS
             </span>
             <span 
-              className="block font-black py-1 tracking-tight drop-shadow-sm"
-              style={{ color: '#FF5C8A' }}
+              className="block font-black py-1 tracking-tight drop-shadow-[0_4px_15px_rgba(255,92,138,0.25)] text-baby-pink-gradient"
             >
               Instant 3-Second Emergency Protection
             </span>
@@ -39,11 +38,11 @@ export const LandingPage = () => {
           </p>
         </div>
 
-        {/* CTA BUTTONS */}
+        {/* CTA BUTTONS (BEST-OF-BEST ANTIQUE BABY PINK BUTTONS) */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
           <Link
             to="/auth?mode=register"
-            className="w-full sm:w-auto bg-gradient-to-r from-rose via-rose-light to-rose text-white text-base font-black px-8 py-4 rounded-2xl shadow-coral-glow hover:scale-105 active:scale-95 transition-all flex items-center justify-center space-x-3"
+            className="w-full sm:w-auto btn-baby-pink text-base px-9 py-4 shadow-coral-glow flex items-center justify-center space-x-3"
           >
             <span>PROTECT YOURSELF NOW</span>
             <ArrowRight className="w-5 h-5" />
@@ -51,16 +50,16 @@ export const LandingPage = () => {
 
           <Link
             to="/pricing"
-            className="w-full sm:w-auto bg-white border border-rose/40 text-tichi-text hover:text-rose text-base font-black px-8 py-4 rounded-2xl hover:bg-rose-soft active:scale-95 transition-all flex items-center justify-center space-x-2 shadow-sm"
+            className="w-full sm:w-auto btn-baby-pink-outline text-base px-8 py-4 flex items-center justify-center space-x-2"
           >
             <Zap className="w-5 h-5 text-rose" />
             <span>VIEW SAFETY PLAN</span>
           </Link>
         </div>
 
-        {/* RADAR SOS PULSE HERO MOCKUP (PORCELAIN BLUSH LIGHT GLASS CARD) */}
+        {/* RADAR SOS PULSE HERO MOCKUP (CARD-ANTIQUE-PINK GLASS CARD) */}
         <div className="pt-10 max-w-3xl mx-auto relative">
-          <div className="glass-card rounded-3xl p-8 border border-blush-border shadow-xl relative overflow-hidden group">
+          <div className="card-antique-pink p-8 sm:p-10 relative overflow-hidden group">
             
             {/* Animated Radar Scanning Overlay */}
             <div className="absolute inset-0 bg-gradient-to-b from-rose/5 via-transparent to-transparent opacity-60 animate-pulse pointer-events-none" />
@@ -69,11 +68,11 @@ export const LandingPage = () => {
               
               {/* Left Column: Interactive SOS Button Preview */}
               <div className="flex flex-col items-center space-y-3">
-                <div className="relative w-32 h-32 flex items-center justify-center">
+                <div className="relative w-36 h-36 flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full border-2 border-emergency animate-ping" />
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-emergency to-emergency-dark border-4 border-white text-white flex flex-col items-center justify-center shadow-sos-glow">
-                    <Radio className="w-8 h-8 animate-pulse" />
-                    <span className="text-[11px] font-black uppercase mt-1">PRESS SOS</span>
+                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-emergency via-rose to-emergency-dark border-4 border-white text-white flex flex-col items-center justify-center shadow-sos-glow">
+                    <Radio className="w-9 h-9 animate-pulse" />
+                    <span className="text-[11px] font-black uppercase mt-1 tracking-wider">PRESS SOS</span>
                   </div>
                 </div>
                 <span className="text-xs font-black text-emergency uppercase tracking-wider">3-Sec Hold Trigger</span>
@@ -81,23 +80,23 @@ export const LandingPage = () => {
 
               {/* Right Column: Live Status Highlights */}
               <div className="text-left space-y-3 flex-1">
-                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-2xl border border-blush-border shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-rose/10 text-rose flex items-center justify-center shrink-0 border border-rose/20">
+                <div className="flex items-center space-x-3.5 bg-blush-subtle p-4 rounded-2xl border border-[#FFCCE1] shadow-sm">
+                  <div className="w-11 h-11 rounded-2xl bg-rose/15 text-rose flex items-center justify-center shrink-0 border border-rose/30">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="text-xs font-black text-tichi-text">Encrypted Live GPS Tracking</div>
-                    <div className="text-[11px] text-tichi-muted font-medium">Shares exact coordinates with trusted contacts</div>
+                    <div className="text-[11px] text-tichi-muted font-bold">Shares exact coordinates with trusted contacts</div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-2xl border border-blush-border shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-gold/10 text-gold-dark flex items-center justify-center shrink-0 border border-gold/30">
+                <div className="flex items-center space-x-3.5 bg-blush-subtle p-4 rounded-2xl border border-[#FFCCE1] shadow-sm">
+                  <div className="w-11 h-11 rounded-2xl bg-gold/15 text-gold-dark flex items-center justify-center shrink-0 border border-gold/30">
                     <BellRing className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="text-xs font-black text-tichi-text">Instant Email & SMS Alerting</div>
-                    <div className="text-[11px] text-tichi-muted font-medium">Instant broadcast to family & emergency response</div>
+                    <div className="text-[11px] text-tichi-muted font-bold">Instant broadcast to family & emergency response</div>
                   </div>
                 </div>
               </div>
@@ -109,26 +108,26 @@ export const LandingPage = () => {
       </section>
 
       {/* METRICS & STATS BAR */}
-      <section className="border-y border-blush-border bg-white/80 py-12 backdrop-blur-md">
+      <section className="border-y border-[#FFCCE1] bg-white/85 py-12 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div className="space-y-1">
             <div className="text-3xl sm:text-4xl font-black text-rose">100%</div>
-            <div className="text-xs text-tichi-muted font-extrabold uppercase tracking-wider">Encrypted Privacy</div>
+            <div className="text-xs text-tichi-muted font-black uppercase tracking-wider">Encrypted Privacy</div>
           </div>
 
           <div className="space-y-1">
             <div className="text-3xl sm:text-4xl font-black text-gold-dark">&lt; 3 Sec</div>
-            <div className="text-xs text-tichi-muted font-extrabold uppercase tracking-wider">Emergency Response</div>
+            <div className="text-xs text-tichi-muted font-black uppercase tracking-wider">Emergency Response</div>
           </div>
 
           <div className="space-y-1">
             <div className="text-3xl sm:text-4xl font-black text-rose">24 / 7</div>
-            <div className="text-xs text-tichi-muted font-extrabold uppercase tracking-wider">HQ Dispatch Monitoring</div>
+            <div className="text-xs text-tichi-muted font-black uppercase tracking-wider">HQ Dispatch Monitoring</div>
           </div>
 
           <div className="space-y-1">
             <div className="text-3xl sm:text-4xl font-black text-gold-dark">5 Contacts</div>
-            <div className="text-xs text-tichi-muted font-extrabold uppercase tracking-wider">Instant Broadcast</div>
+            <div className="text-xs text-tichi-muted font-black uppercase tracking-wider">Instant Broadcast</div>
           </div>
         </div>
       </section>
@@ -147,34 +146,34 @@ export const LandingPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           {/* Card 1 */}
-          <div className="glass-card rounded-3xl p-8 border border-blush-border space-y-4 hover:border-rose transition-all group hover:shadow-card-hover">
-            <div className="w-14 h-14 rounded-2xl bg-rose/10 border border-rose/30 text-rose flex items-center justify-center group-hover:scale-110 transition-transform">
+          <div className="card-antique-pink p-8 space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-rose/15 border border-rose/30 text-rose flex items-center justify-center">
               <Radio className="w-7 h-7" />
             </div>
             <h3 className="text-xl font-bold text-tichi-text">One-Touch SOS Broadcast</h3>
-            <p className="text-xs text-tichi-muted leading-relaxed font-medium">
+            <p className="text-xs text-tichi-muted leading-relaxed font-semibold">
               Press and hold the SOS button for 3 seconds to instantly send your live coordinates, battery level, and emergency link to all trusted contacts.
             </p>
           </div>
 
           {/* Card 2 */}
-          <div className="glass-card rounded-3xl p-8 border border-blush-border space-y-4 hover:border-gold transition-all group hover:shadow-card-hover">
-            <div className="w-14 h-14 rounded-2xl bg-gold/10 border border-gold/30 text-gold-dark flex items-center justify-center group-hover:scale-110 transition-transform">
+          <div className="card-antique-pink p-8 space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-gold/15 border border-gold/30 text-gold-dark flex items-center justify-center">
               <MapPin className="w-7 h-7" />
             </div>
             <h3 className="text-xl font-bold text-tichi-text">Live Journey Companion</h3>
-            <p className="text-xs text-tichi-muted leading-relaxed font-medium">
+            <p className="text-xs text-tichi-muted leading-relaxed font-semibold">
               Share a protected journey link with family before taking a cab or walking alone at night. Auto-alerts triggers if you fail to reach safely.
             </p>
           </div>
 
           {/* Card 3 */}
-          <div className="glass-card rounded-3xl p-8 border border-blush-border space-y-4 hover:border-rose transition-all group hover:shadow-card-hover">
-            <div className="w-14 h-14 rounded-2xl bg-rose/10 border border-rose/30 text-rose flex items-center justify-center group-hover:scale-110 transition-transform">
+          <div className="card-antique-pink p-8 space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-rose/15 border border-rose/30 text-rose flex items-center justify-center">
               <BellRing className="w-7 h-7" />
             </div>
             <h3 className="text-xl font-bold text-tichi-text">Loud Panic Alarm & Fake Call</h3>
-            <p className="text-xs text-tichi-muted leading-relaxed font-medium">
+            <p className="text-xs text-tichi-muted leading-relaxed font-semibold">
               Deter harassers with a high-decibel piercing alarm siren or escape uncomfortable situations using realistic automated fake incoming calls.
             </p>
           </div>
@@ -183,13 +182,13 @@ export const LandingPage = () => {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-blush-border bg-white py-12">
+      <footer className="border-t border-[#FFCCE1] bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
           <div className="flex items-center justify-center space-x-2">
             <Shield className="w-6 h-6 text-rose" />
             <span className="font-black text-lg text-tichi-text">Sakhi Suraksha SOS</span>
           </div>
-          <p className="text-xs text-tichi-muted font-semibold">
+          <p className="text-xs text-tichi-muted font-bold">
             © 2026 Sakhi Suraksha SOS Network. Built with care for Women & Girls everywhere.
           </p>
         </div>

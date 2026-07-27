@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 /* =====================================================
-   SAKHI SURAKSHA SOS – PORCELAIN BLUSH & RICH BABY PINK SYSTEM
+   SAKHI SURAKSHA SOS – ANTIQUE-MODERN BABY PINK DESIGN SYSTEM
    ===================================================== */
 
 @layer base {
@@ -32,7 +32,7 @@
   *:focus-visible {
     outline: 2px solid #FF5C8A;
     outline-offset: 3px;
-    border-radius: 8px;
+    border-radius: 10px;
   }
 
   ::selection {
@@ -47,65 +47,112 @@
 }
 
 /* =====================================================
-   PORCELAIN BLUSH LIGHT MODE MESH & GLOW EFFECTS
+   BEST-OF-BEST ANTIQUE-MODERN BABY PINK COMPONENTS
    ===================================================== */
+
+/* 1. MODERN ANTIQUE BABY PINK BUTTONS */
+.btn-baby-pink {
+  background: linear-gradient(135deg, #FF5C8A 0%, #FF8FAB 50%, #FF3B70 100%);
+  background-size: 200% auto;
+  color: #FFFFFF;
+  font-weight: 900;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px -5px rgba(255, 92, 138, 0.40);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-baby-pink:hover {
+  background-position: right center;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 32px -4px rgba(255, 92, 138, 0.55);
+}
+.btn-baby-pink:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-baby-pink-outline {
+  background: #FFFFFF;
+  color: #2A0826;
+  font-weight: 800;
+  border: 1.5px solid #FFCCE1;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px -3px rgba(42, 8, 38, 0.05);
+  transition: all 0.3s ease;
+}
+.btn-baby-pink-outline:hover {
+  border-color: #FF5C8A;
+  color: #FF5C8A;
+  background: #FFF8FA;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px -4px rgba(255, 92, 138, 0.18);
+}
+
+/* 2. ANTIQUE-MODERN PORCELAIN CARDS */
+.card-antique-pink {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid #FFCCE1;
+  border-radius: 28px;
+  box-shadow: 0 10px 35px -10px rgba(255, 92, 138, 0.10), 0 2px 8px -2px rgba(42, 8, 38, 0.04);
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.card-antique-pink:hover {
+  border-color: #FF8FAB;
+  transform: translateY(-4px);
+  box-shadow: 0 20px 45px -10px rgba(255, 92, 138, 0.20), 0 4px 12px -2px rgba(42, 8, 38, 0.06);
+}
+
+/* 3. SLEEK ANTIQUE INPUT FIELDS */
+.input-antique-pink {
+  background: #FFFFFF;
+  border: 1.5px solid #FFCCE1;
+  border-radius: 14px;
+  color: #2A0826;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+.input-antique-pink:focus {
+  outline: none;
+  border-color: #FF5C8A;
+  background: #FFF8FA;
+  box-shadow: 0 0 0 4px rgba(255, 92, 138, 0.15);
+}
+
+/* 4. SHIMMER & GRADIENT TEXT UTILITIES */
+.text-baby-pink-gradient {
+  background: linear-gradient(135deg, #FF3B70 0%, #FF5C8A 50%, #FF8FAB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #E6A100 0%, #C48800 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Background mesh */
 .auth-mesh-bg {
   background: radial-gradient(circle at 15% 15%, #FFF0F3 0%, #FFE4EC 50%, #FFCCE1 100%);
   position: relative;
   overflow: hidden;
 }
 
-.auth-mesh-glow-1 {
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(255, 92, 138, 0.20) 0%, rgba(255, 92, 138, 0) 70%);
-  top: -150px;
-  left: -100px;
-  animation: floatSlow 8s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
-.auth-mesh-glow-2 {
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(255, 179, 198, 0.25) 0%, rgba(255, 179, 198, 0) 70%);
-  bottom: -200px;
-  right: -150px;
-  animation: floatSlow 10s ease-in-out infinite alternate-reverse;
-  pointer-events: none;
-}
-
-/* Glassmorphism Light Cards */
 .glass-card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid #FFCCE1;
-  box-shadow: 0 4px 20px -2px rgba(42, 8, 38, 0.06);
+  box-shadow: 0 6px 25px -4px rgba(42, 8, 38, 0.06);
 }
 
 .glass-card-dark {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid #FFB3C6;
-  box-shadow: 0 8px 30px -4px rgba(255, 92, 138, 0.15);
-}
-
-/* Gold Gradient Text */
-.gold-gradient-text {
-  background: linear-gradient(135deg, #E6A100 0%, #C48800 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Rich Baby Pink Gradient Text */
-.coral-gradient-text {
-  background: linear-gradient(135deg, #FF5C8A 0%, #FF8FAB 50%, #FF2A6D 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  box-shadow: 0 10px 35px -5px rgba(255, 92, 138, 0.15);
 }
 
 /* Safe Area & Custom Scrollbar */
@@ -118,25 +165,25 @@
 }
 
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: #FFF0F3;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 92, 138, 0.3);
+  background: rgba(255, 92, 138, 0.35);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 92, 138, 0.7);
+  background: rgba(255, 92, 138, 0.75);
 }
 
 /* Leaflet Container Overrides */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  border-radius: 16px;
+  border-radius: 20px;
   z-index: 10;
   font-family: 'Manrope', sans-serif;
 }
