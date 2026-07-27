@@ -7,7 +7,7 @@ import { AuthRequest } from '../middleware/auth';
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { fullName, email, phone, password } = req.body;
+    const { fullName, email, phone, password, role } = req.body;
 
     if (!fullName || !email || !phone || !password) {
       return res.status(400).json({ error: 'All fields are required' });
@@ -19,6 +19,7 @@ export const register = async (req: Request, res: Response) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
+    const assignedRole = role === 'SUPER_ADMIN' ? 'SUPER_ADMIN' : 'USER';
 
     const user = await prisma.user.create({
       data: {
@@ -26,11 +27,12 @@ export const register = async (req: Request, res: Response) => {
         email,
         phone,
         passwordHash,
+        role: assignedRole,
       },
     });
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, fullName: user.fullName },
+      { id: user.id, email: user.email, fullName: user.fullName, role: user.role },
       config.jwtSecret,
       { expiresIn: '7d' }
     );
@@ -43,6 +45,7 @@ export const register = async (req: Request, res: Response) => {
         fullName: user.fullName,
         email: user.email,
         phone: user.phone,
+        role: user.role,
         safetyStatus: user.safetyStatus,
         quickSosMode: user.quickSosMode,
         onboardingStep: user.onboardingStep,
@@ -73,7 +76,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, fullName: user.fullName },
+      { id: user.id, email: user.email, fullName: user.fullName, role: user.role },
       config.jwtSecret,
       { expiresIn: '7d' }
     );
@@ -86,6 +89,7 @@ export const login = async (req: Request, res: Response) => {
         fullName: user.fullName,
         email: user.email,
         phone: user.phone,
+        role: user.role,
         safetyStatus: user.safetyStatus,
         quickSosMode: user.quickSosMode,
         onboardingStep: user.onboardingStep,
@@ -116,6 +120,7 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
         fullName: user.fullName,
         email: user.email,
         phone: user.phone,
+        role: user.role,
         safetyStatus: user.safetyStatus,
         quickSosMode: user.quickSosMode,
         onboardingStep: user.onboardingStep,
@@ -146,6 +151,7 @@ export const updateSettings = async (req: AuthRequest, res: Response) => {
         fullName: updated.fullName,
         email: updated.email,
         phone: updated.phone,
+        role: updated.role,
         safetyStatus: updated.safetyStatus,
         quickSosMode: updated.quickSosMode,
         onboardingStep: updated.onboardingStep,

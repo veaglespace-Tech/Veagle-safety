@@ -1,13 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================
-   TICHI SURAKSHA – GLOBAL DESIGN SYSTEM
+   TICHI SURAKSHA – ANTIQUE-MODERN CYBER-SHIELD SYSTEM
    ===================================================== */
-
-/* Import Premium Typography */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap');
 
 @layer base {
   * {
@@ -22,25 +21,23 @@
 
   body {
     font-family: 'Manrope', 'Inter', system-ui, sans-serif;
-    background-color: #FFF8FB;
-    color: #241A20;
+    background-color: #FAF6FD;
+    color: #1E122B;
     line-height: 1.5;
     user-select: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Accessible focus ring - visible but elegant */
   *:focus-visible {
-    outline: 2px solid #6D214F;
+    outline: 2px solid #FF3B70;
     outline-offset: 3px;
     border-radius: 8px;
   }
 
-  /* Selection highlight */
   ::selection {
-    background: #E8A0BF;
-    color: #6D214F;
+    background: #FF3B70;
+    color: #FFFFFF;
   }
 
   input, textarea, select {
@@ -50,8 +47,66 @@
 }
 
 /* =====================================================
-   SAFE AREA UTILITIES (Mobile notch / home indicator)
+   ANIMATED AUTH BACKGROUND MESH & GLOW EFFECTS
    ===================================================== */
+.auth-mesh-bg {
+  background: radial-gradient(circle at 15% 15%, #26123D 0%, #170A28 50%, #0C0418 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-mesh-glow-1 {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 59, 112, 0.25) 0%, rgba(255, 59, 112, 0) 70%);
+  top: -150px;
+  left: -100px;
+  animation: floatSlow 8s ease-in-out infinite alternate;
+  pointer-events-none: none;
+}
+
+.auth-mesh-glow-2 {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 209, 102, 0.20) 0%, rgba(255, 209, 102, 0) 70%);
+  bottom: -200px;
+  right: -150px;
+  animation: floatSlow 10s ease-in-out infinite alternate-reverse;
+  pointer-events-none: none;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(234, 218, 250, 0.8);
+}
+
+.glass-card-dark {
+  background: rgba(38, 18, 61, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 209, 102, 0.25);
+}
+
+/* Gold Gradient Text */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FFD166 0%, #F7B801 50%, #FFA800 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Coral Pink Gradient Text */
+.coral-gradient-text {
+  background: linear-gradient(135deg, #FF3B70 0%, #FF6B95 50%, #FF8DAF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Safe Area & Custom Scrollbar */
 .safe-pb {
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
@@ -60,200 +115,26 @@
   padding-top: max(0.75rem, env(safe-area-inset-top));
 }
 
-/* =====================================================
-   SCROLLBAR CUSTOMIZATION (Premium subtle)
-   ===================================================== */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #FFF8FB;
+  background: #FAF6FD;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(109, 33, 79, 0.2);
+  background: rgba(38, 18, 61, 0.25);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(109, 33, 79, 0.5);
+  background: rgba(255, 59, 112, 0.6);
 }
 
-/* =====================================================
-   LEAFLET MAP OVERRIDES
-   ===================================================== */
+/* Leaflet Container Overrides */
 .leaflet-container {
   width: 100%;
   height: 100%;
   border-radius: 16px;
   z-index: 10;
   font-family: 'Manrope', sans-serif;
-}
-
-.leaflet-popup-content-wrapper {
-  border-radius: 12px !important;
-  box-shadow: 0 4px 20px -2px rgba(109, 33, 79, 0.12) !important;
-  font-family: 'Manrope', sans-serif !important;
-  font-size: 12px !important;
-  font-weight: 600;
-  color: #241A20 !important;
-  border: 1px solid #F3E5ED !important;
-}
-
-.leaflet-popup-tip {
-  background: #ffffff !important;
-}
-
-/* =====================================================
-   PREMIUM ANIMATIONS
-   ===================================================== */
-
-/* SOS Radar pulse - 3-ring breathing effect */
-@keyframes sos-radar {
-  0% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1.8);
-    opacity: 0;
-  }
-}
-
-.sos-radar-ring {
-  animation: sos-radar 2.5s ease-out infinite;
-}
-
-.sos-radar-ring-delayed {
-  animation: sos-radar 2.5s ease-out 0.8s infinite;
-}
-
-/* GPS Location marker pulse */
-@keyframes gps-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(109, 33, 79, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(109, 33, 79, 0);
-  }
-}
-
-.gps-pulse {
-  animation: gps-pulse 2s ease infinite;
-}
-
-/* Smooth page entrance */
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-up {
-  animation: fade-up 0.35s ease-out forwards;
-}
-
-/* Card entry stagger */
-.fade-up-1 { animation: fade-up 0.3s ease-out 0.05s both; }
-.fade-up-2 { animation: fade-up 0.3s ease-out 0.1s both; }
-.fade-up-3 { animation: fade-up 0.3s ease-out 0.15s both; }
-.fade-up-4 { animation: fade-up 0.3s ease-out 0.2s both; }
-
-/* =====================================================
-   CUSTOM COMPONENT UTILITIES
-   ===================================================== */
-
-/* Bottom navigation active indicator dot */
-.nav-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #6D214F;
-  margin: 2px auto 0;
-}
-
-/* Prevent iOS rubber band scroll on modals */
-.modal-open {
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-}
-
-/* Map loading skeleton */
-.map-skeleton {
-  background: linear-gradient(90deg, #FBF4F7 25%, #F5E6ED 50%, #FBF4F7 75%);
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s ease infinite;
-}
-
-@keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Touch feedback optimization */
-.touch-action-none {
-  touch-action: none;
-}
-
-/* Prevent text selection during SOS hold */
-.sos-hold-zone {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  touch-action: none;
-}
-
-/* Emergency critical state background */
-.emergency-bg {
-  background: linear-gradient(135deg, #D92D20 0%, #B91C1C 100%);
-}
-
-/* =====================================================
-   REDUCED MOTION SUPPORT (Accessibility)
-   ===================================================== */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* =====================================================
-   RESPONSIVE DESKTOP SIDEBAR LAYOUT
-   ===================================================== */
-@media (min-width: 1024px) {
-  .desktop-layout {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    min-height: 100vh;
-  }
-
-  .desktop-sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 260px;
-    background: #FFFFFF;
-    border-right: 1px solid #F3E5ED;
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem 1rem;
-    z-index: 50;
-    overflow-y: auto;
-  }
-
-  .desktop-content {
-    margin-left: 260px;
-    padding: 1.5rem;
-    max-width: calc(100% - 260px);
-  }
 }

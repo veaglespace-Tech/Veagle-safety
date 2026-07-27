@@ -9,8 +9,8 @@ import {
   User,
   Bell,
   HelpCircle,
-  Settings,
   LogOut,
+  Crown,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useSOSStore } from '../../store/useSOSStore';
@@ -22,6 +22,8 @@ export const DesktopSidebar: React.FC = () => {
   const { status } = useLocationStore();
   const navigate = useNavigate();
 
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+
   const navItems = [
     { path: '/', label: 'Home', icon: Home, desc: 'Safety Dashboard' },
     { path: '/track', label: 'Track Journey', icon: MapPin, desc: 'Journey & Check-ins' },
@@ -30,6 +32,10 @@ export const DesktopSidebar: React.FC = () => {
     { path: '/alarm', label: 'Loud Alarm', icon: Bell, desc: 'Emergency Siren' },
     { path: '/profile', label: 'Profile', icon: User, desc: 'Settings & Diagnostics' },
   ];
+
+  if (isSuperAdmin) {
+    navItems.unshift({ path: '/admin', label: 'Super Admin HQ', icon: Crown, desc: 'Incident Command' });
+  }
 
   return (
     <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 flex-col bg-white border-r border-blush-border z-50 overflow-y-auto">
@@ -56,7 +62,14 @@ export const DesktopSidebar: React.FC = () => {
             {user?.fullName?.charAt(0) || 'P'}
           </div>
           <div className="min-w-0">
-            <p className="font-bold text-xs text-tichi-text truncate">{user?.fullName || 'Priya Sharma'}</p>
+            <div className="flex items-center space-x-1.5">
+              <p className="font-bold text-xs text-tichi-text truncate">{user?.fullName || 'Priya Sharma'}</p>
+              {isSuperAdmin && (
+                <span className="bg-gold text-plum font-black text-[9px] px-1.5 py-0.5 rounded-md uppercase">
+                  ADMIN
+                </span>
+              )}
+            </div>
             <p className="text-[10px] text-tichi-muted truncate">{user?.email}</p>
           </div>
         </div>
@@ -74,6 +87,7 @@ export const DesktopSidebar: React.FC = () => {
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
+          const isAdminTab = item.path === '/admin';
           return (
             <NavLink
               key={item.path}
@@ -82,17 +96,21 @@ export const DesktopSidebar: React.FC = () => {
               className={({ isActive }) =>
                 `flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold transition-all group ${
                   isActive
-                    ? 'bg-plum text-white shadow-sm'
+                    ? isAdminTab
+                      ? 'bg-gold text-plum font-black shadow-gold-glow'
+                      : 'bg-plum text-white shadow-sm'
+                    : isAdminTab
+                    ? 'bg-gold/10 text-gold-dark font-bold hover:bg-gold/20'
                     : 'text-tichi-muted hover:bg-plum-50 hover:text-plum'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-rose' : ''}`} />
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? (isAdminTab ? 'text-plum' : 'text-rose') : ''}`} />
                   <div>
-                    <p className={`font-bold ${isActive ? 'text-white' : ''}`}>{item.label}</p>
-                    <p className={`text-[10px] font-medium ${isActive ? 'text-rose/80' : 'text-tichi-muted'}`}>{item.desc}</p>
+                    <p className={`font-bold ${isActive ? (isAdminTab ? 'text-plum' : 'text-white') : ''}`}>{item.label}</p>
+                    <p className={`text-[10px] font-medium ${isActive ? (isAdminTab ? 'text-plum/80' : 'text-rose/80') : 'text-tichi-muted'}`}>{item.desc}</p>
                   </div>
                 </>
               )}

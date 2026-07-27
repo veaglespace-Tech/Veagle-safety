@@ -5,7 +5,7 @@ import * as sosController from '../controllers/sosController';
 import * as journeyController from '../controllers/journeyController';
 import * as checkinController from '../controllers/checkinController';
 import * as adminController from '../controllers/adminController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, requireSuperAdmin } from '../middleware/auth';
 
 const router = Router();
 
@@ -37,7 +37,10 @@ router.post('/checkin/start', authenticateToken, checkinController.startCheckin)
 router.post('/checkin/safe', authenticateToken, checkinController.confirmCheckinSafe);
 router.get('/checkin/active', authenticateToken, checkinController.getActiveCheckin);
 
-// Admin Operations Portal
-router.get('/admin/overview', adminController.getAdminOverview);
+// Super Admin Operations Command Portal
+router.get('/admin/overview', authenticateToken, requireSuperAdmin, adminController.getAdminOverview);
+router.get('/admin/users', authenticateToken, requireSuperAdmin, adminController.getAllUsers);
+router.put('/admin/user/role', authenticateToken, requireSuperAdmin, adminController.updateUserRole);
+router.post('/admin/sos/resolve', authenticateToken, requireSuperAdmin, adminController.adminResolveSos);
 
 export default router;

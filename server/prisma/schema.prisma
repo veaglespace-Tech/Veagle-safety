@@ -13,6 +13,7 @@ model User {
   email             String            @unique
   phone             String
   passwordHash      String
+  role              String            @default("USER") // USER, SUPER_ADMIN
   safetyStatus      String            @default("SAFE") // SAFE, SOS_ACTIVE, JOURNEY_ACTIVE
   quickSosMode      String            @default("STANDARD") // STANDARD, SILENT
   onboardingStep    Int               @default(1)

@@ -6,6 +6,7 @@ export interface User {
   fullName: string;
   email: string;
   phone: string;
+  role: 'USER' | 'SUPER_ADMIN';
   safetyStatus: 'SAFE' | 'SOS_ACTIVE' | 'JOURNEY_ACTIVE';
   quickSosMode: 'STANDARD' | 'SILENT';
   onboardingStep: number;
@@ -17,7 +18,7 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   login: (email: string, pass: string) => Promise<boolean>;
-  register: (fullName: string, email: string, phone: string, pass: string) => Promise<boolean>;
+  register: (fullName: string, email: string, phone: string, pass: string, role?: 'USER' | 'SUPER_ADMIN') => Promise<boolean>;
   logout: () => void;
   fetchUser: () => Promise<void>;
   updateUserStatus: (status: 'SAFE' | 'SOS_ACTIVE' | 'JOURNEY_ACTIVE') => void;
@@ -46,10 +47,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  register: async (fullName, email, phone, password) => {
+  register: async (fullName, email, phone, password, role = 'USER') => {
     set({ isLoading: true, error: null });
     try {
-      const res = await api.post('/auth/register', { fullName, email, phone, password });
+      const res = await api.post('/auth/register', { fullName, email, phone, password, role });
       const { token, user } = res.data;
       localStorage.setItem('tichi_token', token);
       set({ token, user, isLoading: false });

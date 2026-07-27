@@ -52,19 +52,39 @@ io.on('connection', (socket) => {
   });
 });
 
-// Seeding default demo data if database is empty
+// Seeding default demo data if database is empty or missing admin
 async function seedDefaultData() {
   try {
-    const userCount = await prisma.user.count();
+    const adminExists = await prisma.user.findFirst({ where: { role: 'SUPER_ADMIN' } });
+    if (!adminExists) {
+      console.log('[Seed] Seeding Super Admin account...');
+      const adminPassHash = await bcrypt.hash('Admin123!', 10);
+      await prisma.user.upsert({
+        where: { email: 'admin@tichisuraksha.org' },
+        update: { role: 'SUPER_ADMIN' },
+        create: {
+          fullName: 'Super Admin HQ',
+          email: 'admin@tichisuraksha.org',
+          phone: '+91 99000 00000',
+          passwordHash: adminPassHash,
+          role: 'SUPER_ADMIN',
+          onboardingStep: 7,
+        },
+      });
+      console.log('[Seed] Super Admin created: admin@tichisuraksha.org / Admin123!');
+    }
+
+    const userCount = await prisma.user.count({ where: { role: 'USER' } });
     if (userCount === 0) {
       console.log('[Seed] Seeding initial demo account Priya Sharma...');
       const passwordHash = await bcrypt.hash('Priya123!', 10);
-      const demoUser = await prisma.user.create({
+      await prisma.user.create({
         data: {
           fullName: 'Priya Sharma',
           email: 'priya@tichisuraksha.org',
           phone: '+91 98765 43210',
           passwordHash,
+          role: 'USER',
           onboardingStep: 7,
           trustedContacts: {
             create: [
@@ -75,7 +95,7 @@ async function seedDefaultData() {
           },
         },
       });
-      console.log(`[Seed] Demo account created: priya@tichisuraksha.org / Priya123!`);
+      console.log('[Seed] Demo account created: priya@tichisuraksha.org / Priya123!');
     }
   } catch (err) {
     console.error('[Seed Error]:', err);

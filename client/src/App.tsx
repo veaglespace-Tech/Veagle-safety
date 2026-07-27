@@ -17,12 +17,26 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   const { token, isLoading } = useAuthStore();
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-blush flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-plum border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-plum-dark flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-rose border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
   return token ? <>{children}</> : <Navigate to="/auth" replace />;
+};
+
+const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { token, user, isLoading } = useAuthStore();
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-plum-dark flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  if (!token) return <Navigate to="/auth" replace />;
+  if (user?.role !== 'SUPER_ADMIN') return <Navigate to="/" replace />;
+  return <>{children}</>;
 };
 
 export const App: React.FC = () => {
@@ -111,7 +125,15 @@ export const App: React.FC = () => {
           }
         />
 
-        <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

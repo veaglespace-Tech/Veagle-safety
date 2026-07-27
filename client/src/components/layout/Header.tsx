@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Bell, User as UserIcon } from 'lucide-react';
+import { Shield, Bell, Crown } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useLocationStore } from '../../store/useLocationStore';
 import { useSOSStore } from '../../store/useSOSStore';
@@ -14,8 +14,9 @@ export const Header: React.FC = () => {
     ? user.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'PS';
 
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+
   return (
-    // Hidden on desktop — sidebar handles navigation there
     <header className="lg:hidden bg-white border-b border-blush-border px-4 py-3 sticky top-0 z-30 safe-pt">
       <div className="max-w-xl mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2.5 group">
@@ -23,7 +24,12 @@ export const Header: React.FC = () => {
             <Shield className="w-5 h-5 text-rose fill-rose/20" />
           </div>
           <div>
-            <span className="font-extrabold text-base text-plum tracking-tight leading-none block">Tichi Suraksha</span>
+            <div className="flex items-center space-x-1">
+              <span className="font-extrabold text-base text-plum tracking-tight leading-none block">Tichi Suraksha</span>
+              {isSuperAdmin && (
+                <span className="bg-gold text-plum font-black text-[9px] px-1 rounded-sm uppercase">ADMIN</span>
+              )}
+            </div>
             <div className="flex items-center space-x-1.5 mt-0.5">
               <span className={`w-1.5 h-1.5 rounded-full ${status === 'LIVE' ? 'bg-tichi-success animate-pulse' : 'bg-amber-500'}`}></span>
               <span className="text-[11px] text-tichi-muted font-semibold">{status === 'LIVE' ? 'Protected' : 'GPS Updating'}</span>
@@ -32,6 +38,17 @@ export const Header: React.FC = () => {
         </Link>
 
         <div className="flex items-center space-x-1.5">
+          {/* Super Admin Quick HQ Button */}
+          {isSuperAdmin && (
+            <Link
+              to="/admin"
+              className="bg-gold text-plum text-[10px] font-black px-2.5 py-1.5 rounded-xl shadow-gold-glow flex items-center space-x-1"
+            >
+              <Crown className="w-3 h-3" />
+              <span>HQ</span>
+            </Link>
+          )}
+
           {/* Active SOS indicator */}
           {activeSession && (
             <Link

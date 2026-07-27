@@ -7,6 +7,7 @@ export interface AuthRequest extends Request {
     id: string;
     email: string;
     fullName: string;
+    role: string;
   };
 }
 
@@ -19,10 +20,17 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   }
 
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as { id: string; email: string; fullName: string };
+    const decoded = jwt.verify(token, config.jwtSecret) as { id: string; email: string; fullName: string; role: string };
     req.user = decoded;
     next();
   } catch (err) {
     return res.status(403).json({ error: 'Invalid or expired session token' });
   }
+};
+
+export const requireSuperAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user || req.user.role !== 'SUPER_ADMIN') {
+    return res.status(403).json({ error: 'Access denied. Super Admin privileges required.' });
+  }
+  next();
 };
