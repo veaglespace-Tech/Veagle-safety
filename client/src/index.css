@@ -50,6 +50,13 @@
    BEST-OF-BEST ANTIQUE-MODERN BABY PINK COMPONENTS
    ===================================================== */
 
+/* VIBRANT DYNAMIC EMERGENCY SOS BUTTON GRADIENT */
+.sos-btn-gradient {
+  background: linear-gradient(135deg, #FF2A6D 0%, #FF5C8A 50%, #D91B55 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 35px 8px rgba(255, 42, 109, 0.40), 0 4px 20px -2px rgba(255, 42, 109, 0.50);
+}
+
 /* 1. MODERN ANTIQUE BABY PINK BUTTONS */
 .btn-baby-pink {
   background: linear-gradient(135deg, #FF5C8A 0%, #FF8FAB 50%, #FF3B70 100%);

@@ -69,13 +69,13 @@ export const LandingPage = () => {
               {/* Left Column: Interactive SOS Button Preview */}
               <div className="flex flex-col items-center space-y-3">
                 <div className="relative w-36 h-36 flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-full border-2 border-emergency animate-ping" />
-                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-emergency via-rose to-emergency-dark border-4 border-white text-white flex flex-col items-center justify-center shadow-sos-glow">
-                    <Radio className="w-9 h-9 animate-pulse" />
-                    <span className="text-[11px] font-black uppercase mt-1 tracking-wider">PRESS SOS</span>
+                  <div className="absolute inset-0 rounded-full border-2 border-[#FF2A6D] animate-ping" />
+                  <div className="w-28 h-28 rounded-full sos-btn-gradient border-4 border-white flex flex-col items-center justify-center">
+                    <Radio className="w-9 h-9 text-white animate-pulse" />
+                    <span className="text-[11px] font-black text-white uppercase mt-1 tracking-wider">PRESS SOS</span>
                   </div>
                 </div>
-                <span className="text-xs font-black text-emergency uppercase tracking-wider">3-Sec Hold Trigger</span>
+                <span className="text-xs font-black text-rose uppercase tracking-wider">3-Sec Hold Trigger</span>
               </div>
 
               {/* Right Column: Live Status Highlights */}
