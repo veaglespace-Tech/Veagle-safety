@@ -1,248 +1,453 @@
-import React, { useState } from 'react';
-import { useAuthStore } from '../store/useAuthStore.js';
-import { useNavigate, Link } from 'react-router-dom';
-import { Shield, Eye, EyeOff, Lock, Mail, Phone, User as UserIcon, ArrowRight, ShieldCheck, Crown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { PublicNavbar } from '../components/layout/PublicNavbar.jsx';
+import {
+  registerUser,
+  loginUser,
+  verifyEmailOtp,
+  resendOtpCode,
+  clearAuthMessages,
+  setShowOtpModal,
+} from '../store/slices/authSlice.js';
+import {
+  Shield,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  Phone,
+  User as UserIcon,
+  MapPin,
+  Heart,
+  Image as ImageIcon,
+  ArrowRight,
+  ShieldCheck,
+  Crown,
+  KeyRound,
+  CheckCircle2,
+} from 'lucide-react';
 
 export const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get('mode') === 'register' ? false : true;
+  const [isLogin, setIsLogin] = useState(initialMode);
+
+  // Registration 10 Fields State
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [profilePhoto, setProfilePhoto] = useState('https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png');
+  const [bloodGroup, setBloodGroup] = useState('O+');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [country, setCountry] = useState('India');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
-  const [inputFocused, setInputFocused] = useState('NONE');
 
-  const { login, register, isLoading, error } = useAuthStore();
+  // OTP State
+  const [otpCode, setOtpCode] = useState('');
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { token, user, isLoading, error, successMessage, showOtpModal, pendingVerificationEmail } = useSelector(
+    (state) => state.auth
+  );
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    let success = false;
-    if (isLogin) {
-      success = await login(email, password);
-    } else {
-      success = await register(fullName, email, phone, password, 'USER');
-    }
-    if (success) {
-      const currentUser = useAuthStore.getState().user;
-      if (currentUser?.role === 'SUPER_ADMIN') {
+  useEffect(() => {
+    if (token && user) {
+      if (user.role === 'SUPER_ADMIN') {
         navigate('/admin');
+      } else if (user.subscriptionStatus !== 'ACTIVE') {
+        navigate('/pricing');
       } else {
         navigate('/');
       }
     }
+  }, [token, user, navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    dispatch(clearAuthMessages());
+
+    if (isLogin) {
+      dispatch(loginUser({ email, password }));
+    } else {
+      dispatch(
+        registerUser({
+          fullName,
+          email,
+          phone,
+          profilePhoto,
+          bloodGroup,
+          address,
+          city,
+          state,
+          country,
+          password,
+          role: 'USER',
+        })
+      );
+    }
+  };
+
+  const handleVerifyOtp = (e) => {
+    e.preventDefault();
+    dispatch(verifyEmailOtp({ email: pendingVerificationEmail || email, otp: otpCode }));
+  };
+
+  const handleResendOtp = () => {
+    dispatch(resendOtpCode(pendingVerificationEmail || email));
   };
 
   return (
-    <div className="min-h-screen auth-mesh-bg flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Animated Glow Meshes */}
-      <div className="auth-mesh-glow-1" />
-      <div className="auth-mesh-glow-2" />
+    <div className="min-h-screen bg-plum-dark text-white font-sans relative overflow-hidden">
+      <PublicNavbar />
 
-      <div className="w-full max-w-md relative z-10 space-y-5 animate-fade-up">
+      <div className="max-w-4xl mx-auto px-4 py-12 relative z-10 space-y-6">
 
-        {/* TOP BRANDING & INTERACTIVE SAFETY SHIELD MASCOT */}
-        <div className="text-center space-y-3">
-          {/* ANIMATED INTERACTIVE MASCOT SHIELD */}
-          <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
-            {/* Outer radar pulse rings */}
-            <div className={`absolute inset-0 rounded-full border-2 border-rose/30 ${isLoading ? 'animate-ping' : 'animate-pulse'}`} />
-            <div className="absolute -inset-3 rounded-full border border-gold/20 animate-spin-slow" style={{ animationDuration: '15s' }} />
-
-            {/* Glowing Shield Base */}
-            <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-plum to-plum-dark border-2 transition-all duration-300 shadow-coral-glow flex flex-col items-center justify-center relative ${
-              inputFocused === 'PASS'
-                ? 'border-gold scale-95 shadow-gold-glow'
-                : inputFocused === 'EMAIL' || inputFocused === 'NAME'
-                ? 'border-rose scale-105'
-                : 'border-rose/50'
-            }`}>
-              <Shield className={`w-9 h-9 transition-all duration-300 ${
-                inputFocused === 'PASS' ? 'text-gold fill-gold/20' : 'text-rose fill-rose/20 animate-pulse'
-              }`} />
-
-              {/* Eye/Visor Micro Animations inside Shield */}
-              <div className="flex items-center space-x-2 mt-1">
-                {inputFocused === 'PASS' && !showPass ? (
-                  <div className="text-[10px] font-bold text-gold tracking-widest animate-pulse">🔒 LOCKED</div>
-                ) : (
-                  <div className="flex space-x-1.5 items-center">
-                    <span className={`w-1.5 h-1.5 rounded-full ${inputFocused === 'EMAIL' ? 'bg-gold translate-x-0.5' : 'bg-white'} transition-transform`} />
-                    <span className={`w-1.5 h-1.5 rounded-full ${inputFocused === 'EMAIL' ? 'bg-gold translate-x-0.5' : 'bg-white'} transition-transform`} />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-center space-x-2">
-              <h1 className="font-black text-2xl tracking-tight text-white">Tichi Suraksha</h1>
-              <span className="bg-rose/20 text-rose border border-rose/40 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">v2.0</span>
-            </div>
-            <p className="text-xs text-rose-muted font-medium mt-0.5">
-              Personal Safety & Emergency Companion
-            </p>
-          </div>
+        {/* TOP BRANDING */}
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
+            {isLogin ? 'Welcome Back to Safety' : 'Create Protected Account'}
+          </h1>
+          <p className="text-rose-muted text-xs sm:text-sm font-medium">
+            {isLogin
+              ? 'Sign in to access your personal emergency companion'
+              : 'Complete your profile details to activate 24/7 protection formalities'}
+          </p>
         </div>
 
-        {/* MAIN AUTH GLASS CARD WITH TAB SLIDER */}
-        <div className="glass-card-dark rounded-3xl p-6 shadow-modal border border-rose/30 space-y-5 relative">
-
+        {/* MAIN CARD */}
+        <div className="glass-card-dark rounded-3xl p-6 sm:p-8 border border-rose/30 shadow-2xl space-y-6 max-w-2xl mx-auto">
+          
           {/* TAB SWITCHER */}
           <div className="flex bg-plum-dark p-1.5 rounded-2xl border border-rose/20 relative">
             <button
               type="button"
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all relative z-10 ${
-                isLogin ? 'text-white shadow-coral-glow' : 'text-tichi-faint hover:text-white'
+              onClick={() => {
+                setIsLogin(true);
+                dispatch(clearAuthMessages());
+              }}
+              className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
+                isLogin ? 'bg-gradient-to-r from-rose to-plum-light text-white shadow-coral-glow' : 'text-rose-muted hover:text-white'
               }`}
             >
-              {isLogin && (
-                <div className="absolute inset-0 bg-gradient-to-r from-rose to-plum-light rounded-xl -z-10 animate-scale-in" />
-              )}
               SIGN IN
             </button>
 
             <button
               type="button"
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all relative z-10 ${
-                !isLogin ? 'text-white shadow-coral-glow' : 'text-tichi-faint hover:text-white'
+              onClick={() => {
+                setIsLogin(false);
+                dispatch(clearAuthMessages());
+              }}
+              className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
+                !isLogin ? 'bg-gradient-to-r from-rose to-plum-light text-white shadow-coral-glow' : 'text-rose-muted hover:text-white'
               }`}
             >
-              {!isLogin && (
-                <div className="absolute inset-0 bg-gradient-to-r from-rose to-plum-light rounded-xl -z-10 animate-scale-in" />
-              )}
-              CREATE ACCOUNT
+              CREATE ACCOUNT (SIGN UP)
             </button>
           </div>
 
           {/* ERROR ALERT */}
           {error && (
-            <div className="bg-emergency-dark/80 border border-emergency text-white text-xs font-bold p-3 rounded-xl flex items-center space-x-2 animate-bounce">
-              <span>⚠️</span>
+            <div className="bg-emergency-dark/90 border border-emergency text-white text-xs font-bold p-3.5 rounded-xl flex items-center space-x-2 animate-bounce">
+              <span>🚨</span>
               <span>{error}</span>
             </div>
           )}
 
-          {/* FORM FIELDS */}
+          {/* SUCCESS ALERT */}
+          {successMessage && (
+            <div className="bg-rose/20 border border-rose text-white text-xs font-bold p-3.5 rounded-xl flex items-center space-x-2">
+              <CheckCircle2 className="w-4 h-4 text-rose shrink-0" />
+              <span>{successMessage}</span>
+            </div>
+          )}
+
+          {/* FORM */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            
+            {!isLogin ? (
+              // 10-FIELD USER REGISTRATION
+              <div className="space-y-4 text-xs">
+                
+                {/* FULL NAME */}
+                <div>
+                  <label className="block text-rose-muted font-bold mb-1">1. Full Name *</label>
+                  <div className="relative">
+                    <UserIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="Priya Sharma"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                    />
+                  </div>
+                </div>
 
-            {/* FULL NAME */}
-            {!isLogin && (
-              <div className="animate-fade-up">
-                <label className="block text-xs font-bold text-white mb-1">Full Name</label>
-                <div className="relative">
-                  <UserIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={fullName}
-                    onFocus={() => setInputFocused('NAME')}
-                    onBlur={() => setInputFocused('NONE')}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 text-xs font-medium text-white placeholder-rose-muted/40 focus:ring-2 focus:ring-rose focus:border-rose focus:outline-none bg-plum-dark/70 transition-all"
-                  />
+                {/* EMAIL & PHONE GRID */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-rose-muted font-bold mb-1">2. Email Address *</label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="email"
+                        required
+                        placeholder="priya@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-rose-muted font-bold mb-1">3. Mobile Phone *</label>
+                    <div className="relative">
+                      <Phone className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="tel"
+                        required
+                        placeholder="+91 98765 43210"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* PROFILE PHOTO URL & BLOOD GROUP GRID */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-rose-muted font-bold mb-1">4. Profile Photo URL *</label>
+                    <div className="relative">
+                      <ImageIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="url"
+                        required
+                        placeholder="https://ik.imagekit.io/avatar.png"
+                        value={profilePhoto}
+                        onChange={(e) => setProfilePhoto(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-rose-muted font-bold mb-1">5. Blood Group *</label>
+                    <div className="relative">
+                      <Heart className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <select
+                        value={bloodGroup}
+                        onChange={(e) => setBloodGroup(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white"
+                      >
+                        <option value="O+">O Positive (O+)</option>
+                        <option value="O-">O Negative (O-)</option>
+                        <option value="A+">A Positive (A+)</option>
+                        <option value="A-">A Negative (A-)</option>
+                        <option value="B+">B Positive (B+)</option>
+                        <option value="B-">B Negative (B-)</option>
+                        <option value="AB+">AB Positive (AB+)</option>
+                        <option value="AB-">AB Negative (AB-)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ADDRESS */}
+                <div>
+                  <label className="block text-rose-muted font-bold mb-1">6. Residential Address *</label>
+                  <div className="relative">
+                    <MapPin className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="Flat No 402, Lotus Heights"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                    />
+                  </div>
+                </div>
+
+                {/* CITY, STATE, COUNTRY GRID */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-rose-muted font-bold mb-1">7. City *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Pune"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full p-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-rose-muted font-bold mb-1">8. State *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Maharashtra"
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      className="w-full p-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-rose-muted font-bold mb-1">9. Country *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="India"
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="w-full p-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                    />
+                  </div>
+                </div>
+
+                {/* PASSWORD */}
+                <div>
+                  <label className="block text-rose-muted font-bold mb-1">10. Account Password *</label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type={showPass ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-10 pr-10 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass(!showPass)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-rose/70 hover:text-gold"
+                    >
+                      {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            ) : (
+              // LOGIN FORM
+              <div className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-rose-muted font-bold mb-1">Email Address</label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      required
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-rose-muted font-bold mb-1">Password</label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type={showPass ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-10 pr-10 py-3.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass(!showPass)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-rose/70 hover:text-gold"
+                    >
+                      {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* EMAIL ADDRESS */}
-            <div>
-              <label className="block text-xs font-bold text-white mb-1">Email Address</label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  placeholder="name@example.com"
-                  value={email}
-                  onFocus={() => setInputFocused('EMAIL')}
-                  onBlur={() => setInputFocused('NONE')}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 text-xs font-medium text-white placeholder-rose-muted/40 focus:ring-2 focus:ring-rose focus:border-rose focus:outline-none bg-plum-dark/70 transition-all"
-                />
-              </div>
-            </div>
-
-            {/* MOBILE NUMBER */}
-            {!isLogin && (
-              <div className="animate-fade-up">
-                <label className="block text-xs font-bold text-white mb-1">Mobile Phone</label>
-                <div className="relative">
-                  <Phone className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="tel"
-                    placeholder="+91 98765 43210"
-                    value={phone}
-                    onFocus={() => setInputFocused('PHONE')}
-                    onBlur={() => setInputFocused('NONE')}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 text-xs font-medium text-white placeholder-rose-muted/40 focus:ring-2 focus:ring-rose focus:border-rose focus:outline-none bg-plum-dark/70 transition-all"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* PASSWORD */}
-            <div>
-              <label className="block text-xs font-bold text-white mb-1">Password</label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type={showPass ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={password}
-                  onFocus={() => setInputFocused('PASS')}
-                  onBlur={() => setInputFocused('NONE')}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-rose/30 text-xs font-medium text-white placeholder-rose-muted/40 focus:ring-2 focus:ring-gold focus:border-gold focus:outline-none bg-plum-dark/70 transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-rose/70 hover:text-gold transition-colors"
-                >
-                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* SUBMIT BUTTON WITH NEON GLOW */}
+            {/* SUBMIT BUTTON */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-rose to-plum-light text-white font-extrabold py-3.5 rounded-xl text-xs shadow-coral-glow hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center space-x-2 disabled:opacity-60 mt-2"
+              className="w-full bg-gradient-to-r from-rose via-plum-light to-rose text-white font-black py-4 rounded-xl text-xs uppercase tracking-wider shadow-coral-glow hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-2"
             >
-              <span>{isLoading ? 'VERIFYING SECURITY...' : isLogin ? 'SIGN IN TO DASHBOARD' : 'CREATE PROTECTED ACCOUNT'}</span>
+              <span>{isLoading ? 'PROCESSING FORMALITIES...' : isLogin ? 'SIGN IN' : 'REGISTER & PROCEED TO PLAN FORMALITIES'}</span>
               {!isLoading && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
-        </div>
 
-        {/* FOOTER & DEDICATED SUPER ADMIN PORTAL LINK */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center space-x-1.5 bg-plum-dark/60 border border-rose/20 px-3 py-1 rounded-full text-[10px] text-rose-muted font-bold">
-            <ShieldCheck className="w-3.5 h-3.5 text-rose" />
-            <span>256-Bit Encrypted Safety Network • Strict Privacy</span>
-          </div>
-
-          <div>
-            <Link
-              to="/admin/login"
-              className="inline-flex items-center space-x-1 text-[11px] text-gold/80 hover:text-gold font-bold transition-colors"
-            >
-              <Crown className="w-3 h-3 text-gold" />
-              <span>Company Super Admin Portal →</span>
-            </Link>
-          </div>
         </div>
 
       </div>
+
+      {/* STEP 2: EMAIL OTP VERIFICATION MODAL */}
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="glass-card-dark rounded-3xl p-6 sm:p-8 max-w-md w-full border border-rose/40 space-y-5 text-center shadow-2xl relative">
+            
+            <div className="w-16 h-16 rounded-2xl bg-rose/20 border border-rose/40 text-rose flex items-center justify-center mx-auto shadow-coral-glow">
+              <KeyRound className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-xl font-black text-white">Enter Email Verification OTP</h3>
+              <p className="text-xs text-rose-muted">
+                A 6-digit OTP code has been sent to <span className="text-gold font-bold">{pendingVerificationEmail || email}</span>
+              </p>
+            </div>
+
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <input
+                type="text"
+                maxLength={6}
+                required
+                placeholder="123456"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value)}
+                className="w-full py-4 text-center font-mono text-2xl font-black tracking-[0.5em] rounded-2xl border-2 border-rose/40 bg-plum-dark text-gold focus:border-rose focus:outline-none"
+              />
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-rose via-plum-light to-rose text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-coral-glow hover:brightness-110 active:scale-98 transition-all"
+              >
+                {isLoading ? 'VERIFYING CODE...' : 'VERIFY & PROCEED TO PLAN FORMALITIES'}
+              </button>
+            </form>
+
+            <div className="pt-2 flex justify-between text-xs">
+              <button onClick={handleResendOtp} className="text-gold hover:underline font-bold">
+                Resend OTP Code
+              </button>
+
+              <button onClick={() => dispatch(setShowOtpModal(false))} className="text-rose-muted hover:text-white">
+                Cancel
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
