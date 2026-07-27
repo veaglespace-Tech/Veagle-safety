@@ -25,7 +25,7 @@ export const Header = () => {
           </div>
           <div>
             <div className="flex items-center space-x-1">
-              <span className="font-extrabold text-base text-plum tracking-tight leading-none block">Tichi Suraksha</span>
+              <span className="font-extrabold text-base text-plum tracking-tight leading-none block">Sakhi Suraksha SOS</span>
               {isSuperAdmin && (
                 <span className="bg-gold text-plum font-black text-[9px] px-1 rounded-sm uppercase">ADMIN</span>
               )}

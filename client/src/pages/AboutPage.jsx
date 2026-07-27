@@ -17,7 +17,7 @@ export const AboutPage = () => {
             Built to Protect Every Girl and Woman
           </h1>
           <p className="text-rose-muted text-base font-medium max-w-2xl mx-auto leading-relaxed">
-            Tichi Suraksha was engineered with one primary goal: extremely fast access to emergency help, trusted contacts, and secure live location sharing without complexity or delay.
+            Sakhi Suraksha SOS was engineered with one primary goal: extremely fast access to emergency help, trusted contacts, and secure live location sharing without complexity or delay.
           </p>
         </div>
 

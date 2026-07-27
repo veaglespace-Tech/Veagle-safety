@@ -31,7 +31,7 @@ export const PublicNavbar = () => {
           <div>
             <div className="flex items-center space-x-1.5">
               <span className="font-black text-xl tracking-tight text-white group-hover:text-rose transition-colors">
-                Tichi Suraksha
+                Sakhi Suraksha SOS
               </span>
               <span className="bg-rose/20 text-rose border border-rose/40 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
                 v2.0

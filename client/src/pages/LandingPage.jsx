@@ -24,7 +24,7 @@ export const LandingPage = () => {
         {/* HERO TITLE */}
         <div className="space-y-4 max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-none">
-            Empowering Women & Girls with <br />
+            Sakhi Suraksha SOS <br />
             <span className="bg-gradient-to-r from-rose via-gold to-rose-muted bg-clip-text text-transparent">
               Instant 3-Second SOS Protection
             </span>
@@ -131,7 +131,7 @@ export const LandingPage = () => {
             Designed For Real Safety in Any Situation
           </h2>
           <p className="text-rose-muted text-sm sm:text-base max-w-xl mx-auto font-medium">
-            From night commutes to solitary journeys, Tichi Suraksha delivers peace of mind.
+            From night commutes to solitary journeys, Sakhi Suraksha SOS delivers peace of mind.
           </p>
         </div>
 
@@ -178,10 +178,10 @@ export const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
           <div className="flex items-center justify-center space-x-2">
             <Shield className="w-6 h-6 text-rose" />
-            <span className="font-black text-lg text-white">Tichi Suraksha</span>
+            <span className="font-black text-lg text-white">Sakhi Suraksha SOS</span>
           </div>
           <p className="text-xs text-rose-muted">
-            © 2026 Tichi Suraksha Safety Network. Built with care for Women & Girls everywhere.
+            © 2026 Sakhi Suraksha SOS Network. Built with care for Women & Girls everywhere.
           </p>
         </div>
       </footer>

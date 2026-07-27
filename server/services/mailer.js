@@ -14,12 +14,12 @@ const transporter = nodemailer.createTransport({
 export const sendEmailVerificationOtp = async ({ recipientEmail, userName, otp }) => {
   try {
     const info = await transporter.sendMail({
-      from: `"Veagle Safety" <${config.emailService.user || 'no-reply@veaglesafety.org'}>`,
+      from: `"Sakhi Suraksha SOS" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
       to: recipientEmail,
-      subject: `🔐 Email Verification OTP for Veagle Safety`,
+      subject: `🔐 Email Verification OTP for Sakhi Suraksha SOS`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 12px; padding: 24px; background-color: #ffffff;">
-          <h2 style="color: #6366f1; text-align: center; margin-bottom: 24px;">Welcome to Veagle Safety</h2>
+          <h2 style="color: #6366f1; text-align: center; margin-bottom: 24px;">Welcome to Sakhi Suraksha SOS</h2>
           <p style="font-size: 16px; color: #333333;">Hi <strong>${userName}</strong>,</p>
           <p style="font-size: 15px; color: #555555;">
             Thank you for registering. Please use the following 6-digit OTP code to verify your email address:
@@ -32,7 +32,7 @@ export const sendEmailVerificationOtp = async ({ recipientEmail, userName, otp }
           </p>
           <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 24px 0;" />
           <p style="font-size: 12px; color: #aaaaaa; text-align: center;">
-            &copy; ${new Date().getFullYear()} Veagle Safety SaaS. All rights reserved.
+            &copy; ${new Date().getFullYear()} Sakhi Suraksha SOS Platform. All rights reserved.
           </p>
         </div>
       `,
@@ -58,7 +58,7 @@ export const sendSosEmergencyAlert = async ({
     const mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
     const info = await transporter.sendMail({
-      from: `"Veagle Safety Emergency" <${config.emailService.user || 'sos@veaglesafety.org'}>`,
+      from: `"Sakhi Suraksha SOS Emergency" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: `🚨 EMERGENCY SOS ALERT: ${userName} Needs Help Immediately!`,
       html: `
@@ -66,7 +66,7 @@ export const sendSosEmergencyAlert = async ({
           <h1 style="color: #E62E5C; text-align: center;">🚨 EMERGENCY SOS ACTIVATED</h1>
           <p style="font-size: 16px; color: #1E122B;">Hi <strong>${recipientName}</strong>,</p>
           <p style="font-size: 16px; color: #1E122B;">
-            <strong>${userName}</strong> has activated an Emergency SOS trigger on Veagle Safety and marked you as a trusted contact.
+            <strong>${userName}</strong> has activated an Emergency SOS trigger on Sakhi Suraksha SOS and marked you as a trusted contact.
           </p>
           
           <div style="background: #ffffff; padding: 16px; border-radius: 8px; border-left: 4px solid #E62E5C; margin: 20px 0;">
@@ -84,7 +84,7 @@ export const sendSosEmergencyAlert = async ({
 
           <hr style="border: 0; border-top: 1px solid #EADAFA; margin: 20px 0;" />
           <p style="font-size: 12px; color: #6C5D7C; text-align: center;">
-            This is an automated high-priority safety alert broadcast by Veagle Safety.
+            This is an automated high-priority safety alert broadcast by Sakhi Suraksha SOS.
           </p>
         </div>
       `,

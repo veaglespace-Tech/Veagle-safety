@@ -107,16 +107,27 @@ export const AuthPage = () => {
 
       <div className="max-w-4xl mx-auto px-4 py-12 relative z-10 space-y-6">
 
-        {/* TOP BRANDING */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
-            {isLogin ? 'Welcome Back to Safety' : 'Create Protected Account'}
-          </h1>
-          <p className="text-rose-muted text-xs sm:text-sm font-medium">
-            {isLogin
-              ? 'Sign in to access your personal emergency companion'
-              : 'Complete your profile details to activate 24/7 protection formalities'}
-          </p>
+        {/* TOP BRANDING & INTERACTIVE SAFETY SHIELD MASCOT */}
+        <div className="text-center space-y-3">
+          {/* ANIMATED INTERACTIVE MASCOT SHIELD */}
+          <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
+            <div className={`absolute inset-0 rounded-full border-2 border-rose/30 ${isLoading ? 'animate-ping' : 'animate-pulse'}`} />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose via-plum-light to-gold p-0.5 shadow-coral-glow flex items-center justify-center">
+              <div className="w-full h-full bg-plum-dark rounded-[14px] flex items-center justify-center">
+                <Shield className="w-8 h-8 text-rose" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-center space-x-2">
+              <h1 className="font-black text-2xl tracking-tight text-white">Sakhi Suraksha SOS</h1>
+              <span className="bg-rose/20 text-rose border border-rose/40 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">v2.0</span>
+            </div>
+            <p className="text-xs text-rose-muted font-medium mt-0.5">
+              Personal Safety & Emergency Companion
+            </p>
+          </div>
         </div>
 
         {/* MAIN CARD */}

@@ -45,7 +45,7 @@ export const DesktopSidebar = () => {
             <Shield className="w-5 h-5 text-rose fill-rose/20" />
           </div>
           <div>
-            <h1 className="font-extrabold text-base text-plum tracking-tight">Tichi Suraksha</h1>
+            <h1 className="font-extrabold text-base text-plum tracking-tight">Sakhi Suraksha SOS</h1>
             <div className="flex items-center space-x-1.5">
               <span className={`w-1.5 h-1.5 rounded-full ${status === 'LIVE' ? 'bg-tichi-success animate-pulse' : 'bg-amber-500'}`}></span>
               <span className="text-[10px] font-semibold text-tichi-muted">{status === 'LIVE' ? 'GPS Active' : 'Connecting...'}</span>
@@ -57,11 +57,11 @@ export const DesktopSidebar = () => {
       <div className="px-5 py-4 border-b border-blush-border bg-blush">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-rose/30 text-plum font-extrabold text-base flex items-center justify-center border border-rose/40">
-            {user?.fullName?.charAt(0) || 'P'}
+            {user?.fullName?.charAt(0) || 'S'}
           </div>
           <div className="min-w-0">
             <div className="flex items-center space-x-1.5">
-              <p className="font-bold text-xs text-tichi-text truncate">{user?.fullName || 'Priya Sharma'}</p>
+              <p className="font-bold text-xs text-tichi-text truncate">{user?.fullName || 'User Profile'}</p>
               {isSuperAdmin && (
                 <span className="bg-gold text-plum font-black text-[9px] px-1.5 py-0.5 rounded-md uppercase">
                   ADMIN

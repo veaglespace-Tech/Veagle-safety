@@ -29,7 +29,7 @@ export const AdminLoginPage = () => {
   };
 
   const fillAdminCredentials = () => {
-    setEmail('admin@tichisuraksha.org');
+    setEmail('admin@sakhisuraksha.org');
     setPassword('Admin123!');
     setLocalError(null);
   };
@@ -56,7 +56,7 @@ export const AdminLoginPage = () => {
               <Terminal className="w-3 h-3" />
               <span>COMPANY SUPER ADMIN PORTAL</span>
             </div>
-            <h1 className="font-black text-2xl tracking-tight text-white">Command Center Login</h1>
+            <h1 className="font-black text-2xl tracking-tight text-white">Sakhi Suraksha SOS</h1>
             <p className="text-xs text-gold/80 font-medium mt-1">
               Authorized HQ Personnel & Dispatch Officers Only
             </p>
@@ -94,7 +94,7 @@ export const AdminLoginPage = () => {
                 <Mail className="w-4 h-4 text-gold/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
-                  placeholder="admin@tichisuraksha.org"
+                  placeholder="admin@sakhisuraksha.org"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -145,7 +145,7 @@ export const AdminLoginPage = () => {
               🔒 Dedicated Company URL: <span className="font-mono text-gold">/admin/login</span>
             </p>
             <p className="text-[10px] text-tichi-faint">
-              Strictly restricted to Tichi Suraksha Command & Dispatch Officers.
+              Strictly restricted to Sakhi Suraksha SOS Command Officers.
             </p>
           </div>
         </div>
