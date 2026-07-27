@@ -5,6 +5,7 @@ import { config } from './config/index.js';
 import { prisma } from './config/prisma.js';
 import apiRouter from './routes/api.js';
 import { initSocketIO } from './socket.js';
+import bcrypt from 'bcryptjs';
 
 const app = express();
 const server = http.createServer(app);
@@ -14,9 +15,8 @@ const PORT = config.port || 5000;
 // Trust Nginx / Cloudflare proxy
 app.set("trust proxy", 1);
 
-// Middleware
+// Middleware (Body Parsers BEFORE API Routes)
 app.use(cors());
-app.use("/api", apiRouter);
 app.use(
   express.json({
     limit: process.env.JSON_BODY_LIMIT || "10mb",
@@ -28,6 +28,9 @@ app.use(
     extended: true,
   })
 );
+
+// API Routes
+app.use("/api", apiRouter);
 
 // Health Check Endpoint
 app.get("/healthz", (req, res) => {
@@ -56,6 +59,33 @@ app.get("/readyz", async (req, res) => {
     });
   }
 });
+
+// Seed default Super Admin account if not present
+async function seedSuperAdminData() {
+  try {
+    const adminExists = await prisma.user.findFirst({ where: { role: 'SUPER_ADMIN' } });
+    if (!adminExists) {
+      console.log('[Seed] Seeding Super Admin account...');
+      const adminPassHash = await bcrypt.hash('Admin123!', 10);
+      await prisma.user.upsert({
+        where: { email: 'admin@tichisuraksha.org' },
+        update: { role: 'SUPER_ADMIN' },
+        create: {
+          fullName: 'Super Admin HQ',
+          email: 'admin@tichisuraksha.org',
+          phone: '+91 99000 00000',
+          passwordHash: adminPassHash,
+          role: 'SUPER_ADMIN',
+          onboardingStep: 7,
+          isEmailVerified: true,
+        },
+      });
+      console.log('[Seed] Super Admin created: admin@tichisuraksha.org / Admin123!');
+    }
+  } catch (err) {
+    console.error('[Seed Error]:', err.message);
+  }
+}
 
 // Catch-all 404 handler for non-existent routes
 app.use("*", (req, res) => {
@@ -100,6 +130,8 @@ const startServer = async () => {
   console.log("prisma connecting...");
   await prisma.$connect();
   console.log("prisma connected");
+
+  await seedSuperAdminData();
 
   initSocketIO(server);
 
