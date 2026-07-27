@@ -12,6 +12,7 @@ import { EmergencyHelpPage } from './pages/EmergencyHelpPage.jsx';
 import { AlarmPage } from './pages/AlarmPage.jsx';
 import { ProfilePage } from './pages/ProfilePage.jsx';
 import { AdminDashboardPage } from './pages/AdminDashboardPage.jsx';
+import { AdminLoginPage } from './pages/AdminLoginPage.jsx';
 
 const ProtectedRoute = ({ children }) => {
   const { token, isLoading } = useAuthStore();
@@ -34,8 +35,8 @@ const AdminRoute = ({ children }) => {
       </div>
     );
   }
-  if (!token) return <Navigate to="/auth" replace />;
-  if (user?.role !== 'SUPER_ADMIN') return <Navigate to="/" replace />;
+  if (!token) return <Navigate to="/admin/login" replace />;
+  if (user?.role !== 'SUPER_ADMIN') return <Navigate to="/admin/login" replace />;
   return children;
 };
 
@@ -49,9 +50,15 @@ export const App = () => {
   return (
     <Router>
       <Routes>
+        {/* Public SOS Viewer */}
         <Route path="/track/:token" element={<LiveViewerPage />} />
-        <Route path="/auth" element={<AuthPage />} />
 
+        {/* Dedicated Auth URLs */}
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin-auth" element={<Navigate to="/admin/login" replace />} />
+
+        {/* User Protected Routes */}
         <Route
           path="/"
           element={
@@ -125,6 +132,7 @@ export const App = () => {
           }
         />
 
+        {/* Super Admin Protected Route */}
         <Route
           path="/admin"
           element={

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore.js';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Eye, EyeOff, Lock, Mail, Phone, User as UserIcon, ArrowRight, ShieldCheck, Crown } from 'lucide-react';
 
 export const AuthPage = () => {
@@ -9,7 +9,6 @@ export const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState('USER');
   const [showPass, setShowPass] = useState(false);
   const [inputFocused, setInputFocused] = useState('NONE');
 
@@ -22,7 +21,7 @@ export const AuthPage = () => {
     if (isLogin) {
       success = await login(email, password);
     } else {
-      success = await register(fullName, email, phone, password, selectedRole);
+      success = await register(fullName, email, phone, password, 'USER');
     }
     if (success) {
       const currentUser = useAuthStore.getState().user;
@@ -34,29 +33,29 @@ export const AuthPage = () => {
     }
   };
 
-  const setDemoUser = (type) => {
-    if (type === 'GIRL') {
-      setEmail('priya@tichisuraksha.org');
-      setPassword('Priya123!');
-      setIsLogin(true);
-    } else {
-      setEmail('admin@tichisuraksha.org');
-      setPassword('Admin123!');
-      setIsLogin(true);
-    }
+  const fillDemoGirlUser = () => {
+    setEmail('priya@tichisuraksha.org');
+    setPassword('Priya123!');
+    setIsLogin(true);
   };
 
   return (
     <div className="min-h-screen auth-mesh-bg flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Animated Glow Meshes */}
       <div className="auth-mesh-glow-1" />
       <div className="auth-mesh-glow-2" />
 
       <div className="w-full max-w-md relative z-10 space-y-5 animate-fade-up">
+
+        {/* TOP BRANDING & INTERACTIVE SAFETY SHIELD MASCOT */}
         <div className="text-center space-y-3">
+          {/* ANIMATED INTERACTIVE MASCOT SHIELD */}
           <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
+            {/* Outer radar pulse rings */}
             <div className={`absolute inset-0 rounded-full border-2 border-rose/30 ${isLoading ? 'animate-ping' : 'animate-pulse'}`} />
             <div className="absolute -inset-3 rounded-full border border-gold/20 animate-spin-slow" style={{ animationDuration: '15s' }} />
 
+            {/* Glowing Shield Base */}
             <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-plum to-plum-dark border-2 transition-all duration-300 shadow-coral-glow flex flex-col items-center justify-center relative ${
               inputFocused === 'PASS'
                 ? 'border-gold scale-95 shadow-gold-glow'
@@ -68,6 +67,7 @@ export const AuthPage = () => {
                 inputFocused === 'PASS' ? 'text-gold fill-gold/20' : 'text-rose fill-rose/20 animate-pulse'
               }`} />
 
+              {/* Eye/Visor Micro Animations inside Shield */}
               <div className="flex items-center space-x-2 mt-1">
                 {inputFocused === 'PASS' && !showPass ? (
                   <div className="text-[10px] font-bold text-gold tracking-widest animate-pulse">🔒 LOCKED</div>
@@ -84,35 +84,28 @@ export const AuthPage = () => {
           <div>
             <div className="flex items-center justify-center space-x-2">
               <h1 className="font-black text-2xl tracking-tight text-white">Tichi Suraksha</h1>
-              <span className="bg-gold/20 text-gold border border-gold/40 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">v2.0</span>
+              <span className="bg-rose/20 text-rose border border-rose/40 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">v2.0</span>
             </div>
             <p className="text-xs text-rose-muted font-medium mt-0.5">
-              Modern & Antique Personal Safety Platform
+              Personal Safety & Emergency Companion
             </p>
           </div>
         </div>
 
-        <div className="bg-plum-dark/80 backdrop-blur-md border border-rose/30 p-2 rounded-2xl grid grid-cols-2 gap-2 text-xs">
-          <button
-            type="button"
-            onClick={() => setDemoUser('GIRL')}
-            className="flex items-center justify-center space-x-2 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-all active:scale-95 border border-white/10"
-          >
-            <span>👧</span>
-            <span className="truncate">Demo User (Priya)</span>
-          </button>
+        {/* ONE-CLICK DEMO USER BUTTON */}
+        <button
+          type="button"
+          onClick={fillDemoGirlUser}
+          className="w-full bg-plum-dark/80 hover:bg-plum-dark backdrop-blur-md border border-rose/30 text-white p-2.5 rounded-2xl text-xs font-bold transition-all active:scale-95 shadow-md flex items-center justify-center space-x-2"
+        >
+          <span>👧</span>
+          <span>Click to Fill Demo Account (Priya)</span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setDemoUser('ADMIN')}
-            className="flex items-center justify-center space-x-2 py-2 px-3 rounded-xl bg-gradient-to-r from-gold/20 to-gold/40 border border-gold/50 text-gold font-extrabold transition-all active:scale-95 shadow-gold-glow"
-          >
-            <Crown className="w-3.5 h-3.5" />
-            <span className="truncate">Super Admin HQ</span>
-          </button>
-        </div>
+        {/* MAIN AUTH GLASS CARD WITH TAB SLIDER */}
+        <div className="glass-card-dark rounded-3xl p-6 shadow-modal border border-rose/30 space-y-5 relative">
 
-        <div className="glass-card-dark rounded-3xl p-6 shadow-modal border border-gold/30 space-y-5 relative">
+          {/* TAB SWITCHER */}
           <div className="flex bg-plum-dark p-1.5 rounded-2xl border border-rose/20 relative">
             <button
               type="button"
@@ -141,6 +134,7 @@ export const AuthPage = () => {
             </button>
           </div>
 
+          {/* ERROR ALERT */}
           {error && (
             <div className="bg-emergency-dark/80 border border-emergency text-white text-xs font-bold p-3 rounded-xl flex items-center space-x-2 animate-bounce">
               <span>⚠️</span>
@@ -148,38 +142,10 @@ export const AuthPage = () => {
             </div>
           )}
 
+          {/* FORM FIELDS */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div className="space-y-1.5 animate-fade-up">
-                <label className="block text-[11px] font-extrabold text-gold uppercase tracking-wider">Account Role</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedRole('USER')}
-                    className={`py-2 rounded-xl text-xs font-bold border transition-all ${
-                      selectedRole === 'USER'
-                        ? 'bg-rose text-white border-rose shadow-coral-glow'
-                        : 'bg-plum-dark/60 text-tichi-faint border-rose/20 hover:text-white'
-                    }`}
-                  >
-                    👧 User (Girl / Woman)
-                  </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setSelectedRole('SUPER_ADMIN')}
-                    className={`py-2 rounded-xl text-xs font-bold border transition-all ${
-                      selectedRole === 'SUPER_ADMIN'
-                        ? 'bg-gold text-plum border-gold shadow-gold-glow font-black'
-                        : 'bg-plum-dark/60 text-tichi-faint border-gold/20 hover:text-gold'
-                    }`}
-                  >
-                    👑 Super Admin
-                  </button>
-                </div>
-              </div>
-            )}
-
+            {/* FULL NAME */}
             {!isLogin && (
               <div className="animate-fade-up">
                 <label className="block text-xs font-bold text-white mb-1">Full Name</label>
@@ -199,6 +165,7 @@ export const AuthPage = () => {
               </div>
             )}
 
+            {/* EMAIL ADDRESS */}
             <div>
               <label className="block text-xs font-bold text-white mb-1">Email Address</label>
               <div className="relative">
@@ -216,6 +183,7 @@ export const AuthPage = () => {
               </div>
             </div>
 
+            {/* MOBILE NUMBER */}
             {!isLogin && (
               <div className="animate-fade-up">
                 <label className="block text-xs font-bold text-white mb-1">Mobile Phone</label>
@@ -235,6 +203,7 @@ export const AuthPage = () => {
               </div>
             )}
 
+            {/* PASSWORD */}
             <div>
               <label className="block text-xs font-bold text-white mb-1">Password</label>
               <div className="relative">
@@ -259,6 +228,7 @@ export const AuthPage = () => {
               </div>
             </div>
 
+            {/* SUBMIT BUTTON WITH NEON GLOW */}
             <button
               type="submit"
               disabled={isLoading}
@@ -270,12 +240,24 @@ export const AuthPage = () => {
           </form>
         </div>
 
-        <div className="text-center space-y-1">
-          <div className="inline-flex items-center space-x-1.5 bg-plum-dark/60 border border-gold/20 px-3 py-1 rounded-full text-[10px] text-gold font-bold">
-            <ShieldCheck className="w-3.5 h-3.5" />
+        {/* FOOTER & DEDICATED SUPER ADMIN PORTAL LINK */}
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center space-x-1.5 bg-plum-dark/60 border border-rose/20 px-3 py-1 rounded-full text-[10px] text-rose-muted font-bold">
+            <ShieldCheck className="w-3.5 h-3.5 text-rose" />
             <span>256-Bit Encrypted Safety Network • Strict Privacy</span>
           </div>
+
+          <div>
+            <Link
+              to="/admin/login"
+              className="inline-flex items-center space-x-1 text-[11px] text-gold/80 hover:text-gold font-bold transition-colors"
+            >
+              <Crown className="w-3 h-3 text-gold" />
+              <span>Company Super Admin Portal →</span>
+            </Link>
+          </div>
         </div>
+
       </div>
     </div>
   );
