@@ -33,12 +33,6 @@ export const AuthPage = () => {
     }
   };
 
-  const fillDemoGirlUser = () => {
-    setEmail('priya@tichisuraksha.org');
-    setPassword('Priya123!');
-    setIsLogin(true);
-  };
-
   return (
     <div className="min-h-screen auth-mesh-bg flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Animated Glow Meshes */}
@@ -92,16 +86,6 @@ export const AuthPage = () => {
           </div>
         </div>
 
-        {/* ONE-CLICK DEMO USER BUTTON */}
-        <button
-          type="button"
-          onClick={fillDemoGirlUser}
-          className="w-full bg-plum-dark/80 hover:bg-plum-dark backdrop-blur-md border border-rose/30 text-white p-2.5 rounded-2xl text-xs font-bold transition-all active:scale-95 shadow-md flex items-center justify-center space-x-2"
-        >
-          <span>👧</span>
-          <span>Click to Fill Demo Account (Priya)</span>
-        </button>
-
         {/* MAIN AUTH GLASS CARD WITH TAB SLIDER */}
         <div className="glass-card-dark rounded-3xl p-6 shadow-modal border border-rose/30 space-y-5 relative">
 
@@ -153,7 +137,7 @@ export const AuthPage = () => {
                   <UserIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Priya Sharma"
+                    placeholder="Enter your full name"
                     value={fullName}
                     onFocus={() => setInputFocused('NAME')}
                     onBlur={() => setInputFocused('NONE')}
@@ -172,7 +156,7 @@ export const AuthPage = () => {
                 <Mail className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
-                  placeholder="priya@tichisuraksha.org"
+                  placeholder="name@example.com"
                   value={email}
                   onFocus={() => setInputFocused('EMAIL')}
                   onBlur={() => setInputFocused('NONE')}

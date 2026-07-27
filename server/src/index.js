@@ -50,9 +50,20 @@ io.on('connection', (socket) => {
   });
 });
 
-// Seeding default demo data if database is empty or missing admin
+// Seeding ONLY Super Admin account
 async function seedDefaultData() {
   try {
+    // 1. Delete any non-Super Admin demo users if they exist
+    const demoUser = await prisma.user.findFirst({ where: { email: 'priya@tichisuraksha.org' } });
+    if (demoUser) {
+      console.log('[Seed] Cleaning up demo user accounts...');
+      await prisma.user.deleteMany({
+        where: { email: 'priya@tichisuraksha.org' },
+      });
+      console.log('[Seed] Demo accounts removed cleanly.');
+    }
+
+    // 2. Ensure Super Admin account exists
     const adminExists = await prisma.user.findFirst({ where: { role: 'SUPER_ADMIN' } });
     if (!adminExists) {
       console.log('[Seed] Seeding Super Admin account...');
@@ -70,30 +81,8 @@ async function seedDefaultData() {
         },
       });
       console.log('[Seed] Super Admin created: admin@tichisuraksha.org / Admin123!');
-    }
-
-    const userCount = await prisma.user.count({ where: { role: 'USER' } });
-    if (userCount === 0) {
-      console.log('[Seed] Seeding initial demo account Priya Sharma...');
-      const passwordHash = await bcrypt.hash('Priya123!', 10);
-      await prisma.user.create({
-        data: {
-          fullName: 'Priya Sharma',
-          email: 'priya@tichisuraksha.org',
-          phone: '+91 98765 43210',
-          passwordHash,
-          role: 'USER',
-          onboardingStep: 7,
-          trustedContacts: {
-            create: [
-              { name: 'Ananya Sharma (Sister)', relationship: 'Sister', phone: '+91 98765 11111', email: 'ananya@tichisuraksha.org', isVerified: true, priorityOrder: 1 },
-              { name: 'Rajesh Sharma (Dad)', relationship: 'Father', phone: '+91 98765 22222', email: 'dad@tichisuraksha.org', isVerified: true, priorityOrder: 2 },
-              { name: 'Neha Gupta (Friend)', relationship: 'Friend', phone: '+91 98765 33333', email: 'neha@tichisuraksha.org', isVerified: true, priorityOrder: 3 },
-            ],
-          },
-        },
-      });
-      console.log('[Seed] Demo account created: priya@tichisuraksha.org / Priya123!');
+    } else {
+      console.log('[Seed] Super Admin account verified.');
     }
   } catch (err) {
     console.error('[Seed Error]:', err);
