@@ -113,7 +113,7 @@ export const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-plum-dark text-white font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden">
       <PublicNavbar />
 
       <div className="max-w-4xl mx-auto px-4 py-12 relative z-10 space-y-6">
@@ -122,8 +122,8 @@ export const AuthPage = () => {
         <div className="text-center space-y-3">
           <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
             <div className={`absolute inset-0 rounded-full border-2 border-rose/30 ${isLoading ? 'animate-ping' : 'animate-pulse'}`} />
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose via-plum-light to-gold p-0.5 shadow-coral-glow flex items-center justify-center">
-              <div className="w-full h-full bg-plum-dark rounded-[14px] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 shadow-coral-glow flex items-center justify-center">
+              <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
                 <Shield className="w-8 h-8 text-rose" />
               </div>
             </div>
@@ -131,20 +131,20 @@ export const AuthPage = () => {
 
           <div>
             <div className="flex items-center justify-center space-x-2">
-              <h1 className="font-black text-2xl tracking-tight text-white">Sakhi Suraksha SOS</h1>
-              <span className="bg-rose/20 text-rose border border-rose/40 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">v2.0</span>
+              <h1 className="font-black text-2xl tracking-tight text-tichi-text">Sakhi Suraksha SOS</h1>
+              <span className="bg-rose/10 text-rose border border-rose/30 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">v2.0</span>
             </div>
-            <p className="text-xs text-rose-muted font-medium mt-0.5">
+            <p className="text-xs text-tichi-muted font-bold mt-0.5">
               Personal Safety & Emergency Companion
             </p>
           </div>
         </div>
 
-        {/* MAIN CARD */}
-        <div className="glass-card-dark rounded-3xl p-6 sm:p-8 border border-rose/30 shadow-2xl space-y-6 max-w-2xl mx-auto">
+        {/* MAIN CARD (PORCELAIN BLUSH LIGHT CARD) */}
+        <div className="glass-card rounded-3xl p-6 sm:p-8 border border-blush-border shadow-xl space-y-6 max-w-2xl mx-auto">
           
           {/* TAB SWITCHER */}
-          <div className="flex bg-plum-dark p-1.5 rounded-2xl border border-rose/20 relative">
+          <div className="flex bg-blush-subtle p-1.5 rounded-2xl border border-blush-border relative">
             <button
               type="button"
               onClick={() => {
@@ -152,7 +152,7 @@ export const AuthPage = () => {
                 dispatch(clearAuthMessages());
               }}
               className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
-                isLogin ? 'bg-gradient-to-r from-rose to-plum-light text-white shadow-coral-glow' : 'text-rose-muted hover:text-white'
+                isLogin ? 'bg-gradient-to-r from-rose to-rose-light text-white shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
               }`}
             >
               SIGN IN
@@ -165,7 +165,7 @@ export const AuthPage = () => {
                 dispatch(clearAuthMessages());
               }}
               className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
-                !isLogin ? 'bg-gradient-to-r from-rose to-plum-light text-white shadow-coral-glow' : 'text-rose-muted hover:text-white'
+                !isLogin ? 'bg-gradient-to-r from-rose to-rose-light text-white shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
               }`}
             >
               CREATE ACCOUNT (SIGN UP)
@@ -174,7 +174,7 @@ export const AuthPage = () => {
 
           {/* ERROR ALERT */}
           {error && (
-            <div className="bg-emergency-dark/90 border border-emergency text-white text-xs font-bold p-3.5 rounded-xl flex items-center space-x-2 animate-bounce">
+            <div className="bg-emergency-bg border border-emergency text-emergency-dark text-xs font-bold p-3.5 rounded-xl flex items-center space-x-2 animate-bounce">
               <span>🚨</span>
               <span>{error}</span>
             </div>
@@ -182,7 +182,7 @@ export const AuthPage = () => {
 
           {/* SUCCESS ALERT */}
           {successMessage && (
-            <div className="bg-rose/20 border border-rose text-white text-xs font-bold p-3.5 rounded-xl flex items-center space-x-2">
+            <div className="bg-rose/10 border border-rose text-rose text-xs font-bold p-3.5 rounded-xl flex items-center space-x-2">
               <CheckCircle2 className="w-4 h-4 text-rose shrink-0" />
               <span>{successMessage}</span>
             </div>
@@ -196,75 +196,75 @@ export const AuthPage = () => {
               <div className="space-y-6 text-xs">
                 
                 {/* SECTION 1: PERSONAL IDENTITY & SECURITY */}
-                <div className="space-y-3 bg-plum-dark/60 p-4 rounded-2xl border border-rose/20">
-                  <div className="flex items-center space-x-2 text-gold font-black uppercase text-[11px]">
-                    <UserIcon className="w-4 h-4 text-gold" />
+                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-blush-border">
+                  <div className="flex items-center space-x-2 text-rose font-black uppercase text-[11px]">
+                    <UserIcon className="w-4 h-4 text-rose" />
                     <span>Section 1: Personal Identity & Security</span>
                   </div>
 
                   <div>
-                    <label className="block text-rose-muted font-bold mb-1">Full Name *</label>
+                    <label className="block text-tichi-muted font-bold mb-1">Full Name *</label>
                     <div className="relative">
-                      <UserIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <UserIcon className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         required
                         placeholder="Priya Sharma"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-rose-muted font-bold mb-1">Email Address *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Email Address *</label>
                       <div className="relative">
-                        <Mail className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="email"
                           required
                           placeholder="priya@example.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-rose-muted font-bold mb-1">Mobile Phone *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Mobile Phone *</label>
                       <div className="relative">
-                        <Phone className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <Phone className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="tel"
                           required
                           placeholder="+91 98765 43210"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                         />
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-rose-muted font-bold mb-1">Account Password *</label>
+                    <label className="block text-tichi-muted font-bold mb-1">Account Password *</label>
                     <div className="relative">
-                      <Lock className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type={showPass ? 'text' : 'password'}
                         required
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-10 pr-10 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        className="w-full pl-10 pr-10 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPass(!showPass)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-rose/70 hover:text-gold"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
                       >
                         {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -273,21 +273,21 @@ export const AuthPage = () => {
                 </div>
 
                 {/* SECTION 2: EMERGENCY PROFILE & HEALTH DATA */}
-                <div className="space-y-3 bg-plum-dark/60 p-4 rounded-2xl border border-rose/20">
-                  <div className="flex items-center space-x-2 text-gold font-black uppercase text-[11px]">
+                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-blush-border">
+                  <div className="flex items-center space-x-2 text-rose font-black uppercase text-[11px]">
                     <Heart className="w-4 h-4 text-rose" />
                     <span>Section 2: Emergency Guardian & Health Data</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-rose-muted font-bold mb-1">Blood Group *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Blood Group *</label>
                       <div className="relative">
-                        <Heart className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <Heart className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <select
                           value={bloodGroup}
                           onChange={(e) => setBloodGroup(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text"
                         >
                           <option value="O+">O Positive (O+)</option>
                           <option value="O-">O Negative (O-)</option>
@@ -302,16 +302,16 @@ export const AuthPage = () => {
                     </div>
 
                     <div>
-                      <label className="block text-rose-muted font-bold mb-1">Profile Photo URL *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Profile Photo URL *</label>
                       <div className="relative">
-                        <ImageIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <ImageIcon className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="url"
                           required
                           placeholder="https://ik.imagekit.io/avatar.png"
                           value={profilePhoto}
                           onChange={(e) => setProfilePhoto(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                         />
                       </div>
                     </div>
@@ -320,116 +320,116 @@ export const AuthPage = () => {
                   {/* PRIMARY GUARDIAN EMERGENCY CONTACT */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-gold font-bold mb-1">Primary Guardian / Contact Name</label>
+                      <label className="block text-rose font-bold mb-1">Primary Guardian / Contact Name</label>
                       <div className="relative">
-                        <Users className="w-4 h-4 text-gold/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <Users className="w-4 h-4 text-rose absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
                           placeholder="Mother / Father / Spouse Name"
                           value={emergencyContactName}
                           onChange={(e) => setEmergencyContactName(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gold/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/40 bg-white text-tichi-text placeholder-tichi-faint"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-gold font-bold mb-1">Guardian Emergency Phone</label>
+                      <label className="block text-rose font-bold mb-1">Guardian Emergency Phone</label>
                       <div className="relative">
-                        <Phone className="w-4 h-4 text-gold/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <Phone className="w-4 h-4 text-rose absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="tel"
                           placeholder="+91 98765 00000"
                           value={emergencyContactPhone}
                           onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gold/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/40 bg-white text-tichi-text placeholder-tichi-faint"
                         />
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-rose-muted font-bold mb-1">Emergency Medical Notes / Allergies (Optional)</label>
+                    <label className="block text-tichi-muted font-bold mb-1">Emergency Medical Notes / Allergies (Optional)</label>
                     <div className="relative">
-                      <FileText className="w-4 h-4 text-rose/70 absolute left-3.5 top-3" />
+                      <FileText className="w-4 h-4 text-tichi-muted absolute left-3.5 top-3" />
                       <textarea
                         rows={2}
                         placeholder="e.g. Asthma patient, Diabetic, Penicillin allergy (Optional for first responders)"
                         value={medicalNotes}
                         onChange={(e) => setMedicalNotes(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* SECTION 3: RESIDENTIAL ADDRESS & LOCATION */}
-                <div className="space-y-3 bg-plum-dark/60 p-4 rounded-2xl border border-rose/20">
-                  <div className="flex items-center space-x-2 text-gold font-black uppercase text-[11px]">
-                    <MapPin className="w-4 h-4 text-gold" />
+                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-blush-border">
+                  <div className="flex items-center space-x-2 text-rose font-black uppercase text-[11px]">
+                    <MapPin className="w-4 h-4 text-rose" />
                     <span>Section 3: Location & Residential Dispatch Address</span>
                   </div>
 
                   <div>
-                    <label className="block text-rose-muted font-bold mb-1">Residential Address *</label>
+                    <label className="block text-tichi-muted font-bold mb-1">Residential Address *</label>
                     <div className="relative">
-                      <MapPin className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <MapPin className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         required
                         placeholder="Flat No 402, Lotus Heights, MG Road"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     <div>
-                      <label className="block text-rose-muted font-bold mb-1">City *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">City *</label>
                       <input
                         type="text"
                         required
                         placeholder="Pune"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        className="w-full p-2.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-rose-muted font-bold mb-1">State *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">State *</label>
                       <input
                         type="text"
                         required
                         placeholder="Maharashtra"
                         value={state}
                         onChange={(e) => setState(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        className="w-full p-2.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-rose-muted font-bold mb-1">Country *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Country *</label>
                       <input
                         type="text"
                         required
                         placeholder="India"
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        className="w-full p-2.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-gold font-bold mb-1">Pincode</label>
+                      <label className="block text-rose font-bold mb-1">Pincode</label>
                       <input
                         type="text"
                         placeholder="411001"
                         value={pincode}
                         onChange={(e) => setPincode(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-gold/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        className="w-full p-2.5 rounded-xl border border-rose/40 bg-white text-tichi-text placeholder-tichi-faint"
                       />
                     </div>
                   </div>
@@ -440,36 +440,36 @@ export const AuthPage = () => {
               // LOGIN FORM
               <div className="space-y-4 text-xs">
                 <div>
-                  <label className="block text-rose-muted font-bold mb-1">Email Address</label>
+                  <label className="block text-tichi-muted font-bold mb-1">Email Address</label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       required
                       placeholder="name@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-rose-muted font-bold mb-1">Password</label>
+                  <label className="block text-tichi-muted font-bold mb-1">Password</label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type={showPass ? 'text' : 'password'}
                       required
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-3.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      className="w-full pl-10 pr-10 py-3.5 rounded-xl border border-blush-border bg-white text-tichi-text placeholder-tichi-faint"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPass(!showPass)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-rose/70 hover:text-gold"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
                     >
                       {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -482,7 +482,7 @@ export const AuthPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-rose via-plum-light to-rose text-white font-black py-4 rounded-xl text-xs uppercase tracking-wider shadow-coral-glow hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-2"
+              className="w-full bg-gradient-to-r from-rose via-rose-light to-rose text-white font-black py-4 rounded-xl text-xs uppercase tracking-wider shadow-coral-glow hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-2"
             >
               <span>{isLoading ? 'PROCESSING FORMALITIES...' : isLogin ? 'SIGN IN' : 'REGISTER & PROCEED TO PLAN FORMALITIES'}</span>
               {!isLoading && <ArrowRight className="w-4 h-4" />}
@@ -495,17 +495,17 @@ export const AuthPage = () => {
 
       {/* STEP 2: EMAIL OTP VERIFICATION MODAL */}
       {showOtpModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="glass-card-dark rounded-3xl p-6 sm:p-8 max-w-md w-full border border-rose/40 space-y-5 text-center shadow-2xl relative">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="glass-card rounded-3xl p-6 sm:p-8 max-w-md w-full border border-rose/40 space-y-5 text-center shadow-2xl relative bg-white">
             
-            <div className="w-16 h-16 rounded-2xl bg-rose/20 border border-rose/40 text-rose flex items-center justify-center mx-auto shadow-coral-glow">
+            <div className="w-16 h-16 rounded-2xl bg-rose/10 border border-rose/30 text-rose flex items-center justify-center mx-auto shadow-coral-glow">
               <KeyRound className="w-8 h-8" />
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-xl font-black text-white">Enter Email Verification OTP</h3>
-              <p className="text-xs text-rose-muted">
-                A 6-digit OTP code has been sent to <span className="text-gold font-bold">{pendingVerificationEmail || email}</span>
+              <h3 className="text-xl font-black text-tichi-text">Enter Email Verification OTP</h3>
+              <p className="text-xs text-tichi-muted">
+                A 6-digit OTP code has been sent to <span className="text-rose font-bold">{pendingVerificationEmail || email}</span>
               </p>
             </div>
 
@@ -517,24 +517,24 @@ export const AuthPage = () => {
                 placeholder="123456"
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value)}
-                className="w-full py-4 text-center font-mono text-2xl font-black tracking-[0.5em] rounded-2xl border-2 border-rose/40 bg-plum-dark text-gold focus:border-rose focus:outline-none"
+                className="w-full py-4 text-center font-mono text-2xl font-black tracking-[0.5em] rounded-2xl border-2 border-rose/40 bg-blush-subtle text-tichi-text focus:border-rose focus:outline-none"
               />
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-rose via-plum-light to-rose text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-coral-glow hover:brightness-110 active:scale-98 transition-all"
+                className="w-full bg-gradient-to-r from-rose via-rose-light to-rose text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-coral-glow hover:brightness-110 active:scale-98 transition-all"
               >
                 {isLoading ? 'VERIFYING CODE...' : 'VERIFY & PROCEED TO PLAN FORMALITIES'}
               </button>
             </form>
 
             <div className="pt-2 flex justify-between text-xs">
-              <button onClick={handleResendOtp} className="text-gold hover:underline font-bold">
+              <button onClick={handleResendOtp} className="text-rose hover:underline font-bold">
                 Resend OTP Code
               </button>
 
-              <button onClick={() => dispatch(setShowOtpModal(false))} className="text-rose-muted hover:text-white">
+              <button onClick={() => dispatch(setShowOtpModal(false))} className="text-tichi-muted hover:text-tichi-text">
                 Cancel
               </button>
             </div>

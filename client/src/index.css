@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 /* =====================================================
-   TICHI SURAKSHA – ANTIQUE-MODERN CYBER-SHIELD SYSTEM
+   SAKHI SURAKSHA SOS – PORCELAIN BLUSH & RICH BABY PINK SYSTEM
    ===================================================== */
 
 @layer base {
@@ -21,8 +21,8 @@
 
   body {
     font-family: 'Manrope', 'Inter', system-ui, sans-serif;
-    background-color: #FAF6FD;
-    color: #1E122B;
+    background-color: #FFF0F3;
+    color: #2A0826;
     line-height: 1.5;
     user-select: none;
     -webkit-font-smoothing: antialiased;
@@ -30,13 +30,13 @@
   }
 
   *:focus-visible {
-    outline: 2px solid #FF3B70;
+    outline: 2px solid #FF5C8A;
     outline-offset: 3px;
     border-radius: 8px;
   }
 
   ::selection {
-    background: #FF3B70;
+    background: #FF5C8A;
     color: #FFFFFF;
   }
 
@@ -47,10 +47,10 @@
 }
 
 /* =====================================================
-   ANIMATED AUTH BACKGROUND MESH & GLOW EFFECTS
+   PORCELAIN BLUSH LIGHT MODE MESH & GLOW EFFECTS
    ===================================================== */
 .auth-mesh-bg {
-  background: radial-gradient(circle at 15% 15%, #26123D 0%, #170A28 50%, #0C0418 100%);
+  background: radial-gradient(circle at 15% 15%, #FFF0F3 0%, #FFE4EC 50%, #FFCCE1 100%);
   position: relative;
   overflow: hidden;
 }
@@ -59,49 +59,51 @@
   position: absolute;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(255, 59, 112, 0.25) 0%, rgba(255, 59, 112, 0) 70%);
+  background: radial-gradient(circle, rgba(255, 92, 138, 0.20) 0%, rgba(255, 92, 138, 0) 70%);
   top: -150px;
   left: -100px;
   animation: floatSlow 8s ease-in-out infinite alternate;
-  pointer-events-none: none;
+  pointer-events: none;
 }
 
 .auth-mesh-glow-2 {
   position: absolute;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(255, 209, 102, 0.20) 0%, rgba(255, 209, 102, 0) 70%);
+  background: radial-gradient(circle, rgba(255, 179, 198, 0.25) 0%, rgba(255, 179, 198, 0) 70%);
   bottom: -200px;
   right: -150px;
   animation: floatSlow 10s ease-in-out infinite alternate-reverse;
-  pointer-events-none: none;
+  pointer-events: none;
 }
 
-/* Glassmorphism Cards */
+/* Glassmorphism Light Cards */
 .glass-card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(234, 218, 250, 0.8);
+  border: 1px solid #FFCCE1;
+  box-shadow: 0 4px 20px -2px rgba(42, 8, 38, 0.06);
 }
 
 .glass-card-dark {
-  background: rgba(38, 18, 61, 0.75);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 209, 102, 0.25);
+  border: 1px solid #FFB3C6;
+  box-shadow: 0 8px 30px -4px rgba(255, 92, 138, 0.15);
 }
 
 /* Gold Gradient Text */
 .gold-gradient-text {
-  background: linear-gradient(135deg, #FFD166 0%, #F7B801 50%, #FFA800 100%);
+  background: linear-gradient(135deg, #E6A100 0%, #C48800 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Coral Pink Gradient Text */
+/* Rich Baby Pink Gradient Text */
 .coral-gradient-text {
-  background: linear-gradient(135deg, #FF3B70 0%, #FF6B95 50%, #FF8DAF 100%);
+  background: linear-gradient(135deg, #FF5C8A 0%, #FF8FAB 50%, #FF2A6D 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -120,14 +122,14 @@
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #FAF6FD;
+  background: #FFF0F3;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(38, 18, 61, 0.25);
+  background: rgba(255, 92, 138, 0.3);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 59, 112, 0.6);
+  background: rgba(255, 92, 138, 0.7);
 }
 
 /* Leaflet Container Overrides */

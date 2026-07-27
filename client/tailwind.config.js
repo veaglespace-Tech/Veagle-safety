@@ -7,51 +7,51 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 1. PRIMARY - Midnight Amethyst (Antique Imperial Purple)
+        // 1. PRIMARY - Porcelain Amethyst & Rich Baby Pink Theme
         plum: {
-          DEFAULT: '#26123D',
-          dark: '#170A28',
-          light: '#3D1F61',
-          50: '#F7F3FC',
-          100: '#EFE5FA',
-          200: '#D6C0F3',
+          DEFAULT: '#2A0826',
+          dark: '#FFF0F5', // Light Mode Primary Base
+          light: '#FFE4EC',
+          50: '#FFF8FA',
+          100: '#FFE4EC',
+          200: '#FFC6D9',
         },
-        // 2. SECONDARY - Electric Coral Rose (Modern Vibrant Safety Accent)
+        // 2. SECONDARY - Rich Soft Baby Pink & Hot Rose
         rose: {
-          DEFAULT: '#FF3B70',
-          light: '#FF6B95',
-          soft: '#FFF0F5',
-          muted: '#FFC2D4',
+          DEFAULT: '#FF5C8A', // Hero Baby Pink Accent
+          light: '#FF8FAB', // Soft Baby Pink
+          soft: '#FFF0F5', // Soft Blush
+          muted: '#684E67', // High-Contrast Muted Slate Text
         },
-        // 3. HIGHLIGHT - Cyber Gold (Antique Super Admin & Elite Status)
+        // 3. HIGHLIGHT - Antique Imperial Gold (Badges & Super Admin HQ)
         gold: {
-          DEFAULT: '#FFD166',
-          dark: '#E5AB1C',
+          DEFAULT: '#E6A100',
+          dark: '#C48800',
           light: '#FFE6A3',
           soft: '#FFF9E6',
         },
-        // BACKGROUND SYSTEM
+        // BACKGROUND SYSTEM (PORCELAIN BLUSH LIGHT MODE)
         blush: {
-          DEFAULT: '#FAF6FD',
+          DEFAULT: '#FFF0F3',
           card: '#FFFFFF',
-          border: '#EADAFA',
-          subtle: '#F6EFFC',
+          border: '#FFCCE1',
+          subtle: '#FFF8FA',
         },
-        // TEXT SYSTEM
+        // TEXT SYSTEM (HIGH-CONTRAST DARK TEXT FOR 100% READABILITY)
         tichi: {
-          text: '#1E122B',
-          muted: '#6C5D7C',
-          faint: '#A092B0',
-          emergency: '#E62E5C',
+          text: '#2A0826',
+          muted: '#684E67',
+          faint: '#9B7C99',
+          emergency: '#FF2A6D',
           success: '#10B981',
           warning: '#F59E0B',
         },
         // SEMANTIC STATUS COLORS
         emergency: {
-          DEFAULT: '#E62E5C',
+          DEFAULT: '#FF2A6D',
           bg: '#FFF0F3',
-          border: '#FECDD3',
-          dark: '#BE123C',
+          border: '#FFCCE1',
+          dark: '#D91B55',
         },
         success: {
           DEFAULT: '#10B981',
@@ -87,17 +87,17 @@ export default {
       },
 
       boxShadow: {
-        'plum-subtle': '0 2px 12px -2px rgba(38, 18, 61, 0.08), 0 1px 4px -1px rgba(38, 18, 61, 0.04)',
-        'plum-md': '0 6px 24px -2px rgba(38, 18, 61, 0.15)',
-        'plum-lg': '0 12px 36px -4px rgba(38, 18, 61, 0.22)',
-        'coral-glow': '0 0 28px 4px rgba(255, 59, 112, 0.35)',
-        'gold-glow': '0 0 28px 4px rgba(255, 209, 102, 0.40)',
-        'sos-idle': '0 0 0 8px rgba(230, 46, 92, 0.10), 0 4px 24px -4px rgba(230, 46, 92, 0.25)',
-        'sos-glow': '0 0 30px 8px rgba(230, 46, 92, 0.30), 0 4px 20px -2px rgba(230, 46, 92, 0.40)',
-        'sos-holding': '0 0 50px 16px rgba(230, 46, 92, 0.50), 0 8px 32px -2px rgba(230, 46, 92, 0.60)',
-        'card': '0 2px 8px -1px rgba(30, 18, 43, 0.05), 0 4px 16px -2px rgba(30, 18, 43, 0.04)',
-        'card-hover': '0 8px 28px -4px rgba(30, 18, 43, 0.12)',
-        'modal': '0 24px 64px -12px rgba(18, 8, 36, 0.35)',
+        'plum-subtle': '0 2px 12px -2px rgba(42, 8, 38, 0.08), 0 1px 4px -1px rgba(42, 8, 38, 0.04)',
+        'plum-md': '0 6px 24px -2px rgba(42, 8, 38, 0.12)',
+        'plum-lg': '0 12px 36px -4px rgba(42, 8, 38, 0.18)',
+        'coral-glow': '0 0 28px 4px rgba(255, 92, 138, 0.30)',
+        'gold-glow': '0 0 28px 4px rgba(230, 161, 0, 0.35)',
+        'sos-idle': '0 0 0 8px rgba(255, 42, 109, 0.12), 0 4px 24px -4px rgba(255, 42, 109, 0.25)',
+        'sos-glow': '0 0 30px 8px rgba(255, 42, 109, 0.35), 0 4px 20px -2px rgba(255, 42, 109, 0.45)',
+        'sos-holding': '0 0 50px 16px rgba(255, 42, 109, 0.55), 0 8px 32px -2px rgba(255, 42, 109, 0.65)',
+        'card': '0 2px 8px -1px rgba(42, 8, 38, 0.05), 0 4px 16px -2px rgba(42, 8, 38, 0.04)',
+        'card-hover': '0 8px 28px -4px rgba(42, 8, 38, 0.12)',
+        'modal': '0 24px 64px -12px rgba(42, 8, 38, 0.25)',
       },
 
       animation: {
@@ -134,8 +134,8 @@ export default {
           '50%': { transform: 'translateY(-8px)' },
         },
         shieldPulse: {
-          '0%, 100%': { transform: 'scale(1)', filter: 'drop-shadow(0 0 12px rgba(255, 59, 112, 0.4))' },
-          '50%': { transform: 'scale(1.05)', filter: 'drop-shadow(0 0 24px rgba(255, 209, 102, 0.7))' },
+          '0%, 100%': { transform: 'scale(1)', filter: 'drop-shadow(0 0 12px rgba(255, 92, 138, 0.4))' },
+          '50%': { transform: 'scale(1.05)', filter: 'drop-shadow(0 0 24px rgba(230, 161, 0, 0.7))' },
         },
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
