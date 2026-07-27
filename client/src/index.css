@@ -1,0 +1,259 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================
+   TICHI SURAKSHA – GLOBAL DESIGN SYSTEM
+   ===================================================== */
+
+/* Import Premium Typography */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap');
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+    background-color: #FFF8FB;
+    color: #241A20;
+    line-height: 1.5;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Accessible focus ring - visible but elegant */
+  *:focus-visible {
+    outline: 2px solid #6D214F;
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+
+  /* Selection highlight */
+  ::selection {
+    background: #E8A0BF;
+    color: #6D214F;
+  }
+
+  input, textarea, select {
+    user-select: auto;
+    -webkit-user-select: auto;
+  }
+}
+
+/* =====================================================
+   SAFE AREA UTILITIES (Mobile notch / home indicator)
+   ===================================================== */
+.safe-pb {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.safe-pt {
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+}
+
+/* =====================================================
+   SCROLLBAR CUSTOMIZATION (Premium subtle)
+   ===================================================== */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #FFF8FB;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(109, 33, 79, 0.2);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(109, 33, 79, 0.5);
+}
+
+/* =====================================================
+   LEAFLET MAP OVERRIDES
+   ===================================================== */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  z-index: 10;
+  font-family: 'Manrope', sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px -2px rgba(109, 33, 79, 0.12) !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  color: #241A20 !important;
+  border: 1px solid #F3E5ED !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+}
+
+/* =====================================================
+   PREMIUM ANIMATIONS
+   ===================================================== */
+
+/* SOS Radar pulse - 3-ring breathing effect */
+@keyframes sos-radar {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.sos-radar-ring {
+  animation: sos-radar 2.5s ease-out infinite;
+}
+
+.sos-radar-ring-delayed {
+  animation: sos-radar 2.5s ease-out 0.8s infinite;
+}
+
+/* GPS Location marker pulse */
+@keyframes gps-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(109, 33, 79, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(109, 33, 79, 0);
+  }
+}
+
+.gps-pulse {
+  animation: gps-pulse 2s ease infinite;
+}
+
+/* Smooth page entrance */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.35s ease-out forwards;
+}
+
+/* Card entry stagger */
+.fade-up-1 { animation: fade-up 0.3s ease-out 0.05s both; }
+.fade-up-2 { animation: fade-up 0.3s ease-out 0.1s both; }
+.fade-up-3 { animation: fade-up 0.3s ease-out 0.15s both; }
+.fade-up-4 { animation: fade-up 0.3s ease-out 0.2s both; }
+
+/* =====================================================
+   CUSTOM COMPONENT UTILITIES
+   ===================================================== */
+
+/* Bottom navigation active indicator dot */
+.nav-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #6D214F;
+  margin: 2px auto 0;
+}
+
+/* Prevent iOS rubber band scroll on modals */
+.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* Map loading skeleton */
+.map-skeleton {
+  background: linear-gradient(90deg, #FBF4F7 25%, #F5E6ED 50%, #FBF4F7 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Touch feedback optimization */
+.touch-action-none {
+  touch-action: none;
+}
+
+/* Prevent text selection during SOS hold */
+.sos-hold-zone {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
+}
+
+/* Emergency critical state background */
+.emergency-bg {
+  background: linear-gradient(135deg, #D92D20 0%, #B91C1C 100%);
+}
+
+/* =====================================================
+   REDUCED MOTION SUPPORT (Accessibility)
+   ===================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =====================================================
+   RESPONSIVE DESKTOP SIDEBAR LAYOUT
+   ===================================================== */
+@media (min-width: 1024px) {
+  .desktop-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  .desktop-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    background: #FFFFFF;
+    border-right: 1px solid #F3E5ED;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1rem;
+    z-index: 50;
+    overflow-y: auto;
+  }
+
+  .desktop-content {
+    margin-left: 260px;
+    padding: 1.5rem;
+    max-width: calc(100% - 260px);
+  }
+}

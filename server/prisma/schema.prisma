@@ -1,0 +1,145 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String            @id @default(uuid())
+  fullName          String
+  email             String            @unique
+  phone             String
+  passwordHash      String
+  safetyStatus      String            @default("SAFE") // SAFE, SOS_ACTIVE, JOURNEY_ACTIVE
+  quickSosMode      String            @default("STANDARD") // STANDARD, SILENT
+  onboardingStep    Int               @default(1)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  trustedContacts   TrustedContact[]
+  sosSessions       SosSession[]
+  journeys          Journey[]
+  liveShares        LiveShareSession[]
+  safetyCheckins    SafetyCheckin[]
+  auditLogs         AuditLog[]
+}
+
+model TrustedContact {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  relationship  String
+  phone         String
+  email         String
+  isVerified    Boolean  @default(true)
+  priorityOrder Int      @default(1)
+  createdAt     DateTime @default(now())
+}
+
+model SosSession {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  status         String        @default("ACTIVE") // ACTIVE, RESOLVED, CANCELLED
+  isSilent       Boolean       @default(false)
+  shareToken     String        @unique @default(uuid())
+  startedAt      DateTime      @default(now())
+  resolvedAt     DateTime?
+  resolutionNote String?
+  locations      SosLocation[]
+  alerts         SosAlert[]
+}
+
+model SosLocation {
+  id           String     @id @default(uuid())
+  sosSessionId String
+  sosSession   SosSession @relation(fields: [sosSessionId], references: [id], onDelete: Cascade)
+  latitude     Float
+  longitude    Float
+  accuracy     Float?
+  altitude     Float?
+  speed        Float?
+  heading      Float?
+  recordedAt   DateTime   @default(now())
+}
+
+model SosAlert {
+  id           String     @id @default(uuid())
+  sosSessionId String
+  sosSession   SosSession @relation(fields: [sosSessionId], references: [id])
+  channel      String     // EMAIL, SMS, WEBSOCKET
+  recipient    String
+  status       String     @default("SENT") // SENT, FAILED
+  sentAt       DateTime   @default(now())
+}
+
+model LiveShareSession {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  shareToken      String   @unique
+  durationMinutes Int
+  expiresAt       DateTime
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+}
+
+model Journey {
+  id              String            @id @default(uuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+  originName      String
+  destinationName String
+  originLat       Float
+  originLng       Float
+  destLat         Float
+  destLng         Float
+  expectedArrival DateTime
+  status          String            @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, OVERDUE, ESCALATED
+  shareToken      String            @unique
+  startedAt       DateTime          @default(now())
+  completedAt     DateTime?
+  locations       JourneyLocation[]
+}
+
+model JourneyLocation {
+  id         String   @id @default(uuid())
+  journeyId  String
+  journey    Journey  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  latitude   Float
+  longitude  Float
+  recordedAt DateTime @default(now())
+}
+
+model SafetyCheckin {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  intervalMins Int
+  triggerAt    DateTime
+  status       String    @default("PENDING") // PENDING, CONFIRMED_SAFE, EXPIRED_ESCALATED
+  createdAt    DateTime  @default(now())
+}
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("DISPATCHER") // SUPERADMIN, DISPATCHER
+  createdAt    DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  details   String
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
