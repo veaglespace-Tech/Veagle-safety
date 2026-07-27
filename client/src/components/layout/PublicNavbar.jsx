@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, Sparkles, PhoneCall, ArrowRight, Image as ImageIcon, Info } from 'lucide-react';
+import { Shield, Zap, UserPlus, PhoneCall, ArrowRight, Image as ImageIcon, Info, ShieldCheck, Award } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/authSlice.js';
 
@@ -65,7 +65,7 @@ export const PublicNavbar = () => {
                 : 'text-tichi-muted hover:text-tichi-text hover:bg-white'
             }`}
           >
-            <Sparkles className="w-4 h-4" />
+            <Zap className="w-4 h-4" />
             <span>Pricing</span>
           </Link>
 
@@ -137,10 +137,19 @@ export const PublicNavbar = () => {
                 className="btn-baby-pink text-xs px-5 py-2.5 shadow-coral-glow flex items-center space-x-1.5"
               >
                 <span>Sign Up</span>
-                <Sparkles className="w-3.5 h-3.5" />
+                <UserPlus className="w-4 h-4" />
               </Link>
             </>
           )}
+
+          {/* Quick Security Badge Button Icon */}
+          <Link
+            to="/auth?mode=register"
+            title="Sakhi Suraksha Instant Sign Up"
+            className="w-10 h-10 rounded-2xl bg-rose/10 border border-rose/30 hover:border-rose text-rose flex items-center justify-center transition-all hover:scale-105 shadow-sm"
+          >
+            <ShieldCheck className="w-5 h-5" />
+          </Link>
         </div>
 
       </div>
