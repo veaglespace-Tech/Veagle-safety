@@ -5,15 +5,27 @@ import * as sosController from '../controllers/sosController.js';
 import * as journeyController from '../controllers/journeyController.js';
 import * as checkinController from '../controllers/checkinController.js';
 import * as adminController from '../controllers/adminController.js';
+import * as paymentController from '../controllers/paymentController.js';
 import { authenticateToken, requireSuperAdmin } from '../middleware/auth.js';
 
 const router = Router();
 
 // Auth & User
 router.post('/auth/register', authController.register);
+router.post('/auth/verify-email', authController.verifyEmail);
+router.post('/auth/resend-otp', authController.resendOtp);
 router.post('/auth/login', authController.login);
+router.post('/auth/logout', authController.logout);
 router.get('/auth/me', authenticateToken, authController.getProfile);
 router.put('/auth/settings', authenticateToken, authController.updateSettings);
+
+// PayU Payment Routes
+router.post('/payment/payu-initiate', authenticateToken, paymentController.initiatePayUPayment);
+router.post('/payment/payu-success', paymentController.handlePayUSuccess);
+router.get('/payment/payu-success', paymentController.handlePayUSuccess);
+router.post('/payment/payu-failure', paymentController.handlePayUFailure);
+router.get('/payment/payu-failure', paymentController.handlePayUFailure);
+router.get('/payment/history', authenticateToken, paymentController.getUserPaymentHistory);
 
 // Contacts
 router.get('/contacts', authenticateToken, contactController.getContacts);
@@ -42,5 +54,10 @@ router.get('/admin/overview', authenticateToken, requireSuperAdmin, adminControl
 router.get('/admin/users', authenticateToken, requireSuperAdmin, adminController.getAllUsers);
 router.put('/admin/user/role', authenticateToken, requireSuperAdmin, adminController.updateUserRole);
 router.post('/admin/sos/resolve', authenticateToken, requireSuperAdmin, adminController.adminResolveSos);
+router.get('/admin/plans', authenticateToken, requireSuperAdmin, adminController.getPlans);
+router.post('/admin/plans', authenticateToken, requireSuperAdmin, adminController.createOrUpdatePlan);
+router.get('/admin/gst', authenticateToken, requireSuperAdmin, adminController.getGstSettings);
+router.put('/admin/gst', authenticateToken, requireSuperAdmin, adminController.updateGstSettings);
+router.get('/admin/payments', authenticateToken, requireSuperAdmin, adminController.getPaymentHistory);
 
 export default router;

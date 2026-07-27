@@ -8,24 +8,78 @@ generator client {
 }
 
 model User {
-  id                String            @id @default(uuid())
-  fullName          String
-  email             String            @unique
-  phone             String
-  passwordHash      String
-  role              String            @default("USER") // USER, SUPER_ADMIN
-  safetyStatus      String            @default("SAFE") // SAFE, SOS_ACTIVE, JOURNEY_ACTIVE
-  quickSosMode      String            @default("STANDARD") // STANDARD, SILENT
-  onboardingStep    Int               @default(1)
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  id                    String            @id @default(uuid())
+  fullName              String
+  email                 String            @unique
+  phone                 String
+  passwordHash          String
+  role                  String            @default("USER") // USER, SUPER_ADMIN
+  profilePhoto          String?
+  bloodGroup            String?
+  address               String?
+  city                  String?
+  state                 String?
+  country               String?
+  isEmailVerified       Boolean           @default(false)
+  emailOtp              String?
+  emailOtpExpiresAt     DateTime?
+  subscriptionStatus    String            @default("INACTIVE") // INACTIVE, ACTIVE, EXPIRED
+  subscriptionExpiresAt DateTime?
+  currentPlanId         String?
+  safetyStatus          String            @default("SAFE") // SAFE, SOS_ACTIVE, JOURNEY_ACTIVE
+  quickSosMode          String            @default("STANDARD") // STANDARD, SILENT
+  onboardingStep        Int               @default(1)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
 
-  trustedContacts   TrustedContact[]
-  sosSessions       SosSession[]
-  journeys          Journey[]
-  liveShares        LiveShareSession[]
-  safetyCheckins    SafetyCheckin[]
-  auditLogs         AuditLog[]
+  trustedContacts       TrustedContact[]
+  sosSessions           SosSession[]
+  journeys              Journey[]
+  liveShares            LiveShareSession[]
+  safetyCheckins        SafetyCheckin[]
+  auditLogs             AuditLog[]
+  paymentHistories      PaymentHistory[]
+}
+
+model Plan {
+  id               String           @id @default(uuid())
+  name             String
+  description      String?
+  basePrice        Float            @default(24.0)
+  gstPercentage    Float            @default(18.0)
+  totalPrice       Float            @default(28.32)
+  durationDays     Int              @default(30)
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  paymentHistories PaymentHistory[]
+}
+
+model PaymentHistory {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId        String?
+  plan          Plan?    @relation(fields: [planId], references: [id])
+  txnid         String   @unique
+  amount        Float
+  baseAmount    Float
+  gstAmount     Float
+  gstPercentage Float
+  status        String   @default("PENDING") // PENDING, SUCCESS, FAILED
+  payuMoneyId   String?
+  paymentMode   String?
+  hash          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 model TrustedContact {
@@ -131,7 +185,7 @@ model AdminUser {
   email        String   @unique
   passwordHash String
   name         String
-  role         String   @default("DISPATCHER") // SUPERADMIN, DISPATCHER
+  role         String   @default("SUPER_ADMIN") // SUPER_ADMIN
   createdAt    DateTime @default(now())
 }
 
