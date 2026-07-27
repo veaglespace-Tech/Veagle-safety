@@ -21,11 +21,16 @@ export const LandingPage = () => {
           <span className="text-white">INDIA'S MOST TRUSTED PERSONAL SAFETY PLATFORM</span>
         </div>
 
-        {/* HERO TITLE (SOLID BRIGHT HIGH-CONTRAST HEADING) */}
+        {/* HERO TITLE (DISTINCT ELECTRIC CORAL ROSE SECOND LINE) */}
         <div className="space-y-4 max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight">
-            <span className="text-white block drop-shadow-md">Sakhi Suraksha SOS</span>
-            <span className="text-gold font-black block drop-shadow-md py-1">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight space-y-2">
+            <span className="text-white block drop-shadow-md">
+              Sakhi Suraksha SOS
+            </span>
+            <span 
+              className="block font-black py-1 tracking-tight drop-shadow-[0_2px_12px_rgba(255,59,112,0.6)]"
+              style={{ color: '#FF3B70' }}
+            >
               Instant 3-Second Emergency Protection
             </span>
           </h1>
