@@ -26,6 +26,9 @@ import {
   Crown,
   KeyRound,
   CheckCircle2,
+  AlertCircle,
+  FileText,
+  Users,
 } from 'lucide-react';
 
 export const AuthPage = () => {
@@ -33,7 +36,7 @@ export const AuthPage = () => {
   const initialMode = searchParams.get('mode') === 'register' ? false : true;
   const [isLogin, setIsLogin] = useState(initialMode);
 
-  // Registration 10 Fields State
+  // Comprehensive Registration Fields State
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -43,6 +46,10 @@ export const AuthPage = () => {
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [country, setCountry] = useState('India');
+  const [pincode, setPincode] = useState('');
+  const [emergencyContactName, setEmergencyContactName] = useState('');
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
+  const [medicalNotes, setMedicalNotes] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
 
@@ -85,6 +92,10 @@ export const AuthPage = () => {
           city,
           state,
           country,
+          pincode,
+          emergencyContactName,
+          emergencyContactPhone,
+          medicalNotes,
           password,
           role: 'USER',
         })
@@ -109,7 +120,6 @@ export const AuthPage = () => {
 
         {/* TOP BRANDING & INTERACTIVE SAFETY SHIELD MASCOT */}
         <div className="text-center space-y-3">
-          {/* ANIMATED INTERACTIVE MASCOT SHIELD */}
           <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
             <div className={`absolute inset-0 rounded-full border-2 border-rose/30 ${isLoading ? 'animate-ping' : 'animate-pulse'}`} />
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose via-plum-light to-gold p-0.5 shadow-coral-glow flex items-center justify-center">
@@ -179,175 +189,249 @@ export const AuthPage = () => {
           )}
 
           {/* FORM */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             
             {!isLogin ? (
-              // 10-FIELD USER REGISTRATION
-              <div className="space-y-4 text-xs">
+              // COMPREHENSIVE SAFETY REGISTRATION FIELDS
+              <div className="space-y-6 text-xs">
                 
-                {/* FULL NAME */}
-                <div>
-                  <label className="block text-rose-muted font-bold mb-1">1. Full Name *</label>
-                  <div className="relative">
-                    <UserIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Priya Sharma"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
-                    />
+                {/* SECTION 1: PERSONAL IDENTITY & SECURITY */}
+                <div className="space-y-3 bg-plum-dark/60 p-4 rounded-2xl border border-rose/20">
+                  <div className="flex items-center space-x-2 text-gold font-black uppercase text-[11px]">
+                    <UserIcon className="w-4 h-4 text-gold" />
+                    <span>Section 1: Personal Identity & Security</span>
                   </div>
-                </div>
 
-                {/* EMAIL & PHONE GRID */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-rose-muted font-bold mb-1">2. Email Address *</label>
+                    <label className="block text-rose-muted font-bold mb-1">Full Name *</label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <UserIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
-                        type="email"
+                        type="text"
                         required
-                        placeholder="priya@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Priya Sharma"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-rose-muted font-bold mb-1">3. Mobile Phone *</label>
-                    <div className="relative">
-                      <Phone className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="tel"
-                        required
-                        placeholder="+91 98765 43210"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
-                      />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-rose-muted font-bold mb-1">Email Address *</label>
+                      <div className="relative">
+                        <Mail className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="email"
+                          required
+                          placeholder="priya@example.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-rose-muted font-bold mb-1">Mobile Phone *</label>
+                      <div className="relative">
+                        <Phone className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="tel"
+                          required
+                          placeholder="+91 98765 43210"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* PROFILE PHOTO URL & BLOOD GROUP GRID */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-rose-muted font-bold mb-1">4. Profile Photo URL *</label>
+                    <label className="block text-rose-muted font-bold mb-1">Account Password *</label>
                     <div className="relative">
-                      <ImageIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Lock className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
-                        type="url"
+                        type={showPass ? 'text' : 'password'}
                         required
-                        placeholder="https://ik.imagekit.io/avatar.png"
-                        value={profilePhoto}
-                        onChange={(e) => setProfilePhoto(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full pl-10 pr-10 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
                       />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-rose-muted font-bold mb-1">5. Blood Group *</label>
-                    <div className="relative">
-                      <Heart className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <select
-                        value={bloodGroup}
-                        onChange={(e) => setBloodGroup(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white"
+                      <button
+                        type="button"
+                        onClick={() => setShowPass(!showPass)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-rose/70 hover:text-gold"
                       >
-                        <option value="O+">O Positive (O+)</option>
-                        <option value="O-">O Negative (O-)</option>
-                        <option value="A+">A Positive (A+)</option>
-                        <option value="A-">A Negative (A-)</option>
-                        <option value="B+">B Positive (B+)</option>
-                        <option value="B-">B Negative (B-)</option>
-                        <option value="AB+">AB Positive (AB+)</option>
-                        <option value="AB-">AB Negative (AB-)</option>
-                      </select>
+                        {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                {/* ADDRESS */}
-                <div>
-                  <label className="block text-rose-muted font-bold mb-1">6. Residential Address *</label>
-                  <div className="relative">
-                    <MapPin className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Flat No 402, Lotus Heights"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
-                    />
+                {/* SECTION 2: EMERGENCY PROFILE & HEALTH DATA */}
+                <div className="space-y-3 bg-plum-dark/60 p-4 rounded-2xl border border-rose/20">
+                  <div className="flex items-center space-x-2 text-gold font-black uppercase text-[11px]">
+                    <Heart className="w-4 h-4 text-rose" />
+                    <span>Section 2: Emergency Guardian & Health Data</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-rose-muted font-bold mb-1">Blood Group *</label>
+                      <div className="relative">
+                        <Heart className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <select
+                          value={bloodGroup}
+                          onChange={(e) => setBloodGroup(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white"
+                        >
+                          <option value="O+">O Positive (O+)</option>
+                          <option value="O-">O Negative (O-)</option>
+                          <option value="A+">A Positive (A+)</option>
+                          <option value="A-">A Negative (A-)</option>
+                          <option value="B+">B Positive (B+)</option>
+                          <option value="B-">B Negative (B-)</option>
+                          <option value="AB+">AB Positive (AB+)</option>
+                          <option value="AB-">AB Negative (AB-)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-rose-muted font-bold mb-1">Profile Photo URL *</label>
+                      <div className="relative">
+                        <ImageIcon className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="url"
+                          required
+                          placeholder="https://ik.imagekit.io/avatar.png"
+                          value={profilePhoto}
+                          onChange={(e) => setProfilePhoto(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PRIMARY GUARDIAN EMERGENCY CONTACT */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-gold font-bold mb-1">Primary Guardian / Contact Name</label>
+                      <div className="relative">
+                        <Users className="w-4 h-4 text-gold/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          placeholder="Mother / Father / Spouse Name"
+                          value={emergencyContactName}
+                          onChange={(e) => setEmergencyContactName(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gold/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-gold font-bold mb-1">Guardian Emergency Phone</label>
+                      <div className="relative">
+                        <Phone className="w-4 h-4 text-gold/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="tel"
+                          placeholder="+91 98765 00000"
+                          value={emergencyContactPhone}
+                          onChange={(e) => setEmergencyContactPhone(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gold/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-rose-muted font-bold mb-1">Emergency Medical Notes / Allergies (Optional)</label>
+                    <div className="relative">
+                      <FileText className="w-4 h-4 text-rose/70 absolute left-3.5 top-3" />
+                      <textarea
+                        rows={2}
+                        placeholder="e.g. Asthma patient, Diabetic, Penicillin allergy (Optional for first responders)"
+                        value={medicalNotes}
+                        onChange={(e) => setMedicalNotes(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* CITY, STATE, COUNTRY GRID */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-rose-muted font-bold mb-1">7. City *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Pune"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      className="w-full p-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
-                    />
+                {/* SECTION 3: RESIDENTIAL ADDRESS & LOCATION */}
+                <div className="space-y-3 bg-plum-dark/60 p-4 rounded-2xl border border-rose/20">
+                  <div className="flex items-center space-x-2 text-gold font-black uppercase text-[11px]">
+                    <MapPin className="w-4 h-4 text-gold" />
+                    <span>Section 3: Location & Residential Dispatch Address</span>
                   </div>
 
                   <div>
-                    <label className="block text-rose-muted font-bold mb-1">8. State *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Maharashtra"
-                      value={state}
-                      onChange={(e) => setState(e.target.value)}
-                      className="w-full p-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
-                    />
+                    <label className="block text-rose-muted font-bold mb-1">Residential Address *</label>
+                    <div className="relative">
+                      <MapPin className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="Flat No 402, Lotus Heights, MG Road"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-rose-muted font-bold mb-1">9. Country *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="India"
-                      value={country}
-                      onChange={(e) => setCountry(e.target.value)}
-                      className="w-full p-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
-                    />
-                  </div>
-                </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <div>
+                      <label className="block text-rose-muted font-bold mb-1">City *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Pune"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full p-2.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      />
+                    </div>
 
-                {/* PASSWORD */}
-                <div>
-                  <label className="block text-rose-muted font-bold mb-1">10. Account Password *</label>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-rose/70 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type={showPass ? 'text' : 'password'}
-                      required
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-3 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPass(!showPass)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-rose/70 hover:text-gold"
-                    >
-                      {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
+                    <div>
+                      <label className="block text-rose-muted font-bold mb-1">State *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Maharashtra"
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        className="w-full p-2.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-rose-muted font-bold mb-1">Country *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="India"
+                        value={country}
+                        onChange={(e) => setCountry(e.target.value)}
+                        className="w-full p-2.5 rounded-xl border border-rose/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-gold font-bold mb-1">Pincode</label>
+                      <input
+                        type="text"
+                        placeholder="411001"
+                        value={pincode}
+                        onChange={(e) => setPincode(e.target.value)}
+                        className="w-full p-2.5 rounded-xl border border-gold/30 bg-plum-dark text-white placeholder-rose-muted/40"
+                      />
+                    </div>
                   </div>
                 </div>
 

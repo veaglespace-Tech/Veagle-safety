@@ -20,6 +20,10 @@ model User {
   city                  String?
   state                 String?
   country               String?
+  pincode               String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  medicalNotes          String?
   isEmailVerified       Boolean           @default(false)
   emailOtp              String?
   emailOtpExpiresAt     DateTime?

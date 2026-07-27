@@ -21,6 +21,10 @@ export const register = asyncHandler(async (req, res) => {
     city,
     state,
     country,
+    pincode,
+    emergencyContactName,
+    emergencyContactPhone,
+    medicalNotes,
   } = req.body;
 
   const assignedRole = role === 'SUPER_ADMIN' ? 'SUPER_ADMIN' : 'USER';
@@ -31,10 +35,10 @@ export const register = asyncHandler(async (req, res) => {
       return res.status(400).json({ error: 'fullName, email, and password are required for SuperAdmin' });
     }
   } else {
-    // USER requires all profile details
+    // USER requires all core profile details
     if (!fullName || !email || !phone || !password || !profilePhoto || !bloodGroup || !address || !city || !state || !country) {
       return res.status(400).json({
-        error: 'All fields are required: fullName, email, phone, password, profilePhoto, bloodGroup, address, city, state, country',
+        error: 'All core fields are required: fullName, email, phone, password, profilePhoto, bloodGroup, address, city, state, country',
       });
     }
   }
@@ -63,11 +67,34 @@ export const register = asyncHandler(async (req, res) => {
       city: city || null,
       state: state || null,
       country: country || null,
+      pincode: pincode || null,
+      emergencyContactName: emergencyContactName || null,
+      emergencyContactPhone: emergencyContactPhone || null,
+      medicalNotes: medicalNotes || null,
       isEmailVerified: assignedRole === 'SUPER_ADMIN' ? true : false,
       emailOtp: assignedRole === 'SUPER_ADMIN' ? null : otp,
       emailOtpExpiresAt: assignedRole === 'SUPER_ADMIN' ? null : otpExpires,
     },
   });
+
+  // Automatically create primary emergency contact in TrustedContact table if provided
+  if (emergencyContactName && emergencyContactPhone) {
+    try {
+      await prisma.trustedContact.create({
+        data: {
+          userId: user.id,
+          name: emergencyContactName,
+          relationship: 'Primary Guardian / Emergency Contact',
+          phone: emergencyContactPhone,
+          email: email, // Default backup notification email
+          isVerified: true,
+          priorityOrder: 1,
+        },
+      });
+    } catch (e) {
+      console.log('[Register Notice] Optional primary contact creation skipped:', e.message);
+    }
+  }
 
   // Send verification email for User role
   if (assignedRole === 'USER') {
@@ -230,6 +257,10 @@ export const login = asyncHandler(async (req, res) => {
       city: user.city,
       state: user.state,
       country: user.country,
+      pincode: user.pincode,
+      emergencyContactName: user.emergencyContactName,
+      emergencyContactPhone: user.emergencyContactPhone,
+      medicalNotes: user.medicalNotes,
       isEmailVerified: user.isEmailVerified,
       subscriptionStatus: user.subscriptionStatus,
       subscriptionExpiresAt: user.subscriptionExpiresAt,
@@ -279,6 +310,10 @@ export const getProfile = asyncHandler(async (req, res) => {
       city: user.city,
       state: user.state,
       country: user.country,
+      pincode: user.pincode,
+      emergencyContactName: user.emergencyContactName,
+      emergencyContactPhone: user.emergencyContactPhone,
+      medicalNotes: user.medicalNotes,
       isEmailVerified: user.isEmailVerified,
       subscriptionStatus: user.subscriptionStatus,
       subscriptionExpiresAt: user.subscriptionExpiresAt,
@@ -295,7 +330,22 @@ export const getProfile = asyncHandler(async (req, res) => {
  * Update User Profile & Settings
  */
 export const updateSettings = asyncHandler(async (req, res) => {
-  const { quickSosMode, onboardingStep, fullName, phone, profilePhoto, bloodGroup, address, city, state, country } = req.body;
+  const {
+    quickSosMode,
+    onboardingStep,
+    fullName,
+    phone,
+    profilePhoto,
+    bloodGroup,
+    address,
+    city,
+    state,
+    country,
+    pincode,
+    emergencyContactName,
+    emergencyContactPhone,
+    medicalNotes,
+  } = req.body;
 
   const updated = await prisma.user.update({
     where: { id: req.user?.id },
@@ -310,6 +360,10 @@ export const updateSettings = asyncHandler(async (req, res) => {
       ...(city && { city }),
       ...(state && { state }),
       ...(country && { country }),
+      ...(pincode && { pincode }),
+      ...(emergencyContactName && { emergencyContactName }),
+      ...(emergencyContactPhone && { emergencyContactPhone }),
+      ...(medicalNotes && { medicalNotes }),
     },
   });
 
