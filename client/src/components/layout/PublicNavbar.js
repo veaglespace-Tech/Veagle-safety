@@ -131,16 +131,18 @@ export const PublicNavbar = () => {
             <>
               <Link
                 href="/auth?mode=login"
-                className="btn-baby-pink-outline text-xs px-4 py-2.5"
+                className="btn-baby-pink-outline text-xs px-4.5 py-2.5"
               >
                 Sign In
               </Link>
               <Link
                 href="/auth?mode=register"
-                className="btn-baby-pink text-xs px-5 py-2.5 shadow-coral-glow flex items-center space-x-1.5"
+                className="btn-baby-pink text-xs px-5 py-2.5 shadow-coral-glow flex items-center space-x-2"
               >
                 <span>Sign Up</span>
-                <UserPlus className="w-4 h-4" />
+                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                  <UserPlus className="w-3 h-3 text-white" />
+                </div>
               </Link>
             </>
           )}
