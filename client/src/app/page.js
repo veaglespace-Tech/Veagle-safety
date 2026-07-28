@@ -5,10 +5,8 @@ import Link from 'next/link';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
 import { Shield, ShieldCheck, Radio, Zap, ArrowRight, MapPin, BellRing, Award, CheckCircle2, PhoneCall } from 'lucide-react';
 import { AnimatedHeading } from '../components/common/AnimatedHeading.jsx';
-import { TypewriterText } from '../components/common/TypewriterText.jsx';
 import { GsapMagneticButton } from '../components/common/GsapMagneticButton.js';
 import { GsapStaggerContainer } from '../components/common/GsapStaggerContainer.js';
-import { LottieAnimation } from '../components/common/LottieAnimation.js';
 
 export default function LandingPage() {
   return (
@@ -35,19 +33,22 @@ export default function LandingPage() {
           <span className="text-shimmer-animated">INDIA'S MOST TRUSTED PERSONAL SAFETY PLATFORM</span>
         </div>
 
-        {/* HERO TITLE */}
-        <div className="space-y-4 max-w-4xl mx-auto">
-          <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight space-y-2">
+        {/* HERO TITLE & HERO MARQUEE */}
+        <div className="space-y-6 max-w-4xl mx-auto">
+          <AnimatedHeading as="h1" className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight">
             <span className="text-tichi-text block drop-shadow-sm">
               Sakhi Suraksha SOS
             </span>
-            <span 
-              className="block font-black py-1 tracking-tight drop-shadow-[0_4px_15px_rgba(255,92,138,0.25)] text-baby-pink-gradient"
-            >
-              <TypewriterText text="Instant 3-Second Emergency Protection" speed={60} />
-            </span>
           </AnimatedHeading>
-          <p className="text-base sm:text-xl text-tichi-muted max-w-2xl mx-auto font-bold leading-relaxed">
+
+          {/* HERO LIVE SCROLLING MARQUEE IN PLACE OF STATIC TEXT */}
+          <div className="py-3 px-4 max-w-3xl mx-auto border-2 border-[#FFCCE1] bg-white/90 backdrop-blur-md rounded-2xl shadow-coral-glow">
+            <AnimatedHeading variant="marquee" className="text-lg sm:text-2xl font-black uppercase tracking-wider text-rose">
+              INSTANT 3-SECOND EMERGENCY PROTECTION ✦ 24/7 LIVE GPS TRACKING STREAM ✦ TRUSTED GUARDIAN SIREN BROADCAST
+            </AnimatedHeading>
+          </div>
+
+          <p className="text-base sm:text-xl text-tichi-muted max-w-2xl mx-auto font-bold leading-relaxed pt-2">
             A modern, calm, and trustworthy personal safety companion designed specifically for girls and women. Fast emergency alerts, live GPS location sharing, and 24/7 command dispatch.
           </p>
         </div>
