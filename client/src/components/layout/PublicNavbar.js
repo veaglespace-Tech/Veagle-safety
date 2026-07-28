@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Shield, Zap, UserPlus, LogIn, PhoneCall, ArrowRight, Image as ImageIcon, Info, Heart } from 'lucide-react';
+import { Shield, Zap, UserPlus, LogIn, PhoneCall, ArrowRight, Image as ImageIcon, Info, Heart, UserCheck } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
 
@@ -128,29 +128,25 @@ export const PublicNavbar = () => {
               </button>
             </div>
           ) : (
-            <>
-              {/* ULTRA-MODERN UNIQUE SIGN IN BUTTON */}
+            <div className="flex items-center space-x-2.5">
+              {/* CLEAN LUXURY SIGN IN CAPSULE */}
               <Link
                 href="/auth?mode=login"
-                className="btn-baby-pink-outline text-xs px-4.5 py-2.5 flex items-center space-x-2 group shadow-sm hover:shadow-md transition-all"
+                className="btn-signin-luxury flex items-center space-x-1.5 group"
               >
-                <div className="w-5 h-5 rounded-full bg-rose/10 flex items-center justify-center border border-rose/25 shrink-0 group-hover:bg-rose group-hover:border-rose transition-all">
-                  <LogIn className="w-3 h-3 text-rose group-hover:text-white transition-colors" />
-                </div>
+                <UserCheck className="w-4 h-4 text-rose group-hover:scale-110 transition-transform" />
                 <span>Sign In</span>
               </Link>
 
-              {/* ULTRA-MODERN UNIQUE SIGN UP BUTTON */}
+              {/* VIBRANT LUXURY SIGN UP GRADIENT PILL */}
               <Link
                 href="/auth?mode=register"
-                className="btn-baby-pink text-xs px-5 py-2.5 shadow-coral-glow flex items-center space-x-2"
+                className="btn-signup-luxury flex items-center space-x-2 group"
               >
                 <span>Sign Up</span>
-                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                  <UserPlus className="w-3 h-3 text-white" />
-                </div>
+                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
               </Link>
-            </>
+            </div>
           )}
         </div>
 
