@@ -99,9 +99,9 @@ export const register = asyncHandler(async (req, res) => {
   // Send verification email for User role
   if (assignedRole === 'USER') {
     try {
-      await sendEmailVerificationOtp(email, fullName, otp);
+      await sendEmailVerificationOtp({ recipientEmail: email, userName: fullName, otp });
     } catch (emailErr) {
-      console.warn('[Register Email Notice] Verification email could not be sent directly:', emailErr.message);
+      console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
     }
 
     return res.status(201).json({
@@ -241,7 +241,7 @@ export const resendOtp = asyncHandler(async (req, res) => {
   });
 
   try {
-    await sendEmailVerificationOtp(email, user.fullName, newOtp);
+    await sendEmailVerificationOtp({ recipientEmail: email, userName: user.fullName, otp: newOtp });
   } catch (emailErr) {
     console.warn('[Resend OTP Email Notice] Failed to send email:', emailErr.message);
   }
