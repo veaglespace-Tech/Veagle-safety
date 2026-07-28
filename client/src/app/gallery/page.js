@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { PublicNavbar } from '../components/layout/PublicNavbar.jsx';
+import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import {
   Image as ImageIcon,
   Shield,
@@ -16,9 +18,11 @@ import {
   Activity,
   BellRing,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
-export const GalleryPage = () => {
+export const dynamic = 'force-dynamic';
+
+export default function PlatformGalleryPage() {
   const [activeTab, setActiveTab] = useState('ALL');
 
   const galleryItems = [
@@ -191,7 +195,7 @@ export const GalleryPage = () => {
             Designed for Simplicity, Speed & Safety
           </h1>
           <p className="text-tichi-muted text-base font-medium leading-relaxed">
-            Explore interactive previews of Sakhi Suraksha SOS’s emergency response interfaces, GPS tracking, and safety tools.
+            Explore interactive previews of Veagle Safety SOS’s emergency response interfaces, GPS tracking, and safety tools.
           </p>
 
           {/* CATEGORY FILTER TABS */}
@@ -212,7 +216,7 @@ export const GalleryPage = () => {
           </div>
         </div>
 
-        {/* 6 TOP-NOTCH UNIQUE ANTIQUE GALLERY CARDS */}
+        {/* 6 TOP-NOTCH UNIQUE GALLERY CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredItems.map((item) => {
             const Icon = item.icon;
@@ -275,7 +279,7 @@ export const GalleryPage = () => {
             </p>
           </div>
           <Link
-            to="/auth?mode=register"
+            href="/auth?mode=register"
             className="inline-flex btn-baby-pink px-8 py-4 text-xs font-black uppercase tracking-wider space-x-2"
           >
             <span>REGISTER FOR ₹24 YEARLY PLAN</span>
@@ -286,4 +290,4 @@ export const GalleryPage = () => {
       </section>
     </div>
   );
-};
+}

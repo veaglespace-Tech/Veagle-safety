@@ -1,9 +1,13 @@
-import React from 'react';
-import { PublicNavbar } from '../components/layout/PublicNavbar.jsx';
-import { Shield, Heart, Lock, Award, Users, Globe, Zap, Radio, CheckCircle2, ArrowRight, Activity, Terminal } from 'lucide-react';
-import { Link } from 'react-router-dom';
+'use client';
 
-export const AboutPage = () => {
+import React from 'react';
+import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
+import { Shield, Heart, Lock, Award, Users, Globe, Zap, Radio, CheckCircle2, ArrowRight, Activity, Terminal } from 'lucide-react';
+import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
+
+export default function AboutUsPage() {
   const pillars = [
     {
       icon: Radio,
@@ -58,7 +62,7 @@ export const AboutPage = () => {
           </h1>
 
           <p className="text-tichi-muted text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
-            Sakhi Suraksha SOS was created to combine cutting-edge technology with compassionate design—ensuring help is always 3 seconds away when it matters most.
+            Veagle Safety SOS was created to combine cutting-edge technology with compassionate design—ensuring help is always 3 seconds away when it matters most.
           </p>
         </div>
 
@@ -84,11 +88,11 @@ export const AboutPage = () => {
           </div>
         </div>
 
-        {/* 4 CORE ARCHITECTURAL PILLARS (ANTIQUE-MODERN PORCELAIN CARDS) */}
+        {/* 4 CORE ARCHITECTURAL PILLARS */}
         <div className="space-y-8">
           <div className="text-center space-y-2 max-w-xl mx-auto">
             <h2 className="text-2xl sm:text-3xl font-black text-tichi-text">
-              The 4 Pillars of Sakhi Suraksha SOS
+              The 4 Pillars of Veagle Safety SOS
             </h2>
             <p className="text-xs text-tichi-muted font-bold">
               Engineering excellence dedicated to non-compromised personal safety.
@@ -134,14 +138,14 @@ export const AboutPage = () => {
           </div>
           <div className="space-y-2">
             <h2 className="text-2xl sm:text-4xl font-black text-tichi-text">
-              Join Sakhi Suraksha SOS Today
+              Join Veagle Safety SOS Today
             </h2>
             <p className="text-xs sm:text-sm text-tichi-muted font-semibold max-w-xl mx-auto">
               Get complete 365-day emergency protection for just ₹24/year. Instant registration in under 2 minutes.
             </p>
           </div>
           <Link
-            to="/auth?mode=register"
+            href="/auth?mode=register"
             className="inline-flex btn-baby-pink px-9 py-4 text-xs font-black uppercase tracking-wider space-x-2"
           >
             <span>START YOUR 365-DAY PROTECTION</span>
@@ -152,4 +156,4 @@ export const AboutPage = () => {
       </section>
     </div>
   );
-};
+}

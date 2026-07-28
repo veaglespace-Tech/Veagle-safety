@@ -1,15 +1,19 @@
+'use client';
+
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { PublicNavbar } from '../components/layout/PublicNavbar.jsx';
-import { fetchPlans, initiatePayUCheckout } from '../store/slices/planSlice.js';
+import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
+import { fetchPlans, initiatePayUCheckout } from '../../redux/slices/planSlice.js';
 import { Sparkles, Shield, Check, ArrowRight, Zap, Award, Lock, ShieldCheck, HelpCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
-export const PricingPage = () => {
+export const dynamic = 'force-dynamic';
+
+export default function PlatformPricingPage() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { plans, isLoading } = useSelector((state) => state.plan);
-  const { token } = useSelector((state) => state.auth);
+  const router = useRouter();
+  const { plans = [], isLoading } = useSelector((state) => state.plan || {});
+  const { token } = useSelector((state) => state.auth || {});
 
   useEffect(() => {
     dispatch(fetchPlans());
@@ -17,7 +21,7 @@ export const PricingPage = () => {
 
   const yearlyPlan = plans[0] || {
     id: 'plan_yearly_24',
-    name: 'Sakhi Suraksha 365 Yearly Protection Plan',
+    name: 'Veagle Safety 365 Yearly Protection Plan',
     description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
     basePrice: 24,
     gstPercentage: 18,
@@ -27,7 +31,7 @@ export const PricingPage = () => {
 
   const handleSelectPlan = () => {
     if (!token) {
-      navigate('/auth?mode=register');
+      router.push('/auth?mode=register');
     } else {
       dispatch(initiatePayUCheckout({ planId: yearlyPlan.id, amount: yearlyPlan.totalPrice }));
     }
@@ -57,7 +61,7 @@ export const PricingPage = () => {
           </p>
         </div>
 
-        {/* TOP-NOTCH SINGLE YEARLY PLAN CARD (CARD-ANTIQUE-PINK PORCELAIN CARD) */}
+        {/* SINGLE YEARLY PLAN CARD */}
         <div className="max-w-3xl mx-auto">
           <div className="card-antique-pink p-8 sm:p-12 border-2 border-rose shadow-coral-glow space-y-8 relative overflow-hidden">
             
@@ -129,7 +133,7 @@ export const PricingPage = () => {
               </div>
             </div>
 
-            {/* ACTION BUTTON (BTN-BABY-PINK) */}
+            {/* ACTION BUTTON */}
             <div className="space-y-3 pt-2">
               <button
                 onClick={handleSelectPlan}
@@ -172,4 +176,4 @@ export const PricingPage = () => {
       </section>
     </div>
   );
-};
+}

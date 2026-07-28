@@ -1,8 +1,12 @@
+'use client';
+
 import React, { useState } from 'react';
-import { PublicNavbar } from '../components/layout/PublicNavbar.jsx';
+import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { PhoneCall, Mail, MapPin, Send, ShieldCheck, Heart, Clock, User, MessageSquare, CheckCircle2, Phone } from 'lucide-react';
 
-export const ContactPage = () => {
+export const dynamic = 'force-dynamic';
+
+export default function ContactSupportPage() {
   const [submitted, setSubmitted] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -46,7 +50,7 @@ export const ContactPage = () => {
           {/* LEFT COLUMN: EMERGENCY HELPLINES & HQ DETAILS */}
           <div className="space-y-8">
             
-            {/* NATIONAL EMERGENCY HELPLINES (CARD-ANTIQUE-PINK PORCELAIN CARD) */}
+            {/* NATIONAL EMERGENCY HELPLINES */}
             <div className="card-antique-pink p-8 space-y-5 border-2 border-rose/40 shadow-coral-glow">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
@@ -125,7 +129,7 @@ export const ContactPage = () => {
                   <MapPin className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-tichi-text">🏢 Sakhi Suraksha HQ Command</h3>
+                  <h3 className="text-xl font-black text-tichi-text">🏢 Veagle Safety HQ Command</h3>
                   <p className="text-xs text-tichi-muted font-bold">Veagle Safety Network Data Centers</p>
                 </div>
               </div>
@@ -137,7 +141,7 @@ export const ContactPage = () => {
               <div className="pt-2 border-t border-blush-border space-y-2 text-xs font-mono font-bold">
                 <div className="flex items-center space-x-2 text-tichi-text">
                   <Mail className="w-4 h-4 text-gold-dark shrink-0" />
-                  <span>Email: support@sakhisuraksha.org</span>
+                  <span>Email: support@veaglesafety.org</span>
                 </div>
                 <div className="flex items-center space-x-2 text-tichi-text">
                   <Clock className="w-4 h-4 text-gold-dark shrink-0" />
@@ -148,7 +152,7 @@ export const ContactPage = () => {
 
           </div>
 
-          {/* RIGHT COLUMN: CONTACT FORM (CARD-ANTIQUE-PINK PORCELAIN FORM) */}
+          {/* RIGHT COLUMN: CONTACT FORM */}
           <div className="card-antique-pink p-8 sm:p-10 space-y-6">
             
             <div className="space-y-1">
@@ -270,4 +274,4 @@ export const ContactPage = () => {
       </section>
     </div>
   );
-};
+}
