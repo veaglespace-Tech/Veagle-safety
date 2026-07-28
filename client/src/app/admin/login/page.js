@@ -45,11 +45,16 @@ export default function SuperAdminLoginPage() {
         {/* LOGO & BRANDING HEADER */}
         <div className="text-center space-y-4">
           
-          {/* FLOATING 3D GOLD CROWN BADGE */}
+          {/* PORCELAIN ROSE-GOLD COMMAND SHIELD EMBLEM */}
           <div className="relative inline-block group">
-            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-gold via-amber-400 to-rose opacity-75 blur-md group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-pulse" />
-            <div className="relative w-20 h-20 rounded-3xl bg-gradient-to-tr from-gold via-amber-400 to-amber-500 text-white flex items-center justify-center shadow-gold-glow border-2 border-white/60 transform group-hover:scale-105 transition-transform duration-300">
-              <Crown className="w-10 h-10 text-white drop-shadow-md animate-bounce" style={{ animationDuration: '3s' }} />
+            <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-rose via-rose-light to-gold opacity-50 blur-lg group-hover:opacity-80 transition duration-500 animate-pulse" />
+            <div className="relative w-20 h-20 rounded-3xl bg-white/95 border-2 border-rose p-1 shadow-coral-glow flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
+              <div className="w-full h-full rounded-[22px] bg-gradient-to-br from-[#FFF0F3] via-white to-[#FFE4EC] flex items-center justify-center border border-rose/30 relative">
+                <ShieldCheck className="w-10 h-10 text-rose stroke-[2.2px] drop-shadow-sm" />
+                <span className="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-gold to-amber-500 text-white rounded-full p-1 shadow-sm border border-white">
+                  <Crown className="w-3.5 h-3.5 fill-white" />
+                </span>
+              </div>
             </div>
           </div>
 
