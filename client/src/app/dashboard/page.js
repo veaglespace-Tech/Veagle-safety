@@ -99,7 +99,7 @@ export default function DashboardAppPage() {
               </div>
             </div>
             <Link
-              href="/sos/active"
+              href="/active-sos"
               className="bg-white text-tichi-emergency font-black text-xs px-4 py-2.5 rounded-xl shadow hover:bg-red-50 transition-all flex items-center space-x-1"
             >
               <span>OPEN LIVE VIEW</span>
