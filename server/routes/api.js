@@ -6,6 +6,7 @@ import * as journeyController from '../controllers/journeyController.js';
 import * as checkinController from '../controllers/checkinController.js';
 import * as adminController from '../controllers/adminController.js';
 import * as paymentController from '../controllers/paymentController.js';
+import * as pushController from '../controllers/pushController.js';
 import { authenticateToken, requireSuperAdmin } from '../middleware/auth.js';
 
 const router = Router();
@@ -62,5 +63,10 @@ router.post('/admin/plans', authenticateToken, requireSuperAdmin, adminControlle
 router.get('/admin/gst', authenticateToken, requireSuperAdmin, adminController.getGstSettings);
 router.put('/admin/gst', authenticateToken, requireSuperAdmin, adminController.updateGstSettings);
 router.get('/admin/payments', authenticateToken, requireSuperAdmin, adminController.getPaymentHistory);
+
+// Web Push Notifications
+router.get('/push/vapid-key', pushController.getVapidPublicKey);
+router.post('/push/subscribe', authenticateToken, pushController.savePushSubscription);
+router.post('/push/subscribe-email', pushController.savePushSubscriptionByEmail);
 
 export default router;

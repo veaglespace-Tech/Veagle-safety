@@ -1,6 +1,8 @@
 import { prisma } from '../config/prisma.js';
 import { sendSosEmergencyAlert } from '../services/mailer.js';
 import { getIO } from '../socket.js';
+import { sendEmergencyPushToEmails } from './pushController.js';
+
 
 export const startSos = async (req, res) => {
   try {
@@ -81,6 +83,17 @@ export const startSos = async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
+
+    // Send Web Push Notifications to all trusted contacts' devices (even if browser is closed)
+    const contactEmails = contacts.map((c) => c.email).filter(Boolean);
+    await sendEmergencyPushToEmails({
+      emails: contactEmails,
+      victimName: req.user?.fullName || 'Sakhi Suraksha User',
+      trackingUrl,
+      latitude: initialLat || 18.5204,
+      longitude: initialLng || 73.8567,
+    });
+
 
     return res.json({
       message: 'SOS Activated! Emergency alerts & Siren Alarm broadcasted.',
