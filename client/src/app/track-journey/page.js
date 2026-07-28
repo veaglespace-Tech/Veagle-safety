@@ -4,15 +4,18 @@ import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { useLocationStore } from '../../redux/useLocationStore.js';
 import { api } from '../../utils/api.js';
-import { Navigation, Clock, ShieldCheck, Info, MapPin, ArrowRight, Shield, CheckCircle2 } from 'lucide-react';
+import { Navigation, Clock, ShieldCheck, Info, MapPin, ArrowRight, Shield, CheckCircle2, Sliders } from 'lucide-react';
 
 export default function UserTrackJourneyPage() {
   const { latitude, longitude } = useLocationStore();
   const [activeTab, setActiveTab] = useState('JOURNEY');
   const [destination, setDestination] = useState('');
   const [minutes, setMinutes] = useState('30');
+  const [isCustomMinutes, setIsCustomMinutes] = useState(false);
   const [journey, setJourney] = useState(null);
+  
   const [checkinInterval, setCheckinInterval] = useState('15');
+  const [isCustomCheckin, setIsCustomCheckin] = useState(false);
   const [checkin, setCheckin] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +40,10 @@ export default function UserTrackJourneyPage() {
 
   const handleStartJourney = async (e) => {
     e.preventDefault();
-    if (!destination) return;
+    if (!destination || !minutes || Number(minutes) <= 0) {
+      alert('Please enter a valid destination and travel duration in minutes.');
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.post('/journey/start', {
@@ -65,6 +71,10 @@ export default function UserTrackJourneyPage() {
   };
 
   const handleStartCheckin = async () => {
+    if (!checkinInterval || Number(checkinInterval) <= 0) {
+      alert('Please enter a valid check-in interval in minutes.');
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.post('/checkin/start', { intervalMins: checkinInterval });
@@ -99,7 +109,7 @@ export default function UserTrackJourneyPage() {
             </div>
             <h1 className="text-3xl font-black text-tichi-text tracking-tight">Stay Protected</h1>
             <p className="text-xs font-bold text-tichi-muted max-w-md mx-auto">
-              Real-time GPS trip tracking & scheduled safety check-in alarms
+              Real-time GPS trip tracking & custom safety check-in timer alarms
             </p>
           </div>
 
@@ -196,23 +206,51 @@ export default function UserTrackJourneyPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-black uppercase tracking-wider text-tichi-text mb-2">Estimated travel duration?</label>
-                      <div className="grid grid-cols-4 gap-2.5">
-                        {['15', '30', '45', '60'].map((m) => (
-                          <button
-                            key={m}
-                            type="button"
-                            onClick={() => setMinutes(m)}
-                            className={`py-3 rounded-xl text-xs font-black border-2 transition-all ${
-                              minutes === m
-                                ? 'bg-rose text-white border-rose shadow-md'
-                                : 'bg-white text-tichi-text border-[#FFCCE1] hover:bg-rose/10'
-                            }`}
-                          >
-                            {m === '60' ? '1 Hour' : `${m} Mins`}
-                          </button>
-                        ))}
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-black uppercase tracking-wider text-tichi-text">Travel Duration (Minutes)</label>
+                        <button
+                          type="button"
+                          onClick={() => setIsCustomMinutes(!isCustomMinutes)}
+                          className="text-[11px] font-black text-rose hover:underline flex items-center space-x-1"
+                        >
+                          <Sliders className="w-3.5 h-3.5" />
+                          <span>{isCustomMinutes ? 'Use Presets' : 'Custom Duration'}</span>
+                        </button>
                       </div>
+
+                      {/* QUICK PRESETS OR CUSTOM INPUT */}
+                      {isCustomMinutes ? (
+                        <div className="relative">
+                          <Clock className="w-5 h-5 text-rose absolute left-3.5 top-3" />
+                          <input
+                            type="number"
+                            min="1"
+                            max="720"
+                            placeholder="Enter custom minutes (e.g. 10, 25, 90)"
+                            value={minutes}
+                            onChange={(e) => setMinutes(e.target.value)}
+                            required
+                            className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:ring-2 focus:ring-rose focus:border-transparent focus:outline-none bg-white transition-all text-tichi-text font-mono"
+                          />
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-4 gap-2.5">
+                          {['15', '30', '45', '60'].map((m) => (
+                            <button
+                              key={m}
+                              type="button"
+                              onClick={() => { setMinutes(m); setIsCustomMinutes(false); }}
+                              className={`py-3 rounded-xl text-xs font-black border-2 transition-all ${
+                                minutes === m && !isCustomMinutes
+                                  ? 'bg-rose text-white border-rose shadow-md'
+                                  : 'bg-white text-tichi-text border-[#FFCCE1] hover:bg-rose/10'
+                              }`}
+                            >
+                              {m === '60' ? '1 Hour' : `${m} Mins`}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -222,7 +260,7 @@ export default function UserTrackJourneyPage() {
                     className="w-full btn-baby-pink py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-coral-glow font-black disabled:opacity-60"
                   >
                     <Navigation className="w-5 h-5" />
-                    <span>{loading ? 'STARTING...' : 'START PROTECTED JOURNEY'}</span>
+                    <span>{loading ? 'STARTING...' : `START JOURNEY (${minutes || '30'} MINS)`}</span>
                   </button>
                 </form>
               )}
@@ -276,27 +314,55 @@ export default function UserTrackJourneyPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-black uppercase tracking-wider text-tichi-text mb-2">Check-in Reminder Interval</label>
-                    <div className="grid grid-cols-3 gap-3">
-                      {[
-                        { val: '15', label: '15 Mins' },
-                        { val: '30', label: '30 Mins' },
-                        { val: '60', label: '1 Hour' },
-                      ].map((opt) => (
-                        <button
-                          key={opt.val}
-                          type="button"
-                          onClick={() => setCheckinInterval(opt.val)}
-                          className={`py-3.5 rounded-2xl text-xs font-black border-2 transition-all ${
-                            checkinInterval === opt.val
-                              ? 'bg-rose text-white border-rose shadow-md'
-                              : 'bg-white text-tichi-text border-[#FFCCE1] hover:bg-rose/10'
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs font-black uppercase tracking-wider text-tichi-text">Check-in Interval (Minutes)</label>
+                      <button
+                        type="button"
+                        onClick={() => setIsCustomCheckin(!isCustomCheckin)}
+                        className="text-[11px] font-black text-rose hover:underline flex items-center space-x-1"
+                      >
+                        <Sliders className="w-3.5 h-3.5" />
+                        <span>{isCustomCheckin ? 'Use Presets' : 'Custom Interval'}</span>
+                      </button>
                     </div>
+
+                    {/* QUICK PRESETS OR CUSTOM INPUT FOR CHECKIN */}
+                    {isCustomCheckin ? (
+                      <div className="relative">
+                        <Clock className="w-5 h-5 text-rose absolute left-3.5 top-3" />
+                        <input
+                          type="number"
+                          min="1"
+                          max="360"
+                          placeholder="Enter custom check-in minutes (e.g. 5, 20, 90)"
+                          value={checkinInterval}
+                          onChange={(e) => setCheckinInterval(e.target.value)}
+                          required
+                          className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:ring-2 focus:ring-rose focus:border-transparent focus:outline-none bg-white transition-all text-tichi-text font-mono"
+                        />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { val: '15', label: '15 Mins' },
+                          { val: '30', label: '30 Mins' },
+                          { val: '60', label: '1 Hour' },
+                        ].map((opt) => (
+                          <button
+                            key={opt.val}
+                            type="button"
+                            onClick={() => { setCheckinInterval(opt.val); setIsCustomCheckin(false); }}
+                            className={`py-3.5 rounded-2xl text-xs font-black border-2 transition-all ${
+                              checkinInterval === opt.val && !isCustomCheckin
+                                ? 'bg-rose text-white border-rose shadow-md'
+                                : 'bg-white text-tichi-text border-[#FFCCE1] hover:bg-rose/10'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <button
@@ -305,7 +371,7 @@ export default function UserTrackJourneyPage() {
                     className="w-full btn-baby-pink py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-coral-glow font-black disabled:opacity-60"
                   >
                     <Clock className="w-5 h-5" />
-                    <span>{loading ? 'STARTING...' : 'START SAFETY CHECK'}</span>
+                    <span>{loading ? 'STARTING...' : `START SAFETY CHECK (${checkinInterval || '15'} MINS)`}</span>
                   </button>
                 </div>
               )}
