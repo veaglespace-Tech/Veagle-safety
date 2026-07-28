@@ -35,11 +35,18 @@ export default function LandingPage() {
           </AnimatedHeading>
         </div>
 
-        {/* FULL SCREEN WIDTH HERO LIVE SCROLLING MARQUEE */}
+        {/* FULL SCREEN WIDTH HERO LIVE SCROLLING MARQUEE WITH MODERN UNIQUE ICONS */}
         <div className="w-full border-y-2 border-[#FFCCE1] bg-white/95 backdrop-blur-md py-4 shadow-coral-glow overflow-hidden my-4">
-          <AnimatedHeading variant="marquee" className="text-xl sm:text-3xl font-black uppercase tracking-wider text-rose">
-            INSTANT 3-SECOND EMERGENCY PROTECTION ✦ 24/7 LIVE GPS TRACKING STREAM ✦ TRUSTED GUARDIAN SIREN BROADCAST ✦ 365-DAY SAFETY NETWORK
-          </AnimatedHeading>
+          <AnimatedHeading
+            variant="marquee"
+            items={[
+              'INSTANT 3-SECOND EMERGENCY PROTECTION',
+              '24/7 LIVE GPS TRACKING STREAM',
+              'TRUSTED GUARDIAN SIREN BROADCAST',
+              '365-DAY WOMEN SAFETY NETWORK',
+            ]}
+            className="text-xl sm:text-3xl font-black uppercase tracking-wider text-rose"
+          />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
