@@ -47,11 +47,11 @@ function UserAuthForm() {
   const [phone, setPhone] = useState('');
   const [profilePhoto, setProfilePhoto] = useState('https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png');
   const [bloodGroup, setBloodGroup] = useState('O+');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
+  const [address, setAddress] = useState('Not Specified');
+  const [city, setCity] = useState('Pune');
+  const [state, setState] = useState('Maharashtra');
   const [country, setCountry] = useState('India');
-  const [pincode, setPincode] = useState('');
+  const [pincode, setPincode] = useState('411001');
   const [emergencyContactName, setEmergencyContactName] = useState('');
   const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
   const [medicalNotes, setMedicalNotes] = useState('');
@@ -93,11 +93,11 @@ function UserAuthForm() {
           phone,
           profilePhoto,
           bloodGroup,
-          address,
-          city,
-          state,
-          country,
-          pincode,
+          address: address || 'Not Specified',
+          city: city || 'Pune',
+          state: state || 'Maharashtra',
+          country: country || 'India',
+          pincode: pincode || '411001',
           emergencyContactName,
           emergencyContactPhone,
           medicalNotes,
@@ -234,14 +234,13 @@ function UserAuthForm() {
 
                 {/* SECTION 2: ADDRESS & EMERGENCY CONTACT */}
                 <div className="space-y-3 pt-2">
-                  <span className="text-[10px] font-black text-rose uppercase tracking-wider block">Section 2: Address & Emergency Contact</span>
+                  <span className="text-[10px] font-black text-rose uppercase tracking-wider block">Section 2: City & Emergency Contact</span>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-tichi-muted font-bold mb-1">City / Region *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">City / Region</label>
                       <input
                         type="text"
-                        required
                         placeholder="Pune"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
@@ -250,10 +249,9 @@ function UserAuthForm() {
                     </div>
 
                     <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Pincode *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Pincode</label>
                       <input
                         type="text"
-                        required
                         placeholder="411001"
                         value={pincode}
                         onChange={(e) => setPincode(e.target.value)}
@@ -264,10 +262,9 @@ function UserAuthForm() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Guardian Name *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Guardian Name (Optional)</label>
                       <input
                         type="text"
-                        required
                         placeholder="Rajesh Sharma (Father)"
                         value={emergencyContactName}
                         onChange={(e) => setEmergencyContactName(e.target.value)}
@@ -276,10 +273,9 @@ function UserAuthForm() {
                     </div>
 
                     <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Guardian Phone *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Guardian Phone (Optional)</label>
                       <input
                         type="tel"
-                        required
                         placeholder="+91 98765 00000"
                         value={emergencyContactPhone}
                         onChange={(e) => setEmergencyContactPhone(e.target.value)}
