@@ -32,6 +32,9 @@ import {
   AlertCircle,
   FileText,
   Users,
+  Upload,
+  Camera,
+  Trash2,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -46,6 +49,22 @@ export default function UserAuthPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [profilePhoto, setProfilePhoto] = useState('https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png');
+  const [showUrlInput, setShowUrlInput] = useState(false);
+
+  const handlePhotoFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image file size exceeds 5MB limit. Please choose a smaller file.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePhoto(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   const [bloodGroup, setBloodGroup] = useState('O+');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
@@ -306,18 +325,70 @@ export default function UserAuthPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Profile Photo URL *</label>
-                      <div className="relative">
-                        <ImageIcon className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="url"
-                          required
-                          placeholder="https://ik.imagekit.io/avatar.png"
-                          value={profilePhoto}
-                          onChange={(e) => setProfilePhoto(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
-                        />
+                    <div className="sm:col-span-2">
+                      <label className="block text-tichi-muted font-bold mb-1.5">Profile Photo *</label>
+                      <div className="bg-blush-subtle border border-[#FFCCE1] rounded-2xl p-4 flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                        {/* Avatar Image Preview Box */}
+                        <div className="relative group shrink-0">
+                          <img
+                            src={profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png'}
+                            alt="Profile Avatar Preview"
+                            className="w-16 h-16 rounded-2xl object-cover border-2 border-rose shadow-sm bg-white"
+                          />
+                          <label
+                            className="absolute -bottom-1 -right-1 bg-rose text-white p-1.5 rounded-full cursor-pointer shadow hover:scale-110 transition-transform"
+                            title="Upload new photo"
+                          >
+                            <Camera className="w-3.5 h-3.5" />
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handlePhotoFileChange}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+
+                        {/* Upload Controls & URL Toggle */}
+                        <div className="flex-1 space-y-2 text-center sm:text-left w-full">
+                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                            <label className="cursor-pointer bg-white text-rose font-extrabold text-xs px-4 py-2 rounded-xl border border-rose/30 hover:bg-rose hover:text-white transition-all inline-flex items-center space-x-1.5 shadow-sm">
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>CHOOSE PHOTO FILE</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handlePhotoFileChange}
+                                className="hidden"
+                              />
+                            </label>
+
+                            <button
+                              type="button"
+                              onClick={() => setShowUrlInput(!showUrlInput)}
+                              className="text-xs font-bold text-plum hover:underline"
+                            >
+                              {showUrlInput ? 'Hide URL input' : 'Paste Image URL instead'}
+                            </button>
+                          </div>
+
+                          <p className="text-[10px] text-tichi-muted font-medium">
+                            Select an image from device (JPG, PNG, WEBP — Max 5MB)
+                          </p>
+
+                          {showUrlInput && (
+                            <div className="relative mt-2">
+                              <ImageIcon className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                              <input
+                                type="url"
+                                placeholder="https://ik.imagekit.io/avatar.png"
+                                value={profilePhoto}
+                                onChange={(e) => setProfilePhoto(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2.5 text-xs input-antique-pink"
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

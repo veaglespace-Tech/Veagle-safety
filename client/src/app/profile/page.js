@@ -17,6 +17,9 @@ import {
   Info,
   ChevronRight,
   Crown,
+  Camera,
+  Upload,
+  X,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +29,24 @@ export default function UserProfileSettingsPage() {
   const { status, accuracy } = useLocationStore();
   const [showTestModal, setShowTestModal] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [userPhoto, setUserPhoto] = useState(user?.profilePhoto || '');
   const router = useRouter();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size exceeds 5MB limit.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUserPhoto(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleLogout = () => {
     if (confirm('Are you sure you want to sign out?')) {
@@ -69,11 +89,33 @@ export default function UserProfileSettingsPage() {
 
           <div className="px-5 pb-5 -mt-8 relative">
             <div className="flex items-end justify-between">
-              <div className="w-16 h-16 rounded-full bg-rose/30 border-4 border-white text-plum font-extrabold text-xl flex items-center justify-center shadow-plum-md">
-                {initials}
+              <div className="relative group">
+                {userPhoto || user?.profilePhoto ? (
+                  <img
+                    src={userPhoto || user?.profilePhoto}
+                    alt="User Profile"
+                    className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-plum-md bg-white"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-rose/30 border-4 border-white text-plum font-extrabold text-xl flex items-center justify-center shadow-plum-md">
+                    {initials}
+                  </div>
+                )}
+                <button
+                  onClick={() => setShowEditModal(true)}
+                  className="absolute bottom-0 right-0 bg-rose text-white p-1 rounded-full shadow hover:scale-110 transition-transform"
+                  title="Change Profile Photo"
+                >
+                  <Camera className="w-3 h-3" />
+                </button>
               </div>
-              <button className="text-xs font-bold text-plum border border-plum/30 px-3 py-1.5 rounded-xl hover:bg-plum-50 transition-colors mb-1">
-                Edit Profile
+
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="text-xs font-bold text-plum border border-plum/30 px-3 py-1.5 rounded-xl hover:bg-plum-50 transition-colors mb-1 flex items-center space-x-1"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>Edit Photo & Profile</span>
               </button>
             </div>
 
@@ -208,6 +250,48 @@ export default function UserProfileSettingsPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full shadow-modal overflow-hidden animate-scale-in">
+            <div className="bg-plum px-5 py-4 text-white flex items-center justify-between">
+              <h3 className="font-extrabold text-base">📷 Profile Photo Uploader</h3>
+              <button onClick={() => setShowEditModal(false)} className="text-white/80 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-5 text-center">
+              <div className="relative w-24 h-24 mx-auto">
+                <img
+                  src={userPhoto || user?.profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png'}
+                  alt="Profile Avatar"
+                  className="w-24 h-24 rounded-full object-cover border-4 border-rose/30 shadow-md bg-white mx-auto"
+                />
+                <label className="absolute bottom-0 right-0 bg-rose text-white p-2 rounded-full cursor-pointer shadow hover:scale-110 transition-transform">
+                  <Camera className="w-4 h-4" />
+                  <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                </label>
+              </div>
+
+              <div className="space-y-2">
+                <label className="cursor-pointer bg-plum text-white font-extrabold text-xs px-5 py-3 rounded-xl shadow hover:bg-plum-dark transition-all inline-flex items-center space-x-2 w-full justify-center">
+                  <Upload className="w-4 h-4" />
+                  <span>UPLOAD FROM DEVICE</span>
+                  <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                </label>
+
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="w-full bg-tichi-success text-white font-bold text-xs py-3 rounded-xl shadow hover:brightness-105 transition-all"
+                >
+                  SAVE PROFILE PHOTO
+                </button>
+              </div>
             </div>
           </div>
         </div>
