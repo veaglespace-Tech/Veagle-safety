@@ -393,3 +393,11 @@ export const updateSettings = asyncHandler(async (req, res) => {
 
   res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
 });
+
+/**
+ * Logout User
+ */
+export const logout = asyncHandler(async (req, res) => {
+  res.status(200).json({ message: 'Logged out successfully' });
+});
+
