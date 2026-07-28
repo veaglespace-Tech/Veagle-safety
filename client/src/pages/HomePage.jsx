@@ -95,7 +95,7 @@ export const HomePage = () => {
         <div className="fade-up-1 flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-tichi-muted uppercase tracking-widest">{getGreeting()}</p>
-            <h1 className="text-xl font-extrabold text-tichi-text mt-0.5 tracking-tight">{firstName} 👋</h1>
+            <h1 className="text-xl font-extrabold text-shimmer-animated text-glow-animated mt-0.5 tracking-tight">{firstName} 👋</h1>
             <p className="text-xs text-tichi-muted font-medium mt-0.5">Your safety companion is active</p>
           </div>
 

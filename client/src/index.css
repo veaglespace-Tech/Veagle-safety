@@ -133,11 +133,38 @@
   -webkit-text-fill-color: transparent;
 }
 
+.text-shimmer-animated {
+  background: linear-gradient(90deg, #FF2A6D 0%, #FF5C8A 30%, #E6A100 50%, #FF8FAB 70%, #FF2A6D 100%);
+  background-size: 200% linear;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 5.5s linear infinite;
+  transition: all 0.3s ease-out;
+}
+
 .text-gold-gradient {
   background: linear-gradient(135deg, #E6A100 0%, #C48800 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+.text-gold-shimmer-animated {
+  background: linear-gradient(90deg, #E6A100 0%, #FFD700 35%, #FF5C8A 65%, #E6A100 100%);
+  background-size: 200% linear;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 4.5s linear infinite;
+  transition: all 0.3s ease-out;
+}
+
+.text-glow-animated {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+.animate-title-reveal {
+  animation: titleReveal 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 
 /* Background mesh */
 .auth-mesh-bg {

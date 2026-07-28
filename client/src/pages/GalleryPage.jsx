@@ -17,6 +17,7 @@ import {
   BellRing,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { AnimatedHeading } from '../components/common/AnimatedHeading.jsx';
 
 export const GalleryPage = () => {
   const [activeTab, setActiveTab] = useState('ALL');
@@ -185,11 +186,11 @@ export const GalleryPage = () => {
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center space-x-2 bg-white text-rose border border-rose/30 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-sm">
             <ImageIcon className="w-4 h-4 text-rose animate-pulse" />
-            <span>PLATFORM VISUAL SHOWCASE</span>
+            <span className="text-shimmer-animated">PLATFORM VISUAL SHOWCASE</span>
           </div>
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-tichi-text">
+          <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight">
             Designed for Simplicity, Speed & Safety
-          </h1>
+          </AnimatedHeading>
           <p className="text-tichi-muted text-base font-medium leading-relaxed">
             Explore interactive previews of Sakhi Suraksha SOS’s emergency response interfaces, GPS tracking, and safety tools.
           </p>

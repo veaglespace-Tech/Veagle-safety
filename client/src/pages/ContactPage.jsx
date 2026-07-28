@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { PublicNavbar } from '../components/layout/PublicNavbar.jsx';
 import { PhoneCall, Mail, MapPin, Send, ShieldCheck, Heart, Clock, User, MessageSquare, CheckCircle2, Phone } from 'lucide-react';
 
+import { AnimatedHeading } from '../components/common/AnimatedHeading.jsx';
+
 export const ContactPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [name, setName] = useState('');
@@ -29,12 +31,12 @@ export const ContactPage = () => {
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center space-x-2 bg-white text-rose border border-rose/30 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-sm">
             <PhoneCall className="w-4 h-4 text-rose animate-pulse" />
-            <span>24/7 HELPLINE & HQ COMMAND SUPPORT</span>
+            <span className="text-shimmer-animated">24/7 HELPLINE & HQ COMMAND SUPPORT</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-tichi-text">
+          <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight">
             We Are Always Here For You
-          </h1>
+          </AnimatedHeading>
           <p className="text-tichi-muted text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
             Reach out to our safety command team, access 24/7 national emergency helplines, or send us a support message.
           </p>

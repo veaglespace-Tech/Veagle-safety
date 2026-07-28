@@ -131,7 +131,7 @@ export const AuthPage = () => {
 
           <div>
             <div className="flex items-center justify-center space-x-2">
-              <h1 className="font-black text-2xl tracking-tight text-tichi-text">Sakhi Suraksha SOS</h1>
+              <h1 className="font-black text-2xl tracking-tight text-shimmer-animated">Sakhi Suraksha SOS</h1>
               <span className="bg-rose/10 text-rose border border-rose/30 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">v2.0</span>
             </div>
             <p className="text-xs text-tichi-muted font-bold mt-0.5">

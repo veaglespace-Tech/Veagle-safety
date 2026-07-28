@@ -3,6 +3,8 @@ import { PublicNavbar } from '../components/layout/PublicNavbar.jsx';
 import { Shield, Heart, Lock, Award, Users, Globe, Zap, Radio, CheckCircle2, ArrowRight, Activity, Terminal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { AnimatedHeading } from '../components/common/AnimatedHeading.jsx';
+
 export const AboutPage = () => {
   const pillars = [
     {
@@ -49,13 +51,13 @@ export const AboutPage = () => {
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center space-x-2 bg-white text-rose border border-rose/30 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-sm">
             <Heart className="w-4 h-4 fill-rose text-rose animate-pulse" />
-            <span>OUR MISSION & CORE ARCHITECTURE</span>
+            <span className="text-shimmer-animated">OUR MISSION & CORE ARCHITECTURE</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-tichi-text leading-tight">
+          <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
             Built to Shield & Empower <br />
-            <span className="text-baby-pink-gradient">Every Girl and Woman</span>
-          </h1>
+            <span className="text-shimmer-animated text-glow-animated">Every Girl and Woman</span>
+          </AnimatedHeading>
 
           <p className="text-tichi-muted text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
             Sakhi Suraksha SOS was created to combine cutting-edge technology with compassionate design—ensuring help is always 3 seconds away when it matters most.
