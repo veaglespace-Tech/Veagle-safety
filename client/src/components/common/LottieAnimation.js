@@ -95,13 +95,28 @@ export const gpsMapLottieData = {
   ]
 };
 
+const LottieComponent = typeof Lottie === 'function' ? Lottie : (Lottie?.default || Lottie);
+
 export const LottieAnimation = ({ type = 'sos', className = 'w-28 h-28', loop = true, autoplay = true }) => {
   let animationData = sosRadarLottieData;
   if (type === 'gps') animationData = gpsMapLottieData;
 
+  const ResolvedComponent = typeof LottieComponent === 'function' ? LottieComponent : LottieComponent?.default;
+
+  if (ResolvedComponent) {
+    return (
+      <div className={`flex items-center justify-center ${className}`}>
+        <ResolvedComponent animationData={animationData} loop={loop} autoplay={autoplay} />
+      </div>
+    );
+  }
+
   return (
-    <div className={`flex items-center justify-center ${className}`}>
-      <Lottie animationData={animationData} loop={loop} autoplay={autoplay} />
+    <div className={`flex items-center justify-center relative ${className}`}>
+      <div className="absolute inset-0 rounded-full border-2 border-[#FF2A6D] animate-ping" />
+      <div className="w-20 h-20 rounded-full sos-btn-gradient flex flex-col items-center justify-center border-4 border-white shadow-sos-glow">
+        <span className="text-white text-xs font-black">SOS</span>
+      </div>
     </div>
   );
 };
