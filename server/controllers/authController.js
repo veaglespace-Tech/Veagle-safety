@@ -155,7 +155,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
   if (user.isEmailVerified) {
     const token = jwt.sign(
-      { userId: user.id, role: user.role, email: user.email },
+      { id: user.id, userId: user.id, role: user.role, email: user.email },
       config.jwt.secret,
       { expiresIn: config.jwt.expiresIn }
     );
@@ -191,7 +191,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   });
 
   const token = jwt.sign(
-    { userId: updatedUser.id, role: updatedUser.role, email: updatedUser.email },
+    { id: updatedUser.id, userId: updatedUser.id, role: updatedUser.role, email: updatedUser.email },
     config.jwt.secret,
     { expiresIn: config.jwt.expiresIn }
   );
@@ -280,7 +280,7 @@ export const login = asyncHandler(async (req, res) => {
   }
 
   const token = jwt.sign(
-    { userId: user.id, role: user.role, email: user.email },
+    { id: user.id, userId: user.id, role: user.role, email: user.email },
     config.jwt.secret,
     { expiresIn: config.jwt.expiresIn }
   );
