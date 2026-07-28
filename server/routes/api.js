@@ -19,6 +19,9 @@ router.post('/auth/logout', authController.logout);
 router.get('/auth/me', authenticateToken, authController.getProfile);
 router.put('/auth/settings', authenticateToken, authController.updateSettings);
 
+// Public Plans & Pricing
+router.get('/plans', adminController.getPlans);
+
 // PayU Payment Routes
 router.post('/payment/payu-initiate', authenticateToken, paymentController.initiatePayUPayment);
 router.post('/payment/payu-success', paymentController.handlePayUSuccess);
