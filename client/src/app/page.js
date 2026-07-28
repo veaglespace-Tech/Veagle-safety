@@ -6,6 +6,9 @@ import { PublicNavbar } from '../components/layout/PublicNavbar.js';
 import { Shield, ShieldCheck, Radio, Zap, ArrowRight, MapPin, BellRing, Award, CheckCircle2 } from 'lucide-react';
 import { AnimatedHeading } from '../components/common/AnimatedHeading.jsx';
 import { TypewriterText } from '../components/common/TypewriterText.jsx';
+import { GsapMagneticButton } from '../components/common/GsapMagneticButton.js';
+import { GsapStaggerContainer } from '../components/common/GsapStaggerContainer.js';
+import { LottieAnimation } from '../components/common/LottieAnimation.js';
 
 export default function LandingPage() {
   return (
@@ -42,26 +45,30 @@ export default function LandingPage() {
           </p>
         </div>
 
-        {/* CTA BUTTONS (BEST-OF-BEST ANTIQUE BABY PINK BUTTONS) */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-          <Link
-            href="/auth?mode=register"
-            className="w-full sm:w-auto btn-baby-pink text-base px-9 py-4 shadow-coral-glow flex items-center justify-center space-x-3"
-          >
-            <span>PROTECT YOURSELF NOW</span>
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+        {/* CTA BUTTONS (GSAP MAGNETIC INTERACTIVE BUTTONS) */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-2">
+          <GsapMagneticButton strength={0.25}>
+            <Link
+              href="/auth?mode=register"
+              className="w-full sm:w-auto btn-baby-pink text-base px-9 py-4 shadow-coral-glow flex items-center justify-center space-x-3"
+            >
+              <span>PROTECT YOURSELF NOW</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </GsapMagneticButton>
 
-          <Link
-            href="/pricing"
-            className="w-full sm:w-auto btn-baby-pink-outline text-base px-8 py-4 flex items-center justify-center space-x-2"
-          >
-            <Zap className="w-5 h-5 text-rose" />
-            <span>VIEW SAFETY PLAN</span>
-          </Link>
+          <GsapMagneticButton strength={0.2}>
+            <Link
+              href="/pricing"
+              className="w-full sm:w-auto btn-baby-pink-outline text-base px-8 py-4 flex items-center justify-center space-x-2"
+            >
+              <Zap className="w-5 h-5 text-rose" />
+              <span>VIEW SAFETY PLAN</span>
+            </Link>
+          </GsapMagneticButton>
         </div>
 
-        {/* RADAR SOS PULSE HERO MOCKUP (CARD-ANTIQUE-PINK GLASS CARD) */}
+        {/* RADAR SOS PULSE HERO MOCKUP (CARD-ANTIQUE-PINK WITH LOTTIE VECTOR JSON ANIMATION) */}
         <div className="pt-10 max-w-3xl mx-auto relative">
           <div className="card-antique-pink p-8 sm:p-10 relative overflow-hidden group">
             
@@ -70,14 +77,10 @@ export default function LandingPage() {
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
               
-              {/* Left Column: Interactive SOS Button Preview */}
-              <div className="flex flex-col items-center space-y-3">
+              {/* Left Column: Interactive SOS Lottie JSON Radar */}
+              <div className="flex flex-col items-center space-y-2">
                 <div className="relative w-36 h-36 flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-full border-2 border-[#FF2A6D] animate-ping" />
-                  <div className="w-28 h-28 rounded-full sos-btn-gradient border-4 border-white flex flex-col items-center justify-center">
-                    <Radio className="w-9 h-9 text-white animate-pulse" />
-                    <span className="text-[11px] font-black text-white uppercase mt-1 tracking-wider">PRESS SOS</span>
-                  </div>
+                  <LottieAnimation type="sos" className="w-36 h-36" />
                 </div>
                 <span className="text-xs font-black text-rose uppercase tracking-wider">3-Sec Hold Trigger</span>
               </div>
@@ -136,7 +139,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* KEY FEATURES GRID */}
+      {/* KEY FEATURES GRID (GSAP STAGGER CONTAINER ANIMATION) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-16">
         <div className="text-center space-y-3">
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-tichi-text">
@@ -147,7 +150,7 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <GsapStaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           {/* Card 1 */}
           <div className="card-antique-pink p-8 space-y-4">
@@ -182,7 +185,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-        </div>
+        </GsapStaggerContainer>
       </section>
 
       {/* FOOTER */}

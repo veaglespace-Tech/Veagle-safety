@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Shield, Zap, UserPlus, LogIn, PhoneCall, ArrowRight, Image as ImageIcon, Info, Heart, UserCheck } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
+import { GsapMagneticButton } from '../common/GsapMagneticButton.js';
 
 export const PublicNavbar = () => {
   const pathname = usePathname();
@@ -109,17 +110,19 @@ export const PublicNavbar = () => {
           </Link>
         </nav>
 
-        {/* RIGHT SIDE ACTION BUTTONS */}
+        {/* RIGHT SIDE ACTION BUTTONS WITH GSAP MAGNETIC PHYSICS */}
         <div className="flex items-center space-x-3">
           {token ? (
             <div className="flex items-center space-x-3">
-              <Link
-                href={user?.role === 'SUPER_ADMIN' ? '/admin' : '/dashboard'}
-                className="btn-baby-pink text-xs px-4 py-2.5 shadow-coral-glow flex items-center space-x-2"
-              >
-                <span>{user?.role === 'SUPER_ADMIN' ? 'HQ Command Center' : 'Safety Dashboard'}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              <GsapMagneticButton strength={0.2}>
+                <Link
+                  href={user?.role === 'SUPER_ADMIN' ? '/admin' : '/dashboard'}
+                  className="btn-baby-pink text-xs px-4 py-2.5 shadow-coral-glow flex items-center space-x-2"
+                >
+                  <span>{user?.role === 'SUPER_ADMIN' ? 'HQ Command Center' : 'Safety Dashboard'}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </GsapMagneticButton>
               <button
                 onClick={handleLogout}
                 className="text-xs font-black text-tichi-muted hover:text-rose px-3 py-2 transition-colors"
@@ -130,22 +133,26 @@ export const PublicNavbar = () => {
           ) : (
             <div className="flex items-center space-x-2.5">
               {/* CLEAN LUXURY SIGN IN CAPSULE */}
-              <Link
-                href="/auth?mode=login"
-                className="btn-signin-luxury flex items-center space-x-1.5 group"
-              >
-                <UserCheck className="w-4 h-4 text-rose group-hover:scale-110 transition-transform" />
-                <span>Sign In</span>
-              </Link>
+              <GsapMagneticButton strength={0.2}>
+                <Link
+                  href="/auth?mode=login"
+                  className="btn-signin-luxury flex items-center space-x-1.5 group"
+                >
+                  <UserCheck className="w-4 h-4 text-rose group-hover:scale-110 transition-transform" />
+                  <span>Sign In</span>
+                </Link>
+              </GsapMagneticButton>
 
               {/* VIBRANT LUXURY SIGN UP GRADIENT PILL */}
-              <Link
-                href="/auth?mode=register"
-                className="btn-signup-luxury flex items-center space-x-2 group"
-              >
-                <span>Sign Up</span>
-                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
-              </Link>
+              <GsapMagneticButton strength={0.25}>
+                <Link
+                  href="/auth?mode=register"
+                  className="btn-signup-luxury flex items-center space-x-2 group"
+                >
+                  <span>Sign Up</span>
+                  <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </GsapMagneticButton>
             </div>
           )}
         </div>
