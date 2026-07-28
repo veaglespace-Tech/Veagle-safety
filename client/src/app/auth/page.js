@@ -38,8 +38,15 @@ export const dynamic = 'force-dynamic';
 
 function UserAuthForm() {
   const searchParams = useSearchParams();
-  const initialMode = searchParams ? searchParams.get('mode') === 'register' : false;
-  const [isLogin, setIsLogin] = useState(!initialMode);
+  const [isLogin, setIsLogin] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (searchParams && searchParams.get('mode') === 'register') {
+      setIsLogin(false);
+    }
+  }, [searchParams]);
 
   // Comprehensive Registration Fields State
   const [fullName, setFullName] = useState('');
@@ -117,7 +124,7 @@ function UserAuthForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden flex flex-col">
+    <div suppressHydrationWarning className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden flex flex-col">
       <PublicNavbar />
 
       {/* BACKGROUND AMBIENT GLOW MESHES */}
