@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Shield, Zap, UserPlus, PhoneCall, ArrowRight, Image as ImageIcon, Info, ShieldCheck, Heart } from 'lucide-react';
+import { Shield, Zap, UserPlus, PhoneCall, ArrowRight, Image as ImageIcon, Info, Heart } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
 
@@ -146,15 +146,6 @@ export const PublicNavbar = () => {
               </Link>
             </>
           )}
-
-          {/* Quick Security Badge Button Icon */}
-          <Link
-            href="/auth?mode=register"
-            title="Sakhi Suraksha Instant Sign Up"
-            className="w-10 h-10 rounded-2xl bg-rose/10 border border-rose/30 hover:border-rose text-rose flex items-center justify-center transition-all hover:scale-105 shadow-sm"
-          >
-            <ShieldCheck className="w-5 h-5" />
-          </Link>
         </div>
 
       </div>
