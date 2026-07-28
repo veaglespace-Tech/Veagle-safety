@@ -1,24 +1,52 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { fetchPlans, initiatePayUCheckout } from '../../redux/slices/planSlice.js';
-import { Shield, Check, ArrowRight, Zap, Award, Lock, ShieldCheck, HelpCircle } from 'lucide-react';
+import { fetchUser } from '../../redux/slices/authSlice.js';
+import { Shield, Check, ArrowRight, Zap, Award, Lock, ShieldCheck, CreditCard, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AnimatedHeading } from '../../components/common/AnimatedHeading.jsx';
+import { apiClient } from '../../redux/api/apiClient.js';
 
 export const dynamic = 'force-dynamic';
 
 export default function PlatformPricingPage() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { plans = [], isLoading } = useSelector((state) => state.plan || {});
-  const { token } = useSelector((state) => state.auth || {});
+  const { plans = [], isLoading, paymentData } = useSelector((state) => state.plan || {});
+  const { token, user } = useSelector((state) => state.auth || {});
+
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentSuccessMsg, setPaymentSuccessMsg] = useState(null);
 
   useEffect(() => {
     dispatch(fetchPlans());
   }, [dispatch]);
+
+  // Auto-submit POST form to PayU gateway when paymentData is generated
+  useEffect(() => {
+    if (paymentData && paymentData.actionUrl) {
+      setIsProcessing(true);
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = paymentData.actionUrl;
+
+      Object.keys(paymentData).forEach((key) => {
+        if (key !== 'actionUrl' && paymentData[key]) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = paymentData[key];
+          form.appendChild(input);
+        }
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+  }, [paymentData]);
 
   const yearlyPlan = plans[0] || {
     id: 'plan_yearly_24',
@@ -34,7 +62,38 @@ export default function PlatformPricingPage() {
     if (!token) {
       router.push('/auth?mode=register');
     } else {
+      setIsProcessing(true);
       dispatch(initiatePayUCheckout({ planId: yearlyPlan.id, amount: yearlyPlan.totalPrice }));
+    }
+  };
+
+  // Instant Test Mode Activation Handler
+  const handleInstantTestActivate = async () => {
+    if (!token) {
+      router.push('/auth?mode=register');
+      return;
+    }
+    try {
+      setIsProcessing(true);
+      const res = await apiClient.post('/payment/payu-initiate', { planId: yearlyPlan.id, amount: yearlyPlan.totalPrice });
+      if (res.data?.paymentData?.txnid) {
+        const txnid = res.data.paymentData.txnid;
+        // Direct test success callback
+        await apiClient.post('/payment/payu-success', {
+          txnid,
+          mihpayid: `TEST_PAYU_${Date.now()}`,
+          mode: 'TEST_UPI',
+          status: 'success',
+        });
+        await dispatch(fetchUser());
+        setPaymentSuccessMsg('Subscription activated successfully! Redirecting to Dashboard...');
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1500);
+      }
+    } catch (e) {
+      console.error('Instant test activation error:', e);
+      setIsProcessing(false);
     }
   };
 
@@ -61,6 +120,13 @@ export default function PlatformPricingPage() {
             Just ₹24 per year (only ₹2/month). Complete your plan formalities to unlock 24/7 Live Emergency SOS, 5 Trusted Contacts, and Encrypted GPS Sharing for a full year.
           </p>
         </div>
+
+        {paymentSuccessMsg && (
+          <div className="max-w-md mx-auto bg-tichi-success/15 border-2 border-tichi-success text-tichi-success p-4 rounded-2xl text-xs font-black flex items-center justify-center space-x-2 shadow-lg animate-fade-up">
+            <CheckCircle2 className="w-5 h-5 shrink-0" />
+            <span>{paymentSuccessMsg}</span>
+          </div>
+        )}
 
         {/* SINGLE YEARLY PLAN CARD */}
         <div className="max-w-3xl mx-auto">
@@ -134,15 +200,28 @@ export default function PlatformPricingPage() {
               </div>
             </div>
 
-            {/* ACTION BUTTON */}
+            {/* ACTION BUTTONS */}
             <div className="space-y-3 pt-2">
               <button
                 onClick={handleSelectPlan}
+                disabled={isProcessing}
                 className="w-full btn-baby-pink py-4 text-xs sm:text-sm uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2"
               >
-                <span>{token ? 'PURCHASE YEARLY PROTECTION WITH PAYU' : 'REGISTER & COMPLETE PLAN FORMALITIES'}</span>
+                <span>{isProcessing ? 'REDIRECTING TO PAYU GATEWAY...' : token ? 'PURCHASE YEARLY PROTECTION WITH PAYU (₹28.32)' : 'REGISTER & COMPLETE PLAN FORMALITIES'}</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
+
+              {token && (
+                <button
+                  type="button"
+                  onClick={handleInstantTestActivate}
+                  disabled={isProcessing}
+                  className="w-full bg-white hover:bg-rose/5 text-rose border-2 border-rose/40 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center space-x-2"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  <span>1-CLICK INSTANT TEST ACTIVATION (DEV SANDBOX)</span>
+                </button>
+              )}
 
               <div className="flex items-center justify-center space-x-2 text-[11px] text-tichi-muted font-extrabold">
                 <Lock className="w-3.5 h-3.5 text-tichi-success" />
