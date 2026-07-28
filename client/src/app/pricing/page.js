@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { fetchPlans, initiatePayUCheckout } from '../../redux/slices/planSlice.js';
-import { Sparkles, Shield, Check, ArrowRight, Zap, Award, Lock, ShieldCheck, HelpCircle } from 'lucide-react';
+import { Shield, Check, ArrowRight, Zap, Award, Lock, ShieldCheck, HelpCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AnimatedHeading } from '../../components/common/AnimatedHeading.jsx';
 
@@ -51,7 +51,7 @@ export default function PlatformPricingPage() {
         {/* TOP HEADER */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center space-x-2 bg-white text-rose border border-rose/30 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-sm">
-            <Sparkles className="w-4 h-4 text-rose animate-pulse" />
+            <Zap className="w-4 h-4 text-rose animate-pulse" />
             <span className="text-shimmer-animated">SINGLE UNIFIED YEARLY PROTECTION PLAN</span>
           </div>
           <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight">

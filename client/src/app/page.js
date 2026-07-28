@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
-import { Shield, Sparkles, Radio, Zap, ArrowRight, MapPin, BellRing, Award, CheckCircle2 } from 'lucide-react';
+import { Shield, ShieldCheck, Radio, Zap, ArrowRight, MapPin, BellRing, Award, CheckCircle2 } from 'lucide-react';
 import { AnimatedHeading } from '../components/common/AnimatedHeading.jsx';
 import { TypewriterText } from '../components/common/TypewriterText.jsx';
 
@@ -21,7 +21,7 @@ export default function LandingPage() {
 
         {/* HERO BADGE */}
         <div className="inline-flex items-center space-x-2 bg-white/95 border border-[#FFCCE1] px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest animate-fade-up shadow-sm">
-          <Sparkles className="w-4 h-4 text-rose animate-pulse" />
+          <ShieldCheck className="w-4 h-4 text-rose animate-pulse" />
           <span className="text-shimmer-animated">INDIA'S MOST TRUSTED PERSONAL SAFETY PLATFORM</span>
         </div>
 
