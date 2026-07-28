@@ -21,9 +21,7 @@ import {
   Activity,
 } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
-
-export default function SuperAdminDashboardPage() {
+export default function SuperAdminOperationsPortal() {
   const [mounted, setMounted] = useState(false);
   const { user, logout } = useAuthStore();
   const router = useRouter();

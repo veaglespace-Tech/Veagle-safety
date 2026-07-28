@@ -74,47 +74,51 @@ export default function UserProfileSettingsPage() {
 
           {/* USER PROFILE HEADER CARD */}
           <div className="card-antique-pink border-2 border-rose shadow-coral-glow overflow-hidden rounded-3xl relative">
-            <div className="bg-gradient-to-r from-rose via-rose-light to-gold h-28 relative">
+            
+            {/* TOP GRADIENT BANNER WITH CENTERED 365-DAY ACTIVE CHIP */}
+            <div className="bg-gradient-to-r from-rose via-rose-light to-gold h-28 relative flex items-start justify-center pt-3">
               <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_80%_50%,#FF2A6D_0%,transparent_70%)]" />
+              
+              {/* CENTERED 365-DAY ACTIVE CHIP */}
+              <div className="bg-white/95 backdrop-blur-md border-2 border-[#FFCCE1] text-tichi-text font-black text-xs px-5 py-2 rounded-full shadow-md uppercase tracking-wider flex items-center space-x-2 relative z-10">
+                <ShieldCheck className="w-4.5 h-4.5 text-tichi-success" />
+                <span>365-DAY PROTECTION ACTIVE</span>
+              </div>
             </div>
 
-            <div className="px-6 pb-6 -mt-12 relative z-10 space-y-4">
-              <div className="flex items-end justify-between">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 shadow-lg">
+            <div className="px-6 pb-6 -mt-10 relative z-10 space-y-4">
+              <div className="flex flex-col items-center text-center">
+                {/* AVATAR PILL */}
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 shadow-lg mb-3">
                   <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center font-black text-2xl text-tichi-text">
                     {initials}
                   </div>
                 </div>
 
-                <span className="bg-white/80 backdrop-blur-md border border-[#FFCCE1] text-tichi-text font-black text-xs px-4 py-2 rounded-2xl shadow-sm uppercase tracking-wider flex items-center space-x-1.5">
-                  <ShieldCheck className="w-4 h-4 text-tichi-success" />
-                  <span>365-DAY ACTIVE</span>
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <h1 className="font-black text-2xl text-tichi-text">{user?.fullName || 'Sakhi Member'}</h1>
-                  {isSuperAdmin && (
-                    <span className="bg-gold text-tichi-text font-black text-[10px] px-3 py-1 rounded-full uppercase flex items-center space-x-1 shadow-gold-glow">
-                      <Crown className="w-3.5 h-3.5" />
-                      <span>SUPER ADMIN</span>
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-tichi-muted pt-1">
-                  <div className="flex items-center space-x-1.5">
-                    <Mail className="w-3.5 h-3.5 text-rose" />
-                    <span>{user?.email || 'sakhi@suraksha.org'}</span>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-center space-x-2">
+                    <h1 className="font-black text-2xl text-tichi-text">{user?.fullName || 'Sakhi Member'}</h1>
+                    {isSuperAdmin && (
+                      <span className="bg-gold text-tichi-text font-black text-[10px] px-3 py-1 rounded-full uppercase flex items-center space-x-1 shadow-gold-glow">
+                        <Crown className="w-3.5 h-3.5" />
+                        <span>SUPER ADMIN</span>
+                      </span>
+                    )}
                   </div>
-                  <div className="flex items-center space-x-1.5">
-                    <PhoneCall className="w-3.5 h-3.5 text-rose" />
-                    <span>{user?.phone || '+91 98765 43210'}</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5 bg-rose/10 px-2.5 py-0.5 rounded-full text-rose font-black">
-                    <Heart className="w-3.5 h-3.5" />
-                    <span>Blood Group: {user?.bloodGroup || 'O+'}</span>
+
+                  <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-tichi-muted pt-1">
+                    <div className="flex items-center space-x-1.5">
+                      <Mail className="w-3.5 h-3.5 text-rose" />
+                      <span>{user?.email || 'sakhi@suraksha.org'}</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5">
+                      <PhoneCall className="w-3.5 h-3.5 text-rose" />
+                      <span>{user?.phone || '+91 98765 43210'}</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5 bg-rose/10 px-3 py-1 rounded-full text-rose font-black border border-rose/20">
+                      <Heart className="w-3.5 h-3.5" />
+                      <span>Blood Group: {user?.bloodGroup || 'O+'}</span>
+                    </div>
                   </div>
                 </div>
               </div>
