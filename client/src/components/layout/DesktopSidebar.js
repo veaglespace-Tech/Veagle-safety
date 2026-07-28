@@ -14,6 +14,8 @@ import {
   HelpCircle,
   LogOut,
   Crown,
+  Sparkles,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuthStore } from '../../redux/useAuthStore.js';
 import { useSOSStore } from '../../redux/useSOSStore.js';
@@ -45,27 +47,33 @@ export const DesktopSidebar = () => {
   };
 
   return (
-    <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 flex-col bg-white border-r border-blush-border z-50 overflow-y-auto">
-      <div className="px-5 py-5 border-b border-blush-border">
+    <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 flex-col bg-[#FFF0F3] border-r-2 border-[#FFCCE1] z-50 overflow-y-auto font-sans shadow-md">
+      
+      {/* BRAND HEADER LOGO */}
+      <div className="px-6 py-6 border-b border-[#FFCCE1] bg-white">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-plum flex items-center justify-center shadow-md">
-            <Shield className="w-5 h-5 text-rose fill-rose/20" />
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#FF5C8A] via-[#FF85A2] to-[#FFD166] p-0.5 shadow-coral-glow shrink-0">
+            <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+              <Shield className="w-6 h-6 text-rose" />
+            </div>
           </div>
           <div>
-            <h1 className="font-extrabold text-sm text-plum leading-tight">VEAGLE SAFETY</h1>
-            <p className="text-[10px] font-bold text-rose tracking-wider uppercase">Women Protection</p>
+            <h1 className="font-black text-base text-tichi-text leading-tight tracking-tight">Sakhi Suraksha SOS</h1>
+            <p className="text-[10px] font-black text-rose tracking-widest uppercase mt-0.5">24/7 Women Protection</p>
           </div>
         </div>
       </div>
 
+      {/* ACTIVE EMERGENCY SOS NOTICE */}
       {activeSession && (
-        <div className="mx-3 mt-3 bg-tichi-emergency text-white text-xs font-bold p-3 rounded-xl flex items-center space-x-2 animate-pulse shadow-sos-glow">
-          <AlertTriangle className="w-4 h-4 shrink-0" />
-          <span>SOS ACTIVE — TRACKING LIVE</span>
+        <div className="mx-4 mt-4 bg-gradient-to-r from-[#FF2A6D] to-rose text-white text-xs font-black p-3.5 rounded-2xl flex items-center space-x-2.5 animate-pulse shadow-coral-glow border border-white">
+          <AlertTriangle className="w-4 h-4 shrink-0 animate-bounce" />
+          <span>SOS ACTIVE — LIVE TRACKING</span>
         </div>
       )}
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      {/* NAVIGATION LINKS LIST */}
+      <nav className="flex-1 px-4 py-6 space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.path;
@@ -74,38 +82,39 @@ export const DesktopSidebar = () => {
             <Link
               key={item.path}
               href={item.path}
-              className={`flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold transition-all group ${
+              className={`flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-xs font-black transition-all group border ${
                 isActive
                   ? isAdminTab
-                    ? 'bg-gold text-plum font-black shadow-gold-glow'
-                    : 'bg-plum text-white shadow-sm'
+                    ? 'bg-gradient-to-r from-gold via-[#FFE29A] to-gold text-tichi-text font-black shadow-gold-glow border-gold/50'
+                    : 'btn-baby-pink shadow-coral-glow border-transparent'
                   : isAdminTab
-                  ? 'bg-gold/10 text-gold-dark font-bold hover:bg-gold/20'
-                  : 'text-tichi-muted hover:bg-plum-50 hover:text-plum'
+                  ? 'bg-gold/10 text-gold-dark font-black hover:bg-gold/20 border-gold/30'
+                  : 'bg-white text-tichi-text border-[#FFCCE1] hover:border-rose hover:bg-rose/10 hover:text-rose'
               }`}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? (isAdminTab ? 'text-plum' : 'text-rose') : ''}`} />
-              <div>
-                <p className={`font-bold ${isActive ? (isAdminTab ? 'text-plum' : 'text-white') : ''}`}>{item.label}</p>
-                <p className={`text-[10px] font-medium ${isActive ? (isAdminTab ? 'text-plum/80' : 'text-rose/80') : 'text-tichi-muted'}`}>{item.desc}</p>
+              <Icon className={`w-5 h-5 shrink-0 ${isActive ? (isAdminTab ? 'text-tichi-text' : 'text-white') : 'text-rose'}`} />
+              <div className="flex-1 min-w-0">
+                <p className={`font-black text-xs ${isActive ? (isAdminTab ? 'text-tichi-text' : 'text-white') : 'text-tichi-text group-hover:text-rose'}`}>{item.label}</p>
+                <p className={`text-[10px] font-bold truncate mt-0.5 ${isActive ? (isAdminTab ? 'text-tichi-text/80' : 'text-white/90') : 'text-tichi-muted'}`}>{item.desc}</p>
               </div>
             </Link>
           );
         })}
       </nav>
 
-      <div className="px-3 py-4 border-t border-blush-border space-y-2">
+      {/* FOOTER ACTIONS */}
+      <div className="px-4 py-5 border-t border-[#FFCCE1] bg-white space-y-3">
         <Link
           href={activeSession ? '/active-sos' : '/dashboard'}
-          className="flex items-center justify-center space-x-2 w-full bg-tichi-emergency text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow-sos-glow hover:brightness-105 transition-all"
+          className="flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-[#FF2A6D] via-rose to-[#FF2A6D] text-white font-black px-4 py-3.5 rounded-2xl text-xs shadow-coral-glow hover:brightness-110 transition-all uppercase tracking-wider border border-white/30"
         >
-          <AlertTriangle className="w-4 h-4" />
+          <AlertTriangle className="w-4 h-4 animate-pulse" />
           <span>{activeSession ? '🚨 VIEW SOS STATUS' : 'EMERGENCY SOS'}</span>
         </Link>
 
         <button
           onClick={handleLogout}
-          className="flex items-center space-x-2 w-full text-tichi-muted hover:text-tichi-emergency px-3 py-2 rounded-xl text-xs font-semibold hover:bg-rose-soft transition-colors"
+          className="flex items-center justify-center space-x-2 w-full text-tichi-muted hover:text-[#FF2A6D] px-3 py-2.5 rounded-xl text-xs font-black transition-colors hover:bg-rose/10"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>
