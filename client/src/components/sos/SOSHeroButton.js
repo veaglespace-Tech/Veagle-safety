@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { ShieldAlert, VolumeX, Volume2, Radio, Zap } from 'lucide-react';
 import { useSOSStore } from '../../redux/useSOSStore.js';
 import { useLocationStore } from '../../redux/useLocationStore.js';
 import { useRouter } from 'next/navigation';
@@ -32,7 +32,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
     startTimeRef.current = Date.now();
 
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate(50);
+      navigator.vibrate([80, 50, 80]);
     }
 
     progressIntervalRef.current = setInterval(() => {
@@ -47,7 +47,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
         clearInterval(progressIntervalRef.current);
         handleTriggered();
       }
-    }, 50);
+    }, 40);
   };
 
   const endHold = () => {
@@ -63,9 +63,9 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
   const handleTriggered = async () => {
     setHolding(false);
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate([200, 100, 300]);
+      navigator.vibrate([300, 100, 300, 100, 400]);
     }
-    const success = await triggerSos(isSilent, latitude || 28.6139, longitude || 77.2090);
+    const success = await triggerSos(isSilent, latitude || 18.5204, longitude || 73.8567);
     if (success) {
       if (onTriggerComplete) onTriggerComplete();
       router.push('/active-sos');
@@ -78,83 +78,136 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
     };
   }, []);
 
-  const circumference = 2 * Math.PI * 80;
+  const circumference = 2 * Math.PI * 92;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center justify-center my-6">
+    <div className="flex flex-col items-center justify-center my-6 relative select-none">
+      
+      {/* OUTER 3D RADAR PULSE WAVES */}
       <div className="relative flex items-center justify-center">
+        
+        {/* WAVE 1: AMBIENT OUTER GLOW */}
         <div
-          className={`absolute inset-0 rounded-full bg-tichi-emergency/15 ${
-            holding ? 'animate-none scale-125 bg-tichi-emergency/30' : 'animate-radar'
+          className={`absolute rounded-full transition-all duration-500 ${
+            holding
+              ? 'bg-[#FF2A6D]/40 scale-125 blur-xl animate-pulse'
+              : activeSession
+              ? 'bg-[#FF2A6D]/30 scale-110 blur-xl animate-ping'
+              : 'bg-rose/20 blur-2xl animate-pulse'
           }`}
-          style={{ width: '220px', height: '220px', margin: '-10px' }}
-        ></div>
+          style={{ width: '260px', height: '260px' }}
+        />
 
-        <svg className="w-52 h-52 transform -rotate-90 pointer-events-none z-10">
+        {/* WAVE 2: STAGGERED HOLOGRAPHIC RINGS */}
+        <div
+          className={`absolute rounded-full border-2 border-rose/30 ${
+            holding ? 'scale-110 border-[#FF2A6D]' : 'animate-ping'
+          }`}
+          style={{ width: '230px', height: '230px' }}
+        />
+        
+        <div
+          className={`absolute rounded-full border border-gold/40 ${
+            holding ? 'scale-105 border-gold' : 'animate-pulse'
+          }`}
+          style={{ width: '200px', height: '200px' }}
+        />
+
+        {/* HIGH-PRECISION SVG COUNTDOWN TIMER RING */}
+        <svg className="w-60 h-60 transform -rotate-90 pointer-events-none z-20">
+          {/* TRACK BACKGROUND */}
           <circle
-            cx="104"
-            cy="104"
-            r="80"
+            cx="120"
+            cy="120"
+            r="92"
             stroke="currentColor"
             strokeWidth="10"
             fill="transparent"
-            className="text-rose/40"
+            className="text-rose/20"
           />
+          {/* PROGRESS FILL */}
           <circle
-            cx="104"
-            cy="104"
-            r="80"
-            stroke="currentColor"
-            strokeWidth="10"
+            cx="120"
+            cy="120"
+            r="92"
+            stroke="url(#sosGradient)"
+            strokeWidth="12"
             fill="transparent"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
-            className="text-tichi-emergency transition-all duration-75"
+            className="transition-all duration-75 drop-shadow-[0_0_12px_rgba(255,42,109,0.8)]"
           />
+          <defs>
+            <linearGradient id="sosGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FF2A6D" />
+              <stop offset="50%" stopColor="#FF5C8A" />
+              <stop offset="100%" stopColor="#FFD700" />
+            </linearGradient>
+          </defs>
         </svg>
 
+        {/* MAIN 3D CRYSTAL SOS BUTTON CORE */}
         <button
           onMouseDown={startHold}
           onMouseUp={endHold}
           onMouseLeave={endHold}
           onTouchStart={startHold}
           onTouchEnd={endHold}
-          className={`absolute w-44 h-44 rounded-full flex flex-col items-center justify-center shadow-sos-glow z-20 transition-transform active:scale-95 select-none cursor-pointer ${
+          className={`absolute w-48 h-48 rounded-full flex flex-col items-center justify-center z-30 transition-all duration-300 transform active:scale-95 cursor-pointer shadow-2xl border-4 ${
             holding
-              ? 'bg-tichi-emergency text-white shadow-sos-holding scale-105'
+              ? 'bg-gradient-to-b from-[#FF2A6D] via-[#FF5C8A] to-[#D90429] text-white border-white scale-105 shadow-coral-glow'
               : activeSession
-              ? 'bg-tichi-emergency text-white animate-pulse'
-              : 'bg-tichi-emergency text-white hover:brightness-105'
+              ? 'bg-gradient-to-b from-[#FF2A6D] to-[#D90429] text-white border-white animate-pulse shadow-coral-glow'
+              : 'bg-gradient-to-br from-[#FF2A6D] via-[#FF5C8A] to-[#FF80A0] text-white border-white/80 hover:scale-105 shadow-[0_15px_35px_rgba(255,92,138,0.55)]'
           }`}
         >
-          <AlertTriangle className={`w-10 h-10 mb-1 ${holding ? 'animate-bounce' : ''}`} />
-          <span className="text-3xl font-extrabold tracking-wider">
-            {holding ? `${countdown}s` : activeSession ? 'ACTIVE' : 'SOS'}
-          </span>
-          <span className="text-[11px] font-semibold text-white/90 uppercase tracking-widest mt-1">
-            {holding ? 'KEEP HOLDING' : activeSession ? 'VIEW STATUS' : 'HOLD 3 SECONDS'}
-          </span>
+          {/* INNER GLASS REFLECTION SHINE */}
+          <div className="absolute inset-x-4 top-2 h-16 rounded-full bg-gradient-to-b from-white/35 to-transparent pointer-events-none" />
+
+          {/* ICON & COUNTDOWN TEXT */}
+          <div className="relative z-10 flex flex-col items-center justify-center space-y-1">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-white/20 backdrop-blur-md shadow-inner ${
+              holding ? 'animate-bounce bg-white text-[#FF2A6D]' : ''
+            }`}>
+              <ShieldAlert className="w-7 h-7 text-white" />
+            </div>
+
+            <span className="text-3xl font-black tracking-widest drop-shadow-md">
+              {holding ? `${countdown}s` : activeSession ? 'ACTIVE' : 'SOS'}
+            </span>
+
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/95 bg-black/20 px-3 py-1 rounded-full border border-white/20 backdrop-blur-sm">
+              {holding ? 'DISPATCHING...' : activeSession ? 'VIEW STATUS' : 'HOLD 3 SECONDS'}
+            </span>
+          </div>
         </button>
+
       </div>
 
-      <div className="mt-6 flex flex-col items-center space-y-2">
-        <p className="text-xs text-rose-muted font-medium text-center">
-          Press & hold for 3 seconds to instantly alert contacts
+      {/* FOOTER CONTROLS & SILENT MODE SWITCH */}
+      <div className="mt-8 flex flex-col items-center space-y-3 z-30">
+        <p className="text-xs font-bold text-tichi-muted text-center tracking-wide flex items-center space-x-1">
+          <Radio className="w-3.5 h-3.5 text-rose animate-pulse" />
+          <span>Press & hold for 3 seconds to broadcast live GPS location</span>
         </p>
 
         <button
+          type="button"
           onClick={() => setIsSilent(!isSilent)}
-          className={`flex items-center space-x-2 text-xs font-semibold px-4 py-1.5 rounded-full transition-all border ${
+          className={`flex items-center space-x-2 text-xs font-black px-5 py-2.5 rounded-full transition-all border-2 shadow-sm cursor-pointer ${
             isSilent
-              ? 'bg-rose text-white border-rose shadow-coral-glow'
-              : 'bg-white/10 text-white/90 border-white/20 hover:bg-white/20'
+              ? 'bg-[#FF2A6D] text-white border-white shadow-coral-glow'
+              : 'bg-white text-tichi-text border-[#FFCCE1] hover:border-rose'
           }`}
         >
-          <span>Silent SOS Mode: {isSilent ? 'ON (No Loud Siren)' : 'OFF'}</span>
+          {isSilent ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-rose" />}
+          <span>Silent Emergency Mode: {isSilent ? 'ON (Discreet Alert)' : 'OFF (Loud Siren)'}</span>
+          <span className={`w-2 h-2 rounded-full ${isSilent ? 'bg-white animate-ping' : 'bg-tichi-success'}`} />
         </button>
       </div>
+
     </div>
   );
 };
