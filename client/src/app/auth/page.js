@@ -369,12 +369,22 @@ function UserAuthForm() {
             <form onSubmit={handleOtpSubmit} className="space-y-4">
               <input
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 maxLength={6}
                 required
-                placeholder="123456"
+                autoFocus
+                autoComplete="one-time-code"
+                placeholder="• • • • • •"
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
-                className="w-full py-4 text-center font-mono text-2xl font-black tracking-[0.5em] input-antique-pink focus:border-rose"
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                style={{
+                  userSelect: 'text',
+                  WebkitUserSelect: 'text',
+                  pointerEvents: 'auto',
+                  cursor: 'text',
+                }}
+                className="w-full px-4 py-5 text-center font-mono text-3xl font-black tracking-[0.4em] input-antique-pink focus:border-rose"
               />
 
               <button
