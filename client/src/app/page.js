@@ -3,121 +3,169 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
-import { Shield, ShieldCheck, Radio, Zap, ArrowRight, MapPin, BellRing } from 'lucide-react';
-import { AnimatedHeading } from '../components/common/AnimatedHeading.jsx';
+import { Shield, ShieldCheck, Zap, MapPin, BellRing, ArrowRight } from 'lucide-react';
 
 export default function LandingPage() {
-  const [year, setYear] = useState(null);
+  const [year, setYear] = useState(2026);
 
   useEffect(() => {
     setYear(new Date().getFullYear());
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden">
+    <div style={{ minHeight: '100vh', backgroundColor: '#FFF0F3', fontFamily: 'Manrope, sans-serif' }}>
       <PublicNavbar />
 
-      {/* BACKGROUND AMBIENT GLOW MESHES */}
-      <div className="absolute w-[750px] h-[750px] rounded-full bg-rose/15 blur-[160px] top-[-120px] left-[-220px] pointer-events-none" />
-      <div className="absolute w-[750px] h-[750px] rounded-full bg-gold/15 blur-[160px] bottom-[80px] right-[-220px] pointer-events-none" />
+      {/* BACKGROUND GLOWS */}
+      <div style={{
+        position: 'fixed', top: '-100px', left: '-200px',
+        width: '700px', height: '700px', borderRadius: '50%',
+        background: 'rgba(255,92,138,0.12)', filter: 'blur(120px)',
+        pointerEvents: 'none', zIndex: 0
+      }} />
+      <div style={{
+        position: 'fixed', bottom: '50px', right: '-200px',
+        width: '700px', height: '700px', borderRadius: '50%',
+        background: 'rgba(230,161,0,0.10)', filter: 'blur(120px)',
+        pointerEvents: 'none', zIndex: 0
+      }} />
 
       {/* HERO SECTION */}
-      <section className="relative z-10 pt-12 pb-24 text-center space-y-8">
+      <section style={{ position: 'relative', zIndex: 1, padding: '60px 20px 80px', textAlign: 'center' }}>
 
-        {/* HERO BADGE & TITLE CONTAINER */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          {/* HERO BADGE */}
-          <div className="inline-flex items-center space-x-2 bg-white/95 border border-[#FFCCE1] px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest animate-fade-up shadow-sm">
-            <ShieldCheck className="w-4 h-4 text-rose animate-pulse" />
-            <span className="text-shimmer-animated">INDIA'S MOST TRUSTED PERSONAL SAFETY PLATFORM</span>
-          </div>
-
-          <AnimatedHeading as="h1" className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight">
-            <span className="text-tichi-text block drop-shadow-sm">
-              Sakhi Suraksha SOS
-            </span>
-          </AnimatedHeading>
+        {/* BADGE */}
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '8px',
+          background: 'rgba(255,255,255,0.95)', border: '1px solid #FFCCE1',
+          padding: '10px 22px', borderRadius: '999px',
+          fontSize: '11px', fontWeight: 900, textTransform: 'uppercase',
+          letterSpacing: '0.1em', color: '#2A0826', marginBottom: '28px',
+          boxShadow: '0 2px 12px rgba(255,92,138,0.12)'
+        }}>
+          <ShieldCheck size={15} color="#FF5C8A" />
+          <span>India's Most Trusted Personal Safety Platform</span>
         </div>
 
-        {/* FULL SCREEN WIDTH HERO LIVE SCROLLING MARQUEE */}
-        <div className="w-full border-y-2 border-[#FFCCE1] bg-white/95 backdrop-blur-md py-4 overflow-hidden my-4">
-          <AnimatedHeading
-            variant="marquee"
-            items={[
-              'INSTANT 3-SECOND EMERGENCY PROTECTION',
-              '24/7 LIVE GPS TRACKING STREAM',
-              'TRUSTED GUARDIAN SIREN BROADCAST',
-              '365-DAY WOMEN SAFETY NETWORK',
-            ]}
-            className="text-xl sm:text-3xl font-black uppercase tracking-wider text-rose"
-          />
+        {/* TITLE */}
+        <h1 style={{
+          fontSize: 'clamp(36px, 7vw, 72px)', fontWeight: 900,
+          color: '#2A0826', margin: '0 0 12px', lineHeight: 1.1,
+          letterSpacing: '-0.02em'
+        }}>
+          Sakhi Suraksha SOS
+        </h1>
+        <p style={{
+          fontSize: 'clamp(14px, 2vw, 20px)', color: '#684E67',
+          fontWeight: 700, maxWidth: '580px', margin: '0 auto 40px',
+          lineHeight: 1.6
+        }}>
+          A modern personal safety companion for girls & women — instant emergency alerts,
+          live GPS tracking, and 24/7 command dispatch.
+        </p>
+
+        {/* MARQUEE STRIP */}
+        <div style={{
+          width: '100%', borderTop: '2px solid #FFCCE1', borderBottom: '2px solid #FFCCE1',
+          background: 'rgba(255,255,255,0.95)', padding: '14px 0',
+          overflow: 'hidden', marginBottom: '40px'
+        }}>
+          <div style={{
+            display: 'flex', gap: '48px', whiteSpace: 'nowrap',
+            animation: 'marqueeScroll 20s linear infinite', width: 'max-content'
+          }}>
+            {['⚡ INSTANT 3-SECOND SOS PROTECTION', '📍 24/7 LIVE GPS TRACKING', '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY NETWORK',
+              '⚡ INSTANT 3-SECOND SOS PROTECTION', '📍 24/7 LIVE GPS TRACKING', '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY NETWORK'].map((item, i) => (
+              <span key={i} style={{ fontSize: '15px', fontWeight: 900, color: '#FF5C8A', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <p className="text-base sm:text-xl text-tichi-muted max-w-2xl mx-auto font-bold leading-relaxed">
-            A modern, calm, and trustworthy personal safety companion designed specifically for girls and women. Fast emergency alerts, live GPS location sharing, and 24/7 command dispatch.
-          </p>
+        {/* CTA BUTTONS */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px', marginBottom: '64px' }}>
+          <Link href="/auth?mode=register" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+            color: '#fff', fontWeight: 900, fontSize: '14px',
+            padding: '16px 36px', borderRadius: '18px', textDecoration: 'none',
+            boxShadow: '0 0 28px rgba(255,92,138,0.40)',
+            letterSpacing: '0.05em', textTransform: 'uppercase',
+            transition: 'transform 0.2s'
+          }}>
+            <span>PROTECT YOURSELF NOW</span>
+            <ArrowRight size={18} />
+          </Link>
 
-          {/* CTA BUTTONS */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-2">
-            <Link
-              href="/auth?mode=register"
-              className="w-full sm:w-auto btn-baby-pink text-base px-9 py-4 shadow-coral-glow flex items-center justify-center space-x-3 rounded-2xl"
-            >
-              <span>PROTECT YOURSELF NOW</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+          <Link href="/about" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            background: 'rgba(255,255,255,0.95)', color: '#2A0826',
+            fontWeight: 800, fontSize: '14px',
+            padding: '16px 32px', borderRadius: '18px', textDecoration: 'none',
+            border: '1.5px solid #FFCCE1',
+            boxShadow: '0 4px 16px rgba(42,8,38,0.06)',
+            letterSpacing: '0.03em', textTransform: 'uppercase',
+          }}>
+            <Shield size={18} color="#FF5C8A" />
+            <span>HOW IT PROTECTS YOU</span>
+          </Link>
+        </div>
 
-            <Link
-              href="/about"
-              className="w-full sm:w-auto btn-baby-pink-outline text-base px-8 py-4 flex items-center justify-center space-x-2 rounded-2xl"
-            >
-              <Shield className="w-5 h-5 text-rose" />
-              <span>HOW IT PROTECTS YOU</span>
-            </Link>
-          </div>
-
-          {/* FEATURES GRID */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 text-left">
-            {[
-              {
-                icon: Zap,
-                title: '3-Second SOS Trigger',
-                desc: 'Press and hold the SOS button for 3 seconds to immediately broadcast alerts to your 5 trusted contacts and dispatch command.',
-              },
-              {
-                icon: MapPin,
-                title: 'Live GPS Satellite Stream',
-                desc: 'Real-time encrypted geolocation tracking with accuracy pin and Google Maps integration for guardians.',
-              },
-              {
-                icon: BellRing,
-                title: 'Guardian Siren Broadcast',
-                desc: 'Triggers high-decibel loud siren alarms and push notifications directly on trusted guardians devices.',
-              },
-            ].map((feat, i) => {
-              const Icon = feat.icon;
-              return (
-                <div key={i} className="card-antique-pink p-8 space-y-4 shadow-md border-2 border-rose">
-                  <div className="w-12 h-12 rounded-2xl bg-rose/15 text-rose flex items-center justify-center border border-rose/30">
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-xl font-black text-tichi-text">{feat.title}</h3>
-                  <p className="text-xs text-tichi-muted font-bold leading-relaxed">{feat.desc}</p>
+        {/* FEATURES GRID */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '24px', maxWidth: '1000px', margin: '0 auto', textAlign: 'left'
+        }}>
+          {[
+            { icon: Zap, title: '3-Second SOS Trigger', desc: 'Press and hold the SOS button for 3 seconds to immediately broadcast emergency alerts to 5 trusted contacts.' },
+            { icon: MapPin, title: 'Live GPS Satellite Stream', desc: 'Real-time encrypted geolocation tracking with accuracy pin and Google Maps integration for guardians.' },
+            { icon: BellRing, title: 'Guardian Siren Broadcast', desc: 'Triggers loud siren alarms and push notifications directly on your trusted guardians\' devices instantly.' },
+          ].map((feat, i) => {
+            const Icon = feat.icon;
+            return (
+              <div key={i} style={{
+                background: 'rgba(255,255,255,0.97)', border: '2px solid #FF5C8A',
+                borderRadius: '24px', padding: '32px',
+                boxShadow: '0 8px 30px rgba(255,92,138,0.10)'
+              }}>
+                <div style={{
+                  width: '48px', height: '48px', borderRadius: '14px',
+                  background: 'rgba(255,92,138,0.10)', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  marginBottom: '16px', border: '1px solid rgba(255,92,138,0.2)'
+                }}>
+                  <Icon size={22} color="#FF5C8A" />
                 </div>
-              );
-            })}
-          </div>
+                <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#2A0826', margin: '0 0 10px' }}>
+                  {feat.title}
+                </h3>
+                <p style={{ fontSize: '13px', color: '#684E67', fontWeight: 600, lineHeight: 1.65, margin: 0 }}>
+                  {feat.desc}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t-2 border-[#FFCCE1] bg-white py-8 text-center text-xs font-bold text-tichi-muted">
-        <p suppressHydrationWarning>
-          &copy; {year ?? new Date().getFullYear()} Sakhi Suraksha SOS. Built with care for Women's Safety in India.
+      <footer style={{
+        borderTop: '2px solid #FFCCE1', background: '#ffffff',
+        padding: '28px 20px', textAlign: 'center',
+        fontSize: '12px', fontWeight: 700, color: '#684E67'
+      }}>
+        <p suppressHydrationWarning style={{ margin: 0 }}>
+          &copy; {year} Sakhi Suraksha SOS. Built with care for Women's Safety in India. 🌸
         </p>
       </footer>
+
+      <style>{`
+        @keyframes marqueeScroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
     </div>
   );
 }
