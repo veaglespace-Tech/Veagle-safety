@@ -1,16 +1,20 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
-import { Shield, ShieldCheck, Radio, Zap, ArrowRight, MapPin, BellRing, Award, CheckCircle2, PhoneCall } from 'lucide-react';
+import { Shield, ShieldCheck, Radio, Zap, ArrowRight, MapPin, BellRing } from 'lucide-react';
 import { AnimatedHeading } from '../components/common/AnimatedHeading.jsx';
-import { GsapMagneticButton } from '../components/common/GsapMagneticButton.js';
-import { GsapStaggerContainer } from '../components/common/GsapStaggerContainer.js';
 
 export default function LandingPage() {
+  const [year, setYear] = useState(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
-    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text selection:bg-rose selection:text-white font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden">
       <PublicNavbar />
 
       {/* BACKGROUND AMBIENT GLOW MESHES */}
@@ -35,8 +39,8 @@ export default function LandingPage() {
           </AnimatedHeading>
         </div>
 
-        {/* FULL SCREEN WIDTH HERO LIVE SCROLLING MARQUEE WITH MODERN UNIQUE ICONS */}
-        <div className="w-full border-y-2 border-[#FFCCE1] bg-white/95 backdrop-blur-md py-4 shadow-coral-glow overflow-hidden my-4">
+        {/* FULL SCREEN WIDTH HERO LIVE SCROLLING MARQUEE */}
+        <div className="w-full border-y-2 border-[#FFCCE1] bg-white/95 backdrop-blur-md py-4 overflow-hidden my-4">
           <AnimatedHeading
             variant="marquee"
             items={[
@@ -56,29 +60,25 @@ export default function LandingPage() {
 
           {/* CTA BUTTONS */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-2">
-            <GsapMagneticButton strength={0.25}>
-              <Link
-                href="/auth?mode=register"
-                className="w-full sm:w-auto btn-baby-pink text-base px-9 py-4 shadow-coral-glow flex items-center justify-center space-x-3"
-              >
-                <span>PROTECT YOURSELF NOW</span>
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </GsapMagneticButton>
+            <Link
+              href="/auth?mode=register"
+              className="w-full sm:w-auto btn-baby-pink text-base px-9 py-4 shadow-coral-glow flex items-center justify-center space-x-3 rounded-2xl"
+            >
+              <span>PROTECT YOURSELF NOW</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
 
-            <GsapMagneticButton strength={0.2}>
-              <Link
-                href="/about"
-                className="w-full sm:w-auto btn-baby-pink-outline text-base px-8 py-4 flex items-center justify-center space-x-2"
-              >
-                <Shield className="w-5 h-5 text-rose" />
-                <span>HOW IT PROTECTS YOU</span>
-              </Link>
-            </GsapMagneticButton>
+            <Link
+              href="/about"
+              className="w-full sm:w-auto btn-baby-pink-outline text-base px-8 py-4 flex items-center justify-center space-x-2 rounded-2xl"
+            >
+              <Shield className="w-5 h-5 text-rose" />
+              <span>HOW IT PROTECTS YOU</span>
+            </Link>
           </div>
 
           {/* FEATURES GRID */}
-          <GsapStaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 text-left">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 text-left">
             {[
               {
                 icon: Zap,
@@ -107,14 +107,16 @@ export default function LandingPage() {
                 </div>
               );
             })}
-          </GsapStaggerContainer>
+          </div>
         </div>
 
       </section>
 
       {/* FOOTER */}
       <footer className="border-t-2 border-[#FFCCE1] bg-white py-8 text-center text-xs font-bold text-tichi-muted">
-        <p>&copy; {new Date().getFullYear()} Sakhi Suraksha SOS. Built with care for Women's Safety in India.</p>
+        <p suppressHydrationWarning>
+          &copy; {year ?? new Date().getFullYear()} Sakhi Suraksha SOS. Built with care for Women's Safety in India.
+        </p>
       </footer>
     </div>
   );
