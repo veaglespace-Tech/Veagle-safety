@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { useAuthStore } from '../../redux/useAuthStore.js';
 import { useLocationStore } from '../../redux/useLocationStore.js';
@@ -40,11 +40,15 @@ import {
 } from 'lucide-react';
 
 export default function UserProfileSettingsPage() {
-  const { user, logout, updateUserAvatar } = useAuthStore();
+  const { user, logout, updateUserAvatar, fetchUser } = useAuthStore();
   const { status, accuracy } = useLocationStore();
   const [activeTab, setActiveTab] = useState('DIAGNOSTICS');
   const [showTestModal, setShowTestModal] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
   
   // AVATAR NOTIFICATION STATE
   const [avatarToast, setAvatarToast] = useState(null);
@@ -151,6 +155,8 @@ export default function UserProfileSettingsPage() {
 
   const initials = user?.fullName
     ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+    : user?.name
+    ? user.name.slice(0, 2).toUpperCase()
     : 'PS';
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
@@ -239,7 +245,9 @@ export default function UserProfileSettingsPage() {
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-center space-x-2">
-                    <h1 className="font-black text-2xl sm:text-3xl text-tichi-text">{user?.fullName || 'Sakhi Member'}</h1>
+                    <h1 className="font-black text-2xl sm:text-3xl text-tichi-text">
+                      {user?.fullName || user?.name || (user?.email ? user.email.split('@')[0] : 'Sakhi Member')}
+                    </h1>
                     {isSuperAdmin && (
                       <span className="bg-gold text-tichi-text font-black text-[10px] px-3 py-1 rounded-full uppercase flex items-center space-x-1 shadow-gold-glow border border-gold/40">
                         <Crown className="w-3.5 h-3.5" />
