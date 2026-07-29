@@ -272,12 +272,30 @@ export const login = asyncHandler(async (req, res) => {
   }
 
   if (!user.isEmailVerified && user.role === 'USER') {
+    // Auto-send fresh OTP on login attempt for unverified account
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { emailOtp: newOtp, emailOtpExpiresAt: otpExpires },
+    });
+
+    console.log(`🔑 [OTP RESENT on Login] Email: ${user.email} | OTP: ${newOtp}`);
+
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: user.email, userName: user.fullName, otp: newOtp });
+    } catch (e) {
+      console.warn('[Login OTP Email Notice]', e.message);
+    }
+
     return res.status(403).json({
-      error: 'Please verify your email address to log in.',
+      error: 'Your email is not verified. A new OTP has been sent to your email.',
       requiresVerification: true,
       email: user.email,
     });
   }
+
 
   const token = jwt.sign(
     { id: user.id, userId: user.id, role: user.role, email: user.email },
