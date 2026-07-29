@@ -150,23 +150,18 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
               : 'bg-gradient-to-br from-[#FF2A6D] via-[#FF5C8A] to-[#FF80A0] text-white border-white hover:scale-105 shadow-[0_15px_35px_rgba(255,92,138,0.5)]'
           }`}
         >
-          {/* HIGH-GLOSS ARC REFLECTION */}
-          <div className="absolute inset-x-6 top-3 h-14 rounded-full bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
-
           {/* INNER SHIELD ICON & TYPOGRAPHY */}
           <div className="relative z-10 flex flex-col items-center justify-center space-y-1 text-center">
             
-            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center bg-white/20 backdrop-blur-md shadow-inner border border-white/30 ${
-              holding ? 'animate-bounce bg-white text-[#FF2A6D]' : ''
-            }`}>
-              <ShieldAlert className="w-6 h-6 text-white" />
-            </div>
+            <ShieldAlert className={`w-9 h-9 text-white drop-shadow-md mb-0.5 ${
+              holding ? 'animate-bounce' : ''
+            }`} />
 
             <span className="text-3xl font-black tracking-widest text-white drop-shadow-md">
               {holding ? `${countdown}s` : activeSession ? 'ACTIVE' : 'SOS'}
             </span>
 
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/95 bg-black/25 px-3 py-1 rounded-full border border-white/20 backdrop-blur-sm shadow-sm">
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/95 bg-black/25 px-3.5 py-1 rounded-full border border-white/20 backdrop-blur-sm shadow-sm">
               {holding ? 'DISPATCHING...' : activeSession ? 'VIEW STATUS' : 'HOLD 3 SECONDS'}
             </span>
 
