@@ -35,15 +35,20 @@ import {
   AlertTriangle,
   Eye,
   EyeOff,
+  Camera,
+  Upload,
 } from 'lucide-react';
 
 export default function UserProfileSettingsPage() {
-  const { user, logout } = useAuthStore();
+  const { user, logout, updateUserAvatar } = useAuthStore();
   const { status, accuracy } = useLocationStore();
   const [activeTab, setActiveTab] = useState('DIAGNOSTICS');
   const [showTestModal, setShowTestModal] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
   
+  // AVATAR NOTIFICATION STATE
+  const [avatarToast, setAvatarToast] = useState(null);
+
   // MODAL STATES FOR SETTINGS
   const [activeModal, setActiveModal] = useState(null); // 'PRIVACY' | 'NOTIFICATIONS' | 'PASSWORD' | 'ABOUT'
   
@@ -64,6 +69,32 @@ export default function UserProfileSettingsPage() {
   const [passMessage, setPassMessage] = useState(null);
 
   const router = useRouter();
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarToast({ type: 'error', text: 'Image file size must be less than 5MB.' });
+      setTimeout(() => setAvatarToast(null), 3000);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64Image = reader.result;
+      updateUserAvatar(base64Image);
+      setAvatarToast({ type: 'success', text: '✅ Profile Photo Updated Successfully!' });
+      setTimeout(() => setAvatarToast(null), 3000);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    updateUserAvatar(null);
+    setAvatarToast({ type: 'success', text: 'Profile Photo Reset to Default Initials.' });
+    setTimeout(() => setAvatarToast(null), 3000);
+  };
 
   const handleLogout = () => {
     if (confirm('Are you sure you want to sign out?')) {
@@ -156,16 +187,55 @@ export default function UserProfileSettingsPage() {
               </div>
             </div>
 
-            {/* UNIFIED USER DETAILS & AVATAR */}
+            {/* UNIFIED USER DETAILS & AVATAR EDITING */}
             <div className="px-6 sm:px-8 pb-6 -mt-12 relative z-10 space-y-6">
               
               <div className="flex flex-col items-center text-center space-y-3">
-                {/* AVATAR RING */}
-                <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 shadow-xl">
-                  <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center font-black text-3xl text-tichi-text">
-                    {initials}
+                
+                {/* AVATAR RING WITH INTERACTIVE CAMERA EDIT BUTTON */}
+                <div className="relative group">
+                  <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 shadow-xl relative overflow-hidden">
+                    <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center font-black text-3xl text-tichi-text overflow-hidden relative">
+                      {user?.avatar ? (
+                        <img src={user.avatar} alt="Profile Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <span>{initials}</span>
+                      )}
+                    </div>
                   </div>
+
+                  {/* INTERACTIVE UPLOAD CAMERA BADGE */}
+                  <label
+                    title="Upload New Profile Photo"
+                    className="absolute -bottom-1 -right-1 bg-rose text-white p-2 rounded-2xl shadow-lg border-2 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center justify-center group-hover:bg-[#FF2A6D]"
+                  >
+                    <Camera className="w-4 h-4" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {user?.avatar && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      title="Remove Profile Photo"
+                      className="absolute -top-1 -left-1 bg-white text-rose border border-[#FFCCE1] p-1.5 rounded-full shadow hover:bg-rose/10 transition-all text-[10px] font-black"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
+
+                {/* AVATAR TOAST FEEDBACK NOTIFICATION */}
+                {avatarToast && (
+                  <div className={`text-xs font-black px-4 py-1.5 rounded-full shadow-sm animate-shake ${avatarToast.type === 'error' ? 'bg-rose/10 text-rose border border-rose' : 'bg-tichi-success/15 text-tichi-success border border-tichi-success'}`}>
+                    {avatarToast.text}
+                  </div>
+                )}
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-center space-x-2">
