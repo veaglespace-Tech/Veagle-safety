@@ -195,8 +195,8 @@ export default function UserProfileSettingsPage() {
                 </div>
               </div>
 
-              {/* INTEGRATED SEGMENTED NAVIGATION TABS */}
-              <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm flex gap-1.5">
+              {/* INTEGRATED SEGMENTED NAVIGATION TABS (100% INSTANT CLICKABLE SWITCHER) */}
+              <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm flex gap-2 relative z-20">
                 {[
                   { key: 'DIAGNOSTICS', label: 'Safety Health & Drill', icon: Shield },
                   { key: 'SETTINGS', label: 'App Settings', icon: Sliders },
@@ -207,15 +207,16 @@ export default function UserProfileSettingsPage() {
                   return (
                     <button
                       key={tab.key}
+                      type="button"
                       onClick={() => setActiveTab(tab.key)}
-                      className={`flex-1 py-3 rounded-xl font-black text-xs transition-all flex items-center justify-center space-x-1.5 uppercase tracking-wider ${
+                      className={`flex-1 py-3 px-2 rounded-xl font-black text-xs transition-all flex items-center justify-center space-x-1.5 uppercase tracking-wider cursor-pointer relative z-20 ${
                         isActive
-                          ? 'btn-baby-pink shadow-coral-glow'
-                          : 'bg-white text-tichi-muted hover:text-rose hover:bg-rose/5 border border-transparent'
+                          ? 'bg-rose text-white border-2 border-rose shadow-md'
+                          : 'bg-white text-tichi-text hover:text-rose hover:bg-rose/10 border-2 border-[#FFCCE1]'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
-                      <span>{tab.label}</span>
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span className="truncate">{tab.label}</span>
                     </button>
                   );
                 })}
@@ -293,8 +294,9 @@ export default function UserProfileSettingsPage() {
                   ].map((item) => (
                     <button
                       key={item.type}
+                      type="button"
                       onClick={() => setActiveModal(item.type)}
-                      className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-[#FFF0F3] transition-all border border-transparent hover:border-[#FFCCE1] text-left group"
+                      className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-[#FFF0F3] transition-all border border-transparent hover:border-[#FFCCE1] text-left group cursor-pointer"
                     >
                       <div>
                         <p className="text-xs font-black text-tichi-text group-hover:text-rose transition-colors">{item.label}</p>
@@ -339,8 +341,9 @@ export default function UserProfileSettingsPage() {
               {/* INTEGRATED FOOTER SIGN OUT BUTTON */}
               <div className="pt-2">
                 <button
+                  type="button"
                   onClick={handleLogout}
-                  className="w-full bg-white border-2 border-[#FF2A6D] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-sm transition-all"
+                  className="w-full bg-white border-2 border-[#FF2A6D] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-sm transition-all cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>SIGN OUT OF ACCOUNT</span>
@@ -364,7 +367,7 @@ export default function UserProfileSettingsPage() {
                   <Lock className="w-5 h-5" />
                   <h3 className="font-black text-base">Privacy & Data Purge Controls</h3>
                 </div>
-                <button onClick={() => setActiveModal(null)} className="text-white/80 hover:text-white">
+                <button type="button" onClick={() => setActiveModal(null)} className="text-white/80 hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -398,8 +401,9 @@ export default function UserProfileSettingsPage() {
                     </p>
 
                     <button
+                      type="button"
                       onClick={handlePurgeLogs}
-                      className="w-full bg-[#FF2A6D] text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-coral-glow hover:brightness-110"
+                      className="w-full bg-[#FF2A6D] text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-coral-glow hover:brightness-110 cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>PURGE MY LOCATION HISTORY LOGS</span>
@@ -422,7 +426,7 @@ export default function UserProfileSettingsPage() {
                   <Bell className="w-5 h-5" />
                   <h3 className="font-black text-base">Notification & Alert Preferences</h3>
                 </div>
-                <button onClick={() => setActiveModal(null)} className="text-white/80 hover:text-white">
+                <button type="button" onClick={() => setActiveModal(null)} className="text-white/80 hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -440,8 +444,9 @@ export default function UserProfileSettingsPage() {
                         <p className="text-[10px] text-tichi-muted font-bold mt-0.5">{opt.desc}</p>
                       </div>
                       <button
+                        type="button"
                         onClick={() => opt.setter(!opt.state)}
-                        className={`w-12 h-6 rounded-full transition-colors p-1 ${opt.state ? 'bg-tichi-success' : 'bg-gray-300'}`}
+                        className={`w-12 h-6 rounded-full transition-colors p-1 cursor-pointer ${opt.state ? 'bg-tichi-success' : 'bg-gray-300'}`}
                       >
                         <div className={`w-4 h-4 rounded-full bg-white transition-transform ${opt.state ? 'translate-x-6' : 'translate-x-0'}`} />
                       </button>
@@ -450,8 +455,9 @@ export default function UserProfileSettingsPage() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={handleTestSirenAudio}
-                  className={`w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow flex items-center justify-center space-x-2 ${isTestingSiren ? 'animate-pulse' : ''}`}
+                  className={`w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow flex items-center justify-center space-x-2 cursor-pointer ${isTestingSiren ? 'animate-pulse' : ''}`}
                 >
                   <Volume2 className="w-4 h-4" />
                   <span>{isTestingSiren ? '🔊 PLAYING SIREN TEST...' : '🔊 TEST SIREN AUDIO SOUND'}</span>
@@ -472,7 +478,7 @@ export default function UserProfileSettingsPage() {
                   <KeyRound className="w-5 h-5" />
                   <h3 className="font-black text-base">Update Account Password</h3>
                 </div>
-                <button onClick={() => setActiveModal(null)} className="text-white/80 hover:text-white">
+                <button type="button" onClick={() => setActiveModal(null)} className="text-white/80 hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -522,7 +528,7 @@ export default function UserProfileSettingsPage() {
 
                 <button
                   type="submit"
-                  className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow"
+                  className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow cursor-pointer"
                 >
                   UPDATE PASSWORD NOW
                 </button>
@@ -542,7 +548,7 @@ export default function UserProfileSettingsPage() {
                   <Info className="w-5 h-5" />
                   <h3 className="font-black text-base">About Sakhi Suraksha SOS</h3>
                 </div>
-                <button onClick={() => setActiveModal(null)} className="text-white/80 hover:text-white">
+                <button type="button" onClick={() => setActiveModal(null)} className="text-white/80 hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -563,8 +569,9 @@ export default function UserProfileSettingsPage() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setActiveModal(null)}
-                  className="w-full btn-baby-pink py-3 rounded-xl text-xs font-black uppercase tracking-wider"
+                  className="w-full btn-baby-pink py-3 rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer"
                 >
                   CLOSE
                 </button>
@@ -602,14 +609,16 @@ export default function UserProfileSettingsPage() {
                       This will trigger a 5-second simulated emergency alarm on your device only.
                     </p>
                     <button
+                      type="button"
                       onClick={handleRunTest}
-                      className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow"
+                      className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow cursor-pointer"
                     >
                       START TEST NOW
                     </button>
                     <button
+                      type="button"
                       onClick={() => setShowTestModal(false)}
-                      className="w-full text-tichi-muted text-xs font-bold hover:text-tichi-text py-2"
+                      className="w-full text-tichi-muted text-xs font-bold hover:text-tichi-text py-2 cursor-pointer"
                     >
                       Cancel
                     </button>
