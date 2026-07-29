@@ -33,6 +33,7 @@ import {
   User,
   Heart,
   KeyRound,
+  Plus,
 } from 'lucide-react';
 
 export default function SuperAdminOperationsPortal() {
@@ -246,6 +247,17 @@ export default function SuperAdminOperationsPortal() {
           {/* ACTION CONTROLS */}
           <div className="flex items-center space-x-2">
             
+            {/* ADD USER BUTTON IN HEADER */}
+            <button
+              type="button"
+              onClick={() => setShowCreateUserModal(true)}
+              className="btn-baby-pink px-3.5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-1.5 cursor-pointer shrink-0"
+              title="Super Admin Help: Add New User via Backend"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>+ Add User</span>
+            </button>
+
             {/* EDIT ADMIN PROFILE BUTTON */}
             <button
               type="button"
@@ -274,10 +286,10 @@ export default function SuperAdminOperationsPortal() {
 
             <Link
               href="/dashboard"
-              className="btn-baby-pink text-xs font-black px-4 py-2.5 rounded-2xl shadow-coral-glow flex items-center space-x-1.5 uppercase tracking-wider"
+              className="bg-white border-2 border-[#FFCCE1] text-tichi-text text-xs font-black px-4 py-2.5 rounded-2xl hover:border-rose transition-all flex items-center space-x-1.5 uppercase tracking-wider"
             >
               <span>User App</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 text-rose" />
             </Link>
 
             <button
@@ -311,6 +323,30 @@ export default function SuperAdminOperationsPortal() {
             </button>
           </div>
         )}
+
+        {/* SUPER ADMIN QUICK USER ASSISTANCE ACTION BANNER */}
+        <div className="card-antique-pink border-2 border-rose p-5 rounded-3xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 rounded-2xl bg-rose/15 text-rose flex items-center justify-center shrink-0 border border-rose/30">
+              <UserPlus className="w-6 h-6 text-rose" />
+            </div>
+            <div>
+              <h3 className="font-black text-base text-tichi-text">Super Admin Direct User Registration Help</h3>
+              <p className="text-xs text-tichi-muted font-bold mt-0.5">
+                Assist users who are unable to register by creating their accounts directly via backend.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowCreateUserModal(true)}
+            className="btn-baby-pink px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-2 shrink-0 cursor-pointer"
+          >
+            <UserPlus className="w-4.5 h-4.5" />
+            <span>+ ADD NEW USER VIA BACKEND</span>
+          </button>
+        </div>
 
         {/* 4-GRID METRICS STATS CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -694,7 +730,7 @@ export default function SuperAdminOperationsPortal() {
             <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <UserPlus className="w-5 h-5" />
-                <h3 className="font-black text-base">Create New Account (Backend)</h3>
+                <h3 className="font-black text-base">Super Admin User Onboarding</h3>
               </div>
               <button type="button" onClick={() => setShowCreateUserModal(false)} className="text-white/80 hover:text-white">
                 <X className="w-5 h-5" />
@@ -709,7 +745,7 @@ export default function SuperAdminOperationsPortal() {
               )}
 
               <div className="space-y-1">
-                <label className="text-xs font-black uppercase text-tichi-text">Full Name</label>
+                <label className="text-xs font-black uppercase text-tichi-text">User Full Name</label>
                 <input
                   type="text"
                   placeholder="Pooja Sharma"
