@@ -56,6 +56,8 @@ router.get('/checkin/active', authenticateToken, checkinController.getActiveChec
 // Super Admin Operations Command Portal
 router.get('/admin/overview', authenticateToken, requireSuperAdmin, adminController.getAdminOverview);
 router.get('/admin/users', authenticateToken, requireSuperAdmin, adminController.getAllUsers);
+router.post('/admin/users/create', authenticateToken, requireSuperAdmin, adminController.createUserByAdmin);
+router.put('/admin/profile', authenticateToken, requireSuperAdmin, adminController.updateSuperAdminProfile);
 router.put('/admin/user/role', authenticateToken, requireSuperAdmin, adminController.updateUserRole);
 router.post('/admin/sos/resolve', authenticateToken, requireSuperAdmin, adminController.adminResolveSos);
 router.get('/admin/plans', authenticateToken, requireSuperAdmin, adminController.getPlans);

@@ -25,11 +25,19 @@ import {
   ArrowRight,
   Shield,
   Layers,
+  UserPlus,
+  Edit3,
+  X,
+  Lock,
+  Mail,
+  User,
+  Heart,
+  KeyRound,
 } from 'lucide-react';
 
 export default function SuperAdminOperationsPortal() {
   const [mounted, setMounted] = useState(false);
-  const { user, logout } = useAuthStore();
+  const { user, logout, fetchUser } = useAuthStore();
   const router = useRouter();
 
   const [metrics, setMetrics] = useState(null);
@@ -40,6 +48,26 @@ export default function SuperAdminOperationsPortal() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('INCIDENTS');
   const [actionSuccess, setActionSuccess] = useState(null);
+
+  // CREATE USER MODAL STATE
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPhone, setNewUserPhone] = useState('');
+  const [newUserPass, setNewUserPass] = useState('');
+  const [newUserRole, setNewUserRole] = useState('USER');
+  const [newUserBlood, setNewUserBlood] = useState('O+');
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState(null);
+
+  // EDIT ADMIN PROFILE MODAL STATE
+  const [showEditAdminModal, setShowEditAdminModal] = useState(false);
+  const [adminName, setAdminName] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPhone, setAdminPhone] = useState('');
+  const [adminPass, setAdminPass] = useState('');
+  const [editAdminLoading, setEditAdminLoading] = useState(false);
+  const [editAdminError, setEditAdminError] = useState(null);
 
   useEffect(() => {
     setMounted(true);
@@ -56,6 +84,11 @@ export default function SuperAdminOperationsPortal() {
       return;
     }
     loadAdminData();
+
+    // Populate initial edit admin fields
+    setAdminName(user.fullName || '');
+    setAdminEmail(user.email || '');
+    setAdminPhone(user.phone || '');
   }, [user, mounted]);
 
   const loadAdminData = async () => {
@@ -76,6 +109,66 @@ export default function SuperAdminOperationsPortal() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setCreateError(null);
+    setCreateLoading(true);
+
+    try {
+      const res = await api.post('/admin/users/create', {
+        fullName: newUserName,
+        email: newUserEmail,
+        phone: newUserPhone,
+        password: newUserPass,
+        role: newUserRole,
+        bloodGroup: newUserBlood,
+      });
+
+      setActionSuccess(res.data.message);
+      setTimeout(() => setActionSuccess(null), 4000);
+
+      // Reset form & close modal
+      setNewUserName('');
+      setNewUserEmail('');
+      setNewUserPhone('');
+      setNewUserPass('');
+      setShowCreateUserModal(false);
+
+      // Refresh list
+      loadAdminData();
+    } catch (err) {
+      setCreateError(err.response?.data?.error || 'Failed to create new user.');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  const handleUpdateAdminProfile = async (e) => {
+    e.preventDefault();
+    setEditAdminError(null);
+    setEditAdminLoading(true);
+
+    try {
+      const res = await api.put('/admin/profile', {
+        fullName: adminName,
+        email: adminEmail,
+        phone: adminPhone,
+        password: adminPass || undefined,
+      });
+
+      setActionSuccess(res.data.message);
+      setTimeout(() => setActionSuccess(null), 4000);
+
+      fetchUser();
+      setShowEditAdminModal(false);
+      setAdminPass('');
+    } catch (err) {
+      setEditAdminError(err.response?.data?.error || 'Failed to update admin profile.');
+    } finally {
+      setEditAdminLoading(false);
     }
   };
 
@@ -151,7 +244,24 @@ export default function SuperAdminOperationsPortal() {
           </div>
 
           {/* ACTION CONTROLS */}
-          <div className="flex items-center space-x-2.5">
+          <div className="flex items-center space-x-2">
+            
+            {/* EDIT ADMIN PROFILE BUTTON */}
+            <button
+              type="button"
+              onClick={() => {
+                setAdminName(user?.fullName || '');
+                setAdminEmail(user?.email || '');
+                setAdminPhone(user?.phone || '');
+                setShowEditAdminModal(true);
+              }}
+              className="p-2.5 rounded-2xl bg-white border-2 border-rose text-rose hover:bg-rose hover:text-white transition-all flex items-center space-x-1.5 text-xs font-black shadow-sm cursor-pointer"
+              title="Edit Super Admin Profile"
+            >
+              <Edit3 className="w-4 h-4" />
+              <span className="hidden md:inline">Edit Profile</span>
+            </button>
+
             <button
               type="button"
               onClick={loadAdminData}
@@ -271,7 +381,7 @@ export default function SuperAdminOperationsPortal() {
         <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm flex gap-2 max-w-xl relative z-20">
           {[
             { key: 'INCIDENTS', label: 'Active Incidents', icon: ShieldAlert, badge: activeSos.length },
-            { key: 'USERS', label: 'User Roles', icon: UserCheck, badge: usersList.length },
+            { key: 'USERS', label: 'User Roles & Accounts', icon: UserCheck, badge: usersList.length },
             { key: 'SYSTEM', label: 'Dispatch Settings', icon: Sliders },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -413,7 +523,7 @@ export default function SuperAdminOperationsPortal() {
           </div>
         )}
 
-        {/* TAB 2: USER & SUPER ADMIN ROLE MANAGEMENT */}
+        {/* TAB 2: USER & SUPER ADMIN ROLE MANAGEMENT WITH CREATE USER BUTTON */}
         {activeTab === 'USERS' && (
           <div className="space-y-6 animate-fade-up">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -423,19 +533,31 @@ export default function SuperAdminOperationsPortal() {
                   <span>User Accounts & Role Privilege Management</span>
                 </h2>
                 <p className="text-xs text-tichi-muted font-bold mt-0.5">
-                  Promote trusted accounts to Super Admin or review user safety statuses.
+                  Create new user accounts directly or manage role permissions.
                 </p>
               </div>
 
-              <div className="relative w-full sm:w-72">
-                <Search className="w-4 h-4 text-rose absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search user name, email..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text placeholder-tichi-muted focus:border-rose focus:ring-4 focus:ring-rose/15 focus:outline-none shadow-sm"
-                />
+              <div className="flex items-center space-x-3">
+                {/* CREATE NEW USER BUTTON */}
+                <button
+                  type="button"
+                  onClick={() => setShowCreateUserModal(true)}
+                  className="btn-baby-pink px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-1.5 cursor-pointer shrink-0"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>+ Create User</span>
+                </button>
+
+                <div className="relative w-full sm:w-64">
+                  <Search className="w-4 h-4 text-rose absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search name, email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 rounded-2xl bg-white border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text placeholder-tichi-muted focus:border-rose focus:ring-4 focus:ring-rose/15 focus:outline-none shadow-sm"
+                  />
+                </div>
               </div>
             </div>
 
@@ -562,6 +684,196 @@ export default function SuperAdminOperationsPortal() {
         )}
 
       </main>
+
+      {/* ---------------------------------------------------- */}
+      {/* 1. SUPER ADMIN CREATE USER MODAL */}
+      {/* ---------------------------------------------------- */}
+      {showCreateUserModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
+            <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <UserPlus className="w-5 h-5" />
+                <h3 className="font-black text-base">Create New Account (Backend)</h3>
+              </div>
+              <button type="button" onClick={() => setShowCreateUserModal(false)} className="text-white/80 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateUser} className="p-6 space-y-4">
+              {createError && (
+                <div className="bg-rose/10 border border-rose text-rose text-xs font-black p-3 rounded-xl text-center">
+                  {createError}
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Full Name</label>
+                <input
+                  type="text"
+                  placeholder="Pooja Sharma"
+                  value={newUserName}
+                  onChange={(e) => setNewUserName(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="pooja@example.com"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Phone Number</label>
+                <input
+                  type="text"
+                  placeholder="+91 98765 43210"
+                  value={newUserPhone}
+                  onChange={(e) => setNewUserPhone(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-tichi-text">Role</label>
+                  <select
+                    value={newUserRole}
+                    onChange={(e) => setNewUserRole(e.target.value)}
+                    className="w-full px-3 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                  >
+                    <option value="USER">USER</option>
+                    <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-tichi-text">Blood Group</label>
+                  <select
+                    value={newUserBlood}
+                    onChange={(e) => setNewUserBlood(e.target.value)}
+                    className="w-full px-3 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                  >
+                    <option value="O+">O+</option>
+                    <option value="A+">A+</option>
+                    <option value="B+">B+</option>
+                    <option value="AB+">AB+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Initial Password</label>
+                <input
+                  type="password"
+                  placeholder="••••••••••••"
+                  value={newUserPass}
+                  onChange={(e) => setNewUserPass(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={createLoading}
+                className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow cursor-pointer disabled:opacity-60"
+              >
+                {createLoading ? 'CREATING ACCOUNT...' : '⚡ CREATE USER VIA BACKEND'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ---------------------------------------------------- */}
+      {/* 2. EDIT SUPER ADMIN PROFILE MODAL */}
+      {/* ---------------------------------------------------- */}
+      {showEditAdminModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
+            <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Edit3 className="w-5 h-5" />
+                <h3 className="font-black text-base">Edit Super Admin Profile</h3>
+              </div>
+              <button type="button" onClick={() => setShowEditAdminModal(false)} className="text-white/80 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateAdminProfile} className="p-6 space-y-4">
+              {editAdminError && (
+                <div className="bg-rose/10 border border-rose text-rose text-xs font-black p-3 rounded-xl text-center">
+                  {editAdminError}
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Super Admin Full Name</label>
+                <input
+                  type="text"
+                  value={adminName}
+                  onChange={(e) => setAdminName(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Admin Email Address</label>
+                <input
+                  type="email"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Phone Number</label>
+                <input
+                  type="text"
+                  value={adminPhone}
+                  onChange={(e) => setAdminPhone(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">New Secret Access Key (Optional)</label>
+                <input
+                  type="password"
+                  placeholder="Leave blank to keep current password"
+                  value={adminPass}
+                  onChange={(e) => setAdminPass(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={editAdminLoading}
+                className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow cursor-pointer disabled:opacity-60"
+              >
+                {editAdminLoading ? 'SAVING CHANGES...' : 'SAVE SUPER ADMIN PROFILE'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
