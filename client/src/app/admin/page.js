@@ -475,8 +475,8 @@ export default function SuperAdminOperationsPortal() {
                         <span className="bg-[#FF2A6D] text-white font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider animate-pulse border border-white">
                           🚨 CRITICAL SOS ACTIVE
                         </span>
-                        <span className="text-xs text-tichi-muted font-bold font-mono">
-                          Started: {new Date(session.startedAt).toLocaleTimeString()}
+                        <span className="text-xs text-tichi-muted font-bold font-mono" suppressHydrationWarning>
+                          Started: {mounted && session.startedAt ? new Date(session.startedAt).toLocaleTimeString() : ''}
                         </span>
                       </div>
 
@@ -543,8 +543,8 @@ export default function SuperAdminOperationsPortal() {
                             {item.status}
                           </span>
                         </td>
-                        <td className="py-3 px-3 text-tichi-muted font-mono">
-                          {new Date(item.startedAt).toLocaleString()}
+                        <td className="py-3 px-3 text-tichi-muted font-mono" suppressHydrationWarning>
+                          {mounted && item.startedAt ? new Date(item.startedAt).toLocaleString() : ''}
                         </td>
                         <td className="py-3 px-3 font-mono text-tichi-muted truncate max-w-[150px]">
                           {item.shareToken}
@@ -645,8 +645,8 @@ export default function SuperAdminOperationsPortal() {
                           {u._count?.trustedContacts || 0} Contacts
                         </td>
 
-                        <td className="p-4 text-tichi-muted font-mono">
-                          {new Date(u.createdAt).toLocaleDateString()}
+                        <td className="p-4 text-tichi-muted font-mono" suppressHydrationWarning>
+                          {mounted && u.createdAt ? new Date(u.createdAt).toLocaleDateString() : ''}
                         </td>
 
                         <td className="p-4 text-right">
