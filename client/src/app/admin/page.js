@@ -378,7 +378,7 @@ export default function SuperAdminOperationsPortal() {
         </div>
 
         {/* PORCELAIN SEGMENTED NAVIGATION TABS */}
-        <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm flex gap-2 max-w-xl relative z-20">
+        <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm flex flex-wrap sm:flex-nowrap gap-2 w-full max-w-2xl relative z-20">
           {[
             { key: 'INCIDENTS', label: 'Active Incidents', icon: ShieldAlert, badge: activeSos.length },
             { key: 'USERS', label: 'User Roles & Accounts', icon: UserCheck, badge: usersList.length },
@@ -391,7 +391,7 @@ export default function SuperAdminOperationsPortal() {
                 key={tab.key}
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex-1 py-3 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center space-x-2 uppercase tracking-wider cursor-pointer relative z-20 ${
+                className={`flex-1 py-3 px-3.5 rounded-xl font-black text-xs transition-all flex items-center justify-center space-x-1.5 uppercase tracking-wider cursor-pointer relative z-20 shrink-0 ${
                   isActive
                     ? 'bg-rose text-white border-2 border-rose shadow-md'
                     : 'bg-white text-tichi-text hover:text-rose hover:bg-rose/10 border-2 border-[#FFCCE1]'
@@ -400,7 +400,7 @@ export default function SuperAdminOperationsPortal() {
                 <Icon className="w-4 h-4 shrink-0" />
                 <span className="truncate">{tab.label}</span>
                 {tab.badge !== undefined && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${isActive ? 'bg-white text-rose' : 'bg-rose/15 text-rose'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 ${isActive ? 'bg-white text-rose' : 'bg-rose/15 text-rose'}`}>
                     {tab.badge}
                   </span>
                 )}
