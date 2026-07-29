@@ -31,6 +31,9 @@ import {
   BellRing,
   Heart,
   Plus,
+  Sun,
+  SunMedium,
+  Moon,
 } from 'lucide-react';
 
 export default function DashboardAppPage() {
@@ -43,20 +46,20 @@ export default function DashboardAppPage() {
 
   useEffect(() => {
     setMounted(true);
-    startTracking();
+    fetchContacts();
+    fetchActiveJourney();
     fetchActiveSos();
-    loadContacts();
-    loadActiveJourney();
+    startTracking();
   }, []);
 
-  const loadContacts = async () => {
+  const fetchContacts = async () => {
     try {
       const res = await api.get('/contacts');
-      setContacts(res.data.contacts);
+      setContacts(res.data.contacts || []);
     } catch (err) {}
   };
 
-  const loadActiveJourney = async () => {
+  const fetchActiveJourney = async () => {
     try {
       const res = await api.get('/journey/active');
       setActiveJourney(res.data.journey);
@@ -64,13 +67,20 @@ export default function DashboardAppPage() {
   };
 
   const getGreeting = () => {
-    if (!mounted) return 'Welcome';
     const h = new Date().getHours();
     if (h < 12) return 'Good Morning';
     if (h < 17) return 'Good Afternoon';
     return 'Good Evening';
   };
 
+  const getGreetingIcon = () => {
+    const h = new Date().getHours();
+    if (h < 12) return Sun;
+    if (h < 17) return SunMedium;
+    return Moon;
+  };
+
+  const GreetingIcon = getGreetingIcon();
   const firstName = user?.fullName?.split(' ')[0] || 'Sakhi Member';
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
@@ -169,9 +179,11 @@ export default function DashboardAppPage() {
             {/* HEADER STATUS BAR */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#FFCCE1] pb-6">
               <div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2.5">
                   <span className="text-xs font-black uppercase tracking-widest text-rose">{getGreeting()}</span>
-                  <Sparkles className="w-4 h-4 text-gold-dark" />
+                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-2xl bg-gradient-to-tr from-rose via-rose-light to-gold text-white shadow-coral-glow border-2 border-white transform hover:scale-110 transition-transform">
+                    <GreetingIcon className="w-4 h-4 text-white drop-shadow-sm" />
+                  </span>
                 </div>
                 <h1 className="text-3xl sm:text-4xl font-black text-tichi-text mt-1 tracking-tight">
                   {firstName}'s Safety Command
@@ -181,196 +193,155 @@ export default function DashboardAppPage() {
                 </p>
               </div>
 
-              {/* LIVE GPS STATUS CHIP */}
-              <div className="flex items-center space-x-3 self-start sm:self-auto bg-white p-3 rounded-2xl border border-[#FFCCE1] shadow-sm">
-                <div className="relative flex items-center justify-center">
-                  <span className={`w-3 h-3 rounded-full ${locInfo.dot} ${status === 'LIVE' ? 'animate-ping absolute inset-0 opacity-75' : ''}`}></span>
-                  <span className={`w-3 h-3 rounded-full ${locInfo.dot}`}></span>
-                </div>
+              {/* GPS METER PILL */}
+              <div className="bg-white/95 border-2 border-[#FFCCE1] p-3.5 rounded-2xl flex items-center space-x-3.5 shadow-sm shrink-0">
+                <div className="w-3 h-3 rounded-full bg-tichi-success animate-ping"></div>
                 <div>
-                  <p className="text-xs font-black uppercase tracking-wider text-tichi-text">{status === 'LIVE' ? 'GPS PROTECTION LIVE' : locInfo.label}</p>
-                  <p className="text-[10px] text-tichi-muted font-mono font-bold">Accuracy: ±{accuracy || '10'}m</p>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-black text-tichi-text">{locInfo.label}</span>
+                    <span className="bg-tichi-success/15 text-tichi-success text-[10px] font-black px-2 py-0.5 rounded-full border border-tichi-success/30">
+                      ±{accuracy || '10'}m
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-tichi-muted font-bold mt-0.5">Real-Time Geolocation Sync</p>
                 </div>
               </div>
             </div>
 
-            {/* CENTRAL HERO SOS BUTTON SECTION */}
-            <div className="py-2">
+            {/* EMERGENCY SOS HERO ACTION BUTTON */}
+            <div className="py-4 text-center space-y-4">
               <SOSHeroButton />
+              <p className="text-xs text-tichi-muted font-black tracking-wider uppercase">
+                HOLD FOR 3 SECONDS OR DOUBLE-CLICK TO BROADCAST EMERGENCY ALERTS
+              </p>
+            </div>
+
+            {/* 4-GRID QUICK ACTIONS */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+              <Link
+                href="/track-journey"
+                className="bg-white p-4 rounded-2xl border-2 border-[#FFCCE1] hover:border-rose transition-all text-center space-y-2 group shadow-sm hover:shadow-md"
+              >
+                <div className="w-10 h-10 rounded-xl bg-rose/15 text-rose flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                  <Navigation className="w-5 h-5" />
+                </div>
+                <p className="text-xs font-black text-tichi-text">Track Journey</p>
+                <p className="text-[10px] text-tichi-muted font-bold">Share Live Route</p>
+              </Link>
+
+              <Link
+                href="/track-journey"
+                className="bg-white p-4 rounded-2xl border-2 border-[#FFCCE1] hover:border-rose transition-all text-center space-y-2 group shadow-sm hover:shadow-md"
+              >
+                <div className="w-10 h-10 rounded-xl bg-rose/15 text-rose flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <p className="text-xs font-black text-tichi-text">Check On Me</p>
+                <p className="text-[10px] text-tichi-muted font-bold">Safety Alarm Timer</p>
+              </Link>
+
+              <Link
+                href="/contacts"
+                className="bg-white p-4 rounded-2xl border-2 border-[#FFCCE1] hover:border-rose transition-all text-center space-y-2 group shadow-sm hover:shadow-md"
+              >
+                <div className="w-10 h-10 rounded-xl bg-rose/15 text-rose flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                  <Users className="w-5 h-5" />
+                </div>
+                <p className="text-xs font-black text-tichi-text">Guardians</p>
+                <p className="text-[10px] text-tichi-muted font-bold">{contacts.length} Trusted Listed</p>
+              </Link>
+
+              <Link
+                href="/help"
+                className="bg-white p-4 rounded-2xl border-2 border-[#FFCCE1] hover:border-rose transition-all text-center space-y-2 group shadow-sm hover:shadow-md"
+              >
+                <div className="w-10 h-10 rounded-xl bg-rose/15 text-rose flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                  <PhoneCall className="w-5 h-5" />
+                </div>
+                <p className="text-xs font-black text-tichi-text">Helplines</p>
+                <p className="text-[10px] text-tichi-muted font-bold">National 112 & 1091</p>
+              </Link>
             </div>
 
           </div>
 
-          {/* UNIFIED QUICK ACTION GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              {
-                href: '/track-journey',
-                icon: Share2,
-                title: 'Share Live Location',
-                desc: 'Send encrypted GPS tracking link to family',
-                badge: 'Real-Time Map',
-              },
-              {
-                href: '/track-journey',
-                icon: Navigation,
-                title: 'Track My Journey',
-                desc: 'Protected trip monitoring & arrival alarms',
-                badge: 'Smart Trip',
-              },
-              {
-                href: '/track-journey',
-                icon: Clock,
-                title: 'Check On Me',
-                desc: 'Timed check-in timer with auto escalation',
-                badge: 'Safety Timer',
-              },
-              {
-                href: '/contact',
-                icon: PhoneCall,
-                title: 'Emergency Helplines',
-                desc: 'One-tap dial 112, 1091 & national support',
-                badge: '24/7 Helpline',
-                emergency: true,
-              },
-            ].map((action, idx) => {
-              const Icon = action.icon;
-              return (
-                <Link
-                  key={idx}
-                  href={action.href}
-                  className={`group bg-white border-2 rounded-3xl p-6 shadow-sm hover:shadow-coral-glow hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-4 ${
-                    action.emergency
-                      ? 'border-[#FF2A6D]/40 hover:border-[#FF2A6D]'
-                      : 'border-[#FFCCE1] hover:border-rose'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${
-                      action.emergency
-                        ? 'bg-[#FF2A6D]/15 text-[#FF2A6D]'
-                        : 'bg-rose/15 text-rose'
-                    }`}>
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
-                      action.emergency ? 'bg-[#FF2A6D]/10 text-[#FF2A6D]' : 'bg-rose/10 text-rose'
-                    }`}>
-                      {action.badge}
-                    </span>
-                  </div>
+          {/* SAFETY READINESS INDEX & TRUSTED GUARDIANS QUICK ACCESS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                  <div>
-                    <h3 className="font-black text-base text-tichi-text group-hover:text-rose transition-colors flex items-center justify-between">
-                      <span>{action.title}</span>
-                      <ChevronRight className="w-4 h-4 text-tichi-muted group-hover:translate-x-1 transition-transform" />
-                    </h3>
-                    <p className="text-xs text-tichi-muted font-bold mt-1 leading-relaxed">{action.desc}</p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+            {/* SAFETY READINESS METER CARD */}
+            <div className="card-antique-pink p-6 border-2 border-rose shadow-md space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-tichi-text uppercase tracking-wider">Safety Readiness</span>
+                <span className="text-xs font-black text-tichi-success bg-tichi-success/15 px-3 py-1 rounded-full border border-tichi-success/30">
+                  {readinessScore}% READY
+                </span>
+              </div>
 
-          {/* UNIFIED GUARDIAN NETWORK & SAFETY READINESS HUB */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="w-full bg-white rounded-full h-3.5 p-0.5 border border-[#FFCCE1]">
+                <div
+                  className="bg-gradient-to-r from-rose via-rose-light to-tichi-success h-full rounded-full transition-all duration-1000 shadow-sm"
+                  style={{ width: `${readinessScore}%` }}
+                />
+              </div>
 
-            {/* LEFT 2 COLUMNS: TRUSTED CONTACTS NETWORK */}
-            <div className="lg:col-span-2 card-antique-pink p-6 sm:p-8 border-2 border-rose shadow-md space-y-6">
-              <div className="flex items-center justify-between border-b border-[#FFCCE1] pb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-2xl bg-rose/15 text-rose flex items-center justify-center shadow-sm">
-                    <Users className="w-6 h-6 text-rose" />
-                  </div>
-                  <div>
-                    <h2 className="font-black text-lg text-tichi-text">Trusted Guardian Network</h2>
-                    <p className="text-xs text-tichi-muted font-bold">5 Family & contacts notified instantly during SOS alerts</p>
-                  </div>
+              <div className="space-y-2 text-xs font-bold text-tichi-muted pt-1">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center space-x-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-tichi-success" />
+                    <span>GPS Location Permissions</span>
+                  </span>
+                  <span className="text-tichi-success font-black">Active</span>
                 </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center space-x-1.5">
+                    <CheckCircle2 className={`w-4 h-4 ${contacts.length >= 3 ? 'text-tichi-success' : 'text-amber-500'}`} />
+                    <span>Trusted Contacts Count</span>
+                  </span>
+                  <span className={`font-black ${contacts.length >= 3 ? 'text-tichi-success' : 'text-amber-600'}`}>
+                    {contacts.length}/5 Added
+                  </span>
+                </div>
+              </div>
+            </div>
 
+            {/* TRUSTED GUARDIANS PREVIEW CARD */}
+            <div className="md:col-span-2 card-antique-pink p-6 border-2 border-rose shadow-md space-y-4">
+              <div className="flex items-center justify-between border-b border-[#FFCCE1] pb-3">
+                <div className="flex items-center space-x-2">
+                  <Heart className="w-4.5 h-4.5 text-rose fill-rose/20" />
+                  <h3 className="font-black text-sm text-tichi-text uppercase tracking-wider">Emergency Guardians</h3>
+                </div>
                 <Link
                   href="/contacts"
-                  className="btn-baby-pink px-4 py-2 text-xs font-black uppercase tracking-wider shadow-sm flex items-center space-x-1"
+                  className="text-xs font-black text-rose hover:underline flex items-center space-x-1"
                 >
-                  <span>Manage</span>
+                  <span>Manage All ({contacts.length})</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 
-              {contacts.length === 0 ? (
-                <div className="bg-blush-subtle border-2 border-dashed border-[#FFCCE1] rounded-3xl p-8 text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-rose/15 text-rose flex items-center justify-center mx-auto shadow-sm">
-                    <Users className="w-8 h-8" />
-                  </div>
+              {contacts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {contacts.slice(0, 2).map((contact) => (
+                    <TrustedContactCard key={contact.id} contact={contact} onEdit={() => {}} onDelete={() => {}} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 space-y-3 bg-white rounded-2xl border border-[#FFCCE1] p-4">
+                  <Users className="w-10 h-10 text-rose/40 mx-auto" />
                   <div>
-                    <p className="font-black text-base text-tichi-text">No Trusted Guardians Added Yet</p>
-                    <p className="text-xs text-tichi-muted font-bold max-w-sm mx-auto mt-1 leading-relaxed">
-                      Add family members or trusted emergency contacts to ensure they receive real-time SOS siren alarms and live tracking links.
-                    </p>
+                    <p className="font-black text-xs text-tichi-text">No Trusted Guardians Added Yet</p>
+                    <p className="text-[11px] text-tichi-muted font-bold mt-0.5">Add up to 5 guardians to receive instant siren alerts.</p>
                   </div>
                   <Link
                     href="/contacts"
-                    className="inline-flex items-center space-x-2 btn-baby-pink px-6 py-3 text-xs font-black uppercase tracking-wider shadow-coral-glow"
+                    className="inline-flex items-center space-x-1.5 btn-baby-pink px-4 py-2 text-xs font-black uppercase shadow-sm"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>ADD FIRST GUARDIAN CONTACT</span>
+                    <span>ADD FIRST GUARDIAN</span>
                   </Link>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {contacts.slice(0, 4).map((contact) => (
-                    <TrustedContactCard key={contact.id} contact={contact} />
-                  ))}
-                </div>
               )}
-            </div>
-
-            {/* RIGHT 1 COLUMN: SAFETY READINESS INDEX */}
-            <div className="bg-gradient-to-br from-tichi-text via-[#3D0C38] to-tichi-text text-white rounded-3xl p-6 sm:p-8 shadow-xl border-2 border-gold/40 space-y-6 flex flex-col justify-between relative overflow-hidden">
-              <div className="space-y-5 relative z-10">
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <div className="flex items-center space-x-2">
-                    <ShieldCheck className="w-6 h-6 text-tichi-success" />
-                    <h3 className="font-black text-base text-white">Readiness Score</h3>
-                  </div>
-                  <span className="text-2xl font-black text-gold font-mono">{readinessScore}%</span>
-                </div>
-
-                {/* READINESS PROGRESS BAR */}
-                <div className="space-y-2">
-                  <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden p-0.5 border border-white/10">
-                    <div
-                      className="bg-gradient-to-r from-rose via-rose-light to-gold h-full rounded-full transition-all duration-700 shadow-md"
-                      style={{ width: `${readinessScore}%` }}
-                    />
-                  </div>
-                  <p className="text-[11px] text-gold font-black text-right uppercase tracking-wider">
-                    {readinessScore === 100 ? '🛡️ Full Emergency Readiness' : '⚠️ Add 3+ Guardians for 100% Score'}
-                  </p>
-                </div>
-
-                {/* READINESS CHECKLIST */}
-                <div className="space-y-3 pt-2">
-                  {[
-                    { done: status === 'LIVE', label: 'Live Encrypted GPS Access' },
-                    { done: contacts.length > 0, label: `${contacts.length} Guardians Connected` },
-                    { done: true, label: 'Email & Push Siren Broadcast' },
-                    { done: contacts.length >= 2, label: 'Multi-Contact Network' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center space-x-3 text-xs font-bold">
-                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${item.done ? 'text-tichi-success' : 'text-white/30'}`} />
-                      <span className={item.done ? 'text-white' : 'text-white/50'}>{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Link
-                href="/profile"
-                className="w-full bg-white/10 hover:bg-white/20 border-2 border-white/20 text-white font-black text-xs py-3.5 rounded-2xl transition-all text-center uppercase tracking-wider block relative z-10"
-              >
-                RUN SAFETY DIAGNOSTICS
-              </Link>
             </div>
 
           </div>
