@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
-import { MagneticButton } from '../components/ui/MagneticButton.js';
 import { Logo3DFlip } from '../components/ui/Logo3DFlip.js';
 
 export default function LandingPage() {
@@ -38,16 +37,14 @@ export default function LandingPage() {
               <Sparkles className="w-4 h-4 text-white animate-pulse" />
               <span>Welcome Back, <strong className="text-[#FFE600] font-black">{user?.fullName || 'Sakhi Member'}</strong>! Active Protection Enabled.</span>
             </div>
-            <MagneticButton pullStrength={0.2}>
-              <Link 
-                href={isSuperAdmin ? '/admin' : '/dashboard'} 
-                className="inline-flex items-center gap-1.5 bg-white text-[#FF2A6D] px-3.5 py-1 rounded-full text-[11px] font-black text-decoration-none shadow-sm hover:bg-[#FFF0F3] transition-all"
-              >
-                {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
-                <span>{isSuperAdmin ? 'Go to Admin Panel' : 'Go to Dashboard'}</span>
-                <ArrowRight size={13} />
-              </Link>
-            </MagneticButton>
+            <Link 
+              href={isSuperAdmin ? '/admin' : '/dashboard'} 
+              className="inline-flex items-center gap-1.5 bg-white text-[#FF2A6D] px-3.5 py-1 rounded-full text-[11px] font-black text-decoration-none shadow-sm hover:bg-[#FFF0F3] transition-all"
+            >
+              {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
+              <span>{isSuperAdmin ? 'Go to Admin Panel' : 'Go to Dashboard'}</span>
+              <ArrowRight size={13} />
+            </Link>
           </div>
         </div>
       )}
@@ -92,57 +89,49 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* MAGNETIC HERO CTA BUTTONS WITH 3D POP-UP EFFECT */}
+        {/* HERO CTA BUTTONS WITH PURE 3D POP-UP EFFECT (NO MAGNETIC MOTION) */}
         <div className="flex flex-wrap justify-center gap-6 pt-3">
           {isLoggedIn ? (
             <>
-              <MagneticButton pullStrength={0.4}>
-                <Link 
-                  href={isSuperAdmin ? '/admin' : '/dashboard'} 
-                  className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
-                >
-                  {isSuperAdmin ? <Crown size={18} /> : <LayoutDashboard size={18} />}
-                  <span>{isSuperAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}</span>
-                  <ArrowRight size={16} />
-                </Link>
-              </MagneticButton>
+              <Link 
+                href={isSuperAdmin ? '/admin' : '/dashboard'} 
+                className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
+              >
+                {isSuperAdmin ? <Crown size={18} /> : <LayoutDashboard size={18} />}
+                <span>{isSuperAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}</span>
+                <ArrowRight size={16} />
+              </Link>
 
-              <MagneticButton pullStrength={0.35}>
-                <Link 
-                  href="/profile" 
-                  className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
-                >
-                  <Shield size={16} className="text-[#FF5C8A]" />
-                  <span>MY PROFILE</span>
-                </Link>
-              </MagneticButton>
+              <Link 
+                href="/profile" 
+                className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
+              >
+                <Shield size={16} className="text-[#FF5C8A]" />
+                <span>MY PROFILE</span>
+              </Link>
             </>
           ) : (
             <>
-              <MagneticButton pullStrength={0.4}>
-                <Link 
-                  href="/auth?mode=register" 
-                  className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
-                >
-                  <span>PROTECT YOURSELF NOW</span>
-                  <ArrowRight size={16} className="shrink-0" />
-                </Link>
-              </MagneticButton>
+              <Link 
+                href="/auth?mode=register" 
+                className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
+              >
+                <span>PROTECT YOURSELF NOW</span>
+                <ArrowRight size={16} className="shrink-0" />
+              </Link>
 
-              <MagneticButton pullStrength={0.35}>
-                <Link 
-                  href="/about" 
-                  className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
-                >
-                  <Shield size={16} className="text-[#FF5C8A]" />
-                  <span>HOW IT WORKS</span>
-                </Link>
-              </MagneticButton>
+              <Link 
+                href="/about" 
+                className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
+              >
+                <Shield size={16} className="text-[#FF5C8A]" />
+                <span>HOW IT WORKS</span>
+              </Link>
             </>
           )}
         </div>
 
-        {/* 3 FEATURE CARDS WITH MAGNETIC HOVER */}
+        {/* 3 FEATURE CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto pt-8 text-left">
           {[
             {
@@ -161,21 +150,19 @@ export default function LandingPage() {
               desc: 'Build your personal network of family & emergency guardians for automated response alerts.'
             },
           ].map((item, idx) => (
-            <MagneticButton key={idx} pullStrength={0.2}>
-              <div className="bg-white/95 backdrop-blur-xl p-8 rounded-3xl space-y-4 border-1.5 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_10px_30px_rgba(255,92,138,0.10)] hover:shadow-[0_16px_40px_rgba(255,92,138,0.22)] transition-all duration-300 h-full flex flex-col justify-between">
-                <div>
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] border-1.5 border-[#FF5C8A] flex items-center justify-center mb-4 shadow-sm">
-                    <item.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-xl font-black text-[#2A0826] mb-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-[#684E67] font-bold leading-relaxed">
-                    {item.desc}
-                  </p>
+            <div key={idx} className="bg-white/95 backdrop-blur-xl p-8 rounded-3xl space-y-4 border-1.5 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_10px_30px_rgba(255,92,138,0.10)] hover:shadow-[0_16px_40px_rgba(255,92,138,0.22)] transition-all duration-300 h-full flex flex-col justify-between hover:-translate-y-1.5">
+              <div>
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] border-1.5 border-[#FF5C8A] flex items-center justify-center mb-4 shadow-sm">
+                  <item.icon className="w-6 h-6" />
                 </div>
+                <h3 className="text-xl font-black text-[#2A0826] mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-[#684E67] font-bold leading-relaxed">
+                  {item.desc}
+                </p>
               </div>
-            </MagneticButton>
+            </div>
           ))}
         </div>
 
@@ -190,17 +177,15 @@ export default function LandingPage() {
             { value: '< 3 Sec', label: 'Alert Dispatch Time', icon: Bell },
             { value: '24/7/365', label: 'Active Command Monitoring', icon: ShieldCheck },
           ].map((stat, i) => (
-            <MagneticButton key={i} pullStrength={0.25}>
-              <div className="bg-[#FFF0F3]/80 p-6 rounded-2xl border-1.5 border-[#FFCCE1] shadow-sm space-y-1.5">
-                <stat.icon className="w-6 h-6 text-[#FF5C8A] mx-auto" />
-                <div className="text-3xl sm:text-4xl font-black text-[#FF2A6D]">
-                  {stat.value}
-                </div>
-                <div className="text-xs font-black text-[#684E67] uppercase tracking-wider">
-                  {stat.label}
-                </div>
+            <div key={i} className="bg-[#FFF0F3]/80 p-6 rounded-2xl border-1.5 border-[#FFCCE1] shadow-sm space-y-1.5 hover:-translate-y-1 transition-transform">
+              <stat.icon className="w-6 h-6 text-[#FF5C8A] mx-auto" />
+              <div className="text-3xl sm:text-4xl font-black text-[#FF2A6D]">
+                {stat.value}
               </div>
-            </MagneticButton>
+              <div className="text-xs font-black text-[#684E67] uppercase tracking-wider">
+                {stat.label}
+              </div>
+            </div>
           ))}
         </div>
       </section>

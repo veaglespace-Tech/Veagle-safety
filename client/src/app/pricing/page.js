@@ -198,25 +198,23 @@ export default function PlatformPricingPage() {
               </div>
             </div>
 
-            {/* ACTION BUTTON WITH MAGNETIC PHYSICS */}
+            {/* ACTION BUTTON WITH 3D POP-UP EFFECT */}
             <div className="space-y-3 pt-2">
               <div className="flex justify-center">
-                <MagneticButton pullStrength={0.35}>
-                  <button
-                    onClick={handleSelectPlan}
-                    disabled={isProcessing}
-                    className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider shadow-[0_8px_25px_rgba(255,92,138,0.40)] hover:shadow-[0_12px_32px_rgba(255,42,109,0.60)] transition-all flex items-center justify-center space-x-3 cursor-pointer active:scale-95 whitespace-nowrap"
-                  >
-                    <span>
-                      {isProcessing
-                        ? 'PROCESSING PAYMENT & ACTIVATING PLAN...'
-                        : token
-                        ? 'PURCHASE YEARLY PROTECTION & ACTIVATE (₹28.32)'
-                        : 'REGISTER & COMPLETE PLAN FORMALITIES'}
-                    </span>
-                    <ArrowRight className="w-4 h-4 shrink-0" />
-                  </button>
-                </MagneticButton>
+                <button
+                  onClick={handleSelectPlan}
+                  disabled={isProcessing}
+                  className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
+                >
+                  <span>
+                    {isProcessing
+                      ? 'PROCESSING PAYMENT & ACTIVATING PLAN...'
+                      : token
+                      ? 'PURCHASE YEARLY PROTECTION & ACTIVATE (₹28.32)'
+                      : 'REGISTER & COMPLETE PLAN FORMALITIES'}
+                  </span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </button>
               </div>
 
               <div className="flex items-center justify-center space-x-2 text-[11px] text-[#684E67] font-extrabold pt-1">

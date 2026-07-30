@@ -109,39 +109,33 @@ export const PublicNavbar = () => {
           {/* RIGHT SIDE MAGNETIC ACTIONS (MAGNETIC PHYSICS ONLY ON BUTTONS) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
             {isLoggedIn ? (
-              <MagneticButton pullStrength={0.3}>
-                <button
-                  onClick={handleLogout}
-                  className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-extrabold px-5 py-2.5 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.20)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.45)] active:scale-95"
-                  title="Sign Out"
-                >
-                  <span className="tracking-wide">Sign Out</span>
-                  <LogOut size={15} className="group-hover:translate-x-0.5 transition-transform duration-300" />
-                </button>
-              </MagneticButton>
+              <button
+                onClick={handleLogout}
+                className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-extrabold px-5 py-2.5 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.20)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.45)] active:scale-95"
+                title="Sign Out"
+              >
+                <span className="tracking-wide">Sign Out</span>
+                <LogOut size={15} className="group-hover:translate-x-0.5 transition-transform duration-300" />
+              </button>
             ) : (
               <div className="hidden md:flex items-center gap-2.5">
                 {/* ULTRA-MODERN SIGN IN BUTTON */}
-                <MagneticButton pullStrength={0.35}>
-                  <Link 
-                    href="/auth?mode=login" 
-                    className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
-                  >
-                    <span className="tracking-wide">Sign In</span>
-                    <UserCheck size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" />
-                  </Link>
-                </MagneticButton>
+                <Link 
+                  href="/auth?mode=login" 
+                  className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
+                >
+                  <span className="tracking-wide">Sign In</span>
+                  <UserCheck size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" />
+                </Link>
 
                 {/* ULTRA-MODERN SIGN UP BUTTON */}
-                <MagneticButton pullStrength={0.4}>
-                  <Link 
-                    href="/auth?mode=register" 
-                    className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
-                  >
-                    <span className="tracking-wide">Sign Up</span>
-                    <ArrowRight size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-1 transition-all duration-300" />
-                  </Link>
-                </MagneticButton>
+                <Link 
+                  href="/auth?mode=register" 
+                  className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
+                >
+                  <span className="tracking-wide">Sign Up</span>
+                  <ArrowRight size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-1 transition-all duration-300" />
+                </Link>
               </div>
             )}
 
