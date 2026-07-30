@@ -142,12 +142,12 @@ export default function LandingPage() {
               desc: 'Build your personal network of family & emergency guardians for automated response alerts.'
             },
           ].map((item, idx) => (
-            <div key={idx} className="bg-white/95 backdrop-blur-xl p-8 rounded-3xl space-y-4 border-1.5 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_10px_30px_rgba(255,92,138,0.10)] hover:shadow-[0_16px_40px_rgba(255,92,138,0.22)] transition-all duration-300 h-full flex flex-col justify-between hover:-translate-y-1.5">
+            <div key={idx} className="group bg-white/95 backdrop-blur-xl p-8 rounded-3xl space-y-4 border-1.5 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_10px_30px_rgba(255,92,138,0.10)] hover:shadow-[0_16px_40px_rgba(255,92,138,0.22)] transition-all duration-300 h-full flex flex-col justify-between hover:-translate-y-1.5 cursor-pointer">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] border-1.5 border-[#FF5C8A] flex items-center justify-center mb-4 shadow-sm shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] border-1.5 border-[#FF5C8A] flex items-center justify-center mb-4 shadow-sm shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                   <item.icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-black text-[#2A0826] mb-2">
+                <h3 className="text-xl font-black mb-2 text-[#2A0826] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#FF2A6D] group-hover:to-[#FF5C8A] transition-all duration-300">
                   {item.title}
                 </h3>
                 <p className="text-xs text-[#684E67] font-bold leading-relaxed">
