@@ -73,17 +73,20 @@ export default function LandingPage() {
           live GPS tracking, and 24/7 command dispatch.
         </p>
 
-        {/* MARQUEE STRIP (FULL SCREEN WIDTH) */}
-        <div className="w-full bg-white/95 border-y-1.5 border-[#FFCCE1] py-4 overflow-hidden my-6 shadow-sm">
-          <div className="flex gap-12 whitespace-nowrap animate-marquee width-max-content">
+        {/* MARQUEE STRIP (FULL SCREEN WIDTH & LIVE CONTINUOUS SCROLLING) */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-white/95 border-y-1.5 border-[#FFCCE1] py-3.5 overflow-hidden my-8 shadow-sm">
+          <div className="animate-marquee-scroll">
             {[
-              '⚡ INSTANT 3-SECOND SOS', '📍 24/7 LIVE GPS TRACKING',
+              '⚡ INSTANT 3-SECOND SOS DISPATCH', '📍 24/7 LIVE GPS TRACKING',
               '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY',
-              '⚡ INSTANT 3-SECOND SOS', '📍 24/7 LIVE GPS TRACKING',
+              '⚡ INSTANT 3-SECOND SOS DISPATCH', '📍 24/7 LIVE GPS TRACKING',
+              '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY',
+              '⚡ INSTANT 3-SECOND SOS DISPATCH', '📍 24/7 LIVE GPS TRACKING',
               '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY',
             ].map((item, i) => (
-              <span key={i} className="text-xs sm:text-sm font-black text-[#FF2A6D] uppercase tracking-widest">
-                {item}
+              <span key={i} className="text-xs sm:text-sm font-black text-[#FF2A6D] uppercase tracking-widest flex items-center gap-3">
+                <span>{item}</span>
+                <span className="text-[#FF5C8A] font-light">·</span>
               </span>
             ))}
           </div>
