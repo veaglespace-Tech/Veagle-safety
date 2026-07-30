@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
+import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
 import {
   registerUser,
   loginUser,
@@ -20,6 +21,7 @@ import {
   Mail,
   Phone,
   User as UserIcon,
+  UserPlus,
   MapPin,
   Heart,
   ArrowRight,
@@ -28,7 +30,6 @@ import {
   KeyRound,
   CheckCircle2,
   AlertCircle,
-  Sparkles,
   Zap,
 } from 'lucide-react';
 
@@ -152,17 +153,20 @@ function UserAuthForm() {
 
           {/* ANIMATED TOP HEADER LUCIDE ICON EMBLEM & BRAND - PERFECTLY CENTERED */}
           <div className="flex flex-col items-center justify-center text-center space-y-3 pt-2">
-            {/* LUCIDE ICON CENTERED */}
+            {/* ROTATING LOGO EMBLEM CENTERED */}
             <div className="relative flex items-center justify-center">
-              <div className="absolute -inset-2 rounded-2xl bg-[#FF5C8A]/30 animate-pulse blur-md" />
-              <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FFCCE1] shadow-md flex items-center justify-center">
-                <ShieldCheck className="w-9 h-9 text-[#FF2A6D] drop-shadow-sm" />
+              <div className="absolute -inset-3 rounded-2xl bg-[#FF5C8A]/20 animate-pulse blur-lg" />
+              <div className="relative z-10 p-3 rounded-2xl bg-gradient-to-br from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FFCCE1] shadow-md flex items-center justify-center">
+                <Logo3DFlip size={52} />
               </div>
             </div>
 
-            {/* LUCIDE SPARKLES BADGE CENTERED DIRECTLY BELOW LOGO */}
+            {/* DYNAMIC BADGE — LOCK FOR SIGN IN, USERPLUS FOR REGISTER */}
             <div className="inline-flex items-center space-x-1.5 bg-[#FFF0F3] border border-[#FFCCE1] px-4 py-1.5 rounded-full text-[10px] font-black text-[#FF2A6D] uppercase tracking-widest shadow-sm mt-1">
-              <Sparkles className="w-3.5 h-3.5 text-[#FF5C8A] animate-pulse" />
+              {isLogin
+                ? <Lock className="w-3.5 h-3.5 text-[#FF5C8A]" />
+                : <UserPlus className="w-3.5 h-3.5 text-[#FF5C8A]" />
+              }
               <span>24/7 Encrypted Sakhi Safety</span>
             </div>
 
@@ -199,7 +203,7 @@ function UserAuthForm() {
                   : 'text-[#684E67] hover:text-[#2A0826]'
               }`}
             >
-              <UserIcon className="w-3.5 h-3.5" />
+              <UserPlus className="w-3.5 h-3.5" />
               <span>CREATE ACCOUNT</span>
             </button>
           </div>
