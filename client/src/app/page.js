@@ -9,6 +9,7 @@ import {
 import { useSelector } from 'react-redux';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
 import { Logo3DFlip } from '../components/ui/Logo3DFlip.js';
+import { HeroBannerCarousel } from '../components/ui/HeroBannerCarousel.js';
 
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
