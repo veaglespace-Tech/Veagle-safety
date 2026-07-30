@@ -102,57 +102,21 @@ export const PublicNavbar = () => {
             </div>
           </Link>
 
-          {/* CENTER NAV — Desktop only (>= 768px, NO Hamburger on Desktop) */}
-          <nav style={{
-            display: 'flex', alignItems: 'center', gap: '3px',
-            background: '#FFF0F3', borderRadius: '16px',
-            border: '1px solid #FFCCE1', padding: '4px', flexShrink: 0,
-          }} className="hidden md:flex">
-            {navLinks.map(({ href, label, icon: Icon }) => (
-              <Link key={href} href={href} style={{
-                display: 'flex', alignItems: 'center', gap: '5px',
-                padding: '6px 13px', borderRadius: '11px',
-                fontSize: '12px', fontWeight: 800,
-                textDecoration: 'none',
-                transition: 'all 0.2s ease',
-                background: isActive(href) ? 'linear-gradient(135deg,#FF5C8A,#FF2A6D)' : 'transparent',
-                color: isActive(href) ? '#fff' : '#684E67',
-                boxShadow: isActive(href) ? '0 3px 10px rgba(255,92,138,0.30)' : 'none',
-                whiteSpace: 'nowrap',
-              }}>
-                <Icon size={13} />
-                <span>{label}</span>
-              </Link>
-            ))}
-          </nav>
-
           {/* RIGHT SIDE ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             {mounted && token ? (
-              <>
-                <Link href={isSuperAdmin ? '/admin' : '/dashboard'} style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  background: 'linear-gradient(135deg,#FF5C8A,#FF2A6D)',
-                  color: '#fff', fontWeight: 900, fontSize: '11px',
-                  padding: '7px 14px', borderRadius: '12px',
-                  textDecoration: 'none',
-                  boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
-                  whiteSpace: 'nowrap',
-                }} className="hidden md:flex">
-                  {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
-                  <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
-                </Link>
-                <button onClick={handleLogout} style={{
-                  background: 'none', border: '1px solid #FFCCE1',
-                  color: '#684E67', fontSize: '11px', fontWeight: 800,
-                  padding: '7px 12px', borderRadius: '10px',
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px',
-                  whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }} className="hidden md:flex">
-                  <LogOut size={13} />
-                  <span>Logout</span>
-                </button>
-              </>
+              <Link href={isSuperAdmin ? '/admin' : '/dashboard'} style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                background: 'linear-gradient(135deg,#FF5C8A,#FF2A6D)',
+                color: '#fff', fontWeight: 900, fontSize: '11px',
+                padding: '7px 14px', borderRadius: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
+                whiteSpace: 'nowrap',
+              }}>
+                {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
+                <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
+              </Link>
             ) : (
               <>
                 <Link href="/auth?mode=login" style={{
@@ -162,7 +126,7 @@ export const PublicNavbar = () => {
                   textDecoration: 'none', border: '1px solid #FFCCE1',
                   background: 'rgba(255,255,255,0.9)',
                   whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }} className="hidden md:flex">
+                }}>
                   <UserCheck size={13} color="#FF5C8A" />
                   <span>Sign In</span>
                 </Link>
@@ -181,7 +145,7 @@ export const PublicNavbar = () => {
               </>
             )}
 
-            {/* HAMBURGER — Mobile only (< 768px) */}
+            {/* HAMBURGER MENU TOGGLE BUTTON */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               style={{
@@ -191,7 +155,6 @@ export const PublicNavbar = () => {
                 alignItems: 'center', justifyContent: 'center',
                 color: '#FF5C8A', flexShrink: 0,
               }}
-              className="md:hidden"
               aria-label="Toggle menu"
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -199,14 +162,14 @@ export const PublicNavbar = () => {
           </div>
         </div>
 
-        {/* MOBILE COLLAPSED DROPDOWN MENU */}
+        {/* MOBILE & DESKTOP COLLAPSED DROPDOWN MENU */}
         {menuOpen && (
           <div style={{
             borderTop: '1.5px solid #FFCCE1',
             background: 'rgba(255,255,255,0.99)',
             padding: '12px 16px 16px',
             boxShadow: '0 10px 25px rgba(255,92,138,0.12)',
-          }} className="md:hidden">
+          }}>
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link key={href} href={href} style={{
                 display: 'flex', alignItems: 'center', gap: '10px',

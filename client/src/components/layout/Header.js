@@ -38,7 +38,7 @@ export const Header = () => {
     ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'SS';
 
-  // Navigation Links array for collapsed dropdown and desktop navbar
+  // All Navigation Links for the Collapsed Menu Toggle Dropdown
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
   ];
@@ -138,42 +138,10 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* DESKTOP FULL HORIZONTAL NAVIGATION BAR (>= 768px ONLY, NO HAMBURGER ON DESKTOP) */}
-          <nav 
-            style={{
-              display: 'flex', alignItems: 'center', gap: '3px',
-              background: '#FFF0F3', borderRadius: '16px',
-              border: '1px solid #FFCCE1', padding: '4px',
-              flexShrink: 0,
-            }}
-            className="hidden md:flex"
-          >
-            {navLinks.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '5px',
-                  padding: '6px 12px', borderRadius: '10px',
-                  fontSize: '12px', fontWeight: 800,
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  background: isActive(href) ? 'linear-gradient(135deg, #FF5C8A, #FF2A6D)' : 'transparent',
-                  color: isActive(href) ? '#FFFFFF' : '#684E67',
-                  boxShadow: isActive(href) ? '0 3px 10px rgba(255,92,138,0.3)' : 'none',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <Icon size={13} />
-                <span>{label}</span>
-              </Link>
-            ))}
-          </nav>
-
           {/* RIGHT SIDE USER ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* Desktop CTA Button (>= 768px) */}
+            {/* Logged in CTA Button */}
             {mounted && token ? (
               <Link
                 href={isSuperAdmin ? '/admin' : '/dashboard'}
@@ -185,7 +153,6 @@ export const Header = () => {
                   textDecoration: 'none', boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
                   whiteSpace: 'nowrap',
                 }}
-                className="hidden md:flex"
               >
                 {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
                 <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
@@ -201,7 +168,6 @@ export const Header = () => {
                   background: 'rgba(255,255,255,0.9)',
                   whiteSpace: 'nowrap', transition: 'all 0.2s',
                 }}
-                className="hidden md:flex"
               >
                 <UserCheck size={13} color="#FF5C8A" />
                 <span>Sign In</span>
@@ -248,25 +214,7 @@ export const Header = () => {
               </Link>
             )}
 
-            {/* Logout Button (Desktop >= 768px) */}
-            {mounted && token && (
-              <button
-                onClick={handleLogout}
-                style={{
-                  background: 'none', border: '1px solid #FFCCE1',
-                  color: '#684E67', fontSize: '11px', fontWeight: 800,
-                  padding: '7px 12px', borderRadius: '10px',
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px',
-                  whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }}
-                className="hidden md:flex"
-              >
-                <LogOut size={13} />
-                <span>Logout</span>
-              </button>
-            )}
-
-            {/* MOBILE MENU TOGGLE BUTTON (ONLY ON MOBILE < 768px) */}
+            {/* MENU TOGGLE BUTTON (OPENS ALL TABS DROPDOWN) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
@@ -276,7 +224,6 @@ export const Header = () => {
                 color: '#FF5C8A', cursor: 'pointer',
                 flexShrink: 0,
               }}
-              className="md:hidden"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -284,7 +231,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* MOBILE COLLAPSED DROPDOWN MENU CONTAINING ALL TABS (< 768px) */}
+        {/* COLLAPSED MENU DROPDOWN CONTAINING ALL NAVIGATION TABS */}
         {mobileMenuOpen && (
           <div 
             style={{
@@ -293,7 +240,6 @@ export const Header = () => {
               padding: '12px 16px 16px',
               boxShadow: '0 10px 25px rgba(255, 92, 138, 0.12)',
             }} 
-            className="md:hidden"
           >
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link
