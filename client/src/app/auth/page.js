@@ -14,7 +14,6 @@ import {
   setShowOtpModal,
 } from '../../redux/slices/authSlice.js';
 import {
-  Shield,
   Eye,
   EyeOff,
   Lock,
@@ -22,11 +21,9 @@ import {
   Phone,
   User as UserIcon,
   UserPlus,
-  MapPin,
   Heart,
   ArrowRight,
   ShieldCheck,
-  Crown,
   KeyRound,
   CheckCircle2,
   AlertCircle,
@@ -405,32 +402,6 @@ function UserAuthForm() {
 
           </form>
 
-          {/* DEMO QUICK LOGIN SHORTCUTS */}
-          {isLogin && (
-            <div className="pt-4 border-t border-[#FFCCE1] space-y-2 text-center">
-              <span className="text-[10px] font-black text-[#684E67] uppercase tracking-wider block">
-                ⚡ Quick Demo One-Click Sign In
-              </span>
-              <div className="flex flex-wrap gap-2 justify-center">
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('priya@example.com', 'password123')}
-                  className="px-3.5 py-1.5 bg-[#FFF0F3] hover:bg-[#FF2A6D] text-[#FF2A6D] hover:text-white border border-[#FFCCE1] rounded-full text-[11px] font-extrabold transition-all flex items-center space-x-1.5"
-                >
-                  <Shield className="w-3.5 h-3.5" />
-                  <span>Demo Member (Priya)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('admin@veaglesafety.org', 'AdminPass123!')}
-                  className="px-3.5 py-1.5 bg-[#FFF0F3] hover:bg-[#2A0826] text-[#2A0826] hover:text-white border border-[#FFCCE1] rounded-full text-[11px] font-extrabold transition-all flex items-center space-x-1.5"
-                >
-                  <Crown className="w-3.5 h-3.5 text-[#E01A4F]" />
-                  <span>Super Admin HQ</span>
-                </button>
-              </div>
-            </div>
-          )}
 
         </div>
       </div>
