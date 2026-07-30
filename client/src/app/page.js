@@ -169,7 +169,16 @@ export default function LandingPage() {
             <span className="text-sm font-black text-[#2A0826] tracking-tight">Sakhi Suraksha SOS</span>
           </div>
           <div className="text-[11px] font-black tracking-wide text-[#684E67]">
-            Designed & Developed by Veagle Space Technology Pvt. Ltd. | © 2026 All Rights Reserved.
+            Designed & Developed by{' '}
+            <a
+              href="https://veaglespace.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#FF2A6D] hover:text-[#E01A4F] underline decoration-1.5 underline-offset-2 transition-colors font-black"
+            >
+              Veagle Space Technology Pvt. Ltd.
+            </a>
+            {' '}| © 2026 All Rights Reserved.
           </div>
         </div>
       </footer>
