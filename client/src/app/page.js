@@ -52,14 +52,6 @@ export default function LandingPage() {
       {/* HERO SECTION */}
       <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 text-center space-y-8">
 
-        {/* HERO BADGE */}
-        <div className="inline-flex items-center space-x-2 bg-white/90 text-[#FF5C8A] border-1.5 border-[#FFCCE1] px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-sm backdrop-blur-md">
-          <ShieldCheck className="w-4 h-4 text-[#FF5C8A]" />
-          <span className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] bg-clip-text text-transparent">
-            India's Most Trusted Personal Safety Platform
-          </span>
-        </div>
-
         {/* MAIN TITLE */}
         <h1 className="heading-gradient-hero text-4xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-tight max-w-5xl mx-auto">
           Sakhi Suraksha <span className="heading-highlight-pill">SOS</span>

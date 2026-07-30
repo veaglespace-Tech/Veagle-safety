@@ -49,12 +49,6 @@ export default function AboutUsPage() {
         
         {/* HERO MISSION HEADER */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 max-w-3xl">
-          <div className="inline-flex items-center space-x-2 bg-white/90 text-[#FF5C8A] border-1.5 border-[#FFCCE1] px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-sm backdrop-blur-md">
-            <Heart className="w-4 h-4 text-[#FF5C8A] fill-[#FF5C8A] animate-pulse" />
-            <span className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] bg-clip-text text-transparent">
-              OUR MISSION & CORE ARCHITECTURE
-            </span>
-          </div>
 
           <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
             <span className="heading-gradient-hero">Built to </span>
