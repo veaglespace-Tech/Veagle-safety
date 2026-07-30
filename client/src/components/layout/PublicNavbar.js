@@ -94,47 +94,55 @@ export const PublicNavbar = () => {
             </div>
           </Link>
 
+          {/* DESKTOP HORIZONTAL NAVIGATION CAPSULE (Visible ONLY on desktop md:flex) */}
+          <nav className="hidden md:flex items-center gap-1 bg-[#FFF0F3] p-1.5 rounded-2xl border border-[#FFCCE1]">
+            {navLinks.map(({ href, label }) => {
+              const active = isActive(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all duration-200 ${
+                    active
+                      ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30'
+                      : 'text-[#2A0826] hover:bg-white/80 hover:text-[#FF5C8A]'
+                  }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+
           {/* RIGHT SIDE ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            {/* Show Sign In only when NOT logged in on public page */}
-            {!isLoggedIn && (
-              <>
-                <Link href="/auth?mode=login" style={{
-                  display: 'flex', alignItems: 'center', gap: '5px',
-                  color: '#2A0826', fontWeight: 800, fontSize: '11px',
-                  padding: '7px 14px', borderRadius: '12px',
-                  textDecoration: 'none', border: '1px solid #FFCCE1',
-                  background: 'rgba(255,255,255,0.9)',
-                  whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }}>
+            {/* DESKTOP DYNAMIC CTA BUTTON */}
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="hidden md:flex items-center gap-1.5 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-3.5 py-1.5 rounded-xl cursor-pointer hover:bg-[#FFCCE1]/30 transition-all shadow-sm"
+                title="Sign Out"
+              >
+                <LogOut size={13} color="#FF2A6D" />
+                <span>Sign Out</span>
+              </button>
+            ) : (
+              <div className="hidden md:flex items-center gap-2">
+                <Link href="/auth?mode=login" className="flex items-center gap-1.5 bg-white border border-[#FFCCE1] text-[#2A0826] text-xs font-extrabold px-3.5 py-1.5 rounded-xl hover:bg-[#FFF0F3] transition-all">
                   <UserCheck size={13} color="#FF5C8A" />
                   <span>Sign In</span>
                 </Link>
-                <Link href="/auth?mode=register" style={{
-                  display: 'flex', alignItems: 'center', gap: '5px',
-                  background: 'linear-gradient(135deg,#FF5C8A,#FF2A6D)',
-                  color: '#fff', fontWeight: 900, fontSize: '11px',
-                  padding: '7px 14px', borderRadius: '12px',
-                  textDecoration: 'none',
-                  boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
-                  whiteSpace: 'nowrap',
-                }} className="hidden sm:flex">
+                <Link href="/auth?mode=register" className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-xs font-black px-3.5 py-1.5 rounded-xl shadow-md shadow-[#FF5C8A]/30 hover:opacity-95 transition-all">
                   <span>Sign Up</span>
                   <ArrowRight size={13} />
                 </Link>
-              </>
+              </div>
             )}
 
-            {/* HAMBURGER MENU TOGGLE BUTTON */}
+            {/* MOBILE MENU TOGGLE BUTTON (Visible ONLY on mobile md:hidden - HIDDEN ON DESKTOP!) */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              style={{
-                background: '#FFF0F3', border: '1.5px solid #FFCCE1',
-                borderRadius: '12px', width: '36px', height: '36px',
-                cursor: 'pointer', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                color: '#FF5C8A', flexShrink: 0,
-              }}
+              className="md:hidden w-9 h-9 rounded-xl bg-[#FFF0F3] border border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer"
               aria-label="Toggle menu"
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -142,23 +150,15 @@ export const PublicNavbar = () => {
           </div>
         </div>
 
-        {/* COLLAPSED DROPDOWN MENU */}
+        {/* MOBILE COLLAPSED MENU DROPDOWN (Visible ONLY when opened on mobile md:hidden) */}
         {menuOpen && (
-          <div style={{
-            borderTop: '1.5px solid #FFCCE1',
-            background: 'rgba(255,255,255,0.99)',
-            padding: '12px 16px 16px',
-            boxShadow: '0 10px 25px rgba(255,92,138,0.12)',
-          }}>
+          <div className="md:hidden border-t-1.5 border-[#FFCCE1] bg-white/99 p-3 shadow-xl">
             {navLinks.map(({ href, label, icon: Icon }) => (
-              <Link key={href} href={href} style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                padding: '10px 14px', borderRadius: '12px',
-                fontSize: '13px', fontWeight: 800,
-                textDecoration: 'none', marginBottom: '4px',
-                background: isActive(href) ? 'linear-gradient(135deg,#FF5C8A,#FF2A6D)' : '#FFF0F3',
-                color: isActive(href) ? '#fff' : '#2A0826',
-              }}>
+              <Link key={href} href={href} className={`flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-extrabold mb-1 ${
+                isActive(href)
+                  ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white'
+                  : 'bg-[#FFF0F3] text-[#2A0826]'
+              }`}>
                 <Icon size={16} />
                 <span>{label}</span>
               </Link>
@@ -167,28 +167,15 @@ export const PublicNavbar = () => {
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  width: '100%', padding: '10px 14px', borderRadius: '12px',
-                  fontSize: '13px', fontWeight: 800,
-                  border: '1.5px solid #FFCCE1', background: '#FFF0F3',
-                  color: '#FF2A6D', cursor: 'pointer', marginTop: '8px',
-                  boxShadow: '0 2px 8px rgba(255,92,138,0.1)',
-                }}
+                className="flex items-center gap-2.5 w-full p-2.5 rounded-xl text-xs font-extrabold border border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] cursor-pointer mt-2"
               >
                 <LogOut size={16} color="#FF2A6D" />
-                <span>Sign Out / Logout</span>
+                <span>Sign Out</span>
               </button>
             ) : (
               <Link
                 href="/auth?mode=login"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  width: '100%', padding: '10px 14px', borderRadius: '12px',
-                  fontSize: '13px', fontWeight: 800,
-                  border: '1px solid #FFCCE1', background: '#FFFFFF',
-                  color: '#2A0826', textDecoration: 'none', marginTop: '8px',
-                }}
+                className="flex items-center gap-2.5 w-full p-2.5 rounded-xl text-xs font-extrabold border border-[#FFCCE1] bg-white text-[#2A0826] cursor-pointer mt-2 shadow-sm"
               >
                 <UserCheck size={16} color="#FF5C8A" />
                 <span>Sign In</span>

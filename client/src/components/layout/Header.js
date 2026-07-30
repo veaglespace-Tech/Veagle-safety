@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Shield, Crown, Home, Zap, Info, Image as ImageIcon,
-  PhoneCall, LogOut, Menu, X
+  PhoneCall, LogOut, Menu, X, UserCheck
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -31,7 +31,7 @@ export const Header = () => {
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
-  // Navigation Links for the Menu Toggle Dropdown
+  // Navigation Links
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/pricing', label: 'Pricing', icon: Zap },
@@ -45,6 +45,7 @@ export const Header = () => {
   }
 
   const isActive = (path) => pathname === path;
+  const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
 
   return (
     <>
@@ -121,17 +122,53 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* RIGHT SIDE ACTIONS: ONLY MENU TOGGLE BUTTON (No Sign In button on App pages!) */}
+          {/* DESKTOP HORIZONTAL NAVIGATION CAPSULE (Visible ONLY on desktop md:flex) */}
+          <nav className="hidden md:flex items-center gap-1 bg-[#FFF0F3] p-1.5 rounded-2xl border border-[#FFCCE1]">
+            {navLinks.map(({ href, label }) => {
+              const active = isActive(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all duration-200 ${
+                    active
+                      ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30'
+                      : 'text-[#2A0826] hover:bg-white/80 hover:text-[#FF5C8A]'
+                  }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* RIGHT SIDE ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            
+            {/* DESKTOP DYNAMIC CTA BUTTON (Sign Out if logged in, Sign In if not logged in) */}
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="hidden md:flex items-center gap-1.5 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-3.5 py-1.5 rounded-xl cursor-pointer hover:bg-[#FFCCE1]/30 transition-all shadow-sm"
+                title="Sign Out"
+              >
+                <LogOut size={13} color="#FF2A6D" />
+                <span>Sign Out</span>
+              </button>
+            ) : (
+              <Link 
+                href="/auth?mode=login" 
+                className="hidden md:flex items-center gap-1.5 bg-[#FFF0F3] border border-[#FFCCE1] text-[#2A0826] text-xs font-bold px-3.5 py-1.5 rounded-xl hover:bg-white transition-all"
+              >
+                <UserCheck size={13} color="#FF5C8A" />
+                <span>Sign In</span>
+              </Link>
+            )}
+
+            {/* MOBILE MENU TOGGLE BUTTON (Visible ONLY on mobile md:hidden - HIDDEN ON DESKTOP!) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              style={{
-                width: '36px', height: '36px', borderRadius: '12px',
-                background: '#FFF0F3', border: '1px solid #FFCCE1',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#FF5C8A', cursor: 'pointer',
-                flexShrink: 0,
-              }}
+              className="md:hidden w-9 h-9 rounded-xl bg-[#FFF0F3] border border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -139,49 +176,41 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* COLLAPSED MENU DROPDOWN (Contains Sign Out / Logout button!) */}
+        {/* MOBILE COLLAPSED MENU DROPDOWN (Visible ONLY when opened on mobile md:hidden) */}
         {mobileMenuOpen && (
-          <div 
-            style={{
-              borderTop: '1.5px solid #FFCCE1',
-              background: 'rgba(255, 255, 255, 0.99)',
-              padding: '12px 16px 16px',
-              boxShadow: '0 10px 25px rgba(255, 92, 138, 0.12)',
-            }} 
-          >
+          <div className="md:hidden border-t-1.5 border-[#FFCCE1] bg-white/99 p-3 shadow-xl">
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  padding: '10px 14px', borderRadius: '12px',
-                  fontSize: '13px', fontWeight: 800,
-                  textDecoration: 'none', marginBottom: '4px',
-                  background: isActive(href) ? 'linear-gradient(135deg, #FF5C8A, #FF2A6D)' : '#FFF0F3',
-                  color: isActive(href) ? '#FFFFFF' : '#2A0826',
-                }}
+                className={`flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-extrabold mb-1 ${
+                  isActive(href)
+                    ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white'
+                    : 'bg-[#FFF0F3] text-[#2A0826]'
+                }`}
               >
                 <Icon size={16} />
                 <span>{label}</span>
               </Link>
             ))}
 
-            {/* LOGOUT / SIGN OUT BUTTON INSIDE MENU DROPDOWN */}
-            <button
-              onClick={handleLogout}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                width: '100%', padding: '10px 14px', borderRadius: '12px',
-                fontSize: '13px', fontWeight: 800,
-                border: '1.5px solid #FFCCE1', background: '#FFF0F3',
-                color: '#FF2A6D', cursor: 'pointer', marginTop: '8px',
-                boxShadow: '0 2px 8px rgba(255,92,138,0.1)',
-              }}
-            >
-              <LogOut size={16} color="#FF2A6D" />
-              <span>Sign Out / Logout</span>
-            </button>
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2.5 w-full p-2.5 rounded-xl text-xs font-extrabold border border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] cursor-pointer mt-2"
+              >
+                <LogOut size={16} color="#FF2A6D" />
+                <span>Sign Out</span>
+              </button>
+            ) : (
+              <Link
+                href="/auth?mode=login"
+                className="flex items-center gap-2.5 w-full p-2.5 rounded-xl text-xs font-extrabold border border-[#FFCCE1] bg-white text-[#2A0826] cursor-pointer mt-2"
+              >
+                <UserCheck size={16} color="#FF5C8A" />
+                <span>Sign In</span>
+              </Link>
+            )}
           </div>
         )}
       </header>
