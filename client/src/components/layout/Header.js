@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Shield, Bell, BellRing, Crown, Home, Zap, Info, Image as ImageIcon,
-  PhoneCall, LayoutDashboard, LogOut, Menu, X, UserCheck, ArrowRight,
+  Shield, Crown, Home, Zap, Info, Image as ImageIcon,
+  PhoneCall, LayoutDashboard, LogOut, Menu, X, UserCheck,
   MapPin, Users, User
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -23,7 +23,6 @@ export const Header = () => {
 
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [pushEnabled, setPushEnabled] = useState(true);
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
@@ -34,10 +33,6 @@ export const Header = () => {
   };
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
-
-  const initials = user?.fullName
-    ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
-    : 'SS';
 
   // Navigation Links for Collapsed Menu Dropdown
   const navLinks = [
@@ -64,7 +59,7 @@ export const Header = () => {
 
   const isActive = (path) => pathname === path;
 
-  // Check if logged in (token exists or stored in localStorage)
+  // Check if logged in
   const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
 
   return (
@@ -142,107 +137,38 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* RIGHT SIDE ACTION CONTROLS */}
+          {/* RIGHT SIDE USER ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* LOGGED IN USER ACTIONS (Sign In button is REMOVED!) */}
+            {/* LOGGED IN: ONLY SHOW LOGOUT BUTTON */}
             {isLoggedIn ? (
-              <>
-                {/* Dashboard / Admin Panel Button */}
-                <Link
-                  href={isSuperAdmin ? '/admin' : '/dashboard'}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                    color: '#FFFFFF', fontSize: '11px', fontWeight: 900,
-                    padding: '7px 14px', borderRadius: '12px',
-                    textDecoration: 'none', boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
-                  <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
-                </Link>
-
-                {/* Push Notification Toggle Button */}
-                <button
-                  onClick={() => setPushEnabled(!pushEnabled)}
-                  style={{
-                    width: '36px', height: '36px', borderRadius: '12px',
-                    background: pushEnabled ? '#FFF0F3' : '#F3F4F6',
-                    border: '1px solid #FFCCE1',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: pushEnabled ? '#FF2A6D' : '#9CA3AF',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    transition: 'all 0.2s ease',
-                    flexShrink: 0,
-                  }}
-                  title={pushEnabled ? 'Push Notifications Active' : 'Push Notifications Muted'}
-                >
-                  <BellRing size={17} />
-                  {pushEnabled && (
-                    <span style={{
-                      position: 'absolute', top: '7px', right: '7px',
-                      width: '6px', height: '6px', borderRadius: '50%',
-                      background: '#FF2A6D', boxShadow: '0 0 6px #FF2A6D',
-                    }} />
-                  )}
-                </button>
-
-                {/* User Profile Avatar */}
-                {user && (
-                  <Link
-                    href="/profile"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '6px',
-                      padding: '3px', borderRadius: '50%',
-                      background: '#FFF0F3', border: '1.5px solid #FFCCE1',
-                      textDecoration: 'none', transition: 'all 0.2s ease',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <div style={{
-                      width: '30px', height: '30px', borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                      color: '#FFFFFF', display: 'flex', alignItems: 'center',
-                      justifyContent: 'center', fontWeight: 900, fontSize: '11px',
-                      boxShadow: '0 2px 8px rgba(255,92,138,0.3)',
-                    }}>
-                      {initials}
-                    </div>
-                  </Link>
-                )}
-
-                {/* PROMINENT LOGOUT TOGGLE BUTTON (Visible on ALL devices) */}
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    background: '#FFF0F3',
-                    border: '1.5px solid #FFCCE1',
-                    color: '#FF2A6D',
-                    fontSize: '11px',
-                    fontWeight: 900,
-                    padding: '7px 12px',
-                    borderRadius: '12px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 2px 8px rgba(255,92,138,0.12)',
-                    flexShrink: 0,
-                  }}
-                  title="Logout / Sign Out"
-                  aria-label="Logout"
-                >
-                  <LogOut size={14} color="#FF2A6D" />
-                  <span className="hidden sm:inline">Logout</span>
-                </button>
-              </>
+              <button
+                onClick={handleLogout}
+                style={{
+                  background: '#FFF0F3',
+                  border: '1.5px solid #FFCCE1',
+                  color: '#FF2A6D',
+                  fontSize: '11px',
+                  fontWeight: 900,
+                  padding: '7px 14px',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(255,92,138,0.12)',
+                  flexShrink: 0,
+                }}
+                title="Logout / Sign Out"
+                aria-label="Logout"
+              >
+                <LogOut size={14} color="#FF2A6D" />
+                <span>Logout</span>
+              </button>
             ) : (
-              /* NON LOGGED IN VISITOR ONLY (Sign In) */
+              /* NON LOGGED IN VISITOR: SIGN IN BUTTON */
               <Link 
                 href="/auth?mode=login" 
                 style={{
@@ -276,7 +202,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* COLLAPSED DROPDOWN MENU CONTAINING ALL NAVIGATION TABS */}
+        {/* COLLAPSED MENU DROPDOWN CONTAINING ALL NAVIGATION TABS */}
         {mobileMenuOpen && (
           <div 
             style={{
