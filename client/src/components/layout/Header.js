@@ -163,18 +163,16 @@ export const Header = () => {
               </MagneticButton>
             )}
 
-            {/* MAGNETIC MOBILE MENU TOGGLE BUTTON */}
-            <MagneticButton pullStrength={0.25} className="md:hidden">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-10 h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm"
-                aria-label="Toggle navigation menu"
-              >
-                <div className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
-                  {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                </div>
-              </button>
-            </MagneticButton>
+            {/* MOBILE MENU TOGGLE BUTTON (HIDDEN ON DESKTOP STRICTLY VIA md:hidden) */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden w-10 h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm"
+              aria-label="Toggle menu"
+            >
+              <div className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </div>
+            </button>
           </div>
         </div>
 

@@ -26,6 +26,8 @@ export const MagneticButton = ({ children, className = '', style = {}, onClick, 
     setPosition({ x: 0, y: 0 });
   };
 
+  const isHiddenByTailwind = className && (className.includes('hidden') || className.includes('md:hidden') || className.includes('lg:hidden'));
+
   return (
     <div
       ref={buttonRef}
@@ -34,7 +36,7 @@ export const MagneticButton = ({ children, className = '', style = {}, onClick, 
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
       style={{
-        display: 'inline-block',
+        display: isHiddenByTailwind ? undefined : 'inline-block',
         transform: `translate3d(${position.x}px, ${position.y}px, 0px) scale(${isHovered ? 1.05 : 1})`,
         transition: isHovered
           ? 'transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, filter 0.3s ease'
