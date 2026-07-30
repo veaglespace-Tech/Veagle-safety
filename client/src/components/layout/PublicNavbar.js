@@ -73,20 +73,18 @@ export const PublicNavbar = () => {
           gap: '12px',
         }}>
 
-          {/* BRAND LOGO WITH 3D ROTATING COIN FLIP (FRONT & BACK LOGOS) */}
-          <MagneticButton pullStrength={0.15}>
-            <Link href="/" className="group flex items-center gap-2.5 no-underline shrink-0 whitespace-nowrap">
-              <Logo3DFlip size={40} />
-              <div style={{ lineHeight: 1.15 }}>
-                <div style={{ fontWeight: 900, fontSize: '15px', color: '#2A0826', letterSpacing: '-0.01em' }}>
-                  Sakhi Suraksha SOS
-                </div>
-                <div style={{ fontSize: '9.5px', color: '#FF5C8A', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  Personal Safety
-                </div>
+          {/* BRAND LOGO STATIONARY WITH 3D ROTATING COIN FLIP (NO MAGNETIC WRAPPER AS REQUESTED) */}
+          <Link href="/" className="group flex items-center gap-2.5 no-underline shrink-0 whitespace-nowrap">
+            <Logo3DFlip size={44} />
+            <div style={{ lineHeight: 1.15 }}>
+              <div style={{ fontWeight: 900, fontSize: '15px', color: '#2A0826', letterSpacing: '-0.01em' }}>
+                Sakhi Suraksha SOS
               </div>
-            </Link>
-          </MagneticButton>
+              <div style={{ fontSize: '9.5px', color: '#FF5C8A', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Personal Safety
+              </div>
+            </div>
+          </Link>
 
           {/* DESKTOP ANIMATED NAV CHIPS CAPSULE */}
           <nav className="hidden md:flex items-center gap-1.5 nav-chip-capsule">
@@ -108,7 +106,7 @@ export const PublicNavbar = () => {
             })}
           </nav>
 
-          {/* RIGHT SIDE MAGNETIC ACTIONS */}
+          {/* RIGHT SIDE MAGNETIC ACTIONS (MAGNETIC PHYSICS ONLY ON BUTTONS) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
             {isLoggedIn ? (
               <MagneticButton pullStrength={0.3}>

@@ -75,41 +75,39 @@ export const Header = () => {
           gap: '12px',
         }}>
 
-          {/* BRAND LOGO WITH 3D ROTATING COIN FLIP (FRONT & BACK LOGOS) */}
-          <MagneticButton pullStrength={0.15}>
-            <Link 
-              href="/" 
-              className="group flex items-center gap-2.5 no-underline shrink-0 whitespace-nowrap"
-            >
-              <Logo3DFlip size={40} />
-              <div style={{ lineHeight: 1.15 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontWeight: 900, fontSize: '15px', color: '#2A0826', letterSpacing: '-0.01em' }}>
-                    Sakhi Suraksha SOS
-                  </span>
-                  {isSuperAdmin && (
-                    <span style={{
-                      background: '#E6A100', color: '#FFFFFF',
-                      fontWeight: 900, fontSize: '9px', padding: '1px 5px',
-                      borderRadius: '5px', textTransform: 'uppercase', letterSpacing: '0.05em'
-                    }}>
-                      ADMIN
-                    </span>
-                  )}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
+          {/* BRAND LOGO STATIONARY WITH 3D ROTATING COIN FLIP (NO MAGNETIC WRAPPER AS REQUESTED) */}
+          <Link 
+            href="/" 
+            className="group flex items-center gap-2.5 no-underline shrink-0 whitespace-nowrap"
+          >
+            <Logo3DFlip size={44} />
+            <div style={{ lineHeight: 1.15 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontWeight: 900, fontSize: '15px', color: '#2A0826', letterSpacing: '-0.01em' }}>
+                  Sakhi Suraksha SOS
+                </span>
+                {isSuperAdmin && (
                   <span style={{
-                    width: '6px', height: '6px', borderRadius: '50%',
-                    background: status === 'LIVE' ? '#059669' : '#F59E0B',
-                    boxShadow: status === 'LIVE' ? '0 0 8px #059669' : 'none'
-                  }} className="animate-pulse" />
-                  <span style={{ fontSize: '10px', color: '#684E67', fontWeight: 800 }}>
-                    {status === 'LIVE' ? 'Protected · GPS Active' : 'GPS Active'}
+                    background: '#E6A100', color: '#FFFFFF',
+                    fontWeight: 900, fontSize: '9px', padding: '1px 5px',
+                    borderRadius: '5px', textTransform: 'uppercase', letterSpacing: '0.05em'
+                  }}>
+                    ADMIN
                   </span>
-                </div>
+                )}
               </div>
-            </Link>
-          </MagneticButton>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
+                <span style={{
+                  width: '6px', height: '6px', borderRadius: '50%',
+                  background: status === 'LIVE' ? '#059669' : '#F59E0B',
+                  boxShadow: status === 'LIVE' ? '0 0 8px #059669' : 'none'
+                }} className="animate-pulse" />
+                <span style={{ fontSize: '10px', color: '#684E67', fontWeight: 800 }}>
+                  {status === 'LIVE' ? 'Protected · GPS Active' : 'GPS Active'}
+                </span>
+              </div>
+            </div>
+          </Link>
 
           {/* DESKTOP ANIMATED NAV CHIPS CAPSULE */}
           <nav className="hidden md:flex items-center gap-1.5 nav-chip-capsule">
@@ -131,7 +129,7 @@ export const Header = () => {
             })}
           </nav>
 
-          {/* RIGHT SIDE MAGNETIC ACTIONS */}
+          {/* RIGHT SIDE MAGNETIC ACTIONS (MAGNETIC PHYSICS ONLY ON BUTTONS) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
             {isLoggedIn ? (
               <MagneticButton pullStrength={0.3}>
