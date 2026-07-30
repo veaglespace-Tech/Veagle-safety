@@ -18,6 +18,9 @@ export const PublicNavbar = () => {
   const { token, user } = useSelector((state) => state?.auth || {});
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -111,7 +114,7 @@ export const PublicNavbar = () => {
 
           {/* RIGHT SIDE ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-            {token ? (
+            {mounted && token ? (
               <>
                 <Link href={user?.role === 'SUPER_ADMIN' ? '/admin' : '/dashboard'} style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
