@@ -11,7 +11,6 @@ export const BottomNavigation = () => {
   const { activeSession } = useSOSStore();
   const [mounted, setMounted] = useState(false);
   const [pressingSOS, setPressingSOS] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
 
   const navItems = [
     { path: '/dashboard',     label: 'Home',     icon: Home },
@@ -25,66 +24,41 @@ export const BottomNavigation = () => {
     setMounted(true); 
   }, []);
 
-  useEffect(() => {
-    const idx = navItems.findIndex(item => item.path === pathname);
-    if (idx !== -1) setActiveIndex(idx);
-  }, [pathname]);
-
   if (!mounted) return null;
 
   return (
     <>
-      {/* 3D LIQUID CURVED MAGIC NAVIGATION DOCK */}
+      {/* 3D MAGIC FLOATING NAVIGATION DOCK */}
       <div 
         style={{
           position: 'fixed',
-          bottom: '18px',
+          bottom: '16px',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 100,
           width: 'calc(100% - 24px)',
-          maxWidth: '460px',
+          maxWidth: '440px',
           fontFamily: 'Manrope, sans-serif',
-          filter: 'drop-shadow(0 14px 28px rgba(255, 92, 138, 0.22)) drop-shadow(0 4px 10px rgba(42, 8, 38, 0.08))',
+          filter: 'drop-shadow(0 12px 24px rgba(255, 92, 138, 0.22)) drop-shadow(0 4px 10px rgba(42, 8, 38, 0.08))',
         }} 
         className="lg:hidden"
       >
         {/* NAV CONTAINER BAR */}
         <div style={{
           position: 'relative',
-          background: 'rgba(255, 255, 255, 0.94)',
+          background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '28px',
-          border: '1.5px solid rgba(255, 204, 225, 0.9)',
-          padding: '6px 12px 10px 12px',
+          borderRadius: '26px',
+          border: '1.5px solid rgba(255, 204, 225, 0.95)',
+          padding: '6px 8px 8px 8px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-around',
+          justifyContent: 'space-between',
           boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -2px 6px rgba(255, 92, 138, 0.06)',
         }}>
 
-          {/* DYNAMIC 3D ACTIVE TAB GLOW INDICATOR BUBBLE */}
-          {activeIndex !== 2 && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '6px',
-                left: `${(activeIndex * 20) + 10}%`,
-                transform: 'translateX(-50%)',
-                width: '56px',
-                height: '42px',
-                borderRadius: '20px',
-                background: 'linear-gradient(135deg, rgba(255,92,138,0.18), rgba(255,42,109,0.10))',
-                border: '1px solid rgba(255,92,138,0.3)',
-                boxShadow: '0 4px 12px rgba(255,92,138,0.2), inset 0 1px 2px rgba(255,255,255,0.8)',
-                transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                pointerEvents: 'none',
-              }}
-            />
-          )}
-
-          {navItems.map((item, index) => {
+          {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.path;
 
@@ -101,23 +75,24 @@ export const BottomNavigation = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     position: 'relative',
-                    marginTop: '-38px',
+                    marginTop: '-34px',
                     textDecoration: 'none',
                     zIndex: 10,
+                    width: '20%',
                   }}
                   onMouseDown={() => setPressingSOS(true)}
                   onMouseUp={() => setPressingSOS(false)}
                   onTouchStart={() => setPressingSOS(true)}
                   onTouchEnd={() => setPressingSOS(false)}
                 >
-                  {/* 3D Multi-Layer Outer Pulse Waves */}
+                  {/* Outer Pulse Waves */}
                   {activeSession && (
                     <>
                       <div style={{
                         position: 'absolute',
                         top: '28px', left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: '96px', height: '96px',
+                        width: '90px', height: '90px',
                         borderRadius: '50%',
                         background: 'radial-gradient(circle, rgba(255,0,67,0.35) 0%, rgba(255,42,109,0) 70%)',
                         animation: 'sos3DPulse1 1.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite',
@@ -127,7 +102,7 @@ export const BottomNavigation = () => {
                         position: 'absolute',
                         top: '28px', left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: '80px', height: '80px',
+                        width: '76px', height: '76px',
                         borderRadius: '50%',
                         background: 'radial-gradient(circle, rgba(255,92,138,0.4) 0%, rgba(255,92,138,0) 70%)',
                         animation: 'sos3DPulse2 1.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite 0.4s',
@@ -136,24 +111,24 @@ export const BottomNavigation = () => {
                     </>
                   )}
 
-                  {/* Ambient Idle Glow Halo */}
+                  {/* Ambient Idle Glow */}
                   {!activeSession && (
                     <div style={{
                       position: 'absolute',
                       top: '28px', left: '50%',
                       transform: 'translate(-50%, -50%)',
-                      width: '76px', height: '76px',
+                      width: '72px', height: '72px',
                       borderRadius: '50%',
-                      background: 'radial-gradient(circle, rgba(255,92,138,0.25) 0%, rgba(255,92,138,0) 75%)',
+                      background: 'radial-gradient(circle, rgba(255,92,138,0.22) 0%, rgba(255,92,138,0) 75%)',
                       animation: 'ambient3DGlow 3s ease-in-out infinite',
                       pointerEvents: 'none',
                     }} />
                   )}
 
-                  {/* Main 3D Sphere SOS Button */}
+                  {/* Main 3D SOS Sphere Button */}
                   <div style={{
-                    width: '64px',
-                    height: '64px',
+                    width: '60px',
+                    height: '60px',
                     borderRadius: '50%',
                     background: activeSession
                       ? 'linear-gradient(145deg, #FF0043 0%, #FF2A6D 50%, #B80031 100%)'
@@ -162,15 +137,15 @@ export const BottomNavigation = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     boxShadow: activeSession
-                      ? '0 12px 30px rgba(255, 0, 67, 0.55), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.35)'
-                      : '0 10px 24px rgba(255, 42, 109, 0.42), inset 0 2px 4px rgba(255, 255, 255, 0.85), inset 0 -3px 6px rgba(180, 20, 70, 0.4)',
+                      ? '0 10px 26px rgba(255, 0, 67, 0.55), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.35)'
+                      : '0 8px 22px rgba(255, 42, 109, 0.42), inset 0 2px 4px rgba(255, 255, 255, 0.85), inset 0 -3px 6px rgba(180, 20, 70, 0.4)',
                     border: '3.5px solid #FFFFFF',
                     transform: pressingSOS ? 'scale(0.92) translateY(2px)' : 'scale(1) translateY(0)',
                     transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     position: 'relative',
                     cursor: 'pointer',
                   }}>
-                    {/* Top 3D Glass Light Reflection Curve */}
+                    {/* Top 3D Glass Light Reflection */}
                     <div style={{
                       position: 'absolute',
                       top: '3px',
@@ -183,7 +158,7 @@ export const BottomNavigation = () => {
                     }} />
 
                     <AlertTriangle
-                      size={28}
+                      size={26}
                       color="#FFFFFF"
                       strokeWidth={2.6}
                       style={{ 
@@ -196,7 +171,7 @@ export const BottomNavigation = () => {
 
                   {/* 3D Label Badge */}
                   <div style={{
-                    marginTop: '4px',
+                    marginTop: '3px',
                     padding: '2px 8px',
                     borderRadius: '999px',
                     background: activeSession ? '#FF0043' : '#FF2A6D',
@@ -220,7 +195,7 @@ export const BottomNavigation = () => {
             }
 
             /* ========================================================
-               REGULAR 3D INTERACTIVE NAVIGATION TAB ITEMS
+               REGULAR PERFECTLY ALIGNED 3D TAB ITEMS
                ======================================================== */
             return (
               <Link
@@ -237,14 +212,15 @@ export const BottomNavigation = () => {
                   zIndex: 2,
                   width: '20%',
                   transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  transform: isActive ? 'translateY(-4px)' : 'translateY(0)',
+                  transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
                 }}
               >
-                {/* 3D Pop Icon Frame */}
+                {/* 3D Active Pill Container Frame */}
                 <div style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '14px',
+                  position: 'relative',
+                  width: '46px',
+                  height: '38px',
+                  borderRadius: '16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -252,17 +228,31 @@ export const BottomNavigation = () => {
                     ? 'linear-gradient(135deg, #FF5C8A 0%, #FF2A6D 100%)'
                     : 'transparent',
                   boxShadow: isActive
-                    ? '0 6px 16px rgba(255, 92, 138, 0.40), inset 0 1px 1px rgba(255,255,255,0.7)'
+                    ? '0 6px 16px rgba(255, 92, 138, 0.38), inset 0 1px 1.5px rgba(255,255,255,0.75)'
                     : 'none',
                   transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 }}>
+                  {/* Subtle 3D Glass Light Highlight for active state */}
+                  {isActive && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '2px',
+                      left: '10%',
+                      width: '80%',
+                      height: '30%',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 100%)',
+                      pointerEvents: 'none',
+                    }} />
+                  )}
+
                   <Icon
                     size={20}
                     color={isActive ? '#FFFFFF' : '#8A6987'}
                     strokeWidth={isActive ? 2.4 : 1.8}
                     style={{
                       transition: 'all 0.25s ease',
-                      filter: isActive ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))' : 'none',
+                      filter: isActive ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.25))' : 'none',
                     }}
                   />
                 </div>
@@ -279,9 +269,9 @@ export const BottomNavigation = () => {
                   {item.label}
                 </span>
 
-                {/* Active Underline Pill */}
+                {/* Active Indicator Underline Dot */}
                 <div style={{
-                  width: isActive ? '14px' : '0px',
+                  width: isActive ? '12px' : '0px',
                   height: '3px',
                   borderRadius: '999px',
                   background: 'linear-gradient(90deg, #FF5C8A, #FF2A6D)',
@@ -296,8 +286,8 @@ export const BottomNavigation = () => {
         </div>
       </div>
 
-      {/* Spacer so page footer content is not blocked */}
-      <div style={{ height: '95px' }} className="lg:hidden" />
+      {/* Spacer so page content is not blocked */}
+      <div style={{ height: '90px' }} className="lg:hidden" />
 
       {/* 3D KEYFRAME ANIMATIONS */}
       <style>{`
