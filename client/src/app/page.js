@@ -49,8 +49,8 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* HERO SECTION */}
-      <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 text-center space-y-8">
+      {/* HERO SECTION WITH GENEROUS TOP OPEN BREATHING SPACE */}
+      <section className="relative z-10 pt-28 sm:pt-36 lg:pt-44 pb-16 px-4 sm:px-6 lg:px-8 text-center space-y-8">
 
         {/* MAIN TITLE */}
         <h1 className="heading-gradient-hero text-4xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-tight max-w-5xl mx-auto">
