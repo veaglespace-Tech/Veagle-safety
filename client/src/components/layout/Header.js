@@ -10,6 +10,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
 import { useLocationStore } from '../../redux/useLocationStore.js';
+import { MagneticButton } from '../ui/MagneticButton.js';
 
 export const Header = () => {
   const pathname = usePathname();
@@ -73,47 +74,49 @@ export const Header = () => {
           gap: '12px',
         }}>
 
-          {/* BRAND LOGO + TITLE + STATUS */}
-          <Link 
-            href="/" 
-            className="group flex items-center gap-2.5 no-underline shrink-0 whitespace-nowrap transition-transform duration-300 hover:scale-105"
-          >
-            <div style={{
-              width: '38px', height: '38px', borderRadius: '12px',
-              background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(255, 92, 138, 0.35)',
-              flexShrink: 0,
-            }} className="group-hover:rotate-6 transition-transform duration-300">
-              <Shield size={19} color="#FFFFFF" />
-            </div>
-            <div style={{ lineHeight: 1.15 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontWeight: 900, fontSize: '15px', color: '#2A0826', letterSpacing: '-0.01em' }}>
-                  Sakhi Suraksha SOS
-                </span>
-                {isSuperAdmin && (
-                  <span style={{
-                    background: '#E6A100', color: '#FFFFFF',
-                    fontWeight: 900, fontSize: '9px', padding: '1px 5px',
-                    borderRadius: '5px', textTransform: 'uppercase', letterSpacing: '0.05em'
-                  }}>
-                    ADMIN
+          {/* BRAND LOGO WITH MAGNETIC EFFECT */}
+          <MagneticButton pullStrength={0.15}>
+            <Link 
+              href="/" 
+              className="group flex items-center gap-2.5 no-underline shrink-0 whitespace-nowrap"
+            >
+              <div style={{
+                width: '38px', height: '38px', borderRadius: '12px',
+                background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(255, 92, 138, 0.35)',
+                flexShrink: 0,
+              }} className="group-hover:rotate-6 transition-transform duration-300">
+                <Shield size={19} color="#FFFFFF" />
+              </div>
+              <div style={{ lineHeight: 1.15 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontWeight: 900, fontSize: '15px', color: '#2A0826', letterSpacing: '-0.01em' }}>
+                    Sakhi Suraksha SOS
                   </span>
-                )}
+                  {isSuperAdmin && (
+                    <span style={{
+                      background: '#E6A100', color: '#FFFFFF',
+                      fontWeight: 900, fontSize: '9px', padding: '1px 5px',
+                      borderRadius: '5px', textTransform: 'uppercase', letterSpacing: '0.05em'
+                    }}>
+                      ADMIN
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
+                  <span style={{
+                    width: '6px', height: '6px', borderRadius: '50%',
+                    background: status === 'LIVE' ? '#059669' : '#F59E0B',
+                    boxShadow: status === 'LIVE' ? '0 0 8px #059669' : 'none'
+                  }} className="animate-pulse" />
+                  <span style={{ fontSize: '10px', color: '#684E67', fontWeight: 800 }}>
+                    {status === 'LIVE' ? 'Protected · GPS Active' : 'GPS Active'}
+                  </span>
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
-                <span style={{
-                  width: '6px', height: '6px', borderRadius: '50%',
-                  background: status === 'LIVE' ? '#059669' : '#F59E0B',
-                  boxShadow: status === 'LIVE' ? '0 0 8px #059669' : 'none'
-                }} className="animate-pulse" />
-                <span style={{ fontSize: '10px', color: '#684E67', fontWeight: 800 }}>
-                  {status === 'LIVE' ? 'Protected · GPS Active' : 'GPS Active'}
-                </span>
-              </div>
-            </div>
-          </Link>
+            </Link>
+          </MagneticButton>
 
           {/* DESKTOP ANIMATED NAV CHIPS CAPSULE */}
           <nav className="hidden md:flex items-center gap-1.5 nav-chip-capsule">
@@ -135,43 +138,47 @@ export const Header = () => {
             })}
           </nav>
 
-          {/* RIGHT SIDE ACTIONS */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            
-            {/* DESKTOP DYNAMIC CTA BUTTON WITH HOVER ANIMATION */}
+          {/* RIGHT SIDE MAGNETIC ACTIONS */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
             {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="hidden md:flex items-center gap-2 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-4 py-2 rounded-xl cursor-pointer hover:bg-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#FF2A6D]/30 group hover:scale-105 active:scale-95"
-                title="Sign Out"
-              >
-                <LogOut size={14} className="group-hover:-translate-x-0.5 transition-transform" />
-                <span>Sign Out</span>
-              </button>
+              <MagneticButton pullStrength={0.3}>
+                <button
+                  onClick={handleLogout}
+                  className="hidden md:flex items-center gap-2 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-4.5 py-2.5 rounded-2xl cursor-pointer hover:bg-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#FF2A6D]/30 group"
+                  title="Sign Out"
+                >
+                  <LogOut size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+                  <span>Sign Out</span>
+                </button>
+              </MagneticButton>
             ) : (
-              <Link 
-                href="/auth?mode=login" 
-                className="hidden md:flex items-center gap-2 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#2A0826] text-xs font-black px-4 py-2 rounded-xl hover:bg-[#FF5C8A] hover:text-white hover:border-transparent transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#FF5C8A]/30 group hover:scale-105 active:scale-95"
-              >
-                <UserCheck size={14} className="text-[#FF5C8A] group-hover:text-white transition-colors" />
-                <span>Sign In</span>
-              </Link>
+              <MagneticButton pullStrength={0.35}>
+                <Link 
+                  href="/auth?mode=login" 
+                  className="hidden md:flex items-center gap-2 bg-white border-1.5 border-[#FFCCE1] text-[#2A0826] text-xs font-black px-4.5 py-2.5 rounded-2xl hover:bg-[#FFF0F3] hover:text-[#FF5C8A] hover:border-[#FF5C8A] transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-[#FF5C8A]/20"
+                >
+                  <UserCheck size={14} color="#FF5C8A" />
+                  <span>Sign In</span>
+                </Link>
+              </MagneticButton>
             )}
 
-            {/* MOBILE MENU TOGGLE BUTTON (WITH ROTATION ANIMATION) */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden w-10 h-10 rounded-xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 active:scale-90 shadow-sm"
-              aria-label="Toggle navigation menu"
-            >
-              <div className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
-                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-              </div>
-            </button>
+            {/* MAGNETIC MOBILE MENU TOGGLE BUTTON */}
+            <MagneticButton pullStrength={0.25} className="md:hidden">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-10 h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm"
+                aria-label="Toggle navigation menu"
+              >
+                <div className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
+                  {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                </div>
+              </button>
+            </MagneticButton>
           </div>
         </div>
 
-        {/* MOBILE COLLAPSED MENU DROPDOWN (WITH ANIMATED ENTRANCE) */}
+        {/* MOBILE COLLAPSED MENU DROPDOWN */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t-1.5 border-[#FFCCE1] bg-white/99 p-3.5 shadow-2xl animate-fade-up">
             {navLinks.map(({ href, label, icon: Icon }) => (
@@ -192,7 +199,7 @@ export const Header = () => {
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all duration-200 mt-2 shadow-sm active:scale-98"
+                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all duration-200 mt-2 shadow-sm"
               >
                 <LogOut size={16} />
                 <span>Sign Out</span>
@@ -200,7 +207,7 @@ export const Header = () => {
             ) : (
               <Link
                 href="/auth?mode=login"
-                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-white text-[#2A0826] hover:bg-[#FF5C8A] hover:text-white transition-all duration-200 mt-2 shadow-sm active:scale-98"
+                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-white text-[#2A0826] hover:bg-[#FF5C8A] hover:text-white transition-all duration-200 mt-2 shadow-sm"
               >
                 <UserCheck size={16} />
                 <span>Sign In</span>

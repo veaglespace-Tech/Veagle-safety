@@ -27,7 +27,7 @@ export default function AboutUsPage() {
     {
       icon: Shield,
       title: '24/7 HQ Command & Dispatch Monitoring',
-      description: 'Integrated with Company Super Admin HQ and national helplines (112, 1091, 181) to ensure continuous monitoring and emergency escalation.',
+      description: 'Integrated with national helplines (112, 1091, 181) to ensure continuous monitoring and emergency escalation.',
       badge: '24/7 COMMAND ONLINE',
       color: 'rose',
     },
