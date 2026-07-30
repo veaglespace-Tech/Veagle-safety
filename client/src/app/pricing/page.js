@@ -150,14 +150,11 @@ export default function PlatformPricingPage() {
             {/* PRICING BREAKDOWN */}
             <div className="bg-[#FFF0F3]/80 p-6 rounded-2xl border-1.5 border-[#FFCCE1] space-y-3.5">
               <div className="flex items-baseline space-x-3">
-                <span className="text-5xl sm:text-6xl font-black bg-gradient-to-r from-[#2A0826] via-[#FF2A6D] to-[#FF5C8A] bg-clip-text text-transparent">₹{yearlyPlan.basePrice}</span>
-                <span className="text-sm sm:text-base text-[#684E67] font-extrabold">/ Year (Just ₹2 / Month)</span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-[#684E67] font-mono font-bold border-t-1.5 border-[#FFCCE1] pt-3.5 gap-2">
-                <span>Base Yearly Fee: ₹{yearlyPlan.basePrice}</span>
-                <span>GST (18%): ₹{(yearlyPlan.basePrice * 0.18).toFixed(2)}</span>
-                <span className="font-black text-[#FF2A6D] text-sm">Total: ₹{yearlyPlan.totalPrice} / Year</span>
+                <span className="text-5xl sm:text-6xl font-black bg-gradient-to-r from-[#2A0826] via-[#FF2A6D] to-[#FF5C8A] bg-clip-text text-transparent">₹{yearlyPlan.totalPrice}</span>
+                <div className="flex flex-col">
+                  <span className="text-sm sm:text-base text-[#684E67] font-extrabold">/ Year (Just ₹2 / Month)</span>
+                  <span className="text-[10px] text-[#FF5C8A] font-black tracking-wide">Incl. 18% GST</span>
+                </div>
               </div>
             </div>
 
