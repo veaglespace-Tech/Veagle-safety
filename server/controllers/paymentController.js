@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { prisma } from '../config/prisma.js';
 import { config } from '../config/index.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
@@ -7,15 +8,34 @@ import { generatePayUHash, verifyPayUResponseHash } from '../utils/payu.js';
  * Initiate PayU Payment for User Subscription
  */
 export const initiatePayUPayment = asyncHandler(async (req, res) => {
-  const userId = req.user?.id;
-  const { planId } = req.body;
+  const { planId, registrationToken } = req.body;
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+  let user = null;
+  let decodedRegistration = null;
+
+  if (req.user?.id) {
+    user = await prisma.user.findUnique({ where: { id: req.user.id } });
   }
 
-  // Fetch target plan or fetch/create default 24 INR plan
+  if (!user && registrationToken) {
+    try {
+      decodedRegistration = jwt.verify(registrationToken, config.jwt.secret);
+      user = {
+        fullName: decodedRegistration.fullName,
+        email: decodedRegistration.email,
+        phone: decodedRegistration.phone,
+        isPendingRegistration: true,
+      };
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid or expired registration session. Please register again.' });
+    }
+  }
+
+  if (!user) {
+    return res.status(401).json({ error: 'User registration session or authentication required' });
+  }
+
+  // Fetch target plan or fetch default 24 INR plan
   let plan = null;
   if (planId) {
     plan = await prisma.plan.findUnique({ where: { id: planId } });
@@ -25,7 +45,6 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
     plan = await prisma.plan.findFirst({ where: { isActive: true } });
   }
 
-  // Get dynamic GST percentage from SystemSetting if available
   let gstPercentage = plan ? plan.gstPercentage : 18.0;
   const gstSetting = await prisma.systemSetting.findUnique({ where: { key: 'GST_PERCENTAGE' } });
   if (gstSetting) {
@@ -37,7 +56,7 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
   const totalAmount = parseFloat((baseAmount + gstAmount).toFixed(2));
 
   const txnid = `VEAGLE_${Date.now()}_${Math.floor(100 + Math.random() * 900)}`;
-  const productinfo = plan ? plan.name : 'Veagle Safety Monthly Subscription';
+  const productinfo = plan ? plan.name : 'Sakhi Suraksha 365 Yearly Protection Plan';
   const firstname = user.fullName.split(' ')[0] || user.fullName;
   const email = user.email;
 
@@ -49,20 +68,22 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
     email,
   });
 
-  // Save pending transaction record
-  await prisma.paymentHistory.create({
-    data: {
-      userId: user.id,
-      planId: plan ? plan.id : null,
-      txnid,
-      amount: totalAmount,
-      baseAmount,
-      gstAmount,
-      gstPercentage,
-      status: 'PENDING',
-      hash,
-    },
-  });
+  // Save pending transaction record (if user exists in DB, attach userId; if pending, store registrationToken)
+  if (!user.isPendingRegistration) {
+    await prisma.paymentHistory.create({
+      data: {
+        userId: user.id,
+        planId: plan ? plan.id : null,
+        txnid,
+        amount: totalAmount,
+        baseAmount,
+        gstAmount,
+        gstPercentage,
+        status: 'PENDING',
+        hash,
+      },
+    });
+  }
 
   const surl = `${config.payu.serverBaseUrl}/api/payment/payu-success`;
   const furl = `${config.payu.serverBaseUrl}/api/payment/payu-failure`;
@@ -93,49 +114,140 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
  */
 export const handlePayUSuccess = asyncHandler(async (req, res) => {
   const payuResponse = req.body;
-  const { txnid, mihpayid, mode, status } = payuResponse;
+  const { txnid, mihpayid, mode, status, registrationToken } = payuResponse;
 
   const verification = verifyPayUResponseHash(payuResponse);
 
-  const paymentRecord = await prisma.paymentHistory.findUnique({ where: { txnid } });
-  if (!paymentRecord) {
-    return res.status(404).json({ error: 'Transaction record not found' });
+  let paymentRecord = await prisma.paymentHistory.findUnique({ where: { txnid } });
+
+  let user = null;
+  let decodedRegistration = null;
+
+  if (registrationToken) {
+    try {
+      decodedRegistration = jwt.verify(registrationToken, config.jwt.secret);
+    } catch (e) {
+      console.error('Registration token verification error:', e.message);
+    }
   }
 
   if (status === 'success' || verification.isValid) {
-    // Update Payment status
-    await prisma.paymentHistory.update({
-      where: { id: paymentRecord.id },
-      data: {
-        status: 'SUCCESS',
-        payuMoneyId: mihpayid || payuResponse.payuMoneyId || null,
-        paymentMode: mode || payuResponse.mode || 'ONLINE',
-      },
-    });
-
-    // Calculate subscription expiry (30 days from now)
-    const durationDays = 30;
+    let durationDays = 365;
     const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
 
-    // Update user subscription
-    await prisma.user.update({
-      where: { id: paymentRecord.userId },
-      data: {
-        subscriptionStatus: 'ACTIVE',
-        subscriptionExpiresAt: expiresAt,
-        currentPlanId: paymentRecord.planId,
-      },
-    });
+    // If user is not yet in DB, create user entry now upon successful payment completion!
+    if (decodedRegistration && decodedRegistration.email) {
+      user = await prisma.user.findUnique({ where: { email: decodedRegistration.email } });
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            fullName: decodedRegistration.fullName,
+            email: decodedRegistration.email,
+            phone: decodedRegistration.phone,
+            passwordHash: decodedRegistration.passwordHash,
+            role: decodedRegistration.role || 'USER',
+            profilePhoto: decodedRegistration.profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
+            bloodGroup: decodedRegistration.bloodGroup || 'O+',
+            address: decodedRegistration.address || 'Not Specified',
+            city: decodedRegistration.city || 'Pune',
+            state: decodedRegistration.state || 'Maharashtra',
+            country: decodedRegistration.country || 'India',
+            pincode: decodedRegistration.pincode || '411001',
+            emergencyContactName: decodedRegistration.emergencyContactName || null,
+            emergencyContactPhone: decodedRegistration.emergencyContactPhone || null,
+            medicalNotes: decodedRegistration.medicalNotes || null,
+            isEmailVerified: true,
+            subscriptionStatus: 'ACTIVE',
+            subscriptionExpiresAt: expiresAt,
+          },
+        });
 
-    // If request comes from client web browser form submission, redirect to client app
-    const clientRedirectUrl = `${config.payu.clientUrl}/payment-status?status=success&txnid=${txnid}`;
+        if (decodedRegistration.emergencyContactName && decodedRegistration.emergencyContactPhone) {
+          try {
+            await prisma.trustedContact.create({
+              data: {
+                userId: user.id,
+                name: decodedRegistration.emergencyContactName,
+                relationship: 'Primary Guardian / Emergency Contact',
+                phone: decodedRegistration.emergencyContactPhone,
+                email: decodedRegistration.email,
+                isVerified: true,
+                priorityOrder: 1,
+              },
+            });
+          } catch (e) {
+            console.log('[Register Notice] Primary contact creation skipped:', e.message);
+          }
+        }
+      }
+    }
+
+    if (!user && paymentRecord) {
+      user = await prisma.user.findUnique({ where: { id: paymentRecord.userId } });
+    }
+
+    if (user) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          subscriptionStatus: 'ACTIVE',
+          subscriptionExpiresAt: expiresAt,
+        },
+      });
+    }
+
+    if (paymentRecord) {
+      await prisma.paymentHistory.update({
+        where: { id: paymentRecord.id },
+        data: {
+          status: 'SUCCESS',
+          payuMoneyId: mihpayid || payuResponse.payuMoneyId || null,
+          paymentMode: mode || payuResponse.mode || 'ONLINE',
+        },
+      });
+    } else if (user) {
+      paymentRecord = await prisma.paymentHistory.create({
+        data: {
+          userId: user.id,
+          txnid,
+          amount: parseFloat(payuResponse.amount || 28.32),
+          baseAmount: 24.0,
+          gstAmount: 4.32,
+          gstPercentage: 18.0,
+          status: 'SUCCESS',
+          payuMoneyId: mihpayid || payuResponse.payuMoneyId || null,
+          paymentMode: mode || payuResponse.mode || 'ONLINE',
+        },
+      });
+    }
+
+    const sessionToken = user
+      ? jwt.sign(
+          { id: user.id, userId: user.id, role: user.role, email: user.email },
+          config.jwt.secret,
+          { expiresIn: config.jwt.expiresIn }
+        )
+      : null;
+
+    const clientRedirectUrl = `${config.payu.clientUrl}/payment/success?status=success&txnid=${txnid}`;
     if (req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
       return res.redirect(clientRedirectUrl);
     }
 
     return res.json({
       success: true,
-      message: 'Payment completed and subscription activated successfully',
+      message: 'Payment completed and user account activated successfully!',
+      token: sessionToken,
+      user: user
+        ? {
+            id: user.id,
+            fullName: user.fullName,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            subscriptionStatus: user.subscriptionStatus,
+          }
+        : null,
       txnid,
       status: 'SUCCESS',
     });
@@ -145,7 +257,7 @@ export const handlePayUSuccess = asyncHandler(async (req, res) => {
       data: { status: 'FAILED' },
     });
 
-    const clientRedirectUrl = `${config.payu.clientUrl}/payment-status?status=failed&txnid=${txnid}`;
+    const clientRedirectUrl = `${config.payu.clientUrl}/payment/success?status=failed&txnid=${txnid}`;
     if (req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
       return res.redirect(clientRedirectUrl);
     }

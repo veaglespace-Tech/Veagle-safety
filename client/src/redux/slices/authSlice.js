@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authApi } from '../api/authApi.js';
 
 const initialToken = typeof window !== 'undefined' ? localStorage.getItem('tichi_token') : null;
+const initialRegToken = typeof window !== 'undefined' ? localStorage.getItem('tichi_reg_token') : null;
+const initialPendingToken = typeof window !== 'undefined' ? localStorage.getItem('tichi_pending_token') : null;
 
 export const fetchUser = createAsyncThunk('auth/fetchUser', async (_, { rejectWithValue }) => {
   try {
@@ -32,17 +34,23 @@ export const loginUser = createAsyncThunk('auth/loginUser', async ({ email, pass
 export const registerUser = createAsyncThunk('auth/registerUser', async (formData, { rejectWithValue }) => {
   try {
     const data = await authApi.register(formData);
+    if (data.pendingToken && typeof window !== 'undefined') {
+      localStorage.setItem('tichi_pending_token', data.pendingToken);
+    }
     return data;
   } catch (err) {
     return rejectWithValue(err.response?.data?.error || 'Registration failed');
   }
 });
 
-export const verifyEmailOtp = createAsyncThunk('auth/verifyEmailOtp', async ({ email, otp }, { rejectWithValue }) => {
+export const verifyEmailOtp = createAsyncThunk('auth/verifyEmailOtp', async ({ email, otp, pendingToken }, { rejectWithValue }) => {
   try {
-    const data = await authApi.verifyEmail({ email, otp });
-    if (data.token) {
+    const data = await authApi.verifyEmail({ email, otp, pendingToken });
+    if (data.token && typeof window !== 'undefined') {
       localStorage.setItem('tichi_token', data.token);
+    }
+    if (data.registrationToken && typeof window !== 'undefined') {
+      localStorage.setItem('tichi_reg_token', data.registrationToken);
     }
     return data;
   } catch (err) {
@@ -73,6 +81,8 @@ const authSlice = createSlice({
   initialState: {
     token: initialToken,
     user: null,
+    registrationToken: initialRegToken,
+    pendingToken: initialPendingToken,
     isLoading: false,
     error: null,
     successMessage: null,
@@ -81,9 +91,15 @@ const authSlice = createSlice({
   },
   reducers: {
     logout: (state) => {
-      localStorage.removeItem('tichi_token');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('tichi_token');
+        localStorage.removeItem('tichi_reg_token');
+        localStorage.removeItem('tichi_pending_token');
+      }
       state.token = null;
       state.user = null;
+      state.registrationToken = null;
+      state.pendingToken = null;
       state.error = null;
       state.pendingVerificationEmail = null;
       state.showOtpModal = false;
@@ -140,8 +156,9 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.successMessage = action.payload.message;
-        if (action.payload.user?.role === 'USER') {
-          state.pendingVerificationEmail = action.payload.user.email;
+        state.pendingToken = action.payload.pendingToken || state.pendingToken;
+        if (action.payload.requiresVerification) {
+          state.pendingVerificationEmail = action.payload.email;
           state.showOtpModal = true;
         }
       })
@@ -156,7 +173,8 @@ const authSlice = createSlice({
       })
       .addCase(verifyEmailOtp.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.token = action.payload.token;
+        if (action.payload.token) state.token = action.payload.token;
+        if (action.payload.registrationToken) state.registrationToken = action.payload.registrationToken;
         state.user = action.payload.user;
         state.showOtpModal = false;
         state.pendingVerificationEmail = null;

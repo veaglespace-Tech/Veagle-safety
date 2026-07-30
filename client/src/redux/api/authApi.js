@@ -6,8 +6,8 @@ export const authApi = {
     return response.data;
   },
 
-  verifyEmail: async ({ email, otp }) => {
-    const response = await apiClient.post('/auth/verify-email', { email, otp });
+  verifyEmail: async ({ email, otp, pendingToken }) => {
+    const response = await apiClient.post('/auth/verify-email', { email, otp, pendingToken });
     return response.data;
   },
 

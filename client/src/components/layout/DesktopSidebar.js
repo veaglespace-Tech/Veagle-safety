@@ -20,8 +20,11 @@ import {
 import { useAuthStore } from '../../redux/useAuthStore.js';
 import { useSOSStore } from '../../redux/useSOSStore.js';
 import { useLocationStore } from '../../redux/useLocationStore.js';
+import { useDispatch } from 'react-redux';
+import { logout as reduxLogout } from '../../redux/slices/authSlice.js';
 
 export const DesktopSidebar = () => {
+  const dispatch = useDispatch();
   const { user, logout } = useAuthStore();
   const { activeSession } = useSOSStore();
   const { status } = useLocationStore();
@@ -42,8 +45,9 @@ export const DesktopSidebar = () => {
   }
 
   const handleLogout = () => {
+    dispatch(reduxLogout());
     logout();
-    router.push('/auth');
+    router.push('/auth?mode=login');
   };
 
   return (

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, MapPin, AlertTriangle, Users, User } from 'lucide-react';
+import { useSelector } from 'react-redux';
 import { useSOSStore } from '../../redux/useSOSStore.js';
 
 export const BottomNavigation = () => {
@@ -12,12 +13,15 @@ export const BottomNavigation = () => {
   const [mounted, setMounted] = useState(false);
   const [pressingSOS, setPressingSOS] = useState(false);
 
+  const { token, user } = useSelector((state) => state?.auth || {});
+  const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
+
   const navItems = [
-    { path: '/dashboard',     label: 'Home',     icon: Home },
-    { path: '/track-journey', label: 'Track',    icon: MapPin },
-    { path: '/active-sos',    label: 'SOS',      icon: AlertTriangle, isCenter: true },
-    { path: '/contacts',      label: 'Contacts', icon: Users },
-    { path: '/profile',       label: 'Profile',  icon: User },
+    { path: isLoggedIn ? '/dashboard' : '/', label: 'Home', icon: Home },
+    { path: '/track-journey', label: 'Track', icon: MapPin },
+    { path: '/active-sos', label: 'SOS', icon: AlertTriangle, isCenter: true },
+    { path: '/contacts', label: 'Contacts', icon: Users },
+    { path: '/profile', label: 'Profile', icon: User },
   ];
 
   useEffect(() => { 

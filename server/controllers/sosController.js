@@ -1,4 +1,5 @@
 import { prisma } from '../config/prisma.js';
+import { config } from '../config/index.js';
 import { sendSosEmergencyAlert } from '../services/mailer.js';
 import { getIO } from '../socket.js';
 import { sendEmergencyPushToEmails } from './pushController.js';
@@ -42,7 +43,8 @@ export const startSos = async (req, res) => {
       where: { userId },
     });
 
-    const trackingUrl = `http://localhost:3000/live-track/${session.shareToken}`;
+    const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
+    const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
 
     // Send emails to trusted contacts
     for (const contact of contacts) {

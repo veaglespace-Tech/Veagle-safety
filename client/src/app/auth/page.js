@@ -23,15 +23,13 @@ import {
   User as UserIcon,
   MapPin,
   Heart,
-  Image as ImageIcon,
   ArrowRight,
-  ShieldCheck,
-  Crown,
-  KeyRound,
   CheckCircle2,
   AlertCircle,
   FileText,
   Users,
+  Building,
+  Map,
 } from 'lucide-react';
 
 function UserAuthForm() {
@@ -46,66 +44,143 @@ function UserAuthForm() {
     }
   }, [searchParams]);
 
-  // Comprehensive Registration Fields State
+  // Clean Registration Fields State (No pre-filled defaults)
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [profilePhoto, setProfilePhoto] = useState('https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png');
-  const [bloodGroup, setBloodGroup] = useState('O+');
-  const [address, setAddress] = useState('Not Specified');
-  const [city, setCity] = useState('Pune');
-  const [state, setState] = useState('Maharashtra');
-  const [country, setCountry] = useState('India');
-  const [pincode, setPincode] = useState('411001');
+  const [bloodGroup, setBloodGroup] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [pincode, setPincode] = useState('');
   const [emergencyContactName, setEmergencyContactName] = useState('');
   const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
-  const [medicalNotes, setMedicalNotes] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
+
+  // Client validation error state
+  const [validationError, setValidationError] = useState('');
 
   // OTP State
   const [otpCode, setOtpCode] = useState('');
 
   const dispatch = useDispatch();
   const router = useRouter();
-  const { token, user, isLoading, error, successMessage, showOtpModal, pendingVerificationEmail } = useSelector(
+  const { token, user, registrationToken, pendingToken, isLoading, error, successMessage, showOtpModal, pendingVerificationEmail } = useSelector(
     (state) => state?.auth || {}
   );
+
+  const [wasOtpModalOpened, setWasOtpModalOpened] = useState(false);
+
+  useEffect(() => {
+    if (showOtpModal) {
+      setWasOtpModalOpened(true);
+    }
+  }, [showOtpModal]);
+
+  useEffect(() => {
+    if (wasOtpModalOpened && !showOtpModal && registrationToken) {
+      router.push('/pricing');
+    }
+  }, [wasOtpModalOpened, showOtpModal, registrationToken, router]);
 
   useEffect(() => {
     if (token && user) {
       if (user.role === 'SUPER_ADMIN') {
         router.push('/admin');
-      } else if (user.subscriptionStatus !== 'ACTIVE') {
-        router.push('/pricing');
-      } else {
+      } else if (user.subscriptionStatus === 'ACTIVE') {
         router.push('/dashboard');
       }
     }
   }, [token, user, router]);
 
+  const validateForm = () => {
+    setValidationError('');
+
+    if (isLogin) {
+      if (!email || !password) {
+        setValidationError('Email and Password are required.');
+        return false;
+      }
+      return true;
+    }
+
+    // Comprehensive Registration Validation
+    if (
+      !fullName.trim() ||
+      !email.trim() ||
+      !phone.trim() ||
+      !password ||
+      !bloodGroup ||
+      !address.trim() ||
+      !city.trim() ||
+      !state.trim() ||
+      !pincode.trim() ||
+      !emergencyContactName.trim() ||
+      !emergencyContactPhone.trim()
+    ) {
+      setValidationError('Please fill in all required fields marked with *.');
+      return false;
+    }
+
+    // Email Regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setValidationError('Please enter a valid email address.');
+      return false;
+    }
+
+    // Indian 10-Digit Phone Regex
+    const phoneRegex = /^[6-9]\d{9}$/;
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (!phoneRegex.test(cleanPhone)) {
+      setValidationError('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.');
+      return false;
+    }
+
+    const cleanGuardianPhone = emergencyContactPhone.replace(/\D/g, '');
+    if (!phoneRegex.test(cleanGuardianPhone)) {
+      setValidationError('Please enter a valid 10-digit mobile number for Guardian Emergency Contact.');
+      return false;
+    }
+
+    // 6-Digit Pincode Regex
+    const pincodeRegex = /^\d{6}$/;
+    if (!pincodeRegex.test(pincode.trim())) {
+      setValidationError('Please enter a valid 6-digit Pincode.');
+      return false;
+    }
+
+    if (password.length < 6) {
+      setValidationError('Password must be at least 6 characters long.');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(clearAuthMessages());
 
+    if (!validateForm()) return;
+
     if (isLogin) {
-      dispatch(loginUser({ email, password }));
+      dispatch(loginUser({ email: email.trim(), password }));
     } else {
       dispatch(
         registerUser({
-          fullName,
-          email,
-          phone,
-          profilePhoto,
+          fullName: fullName.trim(),
+          email: email.trim(),
+          phone: phone.replace(/\D/g, ''),
           bloodGroup,
-          address: address || 'Not Specified',
-          city: city || 'Pune',
-          state: state || 'Maharashtra',
-          country: country || 'India',
-          pincode: pincode || '411001',
-          emergencyContactName,
-          emergencyContactPhone,
-          medicalNotes,
+          address: address.trim(),
+          city: city.trim(),
+          state: state.trim(),
+          country: 'India',
+          pincode: pincode.trim(),
+          emergencyContactName: emergencyContactName.trim(),
+          emergencyContactPhone: emergencyContactPhone.replace(/\D/g, ''),
           password,
         })
       );
@@ -114,7 +189,12 @@ function UserAuthForm() {
 
   const handleOtpSubmit = (e) => {
     e.preventDefault();
-    dispatch(verifyEmailOtp({ email: pendingVerificationEmail || email, otp: otpCode }));
+    if (!otpCode || otpCode.length !== 6) {
+      setValidationError('Please enter full 6-digit OTP code.');
+      return;
+    }
+    const currentPendingToken = pendingToken || (typeof window !== 'undefined' ? localStorage.getItem('tichi_pending_token') : null);
+    dispatch(verifyEmailOtp({ email: pendingVerificationEmail || email, otp: otpCode, pendingToken: currentPendingToken }));
   };
 
   const handleResendOtp = () => {
@@ -149,7 +229,7 @@ function UserAuthForm() {
           <div className="flex bg-blush-subtle p-1.5 rounded-2xl border border-[#FFCCE1]">
             <button
               type="button"
-              onClick={() => setIsLogin(true)}
+              onClick={() => { setIsLogin(true); setValidationError(''); }}
               className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
                 isLogin ? 'btn-baby-pink shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
               }`}
@@ -158,7 +238,7 @@ function UserAuthForm() {
             </button>
             <button
               type="button"
-              onClick={() => setIsLogin(false)}
+              onClick={() => { setIsLogin(false); setValidationError(''); }}
               className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
                 !isLogin ? 'btn-baby-pink shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
               }`}
@@ -167,11 +247,11 @@ function UserAuthForm() {
             </button>
           </div>
 
-          {/* ERROR / SUCCESS NOTIFICATIONS */}
-          {error && (
+          {/* ERROR / VALIDATION / SUCCESS NOTIFICATIONS */}
+          {(validationError || error) && (
             <div className="bg-rose/10 border border-rose text-rose p-4 rounded-xl text-xs font-bold flex items-center space-x-2 animate-fade-up">
               <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
+              <span>{validationError || error}</span>
             </div>
           )}
 
@@ -185,164 +265,247 @@ function UserAuthForm() {
           {/* AUTH FORM */}
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             
-            {!isLogin && (
-              <>
-                {/* SECTION 1: PERSONAL DETAILS */}
-                <div className="space-y-3 pt-2">
-                  <span className="text-[10px] font-black text-rose uppercase tracking-wider block">Section 1: Personal Details</span>
-                  
+            {!isLogin ? (
+              <div className="space-y-4">
+                
+                {/* FULL NAME */}
+                <div>
+                  <label className="block text-tichi-muted font-bold mb-1">Full Name *</label>
+                  <div className="relative">
+                    <UserIcon className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Priya Sharma"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                    />
+                  </div>
+                </div>
+
+                {/* EMAIL & MOBILE */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Full Name *</label>
+                    <label className="block text-tichi-muted font-bold mb-1">Email Address *</label>
                     <div className="relative">
-                      <UserIcon className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
-                        type="text"
+                        type="email"
                         required
-                        placeholder="Priya Sharma"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="priya@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 input-antique-pink"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Mobile Number *</label>
-                      <div className="relative">
-                        <Phone className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="tel"
-                          required
-                          placeholder="+91 98765 43210"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Blood Group</label>
-                      <select
-                        value={bloodGroup}
-                        onChange={(e) => setBloodGroup(e.target.value)}
-                        className="w-full px-4 py-3 input-antique-pink font-bold"
-                      >
-                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bg) => (
-                          <option key={bg} value={bg}>{bg}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SECTION 2: ADDRESS & EMERGENCY CONTACT */}
-                <div className="space-y-3 pt-2">
-                  <span className="text-[10px] font-black text-rose uppercase tracking-wider block">Section 2: City & Emergency Contact</span>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">City / Region</label>
-                      <input
-                        type="text"
-                        placeholder="Pune"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="w-full px-4 py-3 input-antique-pink"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Pincode</label>
-                      <input
-                        type="text"
-                        placeholder="411001"
-                        value={pincode}
-                        onChange={(e) => setPincode(e.target.value)}
-                        className="w-full px-4 py-3 input-antique-pink font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Guardian Name (Optional)</label>
-                      <input
-                        type="text"
-                        placeholder="Rajesh Sharma (Father)"
-                        value={emergencyContactName}
-                        onChange={(e) => setEmergencyContactName(e.target.value)}
-                        className="w-full px-4 py-3 input-antique-pink"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Guardian Phone (Optional)</label>
+                  <div>
+                    <label className="block text-tichi-muted font-bold mb-1">Mobile Number *</label>
+                    <div className="relative">
+                      <Phone className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="tel"
-                        placeholder="+91 98765 00000"
-                        value={emergencyContactPhone}
-                        onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                        className="w-full px-4 py-3 input-antique-pink font-mono"
+                        required
+                        maxLength={10}
+                        placeholder="10-digit number"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                        className="w-full pl-10 pr-4 py-3 input-antique-pink font-mono"
                       />
                     </div>
                   </div>
                 </div>
-              </>
+
+                {/* BLOOD GROUP & PASSWORD */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-tichi-muted font-bold mb-1">Blood Group *</label>
+                    <select
+                      required
+                      value={bloodGroup}
+                      onChange={(e) => setBloodGroup(e.target.value)}
+                      className="w-full px-4 py-3 input-antique-pink font-bold"
+                    >
+                      <option value="" disabled>Select Blood Group</option>
+                      {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bg) => (
+                        <option key={bg} value={bg}>{bg}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-tichi-muted font-bold mb-1">Password *</label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type={showPass ? 'text' : 'password'}
+                        required
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full pl-10 pr-12 py-3 input-antique-pink"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPass(!showPass)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
+                      >
+                        {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ADDRESS & CITY */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-tichi-muted font-bold mb-1">Full Address *</label>
+                    <div className="relative">
+                      <MapPin className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="House no, Street area"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-tichi-muted font-bold mb-1">City *</label>
+                    <div className="relative">
+                      <Building className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Pune"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* STATE & PINCODE */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-tichi-muted font-bold mb-1">State *</label>
+                    <div className="relative">
+                      <Map className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Maharashtra"
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-tichi-muted font-bold mb-1">Pincode *</label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={6}
+                      placeholder="e.g. 411001"
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                      className="w-full px-4 py-3 input-antique-pink font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* EMERGENCY GUARDIAN CONTACT */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-tichi-muted font-bold mb-1">Guardian Name *</label>
+                    <div className="relative">
+                      <Users className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Rajesh Sharma"
+                        value={emergencyContactName}
+                        onChange={(e) => setEmergencyContactName(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-tichi-muted font-bold mb-1">Guardian Mobile Number *</label>
+                    <div className="relative">
+                      <Phone className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="tel"
+                        required
+                        maxLength={10}
+                        placeholder="10-digit number"
+                        value={emergencyContactPhone}
+                        onChange={(e) => setEmergencyContactPhone(e.target.value.replace(/\D/g, ''))}
+                        className="w-full pl-10 pr-4 py-3 input-antique-pink font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            ) : (
+              /* LOGIN FORM */
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-tichi-muted font-bold mb-1">Email Address *</label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      required
+                      placeholder="priya@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-tichi-muted font-bold mb-1">Password *</label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type={showPass ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-10 pr-12 py-3 input-antique-pink"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass(!showPass)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
+                    >
+                      {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
-
-            {/* ACCOUNT CREDENTIALS */}
-            <div className="space-y-3 pt-2">
-              {!isLogin && (
-                <span className="text-[10px] font-black text-rose uppercase tracking-wider block">Section 3: Login Credentials</span>
-              )}
-
-              <div>
-                <label className="block text-tichi-muted font-bold mb-1">Email Address *</label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="email"
-                    required
-                    placeholder="priya@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 input-antique-pink"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-tichi-muted font-bold mb-1">Password *</label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type={showPass ? 'text' : 'password'}
-                    required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 input-antique-pink"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(!showPass)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
-                  >
-                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-            </div>
 
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
               disabled={mounted && isLoading}
-              className="w-full btn-baby-pink py-4 text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2 mt-4"
+              className="w-full btn-baby-pink py-4 text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2 mt-6"
             >
-              <span>{(mounted && isLoading) ? 'PROCESSING...' : isLogin ? 'SIGN IN TO DASHBOARD' : 'REGISTER & PROCEED'}</span>
+              <span>{(mounted && isLoading) ? 'PROCESSING...' : isLogin ? 'SIGN IN TO DASHBOARD' : 'REGISTER & PROCEED TO OTP'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
@@ -392,7 +555,7 @@ function UserAuthForm() {
                 disabled={isLoading}
                 className="w-full btn-baby-pink py-3.5 text-xs uppercase tracking-wider"
               >
-                {isLoading ? 'VERIFYING CODE...' : 'VERIFY & PROCEED TO PLAN FORMALITIES'}
+                {isLoading ? 'VERIFYING CODE...' : 'VERIFY & PROCEED TO PRICING PLAN'}
               </button>
             </form>
 

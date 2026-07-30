@@ -35,11 +35,47 @@ export const register = asyncHandler(async (req, res) => {
       return res.status(400).json({ error: 'fullName, email, and password are required for SuperAdmin' });
     }
   } else {
-    // USER requires essential details (Name, Email, Phone, Password)
-    if (!fullName || !email || !phone || !password) {
+    // USER requires all essential details
+    if (
+      !fullName ||
+      !email ||
+      !phone ||
+      !password ||
+      !bloodGroup ||
+      !address ||
+      !city ||
+      !state ||
+      !pincode ||
+      !emergencyContactName ||
+      !emergencyContactPhone
+    ) {
       return res.status(400).json({
-        error: 'Please fill in all required fields: Full Name, Email, Phone Number, and Password.',
+        error: 'Please fill in all required fields: Full Name, Email, Mobile Number, Password, Blood Group, Address, City, State, Pincode, Guardian Name, and Guardian Phone.',
       });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+
+    // Mobile number validation (10 digits Indian format)
+    const phoneRegex = /^[6-9]\d{9}$/;
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (!phoneRegex.test(cleanPhone)) {
+      return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.' });
+    }
+
+    const cleanEmergencyPhone = emergencyContactPhone.replace(/\D/g, '');
+    if (!phoneRegex.test(cleanEmergencyPhone)) {
+      return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number for Emergency Guardian Contact.' });
+    }
+
+    // Pincode validation (6 digits)
+    const pincodeRegex = /^\d{6}$/;
+    if (!pincodeRegex.test(pincode.trim())) {
+      return res.status(400).json({ error: 'Please enter a valid 6-digit Pincode.' });
     }
   }
 
@@ -54,6 +90,48 @@ export const register = asyncHandler(async (req, res) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+  // For USER role: Defer DB insertion until full flow (payment completion)
+  if (assignedRole === 'USER') {
+    const pendingRegistrationToken = jwt.sign(
+      {
+        fullName,
+        email,
+        phone,
+        passwordHash,
+        role: 'USER',
+        profilePhoto: profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
+        bloodGroup,
+        address,
+        city,
+        state,
+        country: country || 'India',
+        pincode,
+        emergencyContactName,
+        emergencyContactPhone,
+        medicalNotes: medicalNotes || null,
+        otp,
+        otpExpiresAt: otpExpires.getTime(),
+        type: 'PENDING_REGISTRATION',
+      },
+      config.jwt.secret,
+      { expiresIn: '2h' }
+    );
+
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: email, userName: fullName, otp });
+    } catch (emailErr) {
+      console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
+    }
+
+    return res.status(200).json({
+      message: 'OTP code sent to your email. Please verify to proceed to plan formalities.',
+      requiresVerification: true,
+      pendingToken: pendingRegistrationToken,
+      email,
+    });
+  }
+
+  // SuperAdmin gets immediate DB creation & JWT login
   const user = await prisma.user.create({
     data: {
       fullName,
@@ -71,54 +149,10 @@ export const register = asyncHandler(async (req, res) => {
       emergencyContactName: emergencyContactName || null,
       emergencyContactPhone: emergencyContactPhone || null,
       medicalNotes: medicalNotes || null,
-      isEmailVerified: assignedRole === 'SUPER_ADMIN' ? true : false,
-      emailOtp: assignedRole === 'SUPER_ADMIN' ? null : otp,
-      emailOtpExpiresAt: assignedRole === 'SUPER_ADMIN' ? null : otpExpires,
+      isEmailVerified: true,
     },
   });
 
-  // Automatically create primary emergency contact in TrustedContact table if provided
-  if (emergencyContactName && emergencyContactPhone) {
-    try {
-      await prisma.trustedContact.create({
-        data: {
-          userId: user.id,
-          name: emergencyContactName,
-          relationship: 'Primary Guardian / Emergency Contact',
-          phone: emergencyContactPhone,
-          email: email, // Default backup notification email
-          isVerified: true,
-          priorityOrder: 1,
-        },
-      });
-    } catch (e) {
-      console.log('[Register Notice] Optional primary contact creation skipped:', e.message);
-    }
-  }
-
-  // Send verification email for User role
-  if (assignedRole === 'USER') {
-    try {
-      await sendEmailVerificationOtp({ recipientEmail: email, userName: fullName, otp });
-    } catch (emailErr) {
-      console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
-    }
-
-    return res.status(201).json({
-      message: 'Account created successfully! Please enter the 6-digit OTP code sent to your email to complete registration.',
-      requiresVerification: true,
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        subscriptionStatus: user.subscriptionStatus,
-      },
-    });
-  }
-
-  // SuperAdmin gets immediate JWT login
   const token = jwt.sign(
     { userId: user.id, role: user.role, email: user.email },
     config.jwt.secret,
@@ -139,73 +173,115 @@ export const register = asyncHandler(async (req, res) => {
 });
 
 /**
- * Verify Email Verification OTP
+ * Verify Email Verification OTP (Without DB insertion for pending users)
  */
 export const verifyEmail = asyncHandler(async (req, res) => {
-  const { email, otp } = req.body;
+  const { email, otp, pendingToken } = req.body;
 
-  if (!email || !otp) {
-    return res.status(400).json({ error: 'Email and 6-digit OTP code are required' });
+  if (!otp) {
+    return res.status(400).json({ error: '6-digit OTP code is required' });
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    return res.status(404).json({ error: 'User account not found' });
-  }
+  // Case 1: Check existing DB user (for resend OTP / existing users)
+  const existingUser = email ? await prisma.user.findUnique({ where: { email } }) : null;
+  if (existingUser) {
+    if (existingUser.isEmailVerified) {
+      const token = jwt.sign(
+        { id: existingUser.id, userId: existingUser.id, role: existingUser.role, email: existingUser.email },
+        config.jwt.secret,
+        { expiresIn: config.jwt.expiresIn }
+      );
+      return res.status(200).json({
+        message: 'Email is already verified',
+        token,
+        user: {
+          id: existingUser.id,
+          fullName: existingUser.fullName,
+          email: existingUser.email,
+          phone: existingUser.phone,
+          role: existingUser.role,
+          subscriptionStatus: existingUser.subscriptionStatus,
+        },
+      });
+    }
 
-  if (user.isEmailVerified) {
+    if (existingUser.emailOtp !== otp) {
+      return res.status(400).json({ error: 'Invalid OTP code. Please check your email and try again.' });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: existingUser.id },
+      data: { isEmailVerified: true, emailOtp: null, emailOtpExpiresAt: null },
+    });
+
     const token = jwt.sign(
-      { id: user.id, userId: user.id, role: user.role, email: user.email },
+      { id: updatedUser.id, userId: updatedUser.id, role: updatedUser.role, email: updatedUser.email },
       config.jwt.secret,
       { expiresIn: config.jwt.expiresIn }
     );
+
     return res.status(200).json({
-      message: 'Email is already verified',
+      message: 'Email verified successfully!',
       token,
       user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        subscriptionStatus: user.subscriptionStatus,
+        id: updatedUser.id,
+        fullName: updatedUser.fullName,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        role: updatedUser.role,
+        subscriptionStatus: updatedUser.subscriptionStatus,
       },
     });
   }
 
-  if (user.emailOtp !== otp) {
+  // Case 2: Pending registration token verification (NO DB insertion yet)
+  if (!pendingToken) {
+    return res.status(400).json({ error: 'Registration session expired. Please register again.' });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(pendingToken, config.jwt.secret);
+  } catch (err) {
+    return res.status(400).json({ error: 'Registration session expired or invalid. Please try registering again.' });
+  }
+
+  if (decoded.otp !== otp) {
     return res.status(400).json({ error: 'Invalid OTP code. Please check your email and try again.' });
   }
 
-  if (user.emailOtpExpiresAt && new Date() > new Date(user.emailOtpExpiresAt)) {
+  if (decoded.otpExpiresAt && Date.now() > decoded.otpExpiresAt) {
     return res.status(400).json({ error: 'OTP code has expired. Please click Resend OTP.' });
   }
 
-  const updatedUser = await prisma.user.update({
-    where: { id: user.id },
-    data: {
+  // Issue a verified registration token to be passed to Checkout and PayU
+  const { exp, iat, ...cleanPayload } = decoded;
+  const registrationToken = jwt.sign(
+    {
+      ...cleanPayload,
       isEmailVerified: true,
-      emailOtp: null,
-      emailOtpExpiresAt: null,
+      type: 'VERIFIED_REGISTRATION',
     },
-  });
-
-  const token = jwt.sign(
-    { id: updatedUser.id, userId: updatedUser.id, role: updatedUser.role, email: updatedUser.email },
     config.jwt.secret,
-    { expiresIn: config.jwt.expiresIn }
+    { expiresIn: '2h' }
   );
 
   res.status(200).json({
-    message: 'Email verified successfully!',
-    token,
+    message: 'Email verified successfully! Please select your plan and complete payment to activate account.',
+    registrationToken,
     user: {
-      id: updatedUser.id,
-      fullName: updatedUser.fullName,
-      email: updatedUser.email,
-      phone: updatedUser.phone,
-      role: updatedUser.role,
-      subscriptionStatus: updatedUser.subscriptionStatus,
+      fullName: decoded.fullName,
+      email: decoded.email,
+      phone: decoded.phone,
+      role: decoded.role,
+      bloodGroup: decoded.bloodGroup,
+      address: decoded.address,
+      city: decoded.city,
+      state: decoded.state,
+      pincode: decoded.pincode,
+      emergencyContactName: decoded.emergencyContactName,
+      emergencyContactPhone: decoded.emergencyContactPhone,
+      subscriptionStatus: 'INACTIVE',
     },
   });
 });

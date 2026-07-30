@@ -20,7 +20,11 @@ export default function LivePublicTrackingPage() {
 
   useEffect(() => {
     loadPublicSos();
-    const socket = io('http://localhost:5000');
+    const serverUrl = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL)
+      ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '')
+      : (typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:5000` : 'http://localhost:5000');
+
+    const socket = io(serverUrl);
 
     if (token) {
       socket.emit('join-room', `track:${token}`);
