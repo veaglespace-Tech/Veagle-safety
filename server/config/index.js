@@ -9,7 +9,7 @@ const getEnv = (key, defaultValue = '') => {
 const jwtSecretValue = process.env.JWT_KEY || process.env.JWT_SECRET || 'tichi_suraksha_super_secret_jwt_key_2026';
 
 export const config = {
-  port: process.env.PORT || 5000,
+  port: process.env.PORT || (process.env.NODE_ENV === 'production' ? 5002 : 5000),
   jwtSecret: jwtSecretValue,
   jwt: {
     secret: jwtSecretValue,
@@ -25,7 +25,7 @@ export const config = {
     baseUrl: process.env.PAYU_BASE_URL || 'https://test.payu.in/_payment',
     key: process.env.PAYU_TEST_KEY || process.env['PAYU_TEST_KEY '] || 'GKJE3Z',
     salt: process.env.payu_test_salt || process.env['payu_test_salt '] || '0zqiCnB4GslxAanSxjEAutWkWuggFiGs',
-    clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
-    serverBaseUrl: process.env.SERVER_BASE_URL || 'http://localhost:5000',
+    clientUrl: process.env.CLIENT_URL || (process.env.NODE_ENV === 'production' ? 'http://localhost:3002' : 'http://localhost:3000'),
+    serverBaseUrl: process.env.SERVER_BASE_URL || (process.env.NODE_ENV === 'production' ? 'http://localhost:5002' : 'http://localhost:5000'),
   },
 };

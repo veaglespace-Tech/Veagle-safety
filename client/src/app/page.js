@@ -8,9 +8,8 @@ import {
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
-import { Footer } from '../components/layout/Footer.js';
-
-import { MagneticButton } from '../components/ui/MagneticButton.js';
+import { Logo3DFlip } from '../components/ui/Logo3DFlip.js';
+import { HeroBannerCarousel } from '../components/ui/HeroBannerCarousel.js';
 
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
@@ -24,182 +23,112 @@ export default function LandingPage() {
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   return (
-    <div style={{ minHeight: '100vh', background: '#FFF0F3', fontFamily: 'Manrope, sans-serif', color: '#2A0826' }}>
+    <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden">
       <PublicNavbar />
+
+      {/* BACKGROUND AMBIENT GLOW MESHES */}
+      <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF5C8A]/12 blur-[170px] top-[-140px] left-[-240px] pointer-events-none" />
+      <div className="absolute w-[750px] h-[750px] rounded-full bg-[#FFCCE1]/25 blur-[160px] bottom-[60px] right-[-220px] pointer-events-none" />
 
       {/* TOP NOTIFICATION BANNER */}
       {isLoggedIn && (
-        <div style={{
-          background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-          color: '#fff', textAlign: 'center', padding: '12px 20px',
-          position: 'relative', zIndex: 10,
-          boxShadow: '0 4px 15px rgba(255, 92, 138, 0.3)',
-        }}>
-          <div style={{
-            maxWidth: '1280px', margin: '0 auto',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: '12px', flexWrap: 'wrap', fontSize: '13px', fontWeight: 800,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Sparkles size={16} />
-              <span>Welcome Back, <strong style={{ color: '#FFE600' }}>{user?.fullName || 'Sakhi Member'}</strong>! Active Protection Enabled.</span>
+        <div className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-center py-3 px-4 relative z-10 shadow-[0_4px_20px_rgba(255,92,138,0.3)]">
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 flex-wrap text-xs font-black">
+            <div className="flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-white animate-pulse" />
+              <span>Welcome Back, <strong className="text-[#FFE600] font-black">{user?.fullName || 'Sakhi Member'}</strong>! Active Protection Enabled.</span>
             </div>
-            <MagneticButton pullStrength={0.2}>
-              <Link href={isSuperAdmin ? '/admin' : '/dashboard'} style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                background: '#FFFFFF', color: '#FF2A6D',
-                padding: '4px 14px', borderRadius: '999px',
-                fontSize: '11px', fontWeight: 900, textDecoration: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              }}>
-                {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
-                <span>{isSuperAdmin ? 'Go to Admin Panel' : 'Go to Dashboard'}</span>
-                <ArrowRight size={13} />
-              </Link>
-            </MagneticButton>
+            <Link
+              href={isSuperAdmin ? '/admin' : '/dashboard'}
+              className="inline-flex items-center gap-1.5 bg-white text-[#FF2A6D] px-3.5 py-1 rounded-full text-[11px] font-black text-decoration-none shadow-sm hover:bg-[#FFF0F3] transition-all"
+            >
+              {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
+              <span>{isSuperAdmin ? 'Go to Admin Panel' : 'Go to Dashboard'}</span>
+              <ArrowRight size={13} />
+            </Link>
           </div>
         </div>
       )}
 
-      {/* HERO SECTION */}
-      <section style={{ position: 'relative', zIndex: 1, padding: 'clamp(40px,8vw,80px) clamp(16px,5vw,40px) clamp(60px,8vw,100px)', textAlign: 'center' }}>
+      {/* HERO SECTION WITH DIRECT AUTO-SCROLLING HERO BANNER */}
+      <section className="relative z-10 pt-6 sm:pt-10 pb-16 px-4 sm:px-6 lg:px-8 text-center space-y-8">
 
-        {/* BADGE */}
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '8px',
-          background: 'rgba(255,255,255,0.95)', border: '1px solid #FFCCE1',
-          padding: 'clamp(8px,2vw,11px) clamp(16px,4vw,24px)', borderRadius: '999px',
-          fontSize: 'clamp(9px,2vw,11px)', fontWeight: 900, textTransform: 'uppercase',
-          letterSpacing: '0.08em', color: '#2A0826', marginBottom: 'clamp(20px,4vw,32px)',
-          boxShadow: '0 2px 12px rgba(255,92,138,0.12)',
-          flexWrap: 'wrap', justifyContent: 'center',
-        }}>
-          <ShieldCheck size={14} color="#FF5C8A" />
-          <span>India's Most Trusted Personal Safety Platform</span>
-        </div>
+        {/* DIRECT 4K AUTO-SCROLL HERO BANNER */}
+        <HeroBannerCarousel />
 
         {/* MAIN TITLE */}
-        <h1 style={{
-          fontSize: 'clamp(32px, 7vw, 76px)', fontWeight: 900,
-          color: '#2A0826', margin: '0 0 clamp(12px,2vw,18px)',
-          lineHeight: 1.08, letterSpacing: '-0.025em',
-          maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto',
-        }}>
-          Sakhi Suraksha SOS
+        <h1 className="heading-gradient-hero text-4xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-tight max-w-5xl mx-auto">
+          Sakhi Suraksha <span className="heading-highlight-pill">SOS</span>
         </h1>
 
-        <p style={{
-          fontSize: 'clamp(14px, 2.2vw, 20px)', color: '#684E67',
-          fontWeight: 700, maxWidth: '560px', margin: '0 auto clamp(32px,5vw,52px)',
-          lineHeight: 1.65,
-        }}>
+        <p className="text-[#684E67] text-base sm:text-xl font-bold max-w-xl mx-auto leading-relaxed">
           A modern personal safety companion for girls & women — instant emergency alerts,
           live GPS tracking, and 24/7 command dispatch.
         </p>
 
-        {/* MARQUEE STRIP */}
-        <div style={{
-          width: '100vw', marginLeft: 'calc(-50vw + 50%)',
-          borderTop: '2px solid #FFCCE1', borderBottom: '2px solid #FFCCE1',
-          background: 'rgba(255,255,255,0.95)', padding: 'clamp(10px,2vw,16px) 0',
-          overflow: 'hidden', marginBottom: 'clamp(32px,5vw,52px)',
-        }}>
-          <div style={{
-            display: 'flex', gap: 'clamp(32px,5vw,56px)', whiteSpace: 'nowrap',
-            animation: 'marqueeScroll 20s linear infinite', width: 'max-content',
-          }}>
+        {/* MARQUEE STRIP (FULL SCREEN WIDTH & LIVE CONTINUOUS SCROLLING) */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-white/95 border-y-1.5 border-[#FFCCE1] py-3.5 overflow-hidden my-8 shadow-sm">
+          <div className="animate-marquee-scroll">
             {[
-              '⚡ INSTANT 3-SECOND SOS', '📍 24/7 LIVE GPS TRACKING',
+              '⚡ INSTANT 3-SECOND SOS DISPATCH', '📍 24/7 LIVE GPS TRACKING',
               '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY',
-              '⚡ INSTANT 3-SECOND SOS', '📍 24/7 LIVE GPS TRACKING',
+              '⚡ INSTANT 3-SECOND SOS DISPATCH', '📍 24/7 LIVE GPS TRACKING',
+              '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY',
+              '⚡ INSTANT 3-SECOND SOS DISPATCH', '📍 24/7 LIVE GPS TRACKING',
               '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY',
             ].map((item, i) => (
-              <span key={i} style={{
-                fontSize: 'clamp(12px,2vw,16px)', fontWeight: 900,
-                color: '#FF5C8A', textTransform: 'uppercase', letterSpacing: '0.08em'
-              }}>
-                {item}
+              <span key={i} className="text-xs sm:text-sm font-black text-[#FF2A6D] uppercase tracking-widest flex items-center gap-3">
+                <span>{item}</span>
+                <span className="text-[#FF5C8A] font-light">·</span>
               </span>
             ))}
           </div>
         </div>
 
-        {/* MAGNETIC HERO CTA BUTTONS */}
-        <div style={{
-          display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
-          gap: 'clamp(14px,3vw,24px)', marginBottom: 'clamp(48px,8vw,80px)',
-        }}>
+        {/* HERO CTA BUTTONS WITH PURE 3D POP-UP EFFECT (NO MAGNETIC MOTION) */}
+        <div className="flex flex-wrap justify-center gap-6 pt-3">
           {isLoggedIn ? (
             <>
-              <MagneticButton pullStrength={0.4}>
-                <Link href={isSuperAdmin ? '/admin' : '/dashboard'} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                  color: '#fff', fontWeight: 900, fontSize: 'clamp(12px,2vw,15px)',
-                  padding: 'clamp(14px,2.2vw,18px) clamp(28px,4vw,42px)', borderRadius: '20px',
-                  textDecoration: 'none', boxShadow: '0 8px 30px rgba(255,92,138,0.45)',
-                  letterSpacing: '0.04em', textTransform: 'uppercase',
-                }}>
-                  {isSuperAdmin ? <Crown size={18} /> : <LayoutDashboard size={18} />}
-                  <span>{isSuperAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}</span>
-                  <ArrowRight size={16} />
-                </Link>
-              </MagneticButton>
+              <Link
+                href={isSuperAdmin ? '/admin' : '/dashboard'}
+                className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
+              >
+                {isSuperAdmin ? <Crown size={18} /> : <LayoutDashboard size={18} />}
+                <span>{isSuperAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}</span>
+                <ArrowRight size={16} />
+              </Link>
 
-              <MagneticButton pullStrength={0.35}>
-                <Link href="/profile" style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  background: 'rgba(255,255,255,0.98)', color: '#2A0826',
-                  fontWeight: 800, fontSize: 'clamp(12px,2vw,15px)',
-                  padding: 'clamp(14px,2.2vw,18px) clamp(24px,3vw,34px)', borderRadius: '20px',
-                  textDecoration: 'none', border: '2px solid #FFCCE1',
-                  boxShadow: '0 6px 22px rgba(42,8,38,0.08)', textTransform: 'uppercase',
-                }}>
-                  <Shield size={16} color="#FF5C8A" />
-                  <span>MY PROFILE</span>
-                </Link>
-              </MagneticButton>
+              <Link
+                href="/profile"
+                className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
+              >
+                <Shield size={16} className="text-[#FF5C8A]" />
+                <span>MY PROFILE</span>
+              </Link>
             </>
           ) : (
             <>
-              <MagneticButton pullStrength={0.4}>
-                <Link href="/auth?mode=register" style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                  color: '#fff', fontWeight: 900, fontSize: 'clamp(12px,2vw,15px)',
-                  padding: 'clamp(14px,2.2vw,18px) clamp(28px,4vw,42px)', borderRadius: '20px',
-                  textDecoration: 'none', boxShadow: '0 8px 30px rgba(255,92,138,0.45)',
-                  letterSpacing: '0.04em', textTransform: 'uppercase',
-                }}>
-                  <span>PROTECT YOURSELF NOW</span>
-                  <ArrowRight size={16} />
-                </Link>
-              </MagneticButton>
+              <Link
+                href="/auth?mode=register"
+                className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
+              >
+                <span>PROTECT YOURSELF NOW</span>
+                <ArrowRight size={16} className="shrink-0" />
+              </Link>
 
-              <MagneticButton pullStrength={0.35}>
-                <Link href="/about" style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  background: 'rgba(255,255,255,0.98)', color: '#2A0826',
-                  fontWeight: 800, fontSize: 'clamp(12px,2vw,15px)',
-                  padding: 'clamp(14px,2.2vw,18px) clamp(24px,3vw,34px)', borderRadius: '20px',
-                  textDecoration: 'none', border: '2px solid #FFCCE1',
-                  boxShadow: '0 6px 22px rgba(42,8,38,0.08)', textTransform: 'uppercase',
-                }}>
-                  <Shield size={16} color="#FF5C8A" />
-                  <span>HOW IT WORKS</span>
-                </Link>
-              </MagneticButton>
+              <Link
+                href="/about"
+                className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
+              >
+                <Shield size={16} className="text-[#FF5C8A]" />
+                <span>HOW IT WORKS</span>
+              </Link>
             </>
           )}
         </div>
 
-        {/* FEATURE CARDS WITH MAGNETIC HOVER */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
-          gap: 'clamp(14px,3vw,24px)',
-          maxWidth: '1000px', margin: '0 auto', textAlign: 'left',
-        }}>
+        {/* 3 FEATURE CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto pt-8 text-left">
           {[
             {
               icon: Zap, color: '#FF5C8A',
@@ -212,71 +141,57 @@ export default function LandingPage() {
               desc: 'Share live movement updates securely during travel so guardians know you are safe in real time.'
             },
             {
-              icon: Users, color: '#E6A100',
+              icon: Users, color: '#FF5C8A',
               title: 'Trusted Guardian Circle',
               desc: 'Build your personal network of family & emergency guardians for automated response alerts.'
             },
           ].map((item, idx) => (
-            <MagneticButton key={idx} pullStrength={0.2} style={{ width: '100%' }}>
-              <div className="card-antique-pink" style={{
-                padding: 'clamp(20px,4vw,32px)', borderRadius: '24px',
-                height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-              }}>
-                <div>
-                  <div style={{
-                    width: '48px', height: '48px', borderRadius: '16px',
-                    background: '#FFF0F3', border: '1px solid #FFCCE1',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: '16px', boxShadow: '0 4px 12px rgba(255,92,138,0.15)',
-                  }}>
-                    <item.icon size={24} color={item.color} />
-                  </div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#2A0826', marginBottom: '8px' }}>
-                    {item.title}
-                  </h3>
-                  <p style={{ fontSize: '13px', color: '#684E67', fontWeight: 600, lineHeight: 1.6 }}>
-                    {item.desc}
-                  </p>
+            <div key={idx} className="group bg-white/95 backdrop-blur-xl p-8 rounded-3xl space-y-4 border-1.5 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_10px_30px_rgba(255,92,138,0.10)] hover:shadow-[0_16px_40px_rgba(255,92,138,0.22)] transition-all duration-300 h-full flex flex-col justify-between hover:-translate-y-1.5 cursor-pointer">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] border-1.5 border-[#FF5C8A] flex items-center justify-center mb-4 shadow-sm shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                  <item.icon className="w-6 h-6" />
                 </div>
+                <h3 className="text-xl font-black mb-2 text-[#2A0826] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#FF2A6D] group-hover:to-[#FF5C8A] transition-all duration-300">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-[#684E67] font-bold leading-relaxed">
+                  {item.desc}
+                </p>
               </div>
-            </MagneticButton>
+            </div>
           ))}
         </div>
 
       </section>
 
-      {/* STATS SECTION WITH MAGNETIC HOVER */}
-      <section style={{
-        background: 'rgba(255,255,255,0.95)', borderTop: '2px solid #FFCCE1', borderBottom: '2px solid #FFCCE1',
-        padding: 'clamp(40px,6vw,70px) clamp(16px,4vw,32px)', textAlign: 'center',
-      }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '30px' }}>
-          {[
-            { value: '50,000+', label: 'Protected Sakhi Members', icon: Heart },
-            { value: '99.9%', label: 'Emergency Signal Delivery', icon: Zap },
-            { value: '< 3 Sec', label: 'Alert Dispatch Time', icon: Bell },
-            { value: '24/7/365', label: 'Active Command Monitoring', icon: ShieldCheck },
-          ].map((stat, i) => (
-            <MagneticButton key={i} pullStrength={0.25}>
-              <div style={{
-                background: '#FFF0F3', border: '1.5px solid #FFCCE1',
-                padding: '24px 16px', borderRadius: '20px',
-                boxShadow: '0 4px 16px rgba(255,92,138,0.08)',
-              }}>
-                <stat.icon size={24} color="#FF5C8A" style={{ margin: '0 auto 10px' }} />
-                <div style={{ fontSize: '32px', fontWeight: 900, color: '#FF2A6D', lineHeight: 1.1 }}>
-                  {stat.value}
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 800, color: '#684E67', marginTop: '6px', textTransform: 'uppercase' }}>
-                  {stat.label}
-                </div>
-              </div>
-            </MagneticButton>
-          ))}
-        </div>
-      </section>
 
-      <Footer />
+      {/* 100% BLACK FREE ROYAL ANTIQUE COMPACT FOOTER */}
+      <footer className="bg-white/95 backdrop-blur-xl border-t-1.5 border-[#FFCCE1] py-4 text-center sm:text-left text-[#2A0826] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-extrabold text-[#684E67]">
+          <div className="flex items-center space-x-2.5">
+            <Logo3DFlip size={30} />
+            <span className="text-sm font-black text-[#2A0826] tracking-tight">Sakhi Suraksha SOS</span>
+          </div>
+          <div className="flex items-center space-x-4 text-[11px] font-black tracking-wide text-[#684E67]">
+            <Link href="/terms" className="hover:text-[#FF2A6D] transition-colors">Terms of Service</Link>
+            <span className="text-[#FFCCE1]">|</span>
+            <Link href="/privacy" className="hover:text-[#FF2A6D] transition-colors">Privacy Policy</Link>
+          </div>
+          <div className="text-[11px] font-black tracking-wide text-[#684E67]">
+            Designed & Developed by{' '}
+            <a
+              href="https://veaglespace.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#FF2A6D] hover:text-[#E01A4F] underline decoration-1.5 underline-offset-2 transition-colors font-black"
+            >
+              Veagle Space Technology Pvt. Ltd.
+            </a>
+            {' '}| © 2026 All Rights Reserved.
+          </div>
+        </div>
+      </footer>
+
     </div>
   );
 }

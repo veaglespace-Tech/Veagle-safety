@@ -10,7 +10,7 @@ import { seedSuperAdminData } from './services/seed_superadmin.js';
 const app = express();
 const server = http.createServer(app);
 
-const PORT = config.port || 5000;
+const PORT = config.port;
 
 // Trust Nginx / Cloudflare proxy
 app.set("trust proxy", 1);

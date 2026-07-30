@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { api } from '../../../utils/api.js';
+import { api, SERVER_URL } from '../../../utils/api.js';
 import { LiveLocationMap } from '../../../components/location/DynamicLiveLocationMap.js';
 import { ShieldAlert, MapPin, PhoneCall, Clock, CheckCircle, Volume2, VolumeX, AlertTriangle } from 'lucide-react';
 import { io } from 'socket.io-client';
@@ -20,11 +20,7 @@ export default function LivePublicTrackingPage() {
 
   useEffect(() => {
     loadPublicSos();
-    const serverUrl = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL)
-      ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '')
-      : (typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:5000` : 'http://localhost:5000');
-
-    const socket = io(serverUrl);
+    const socket = io(SERVER_URL);
 
     if (token) {
       socket.emit('join-room', `track:${token}`);

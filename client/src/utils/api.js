@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+export const SERVER_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SERVER_URL) || 'http://localhost:5000';
+export const API_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL) || `${SERVER_URL}/api`;
+
 export const api = axios.create({
-  baseURL: (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL) || 'http://localhost:5000/api',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
