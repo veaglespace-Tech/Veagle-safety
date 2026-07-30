@@ -19,6 +19,42 @@ body {
   overflow-x: hidden;
 }
 
+/* ULTRA-MODERN GRADIENT TYPOGRAPHY SYSTEM */
+.heading-gradient-hero {
+  background: linear-gradient(135deg, #2A0826 0%, #FF2A6D 45%, #FF5C8A 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heading-gradient-rose {
+  background: linear-gradient(135deg, #FF5C8A 0%, #FF2A6D 50%, #E01A4F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heading-highlight-pill {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(135deg, #FF5C8A 0%, #FF2A6D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heading-highlight-pill::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 0;
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 92, 138, 0.25);
+  border-radius: 4px;
+  z-index: -1;
+}
+
 /* ANTIQUE VIBRANT ANIMATIONS */
 @keyframes chipBounce {
   0% { transform: scale(0.92); }

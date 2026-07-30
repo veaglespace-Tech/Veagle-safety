@@ -58,8 +58,9 @@ export default function AboutUsPage() {
           </div>
 
           <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
-            Built to Shield & Empower <br />
-            <span className="text-shimmer-animated text-glow-animated">Every Girl and Woman</span>
+            <span className="heading-gradient-hero">Built to </span>
+            <span className="heading-highlight-pill">Shield & Empower</span> <br />
+            <span className="heading-gradient-rose">Every Girl and Woman</span>
           </AnimatedHeading>
 
           <p className="text-tichi-muted text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">

@@ -193,7 +193,8 @@ export default function PlatformGalleryPage() {
             <span className="text-shimmer-animated">PLATFORM VISUAL SHOWCASE</span>
           </div>
           <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight">
-            Designed for Simplicity, Speed & Safety
+            <span className="heading-gradient-hero">Designed for </span>
+            <span className="heading-highlight-pill">Simplicity, Speed & Safety</span>
           </AnimatedHeading>
           <p className="text-tichi-muted text-base font-medium leading-relaxed">
             Explore interactive previews of Sakhi Suraksha SOS’s emergency response interfaces, GPS tracking, and safety tools.

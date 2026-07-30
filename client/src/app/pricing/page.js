@@ -95,7 +95,8 @@ export default function PlatformPricingPage() {
             <span className="text-shimmer-animated">SINGLE UNIFIED YEARLY PROTECTION PLAN</span>
           </div>
           <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight">
-            Complete 365-Day Safety Protection
+            <span className="heading-gradient-hero">Complete </span>
+            <span className="heading-highlight-pill">365-Day Safety Protection</span>
           </AnimatedHeading>
           <p className="text-tichi-muted text-base sm:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
             Just ₹24 per year (only ₹2/month). Complete your plan formalities to unlock 24/7 Live Emergency SOS, 5 Trusted Contacts, and Encrypted GPS Sharing for a full year.

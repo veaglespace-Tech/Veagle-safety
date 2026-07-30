@@ -38,7 +38,8 @@ export default function ContactSupportPage() {
           </div>
 
           <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight">
-            We Are Always Here For You
+            <span className="heading-gradient-hero">We Are </span>
+            <span className="heading-highlight-pill">Always Here For You</span>
           </AnimatedHeading>
           <p className="text-tichi-muted text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
             Reach out to our safety command team, access 24/7 national emergency helplines, or send us a support message.

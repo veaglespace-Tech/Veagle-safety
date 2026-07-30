@@ -8,8 +8,6 @@ import {
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
-import { Footer } from '../components/layout/Footer.js';
-
 import { MagneticButton } from '../components/ui/MagneticButton.js';
 
 export default function LandingPage() {
@@ -79,13 +77,14 @@ export default function LandingPage() {
         </div>
 
         {/* MAIN TITLE */}
-        <h1 style={{
-          fontSize: 'clamp(32px, 7vw, 76px)', fontWeight: 900,
-          color: '#2A0826', margin: '0 0 clamp(12px,2vw,18px)',
-          lineHeight: 1.08, letterSpacing: '-0.025em',
-          maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto',
+        <h1 className="heading-gradient-hero" style={{
+          fontSize: 'clamp(36px, 7.5vw, 80px)', fontWeight: 900,
+          margin: '0 0 clamp(12px,2vw,18px)',
+          lineHeight: 1.05, letterSpacing: '-0.03em',
+          maxWidth: '920px', marginLeft: 'auto', marginRight: 'auto',
+          filter: 'drop-shadow(0 4px 20px rgba(255, 92, 138, 0.25))'
         }}>
-          Sakhi Suraksha SOS
+          Sakhi Suraksha <span className="heading-highlight-pill">SOS</span>
         </h1>
 
         <p style={{
@@ -276,7 +275,25 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <Footer />
+      {/* FOOTER */}
+      <footer style={{
+        background: '#2A0826', color: '#FFFFFF',
+        padding: 'clamp(40px,6vw,60px) 20px', textAlign: 'center',
+        borderTop: '3px solid #FF5C8A',
+      }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '16px' }}>
+            <Shield size={24} color="#FF5C8A" />
+            <span style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '-0.02em' }}>Sakhi Suraksha SOS</span>
+          </div>
+          <p style={{ fontSize: '13px', color: '#FFCCE1', fontWeight: 600, maxWidth: '500px', margin: '0 auto 24px' }}>
+            Empowering women & girls with 24/7 encrypted emergency safety network across India.
+          </p>
+          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', fontWeight: 700 }}>
+            © {new Date().getFullYear()} Sakhi Suraksha SOS · All Rights Reserved.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
