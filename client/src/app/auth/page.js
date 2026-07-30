@@ -3,9 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
-import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
 import {
   registerUser,
   loginUser,
