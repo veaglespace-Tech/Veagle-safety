@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Shield, Zap, ArrowRight, PhoneCall,
+  Zap, ArrowRight, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
   LogOut, Menu, X, Crown, Home
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
 import { MagneticButton } from '../ui/MagneticButton.js';
+import { Logo3DFlip } from '../ui/Logo3DFlip.js';
 
 export const PublicNavbar = () => {
   const pathname = usePathname();
@@ -72,17 +73,10 @@ export const PublicNavbar = () => {
           gap: '12px',
         }}>
 
-          {/* BRAND LOGO WITH MAGNETIC EFFECT */}
+          {/* BRAND LOGO WITH 3D ROTATING COIN FLIP (FRONT & BACK LOGOS) */}
           <MagneticButton pullStrength={0.15}>
             <Link href="/" className="group flex items-center gap-2.5 no-underline shrink-0 whitespace-nowrap">
-              <div style={{
-                width: '38px', height: '38px', borderRadius: '12px',
-                background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(255,92,138,0.35)', flexShrink: 0,
-              }} className="group-hover:rotate-6 transition-transform duration-300">
-                <Shield size={19} color="#fff" />
-              </div>
+              <Logo3DFlip size={40} />
               <div style={{ lineHeight: 1.15 }}>
                 <div style={{ fontWeight: 900, fontSize: '15px', color: '#2A0826', letterSpacing: '-0.01em' }}>
                   Sakhi Suraksha SOS
@@ -140,7 +134,7 @@ export const PublicNavbar = () => {
                   </Link>
                 </MagneticButton>
 
-                {/* ULTRA-MODERN SIGN UP BUTTON (EXACT TWIN STYLE AS SIGN IN) */}
+                {/* ULTRA-MODERN SIGN UP BUTTON */}
                 <MagneticButton pullStrength={0.4}>
                   <Link 
                     href="/auth?mode=register" 
