@@ -288,15 +288,17 @@ export default function ContactSupportPage() {
                   </div>
                 </div>
 
-                <MagneticButton pullStrength={0.3}>
-                  <button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white py-4 rounded-full text-xs font-black uppercase tracking-wider shadow-[0_8px_25px_rgba(255,92,138,0.40)] hover:shadow-[0_12px_32px_rgba(255,42,109,0.60)] transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
-                  >
-                    <span>SEND INQUIRY TO SAFETY HQ</span>
-                    <Send className="w-4 h-4" />
-                  </button>
-                </MagneticButton>
+                <div className="flex justify-center pt-2">
+                  <MagneticButton pullStrength={0.3}>
+                    <button
+                      type="submit"
+                      className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider shadow-[0_8px_25px_rgba(255,92,138,0.40)] hover:shadow-[0_12px_32px_rgba(255,42,109,0.60)] transition-all flex items-center justify-center space-x-3 cursor-pointer active:scale-95 whitespace-nowrap"
+                    >
+                      <span>SEND INQUIRY TO SAFETY HQ</span>
+                      <Send className="w-4 h-4 shrink-0" />
+                    </button>
+                  </MagneticButton>
+                </div>
 
               </form>
             )}
