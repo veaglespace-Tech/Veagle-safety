@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   Shield, Zap, ArrowRight, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
-  LayoutDashboard, LogOut, Menu, X, Crown, Home, MapPin, Users, User
+  LayoutDashboard, LogOut, Menu, X, Crown, Home
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -38,27 +38,18 @@ export const PublicNavbar = () => {
   const isActive = (path) => pathname === path;
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
+  // Clean Navigation Links (NO repeated app tabs!)
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
-  ];
-
-  if (mounted && token) {
-    navLinks.push({ 
-      href: isSuperAdmin ? '/admin' : '/dashboard', 
-      label: isSuperAdmin ? 'Admin Panel' : 'Dashboard', 
-      icon: isSuperAdmin ? Crown : LayoutDashboard 
-    });
-    navLinks.push({ href: '/track-journey', label: 'Track Journey', icon: MapPin });
-    navLinks.push({ href: '/contacts', label: 'Contacts', icon: Users });
-    navLinks.push({ href: '/profile', label: 'Profile', icon: User });
-  }
-
-  navLinks.push(
     { href: '/pricing', label: 'Pricing', icon: Zap },
     { href: '/about', label: 'About', icon: Info },
     { href: '/gallery', label: 'Gallery', icon: ImageIcon },
-    { href: '/contact', label: 'Contact', icon: PhoneCall }
-  );
+    { href: '/contact', label: 'Contact', icon: PhoneCall },
+  ];
+
+  if (mounted && token && isSuperAdmin) {
+    navLinks.splice(1, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
+  }
 
   const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
 

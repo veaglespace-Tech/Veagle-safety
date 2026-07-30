@@ -5,13 +5,11 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Shield, Crown, Home, Zap, Info, Image as ImageIcon,
-  PhoneCall, LayoutDashboard, LogOut, Menu, X, UserCheck,
-  MapPin, Users, User
+  PhoneCall, LogOut, Menu, X, UserCheck
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
 import { useLocationStore } from '../../redux/useLocationStore.js';
-import { useSOSStore } from '../../redux/useSOSStore.js';
 
 export const Header = () => {
   const pathname = usePathname();
@@ -19,7 +17,6 @@ export const Header = () => {
   const dispatch = useDispatch();
   const { token, user } = useSelector((state) => state?.auth || {});
   const { status } = useLocationStore();
-  const { activeSession } = useSOSStore();
 
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -34,32 +31,20 @@ export const Header = () => {
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
-  // Navigation Links for Collapsed Menu Dropdown
+  // Clean Navigation Links for the Menu Toggle Dropdown (NO repeated app tabs!)
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
-  ];
-
-  if (mounted && token) {
-    navLinks.push({
-      href: isSuperAdmin ? '/admin' : '/dashboard',
-      label: isSuperAdmin ? 'Admin Panel' : 'Dashboard',
-      icon: isSuperAdmin ? Crown : LayoutDashboard,
-    });
-    navLinks.push({ href: '/track-journey', label: 'Track Journey', icon: MapPin });
-    navLinks.push({ href: '/contacts', label: 'Contacts', icon: Users });
-    navLinks.push({ href: '/profile', label: 'Profile', icon: User });
-  }
-
-  navLinks.push(
     { href: '/pricing', label: 'Pricing', icon: Zap },
     { href: '/about', label: 'About', icon: Info },
     { href: '/gallery', label: 'Gallery', icon: ImageIcon },
-    { href: '/contact', label: 'Contact', icon: PhoneCall }
-  );
+    { href: '/contact', label: 'Contact', icon: PhoneCall },
+  ];
+
+  if (mounted && token && isSuperAdmin) {
+    navLinks.splice(1, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
+  }
 
   const isActive = (path) => pathname === path;
-
-  // Check if logged in
   const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
 
   return (
@@ -140,7 +125,7 @@ export const Header = () => {
           {/* RIGHT SIDE USER ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* LOGGED IN: ONLY SHOW LOGOUT BUTTON */}
+            {/* LOGGED IN: SHOW LOGOUT BUTTON */}
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
@@ -185,7 +170,7 @@ export const Header = () => {
               </Link>
             )}
 
-            {/* MENU TOGGLE BUTTON (OPENS ALL TABS DROPDOWN) */}
+            {/* MENU TOGGLE BUTTON (OPENS COLLAPSED DROPDOWN) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
@@ -202,7 +187,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* COLLAPSED MENU DROPDOWN CONTAINING ALL NAVIGATION TABS */}
+        {/* COLLAPSED MENU DROPDOWN */}
         {mobileMenuOpen && (
           <div 
             style={{
