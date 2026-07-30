@@ -5,10 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { fetchPlans } from '../../redux/slices/planSlice.js';
 import { fetchUser } from '../../redux/slices/authSlice.js';
-import { Shield, Check, ArrowRight, Zap, Award, Lock, ShieldCheck, CreditCard, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Shield, Check, ArrowRight, Zap, Award, Lock, ShieldCheck, CreditCard, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AnimatedHeading } from '../../components/common/AnimatedHeading.jsx';
 import { apiClient } from '../../redux/api/apiClient.js';
+import { MagneticButton } from '../../components/ui/MagneticButton.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,8 +29,8 @@ export default function PlatformPricingPage() {
 
   const yearlyPlan = plans[0] || {
     id: 'plan_yearly_24',
-    name: 'Sakhi Suraksha 365 Yearly Protection Plan',
-    description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
+    name: 'Sakhi Suraksha 365 Protection Plan',
+    description: 'Complete 365-Day Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and 24/7 HQ Command Dispatch',
     basePrice: 24,
     gstPercentage: 18,
     totalPrice: 28.32,
@@ -79,40 +80,44 @@ export default function PlatformPricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden">
       <PublicNavbar />
 
       {/* BACKGROUND AMBIENT GLOW MESHES */}
-      <div className="absolute w-[750px] h-[750px] rounded-full bg-rose/15 blur-[160px] top-[-120px] left-[-220px] pointer-events-none" />
-      <div className="absolute w-[750px] h-[750px] rounded-full bg-gold/15 blur-[160px] bottom-[80px] right-[-220px] pointer-events-none" />
+      <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF5C8A]/12 blur-[170px] top-[-140px] left-[-240px] pointer-events-none" />
+      <div className="absolute w-[750px] h-[750px] rounded-full bg-[#FFCCE1]/25 blur-[160px] bottom-[60px] right-[-220px] pointer-events-none" />
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16 relative z-10">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-14 relative z-10">
         
-        {/* TOP HEADER */}
+        {/* TOP HERO HEADER */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center space-x-2 bg-white text-rose border border-rose/30 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-sm">
-            <Zap className="w-4 h-4 text-rose animate-pulse" />
-            <span className="text-shimmer-animated">SINGLE UNIFIED YEARLY PROTECTION PLAN</span>
+          <div className="inline-flex items-center space-x-2 bg-white/90 text-[#FF5C8A] border-1.5 border-[#FFCCE1] px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-sm backdrop-blur-md">
+            <Zap className="w-4 h-4 text-[#FF5C8A] animate-pulse" />
+            <span className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] bg-clip-text text-transparent">
+              SINGLE UNIFIED YEARLY PROTECTION PLAN
+            </span>
           </div>
-          <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight">
+
+          <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
             <span className="heading-gradient-hero">Complete </span>
             <span className="heading-highlight-pill">365-Day Safety Protection</span>
           </AnimatedHeading>
-          <p className="text-tichi-muted text-base sm:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
+
+          <p className="text-[#684E67] text-base sm:text-lg font-bold max-w-2xl mx-auto leading-relaxed">
             Just ₹24 per year (only ₹2/month). Complete your plan formalities to unlock 24/7 Live Emergency SOS, 5 Trusted Contacts, and Encrypted GPS Sharing for a full year.
           </p>
         </div>
 
         {/* NOTIFICATIONS */}
         {paymentSuccessMsg && (
-          <div className="max-w-xl mx-auto bg-tichi-success/15 border-2 border-tichi-success text-tichi-success p-4 rounded-2xl text-xs font-black flex items-center justify-center space-x-2 shadow-lg animate-fade-up">
+          <div className="max-w-xl mx-auto bg-[#FFF0F3] border-2 border-[#059669] text-[#059669] p-4 rounded-2xl text-xs font-black flex items-center justify-center space-x-2 shadow-lg animate-fade-up">
             <CheckCircle2 className="w-5 h-5 shrink-0" />
             <span>{paymentSuccessMsg}</span>
           </div>
         )}
 
         {paymentError && (
-          <div className="max-w-xl mx-auto bg-rose/15 border-2 border-rose text-rose p-4 rounded-2xl text-xs font-black flex items-center justify-center space-x-2 shadow-lg animate-fade-up">
+          <div className="max-w-xl mx-auto bg-[#FFF0F3] border-2 border-[#FF2A6D] text-[#FF2A6D] p-4 rounded-2xl text-xs font-black flex items-center justify-center space-x-2 shadow-lg animate-fade-up">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span>{paymentError}</span>
           </div>
@@ -120,95 +125,102 @@ export default function PlatformPricingPage() {
 
         {/* SINGLE YEARLY PLAN CARD */}
         <div className="max-w-3xl mx-auto">
-          <div className="card-antique-pink p-8 sm:p-12 border-2 border-rose shadow-coral-glow space-y-8 relative overflow-hidden">
+          <div className="bg-white/95 backdrop-blur-xl p-8 sm:p-12 rounded-3xl border-1.5 border-[#FFCCE1] shadow-[0_12px_40px_rgba(255,92,138,0.14)] space-y-8 relative overflow-hidden">
             
+            {/* ACCENT GLOW STRIP */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
+
             {/* YEARLY BADGE */}
-            <div className="absolute top-0 right-0 bg-gradient-to-r from-rose via-rose-light to-rose text-white text-xs font-black px-6 py-2 rounded-bl-2xl uppercase tracking-widest shadow-md flex items-center space-x-1.5">
+            <div className="absolute top-0 right-0 bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-[11px] font-black px-5 py-2 rounded-bl-2xl uppercase tracking-widest shadow-md flex items-center space-x-1.5">
               <Award className="w-4 h-4" />
-              <span>365 DAYS UNLIMITED</span>
+              <span>365 DAYS COVERAGE</span>
             </div>
 
             {/* HEADER */}
             <div className="space-y-3 pt-2">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 rounded-2xl bg-rose/15 text-rose border-2 border-rose/30 flex items-center justify-center shadow-sm">
-                  <Shield className="w-9 h-9 text-rose" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] border-1.5 border-[#FF5C8A] flex items-center justify-center shadow-md">
+                  <Shield className="w-9 h-9 text-[#FF2A6D]" />
                 </div>
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-black text-tichi-text">{yearlyPlan.name}</h2>
-                  <p className="text-xs text-tichi-muted font-black uppercase tracking-wider mt-0.5">1 Full Year (365 Days) Coverage</p>
+                  <h2 className="text-2xl sm:text-3xl font-black text-[#2A0826]">{yearlyPlan.name}</h2>
+                  <p className="text-xs text-[#684E67] font-black uppercase tracking-wider mt-0.5">1 Full Year (365 Days) Unlimited Safety</p>
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm text-tichi-muted font-semibold leading-relaxed pt-2">
+              <p className="text-xs sm:text-sm text-[#684E67] font-bold leading-relaxed pt-2">
                 {yearlyPlan.description}
               </p>
             </div>
 
             {/* PRICING BREAKDOWN */}
-            <div className="bg-blush-subtle p-6 rounded-2xl border border-[#FFCCE1] space-y-3">
+            <div className="bg-[#FFF0F3]/80 p-6 rounded-2xl border-1.5 border-[#FFCCE1] space-y-3.5">
               <div className="flex items-baseline space-x-3">
-                <span className="text-5xl sm:text-6xl font-black text-tichi-text">₹{yearlyPlan.basePrice}</span>
-                <span className="text-sm sm:text-base text-tichi-muted font-bold">/ Year (Just ₹2 / Month)</span>
+                <span className="text-5xl sm:text-6xl font-black bg-gradient-to-r from-[#2A0826] via-[#FF2A6D] to-[#FF5C8A] bg-clip-text text-transparent">₹{yearlyPlan.basePrice}</span>
+                <span className="text-sm sm:text-base text-[#684E67] font-extrabold">/ Year (Just ₹2 / Month)</span>
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-tichi-muted font-mono font-bold border-t border-[#FFCCE1] pt-3 gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-[#684E67] font-mono font-bold border-t-1.5 border-[#FFCCE1] pt-3.5 gap-2">
                 <span>Base Yearly Fee: ₹{yearlyPlan.basePrice}</span>
                 <span>GST (18%): ₹{(yearlyPlan.basePrice * 0.18).toFixed(2)}</span>
-                <span className="font-extrabold text-rose text-sm">Total: ₹{yearlyPlan.totalPrice} / Year</span>
+                <span className="font-black text-[#FF2A6D] text-sm">Total: ₹{yearlyPlan.totalPrice} / Year</span>
               </div>
             </div>
 
             {/* FULL FEATURE CHECKLIST */}
             <div className="space-y-4">
-              <h3 className="text-xs font-black text-rose uppercase tracking-wider">Included 6 Safety Modules</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs text-tichi-text font-bold">
-                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-xl border border-[#FFCCE1] shadow-sm">
-                  <Check className="w-4 h-4 text-rose shrink-0" />
+              <h3 className="text-xs font-black text-[#FF2A6D] uppercase tracking-wider">Included 6 Core Safety Modules</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs text-[#2A0826] font-bold">
+                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-2xl border-1.5 border-[#FFCCE1] shadow-sm">
+                  <Check className="w-4 h-4 text-[#FF5C8A] shrink-0" />
                   <span>3-Second Hold Emergency SOS Trigger</span>
                 </div>
-                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-xl border border-[#FFCCE1] shadow-sm">
-                  <Check className="w-4 h-4 text-rose shrink-0" />
+                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-2xl border-1.5 border-[#FFCCE1] shadow-sm">
+                  <Check className="w-4 h-4 text-[#FF5C8A] shrink-0" />
                   <span>5 Trusted Emergency Contacts Network</span>
                 </div>
-                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-xl border border-[#FFCCE1] shadow-sm">
-                  <Check className="w-4 h-4 text-rose shrink-0" />
+                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-2xl border-1.5 border-[#FFCCE1] shadow-sm">
+                  <Check className="w-4 h-4 text-[#FF5C8A] shrink-0" />
                   <span>Real-Time Encrypted Live GPS Tracking</span>
                 </div>
-                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-xl border border-[#FFCCE1] shadow-sm">
-                  <Check className="w-4 h-4 text-rose shrink-0" />
+                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-2xl border-1.5 border-[#FFCCE1] shadow-sm">
+                  <Check className="w-4 h-4 text-[#FF5C8A] shrink-0" />
                   <span>Safety Check-in Timer & Escalation</span>
                 </div>
-                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-xl border border-[#FFCCE1] shadow-sm">
-                  <Check className="w-4 h-4 text-rose shrink-0" />
+                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-2xl border-1.5 border-[#FFCCE1] shadow-sm">
+                  <Check className="w-4 h-4 text-[#FF5C8A] shrink-0" />
                   <span>Piercing Loud Siren Panic Alarm</span>
                 </div>
-                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-xl border border-[#FFCCE1] shadow-sm">
-                  <Check className="w-4 h-4 text-rose shrink-0" />
+                <div className="flex items-center space-x-3 bg-white p-3.5 rounded-2xl border-1.5 border-[#FFCCE1] shadow-sm">
+                  <Check className="w-4 h-4 text-[#FF5C8A] shrink-0" />
                   <span>Fake Simulated Emergency Call</span>
                 </div>
               </div>
             </div>
 
-            {/* ACTION BUTTON */}
+            {/* ACTION BUTTON WITH MAGNETIC PHYSICS */}
             <div className="space-y-3 pt-2">
-              <button
-                onClick={handleSelectPlan}
-                disabled={isProcessing}
-                className="w-full btn-baby-pink py-4 text-xs sm:text-sm uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2"
-              >
-                <span>
-                  {isProcessing
-                    ? 'PROCESSING PAYMENT & ACTIVATING PLAN...'
-                    : token
-                    ? 'PURCHASE YEARLY PROTECTION & ACTIVATE (₹28.32)'
-                    : 'REGISTER & COMPLETE PLAN FORMALITIES'}
-                </span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
+              <div className="flex justify-center">
+                <MagneticButton pullStrength={0.35}>
+                  <button
+                    onClick={handleSelectPlan}
+                    disabled={isProcessing}
+                    className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider shadow-[0_8px_25px_rgba(255,92,138,0.40)] hover:shadow-[0_12px_32px_rgba(255,42,109,0.60)] transition-all flex items-center justify-center space-x-3 cursor-pointer active:scale-95 whitespace-nowrap"
+                  >
+                    <span>
+                      {isProcessing
+                        ? 'PROCESSING PAYMENT & ACTIVATING PLAN...'
+                        : token
+                        ? 'PURCHASE YEARLY PROTECTION & ACTIVATE (₹28.32)'
+                        : 'REGISTER & COMPLETE PLAN FORMALITIES'}
+                    </span>
+                    <ArrowRight className="w-4 h-4 shrink-0" />
+                  </button>
+                </MagneticButton>
+              </div>
 
-              <div className="flex items-center justify-center space-x-2 text-[11px] text-tichi-muted font-extrabold">
-                <Lock className="w-3.5 h-3.5 text-tichi-success" />
+              <div className="flex items-center justify-center space-x-2 text-[11px] text-[#684E67] font-extrabold pt-1">
+                <Lock className="w-3.5 h-3.5 text-[#059669]" />
                 <span>256-Bit SSL Encrypted Payment via PayU Gateway</span>
               </div>
             </div>
@@ -218,22 +230,22 @@ export default function PlatformPricingPage() {
 
         {/* TRUST & GUARANTEE CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div className="card-antique-pink p-6 space-y-2 text-center">
-            <ShieldCheck className="w-8 h-8 text-rose mx-auto" />
-            <h4 className="font-black text-sm text-tichi-text">Instant Activation</h4>
-            <p className="text-xs text-tichi-muted font-semibold">Your protection activates sub-seconds after payment completion.</p>
+          <div className="bg-white/95 backdrop-blur-xl p-6 rounded-3xl space-y-2.5 text-center border-1.5 border-[#FFCCE1] shadow-sm">
+            <ShieldCheck className="w-8 h-8 text-[#FF5C8A] mx-auto" />
+            <h4 className="font-black text-sm text-[#2A0826]">Instant Activation</h4>
+            <p className="text-xs text-[#684E67] font-bold leading-relaxed">Your protection activates sub-seconds after payment completion.</p>
           </div>
 
-          <div className="card-antique-pink p-6 space-y-2 text-center">
-            <Lock className="w-8 h-8 text-gold-dark mx-auto" />
-            <h4 className="font-black text-sm text-tichi-text">Encrypted Location Data</h4>
-            <p className="text-xs text-tichi-muted font-semibold">Zero data trading. Shared strictly during active emergencies.</p>
+          <div className="bg-white/95 backdrop-blur-xl p-6 rounded-3xl space-y-2.5 text-center border-1.5 border-[#FFCCE1] shadow-sm">
+            <Lock className="w-8 h-8 text-[#FF5C8A] mx-auto" />
+            <h4 className="font-black text-sm text-[#2A0826]">Encrypted Location Data</h4>
+            <p className="text-xs text-[#684E67] font-bold leading-relaxed">Zero data trading. Shared strictly during active emergencies.</p>
           </div>
 
-          <div className="card-antique-pink p-6 space-y-2 text-center">
-            <Award className="w-8 h-8 text-rose mx-auto" />
-            <h4 className="font-black text-sm text-tichi-text">365-Day Guarantee</h4>
-            <p className="text-xs text-tichi-muted font-semibold">Full 1-year coverage with 24/7 HQ command backup.</p>
+          <div className="bg-white/95 backdrop-blur-xl p-6 rounded-3xl space-y-2.5 text-center border-1.5 border-[#FFCCE1] shadow-sm">
+            <Award className="w-8 h-8 text-[#FF5C8A] mx-auto" />
+            <h4 className="font-black text-sm text-[#2A0826]">365-Day Guarantee</h4>
+            <p className="text-xs text-[#684E67] font-bold leading-relaxed">Full 1-year coverage with 24/7 HQ command backup.</p>
           </div>
         </div>
 
