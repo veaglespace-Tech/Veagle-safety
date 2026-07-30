@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Shield, Bell, Crown, Home, Zap, Info, Image as ImageIcon,
-  PhoneCall, LayoutDashboard, LogOut, Menu, X, CheckCircle2, UserCheck
+  PhoneCall, LayoutDashboard, LogOut, Menu, X, UserCheck, ArrowRight
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -35,7 +35,7 @@ export const Header = () => {
 
   const initials = user?.fullName
     ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
-    : 'PS';
+    : 'SS';
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
@@ -58,8 +58,8 @@ export const Header = () => {
         style={{
           position: 'sticky',
           top: 0,
-          zIndex: 40,
-          background: 'rgba(255, 255, 255, 0.96)',
+          zIndex: 80,
+          background: 'rgba(255, 255, 255, 0.98)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1.5px solid #FFCCE1',
@@ -78,17 +78,28 @@ export const Header = () => {
           gap: '12px',
         }}>
 
-          {/* BRAND LOGO + STATUS */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+          {/* BRAND LOGO + TITLE + STATUS (NOWRAP) */}
+          <Link 
+            href="/" 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '10px', 
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
             <div style={{
-              width: '40px', height: '40px', borderRadius: '13px',
+              width: '38px', height: '38px', borderRadius: '12px',
               background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 12px rgba(255, 92, 138, 0.35)',
+              flexShrink: 0,
             }}>
-              <Shield size={20} color="#FFFFFF" />
+              <Shield size={19} color="#FFFFFF" />
             </div>
-            <div>
+            <div style={{ lineHeight: 1.15 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ fontWeight: 900, fontSize: '15px', color: '#2A0826', letterSpacing: '-0.01em' }}>
                   Sakhi Suraksha SOS
@@ -96,34 +107,35 @@ export const Header = () => {
                 {isSuperAdmin && (
                   <span style={{
                     background: '#E6A100', color: '#FFFFFF',
-                    fontWeight: 900, fontSize: '9px', padding: '2px 6px',
-                    borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.05em'
+                    fontWeight: 900, fontSize: '9px', padding: '1px 5px',
+                    borderRadius: '5px', textTransform: 'uppercase', letterSpacing: '0.05em'
                   }}>
                     ADMIN
                   </span>
                 )}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '1px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
                 <span style={{
                   width: '6px', height: '6px', borderRadius: '50%',
                   background: status === 'LIVE' ? '#059669' : '#F59E0B',
                   boxShadow: status === 'LIVE' ? '0 0 6px #059669' : 'none'
                 }} />
                 <span style={{ fontSize: '10px', color: '#684E67', fontWeight: 800 }}>
-                  {status === 'LIVE' ? 'Protected · GPS Active' : 'GPS Syncing'}
+                  {status === 'LIVE' ? 'Protected · GPS Active' : 'GPS Active'}
                 </span>
               </div>
             </div>
           </Link>
 
-          {/* CENTER DESKTOP NAVIGATION TABS (Visible on Medium/Desktop Screens) */}
+          {/* CENTER DESKTOP NAVIGATION TABS (Visible ONLY on Desktop >= 1024px) */}
           <nav 
             style={{
-              display: 'flex', alignItems: 'center', gap: '4px',
+              display: 'flex', alignItems: 'center', gap: '3px',
               background: '#FFF0F3', borderRadius: '16px',
               border: '1px solid #FFCCE1', padding: '4px',
+              flexShrink: 0,
             }}
-            className="hidden md:flex"
+            className="hidden lg:flex"
           >
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link
@@ -131,13 +143,14 @@ export const Header = () => {
                 href={href}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '5px',
-                  padding: '6px 12px', borderRadius: '10px',
+                  padding: '6px 13px', borderRadius: '11px',
                   fontSize: '12px', fontWeight: 800,
                   textDecoration: 'none',
                   transition: 'all 0.2s ease',
                   background: isActive(href) ? 'linear-gradient(135deg, #FF5C8A, #FF2A6D)' : 'transparent',
                   color: isActive(href) ? '#FFFFFF' : '#684E67',
                   boxShadow: isActive(href) ? '0 3px 10px rgba(255,92,138,0.3)' : 'none',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 <Icon size={13} />
@@ -147,27 +160,27 @@ export const Header = () => {
           </nav>
 
           {/* RIGHT SIDE USER ACTION CONTROLS */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* SOS Active Live Badge */}
-            {activeSession && (
+            {/* Logged-in Quick Dashboard / Admin HQ Button */}
+            {mounted && token && (
               <Link
-                href="/active-sos"
+                href={isSuperAdmin ? '/admin' : '/dashboard'}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '6px',
-                  background: 'linear-gradient(135deg, #FF0043, #FF2A6D)',
-                  color: '#FFFFFF', fontSize: '10px', fontWeight: 900,
-                  padding: '6px 12px', borderRadius: '999px',
-                  textDecoration: 'none', boxShadow: '0 0 16px rgba(255,0,67,0.4)',
-                  animation: 'pulse 1.5s infinite',
+                  background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+                  color: '#FFFFFF', fontSize: '11px', fontWeight: 900,
+                  padding: '7px 14px', borderRadius: '12px',
+                  textDecoration: 'none', boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FFF' }} />
-                <span>SOS LIVE</span>
+                {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
+                <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
               </Link>
             )}
 
-            {/* Emergency Alarm Quick Button */}
+            {/* Emergency Alarm Quick Siren Button */}
             <Link
               href="/alarm"
               style={{
@@ -176,25 +189,27 @@ export const Header = () => {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: '#FF2A6D', textDecoration: 'none',
                 transition: 'all 0.2s ease',
+                flexShrink: 0,
               }}
-              title="Trigger Emergency Alarm Siren"
+              title="Emergency Siren Alarm"
             >
               <Bell size={18} />
             </Link>
 
-            {/* User Profile Avatar Pill */}
+            {/* User Profile Avatar */}
             {mounted && user && (
               <Link
                 href="/profile"
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '8px',
-                  padding: '3px 10px 3px 4px', borderRadius: '999px',
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '3px 8px 3px 4px', borderRadius: '999px',
                   background: '#FFF0F3', border: '1.5px solid #FFCCE1',
                   textDecoration: 'none', transition: 'all 0.2s ease',
+                  flexShrink: 0,
                 }}
               >
                 <div style={{
-                  width: '32px', height: '32px', borderRadius: '50%',
+                  width: '30px', height: '30px', borderRadius: '50%',
                   background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
                   color: '#FFFFFF', display: 'flex', alignItems: 'center',
                   justifyContent: 'center', fontWeight: 900, fontSize: '11px',
@@ -202,18 +217,10 @@ export const Header = () => {
                 }}>
                   {initials}
                 </div>
-                <div className="hidden sm:block" style={{ lineHeight: 1.1, textAlign: 'left' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 900, color: '#2A0826' }}>
-                    {user?.fullName?.split(' ')[0] || 'User'}
-                  </div>
-                  <div style={{ fontSize: '9px', fontWeight: 700, color: '#FF5C8A' }}>
-                    {isSuperAdmin ? 'Super Admin' : 'Protected User'}
-                  </div>
-                </div>
               </Link>
             )}
 
-            {/* Logout Button */}
+            {/* Logout Button (Desktop only) */}
             {mounted && token && (
               <button
                 onClick={handleLogout}
@@ -224,14 +231,14 @@ export const Header = () => {
                   cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px',
                   whiteSpace: 'nowrap', transition: 'all 0.2s',
                 }}
-                className="hidden sm:flex"
+                className="hidden lg:flex"
               >
                 <LogOut size={13} />
                 <span>Logout</span>
               </button>
             )}
 
-            {/* Mobile Hamburger Menu Toggle */}
+            {/* Mobile / Tablet Hamburger Menu Toggle (< 1024px) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
@@ -239,8 +246,9 @@ export const Header = () => {
                 background: '#FFF0F3', border: '1px solid #FFCCE1',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: '#FF5C8A', cursor: 'pointer',
+                flexShrink: 0,
               }}
-              className="md:hidden"
+              className="lg:hidden"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -248,15 +256,16 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* MOBILE DROPDOWN MENU */}
+        {/* MOBILE & TABLET DROPDOWN MENU */}
         {mobileMenuOpen && (
           <div 
             style={{
-              borderTop: '1px solid #FFCCE1',
+              borderTop: '1.5px solid #FFCCE1',
               background: 'rgba(255, 255, 255, 0.99)',
               padding: '12px 16px 16px',
+              boxShadow: '0 10px 25px rgba(255, 92, 138, 0.12)',
             }} 
-            className="md:hidden"
+            className="lg:hidden"
           >
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link
