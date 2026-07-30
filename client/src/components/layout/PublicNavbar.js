@@ -123,24 +123,24 @@ export const PublicNavbar = () => {
                   className="group hidden md:flex items-center gap-2 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-5 py-2.5 rounded-full cursor-pointer hover:bg-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#FF2A6D]/30 active:scale-95"
                   title="Sign Out"
                 >
-                  <LogOut size={15} className="group-hover:-translate-x-0.5 transition-transform duration-300" />
                   <span className="tracking-wide">Sign Out</span>
+                  <LogOut size={15} className="group-hover:translate-x-0.5 transition-transform duration-300" />
                 </button>
               </MagneticButton>
             ) : (
               <div className="hidden md:flex items-center gap-2.5">
-                {/* SIGN IN BUTTON MATCHING SIGN UP STYLE */}
+                {/* SIGN IN BUTTON (TEXT LEFT, ICON RIGHT) */}
                 <MagneticButton pullStrength={0.35}>
                   <Link 
                     href="/auth?mode=login" 
                     className="group flex items-center gap-2 bg-white/95 border-1.5 border-[#FFCCE1] text-[#2A0826] text-xs font-black px-5 py-2.5 rounded-full hover:bg-[#FFF0F3] hover:text-[#FF5C8A] hover:border-[#FF5C8A] transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-[#FF5C8A]/20 active:scale-95"
                   >
-                    <UserCheck size={15} color="#FF5C8A" className="group-hover:scale-110 transition-transform duration-300" />
                     <span className="tracking-wide">Sign In</span>
+                    <UserCheck size={15} color="#FF5C8A" className="group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" />
                   </Link>
                 </MagneticButton>
 
-                {/* SIGN UP GRADIENT BUTTON */}
+                {/* SIGN UP GRADIENT BUTTON (TEXT LEFT, ICON RIGHT) */}
                 <MagneticButton pullStrength={0.4}>
                   <Link 
                     href="/auth?mode=register" 
