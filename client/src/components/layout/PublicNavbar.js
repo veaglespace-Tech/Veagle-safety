@@ -120,40 +120,44 @@ export const PublicNavbar = () => {
               <MagneticButton pullStrength={0.3}>
                 <button
                   onClick={handleLogout}
-                  className="hidden md:flex items-center gap-2 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-4.5 py-2.5 rounded-2xl cursor-pointer hover:bg-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#FF2A6D]/30 group"
+                  className="group hidden md:flex items-center gap-2.5 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-extrabold px-4.5 py-2.5 rounded-2xl cursor-pointer hover:bg-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_14px_rgba(255,92,138,0.12)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.35)] active:scale-95"
                   title="Sign Out"
                 >
-                  <LogOut size={14} className="group-hover:-translate-x-0.5 transition-transform" />
-                  <span>Sign Out</span>
+                  <div className="w-6 h-6 rounded-lg bg-white border border-[#FFCCE1] flex items-center justify-center text-[#FF2A6D] group-hover:bg-white/20 group-hover:text-white group-hover:border-transparent group-hover:-translate-x-0.5 transition-all duration-300">
+                    <LogOut size={13} />
+                  </div>
+                  <span className="tracking-wide">Sign Out</span>
                 </button>
               </MagneticButton>
             ) : (
               <div className="hidden md:flex items-center gap-2.5">
-                {/* MAGNETIC SIGN IN BUTTON */}
+                {/* ULTRA-MODERN MAGNETIC SIGN IN BUTTON */}
                 <MagneticButton pullStrength={0.35}>
                   <Link 
                     href="/auth?mode=login" 
-                    className="flex items-center gap-2 bg-white border-1.5 border-[#FFCCE1] text-[#2A0826] text-xs font-black px-4.5 py-2.5 rounded-2xl hover:bg-[#FFF0F3] hover:text-[#FF5C8A] hover:border-[#FF5C8A] transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-[#FF5C8A]/20"
+                    className="group flex items-center gap-2.5 bg-white/95 backdrop-blur-md border-1.5 border-[#FFCCE1] text-[#2A0826] text-xs font-extrabold px-4.5 py-2.5 rounded-2xl hover:bg-gradient-to-r hover:from-[#FFF0F3] hover:to-white hover:text-[#FF2A6D] hover:border-[#FF5C8A] transition-all duration-300 shadow-[0_4px_14px_rgba(255,92,138,0.12)] hover:shadow-[0_8px_25px_rgba(255,92,138,0.30)] active:scale-95"
                   >
-                    <UserCheck size={14} color="#FF5C8A" />
-                    <span>Sign In</span>
+                    <div className="w-6 h-6 rounded-lg bg-[#FFF0F3] border border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] group-hover:bg-[#FF5C8A] group-hover:text-white group-hover:border-transparent group-hover:scale-110 transition-all duration-300">
+                      <UserCheck size={13} />
+                    </div>
+                    <span className="tracking-wide">Sign In</span>
                   </Link>
                 </MagneticButton>
 
-                {/* MAGNETIC SIGN UP BUTTON */}
+                {/* ULTRA-MODERN MAGNETIC SIGN UP BUTTON */}
                 <MagneticButton pullStrength={0.4}>
                   <Link 
                     href="/auth?mode=register" 
-                    className="flex items-center gap-2 bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-xs font-black px-5 py-2.5 rounded-2xl shadow-md shadow-[#FF5C8A]/30 hover:shadow-xl hover:shadow-[#FF5C8A]/50 transition-all duration-300 group"
+                    className="group flex items-center gap-2 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black px-5 py-2.5 rounded-2xl shadow-[0_6px_20px_rgba(255,92,138,0.40)] hover:shadow-[0_10px_32px_rgba(255,42,109,0.60)] border border-white/40 hover:border-white/80 transition-all duration-300 active:scale-95"
                   >
-                    <span>Sign Up</span>
-                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    <span className="tracking-wider uppercase text-[11px]">Sign Up</span>
+                    <ArrowRight size={14} className="group-hover:translate-x-1.5 transition-transform duration-300" />
                   </Link>
                 </MagneticButton>
               </div>
             )}
 
-            {/* MOBILE MENU TOGGLE BUTTON (HIDDEN ON DESKTOP STRICTLY VIA md:hidden) */}
+            {/* MOBILE MENU TOGGLE BUTTON */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden w-10 h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm"
