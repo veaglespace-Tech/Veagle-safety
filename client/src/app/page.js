@@ -168,9 +168,6 @@ export default function LandingPage() {
             <Logo3DFlip size={36} />
             <span className="text-lg font-black text-[#2A0826] tracking-tight">Sakhi Suraksha SOS</span>
           </div>
-          <p className="text-xs text-[#684E67] font-bold max-w-md mx-auto leading-relaxed">
-            Empowering women & girls with 24/7 encrypted emergency safety network across India.
-          </p>
           <div className="text-xs text-[#684E67] font-extrabold pt-2">
             Designed & Developed by Veagle Space Technology Pvt. Ltd. | © 2026 All Rights Reserved.
           </div>
