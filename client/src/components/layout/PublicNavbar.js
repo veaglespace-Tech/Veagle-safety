@@ -65,6 +65,8 @@ export const PublicNavbar = () => {
     { href: '/contact', label: 'Contact', icon: PhoneCall }
   );
 
+  const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
+
   return (
     <>
       <header style={{
@@ -109,7 +111,7 @@ export const PublicNavbar = () => {
 
           {/* RIGHT SIDE ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            {mounted && token ? (
+            {isLoggedIn ? (
               <>
                 {/* Dashboard / Admin Panel Button */}
                 <Link href={isSuperAdmin ? '/admin' : '/dashboard'} style={{
@@ -175,25 +177,35 @@ export const PublicNavbar = () => {
                   </Link>
                 )}
 
-                {/* Logout Toggle Button */}
+                {/* PROMINENT LOGOUT TOGGLE BUTTON */}
                 <button
                   onClick={handleLogout}
                   style={{
-                    width: '36px', height: '36px', borderRadius: '12px',
-                    background: '#FFF0F3', border: '1px solid #FFCCE1',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#FF2A6D', cursor: 'pointer',
+                    background: '#FFF0F3',
+                    border: '1.5px solid #FFCCE1',
+                    color: '#FF2A6D',
+                    fontSize: '11px',
+                    fontWeight: 900,
+                    padding: '7px 12px',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    whiteSpace: 'nowrap',
                     transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 8px rgba(255,92,138,0.12)',
                     flexShrink: 0,
                   }}
-                  title="Sign Out"
-                  aria-label="Sign Out"
+                  title="Logout / Sign Out"
+                  aria-label="Logout"
                 >
-                  <LogOut size={16} color="#FF2A6D" />
+                  <LogOut size={14} color="#FF2A6D" />
+                  <span className="hidden sm:inline">Logout</span>
                 </button>
               </>
             ) : (
-              /* NON LOGGED IN VISITOR */
+              /* NON LOGGED IN VISITOR ONLY */
               <>
                 <Link href="/auth?mode=login" style={{
                   display: 'flex', alignItems: 'center', gap: '5px',
@@ -260,7 +272,7 @@ export const PublicNavbar = () => {
               </Link>
             ))}
 
-            {mounted && token && (
+            {isLoggedIn && (
               <button
                 onClick={handleLogout}
                 style={{

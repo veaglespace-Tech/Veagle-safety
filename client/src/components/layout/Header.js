@@ -39,7 +39,7 @@ export const Header = () => {
     ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'SS';
 
-  // All Navigation Links for the Collapsed Menu Toggle Dropdown
+  // Navigation Links for Collapsed Menu Dropdown
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
   ];
@@ -63,6 +63,9 @@ export const Header = () => {
   );
 
   const isActive = (path) => pathname === path;
+
+  // Check if logged in (token exists or stored in localStorage)
+  const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
 
   return (
     <>
@@ -139,11 +142,11 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* RIGHT SIDE USER ACTIONS */}
+          {/* RIGHT SIDE ACTION CONTROLS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* LOGGED IN USER ACTIONS (NO Sign In button!) */}
-            {mounted && token ? (
+            {/* LOGGED IN USER ACTIONS (Sign In button is REMOVED!) */}
+            {isLoggedIn ? (
               <>
                 {/* Dashboard / Admin Panel Button */}
                 <Link
@@ -211,25 +214,35 @@ export const Header = () => {
                   </Link>
                 )}
 
-                {/* Logout Toggle Button */}
+                {/* PROMINENT LOGOUT TOGGLE BUTTON (Visible on ALL devices) */}
                 <button
                   onClick={handleLogout}
                   style={{
-                    width: '36px', height: '36px', borderRadius: '12px',
-                    background: '#FFF0F3', border: '1px solid #FFCCE1',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#684E67', cursor: 'pointer',
+                    background: '#FFF0F3',
+                    border: '1.5px solid #FFCCE1',
+                    color: '#FF2A6D',
+                    fontSize: '11px',
+                    fontWeight: 900,
+                    padding: '7px 12px',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    whiteSpace: 'nowrap',
                     transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 8px rgba(255,92,138,0.12)',
                     flexShrink: 0,
                   }}
-                  title="Sign Out"
-                  aria-label="Sign Out"
+                  title="Logout / Sign Out"
+                  aria-label="Logout"
                 >
-                  <LogOut size={16} color="#FF2A6D" />
+                  <LogOut size={14} color="#FF2A6D" />
+                  <span className="hidden sm:inline">Logout</span>
                 </button>
               </>
             ) : (
-              /* NON LOGGED IN VISITOR (Sign In) */
+              /* NON LOGGED IN VISITOR ONLY (Sign In) */
               <Link 
                 href="/auth?mode=login" 
                 style={{
@@ -246,7 +259,7 @@ export const Header = () => {
               </Link>
             )}
 
-            {/* MENU TOGGLE BUTTON (OPENS ALL NAVIGATION TABS DROPDOWN) */}
+            {/* MENU TOGGLE BUTTON (OPENS ALL TABS DROPDOWN) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
@@ -263,7 +276,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* COLLAPSED MENU DROPDOWN CONTAINING ALL NAVIGATION TABS */}
+        {/* COLLAPSED DROPDOWN MENU CONTAINING ALL NAVIGATION TABS */}
         {mobileMenuOpen && (
           <div 
             style={{
@@ -291,7 +304,7 @@ export const Header = () => {
               </Link>
             ))}
 
-            {mounted && token && (
+            {isLoggedIn && (
               <button
                 onClick={handleLogout}
                 style={{
