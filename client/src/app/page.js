@@ -9,7 +9,6 @@ import {
 import { useSelector } from 'react-redux';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
 import { Logo3DFlip } from '../components/ui/Logo3DFlip.js';
-import { HeroBannerCarousel } from '../components/ui/HeroBannerCarousel.js';
 
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
@@ -38,8 +37,8 @@ export default function LandingPage() {
               <Sparkles className="w-4 h-4 text-white animate-pulse" />
               <span>Welcome Back, <strong className="text-[#FFE600] font-black">{user?.fullName || 'Sakhi Member'}</strong>! Active Protection Enabled.</span>
             </div>
-            <Link 
-              href={isSuperAdmin ? '/admin' : '/dashboard'} 
+            <Link
+              href={isSuperAdmin ? '/admin' : '/dashboard'}
               className="inline-flex items-center gap-1.5 bg-white text-[#FF2A6D] px-3.5 py-1 rounded-full text-[11px] font-black text-decoration-none shadow-sm hover:bg-[#FFF0F3] transition-all"
             >
               {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
@@ -50,11 +49,8 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* HERO SECTION WITH AUTO-SCROLLING HERO BANNER CAROUSEL */}
-      <section className="relative z-10 pt-8 sm:pt-12 pb-16 px-4 sm:px-6 lg:px-8 text-center space-y-8">
-
-        {/* HERO BANNER CAROUSEL */}
-        <HeroBannerCarousel />
+      {/* HERO SECTION WITH PERFECT BALANCED TOP OPEN BREATHING SPACE */}
+      <section className="relative z-10 pt-36 sm:pt-48 lg:pt-60 pb-16 px-4 sm:px-6 lg:px-8 text-center space-y-8">
 
         {/* MAIN TITLE */}
         <h1 className="heading-gradient-hero text-4xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-tight max-w-5xl mx-auto">
@@ -89,8 +85,8 @@ export default function LandingPage() {
         <div className="flex flex-wrap justify-center gap-6 pt-3">
           {isLoggedIn ? (
             <>
-              <Link 
-                href={isSuperAdmin ? '/admin' : '/dashboard'} 
+              <Link
+                href={isSuperAdmin ? '/admin' : '/dashboard'}
                 className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
               >
                 {isSuperAdmin ? <Crown size={18} /> : <LayoutDashboard size={18} />}
@@ -98,8 +94,8 @@ export default function LandingPage() {
                 <ArrowRight size={16} />
               </Link>
 
-              <Link 
-                href="/profile" 
+              <Link
+                href="/profile"
                 className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
               >
                 <Shield size={16} className="text-[#FF5C8A]" />
@@ -108,16 +104,16 @@ export default function LandingPage() {
             </>
           ) : (
             <>
-              <Link 
-                href="/auth?mode=register" 
+              <Link
+                href="/auth?mode=register"
                 className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
               >
                 <span>PROTECT YOURSELF NOW</span>
                 <ArrowRight size={16} className="shrink-0" />
               </Link>
 
-              <Link 
-                href="/about" 
+              <Link
+                href="/about"
                 className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
               >
                 <Shield size={16} className="text-[#FF5C8A]" />
