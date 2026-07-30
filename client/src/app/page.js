@@ -9,6 +9,7 @@ import {
 import { useSelector } from 'react-redux';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
 import { Logo3DFlip } from '../components/ui/Logo3DFlip.js';
+import { HeroBannerCarousel } from '../components/ui/HeroBannerCarousel.js';
 
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
@@ -49,8 +50,11 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* HERO SECTION WITH PERFECT BALANCED TOP OPEN BREATHING SPACE */}
-      <section className="relative z-10 pt-36 sm:pt-48 lg:pt-60 pb-16 px-4 sm:px-6 lg:px-8 text-center space-y-8">
+      {/* HERO SECTION WITH AUTO-SCROLLING HERO BANNER CAROUSEL */}
+      <section className="relative z-10 pt-8 sm:pt-12 pb-16 px-4 sm:px-6 lg:px-8 text-center space-y-8">
+
+        {/* HERO BANNER CAROUSEL */}
+        <HeroBannerCarousel />
 
         {/* MAIN TITLE */}
         <h1 className="heading-gradient-hero text-4xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-tight max-w-5xl mx-auto">
