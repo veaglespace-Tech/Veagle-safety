@@ -19,7 +19,7 @@ export const BottomNavigation = () => {
   ];
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-blush-border safe-pb shadow-[0_-4px_20px_-4px_rgba(36,26,32,0.08)]">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t-2 border-[#FFCCE1] safe-pb shadow-[0_-4px_25px_-4px_rgba(255,92,138,0.25)]">
       <div className="max-w-xl mx-auto flex items-center justify-around px-2 pt-1 pb-1">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -32,17 +32,17 @@ export const BottomNavigation = () => {
                 href={activeSession ? '/active-sos' : '/dashboard'}
                 className="relative -top-5 flex flex-col items-center group"
               >
-                <div className={`absolute -inset-2 rounded-full transition-all ${activeSession ? 'animate-ping bg-tichi-emergency/20' : ''}`} />
+                <div className={`absolute -inset-2 rounded-full transition-all ${activeSession ? 'animate-ping bg-[#FF2A6D]/20' : ''}`} />
                 <div
-                  className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-sos-glow transition-transform group-hover:scale-105 ${
+                  className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-coral-glow transition-transform group-hover:scale-105 border-2 border-white ${
                     activeSession
-                      ? 'bg-tichi-emergency text-white animate-pulse'
-                      : 'bg-tichi-emergency text-white ring-4 ring-rose/30'
+                      ? 'bg-gradient-to-r from-[#FF2A6D] to-rose text-white animate-pulse'
+                      : 'bg-gradient-to-r from-[#FF2A6D] to-rose text-white ring-4 ring-rose/30'
                   }`}
                 >
                   <AlertTriangle className="w-7 h-7 fill-white/20" />
                 </div>
-                <span className="text-[10px] font-extrabold text-tichi-emergency mt-0.5 tracking-widest">
+                <span className="text-[10px] font-black text-[#FF2A6D] mt-0.5 tracking-widest uppercase">
                   {activeSession ? 'ACTIVE' : 'SOS'}
                 </span>
               </Link>
@@ -53,15 +53,15 @@ export const BottomNavigation = () => {
             <Link
               key={item.path}
               href={item.path}
-              className={`flex flex-col items-center py-2 px-3.5 rounded-xl transition-all ${
+              className={`flex flex-col items-center py-2 px-3.5 rounded-2xl transition-all ${
                 isActive
-                  ? 'text-plum'
-                  : 'text-tichi-faint hover:text-plum'
+                  ? 'text-rose font-black'
+                  : 'text-tichi-muted hover:text-rose'
               }`}
             >
-              <Icon className={`w-5 h-5 transition-all ${isActive ? 'stroke-[2.5px]' : 'stroke-[1.8px]'}`} />
-              <div className={`mt-1 transition-all ${isActive ? 'w-4 h-0.5 rounded-full bg-plum' : 'w-0 h-0.5'}`} />
-              <span className={`text-[10px] mt-0.5 font-semibold ${isActive ? 'font-bold' : ''}`}>{item.label}</span>
+              <Icon className={`w-5 h-5 transition-all ${isActive ? 'stroke-[2.5px] text-rose' : 'stroke-[1.8px]'}`} />
+              <div className={`mt-1 transition-all ${isActive ? 'w-4 h-1 rounded-full bg-rose' : 'w-0 h-1'}`} />
+              <span className={`text-[10px] mt-0.5 font-extrabold ${isActive ? 'text-rose' : ''}`}>{item.label}</span>
             </Link>
           );
         })}

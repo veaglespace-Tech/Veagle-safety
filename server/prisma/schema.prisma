@@ -202,3 +202,15 @@ model AuditLog {
   ipAddress String?
   createdAt DateTime @default(now())
 }
+
+// Web Push Notification Subscription - Linked to user email
+// Contacts subscribe once → receive emergency alarms even with browser closed
+model PushSubscription {
+  id          String   @id @default(uuid())
+  userEmail   String
+  endpoint    String   @unique @db.VarChar(500)
+  p256dh      String   @db.Text
+  auth        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

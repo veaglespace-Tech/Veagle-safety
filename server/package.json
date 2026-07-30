@@ -18,7 +18,8 @@
     "express": "^4.18.3",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.11",
-    "socket.io": "^4.7.4"
+    "socket.io": "^4.7.4",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "prisma": "^5.10.2"

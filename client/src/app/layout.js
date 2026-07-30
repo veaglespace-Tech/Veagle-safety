@@ -1,9 +1,9 @@
-import '../index.css';
+import './globals.css';
 import { Providers } from './providers.js';
 
 export const metadata = {
-  title: 'Veagle Safety | Personal & Women Safety Platform',
-  description: 'AI-Powered 24/7 Personal & Women Safety SaaS Platform with Live GPS Tracking and Instant Emergency SOS Alerts.',
+  title: 'Sakhi Suraksha SOS | Personal & Women Safety Platform',
+  description: 'Instant 3-Second Emergency SOS Broadcasting, Real-Time GPS Tracking, and 24/7 Command Dispatch Platform for Women & Girls.',
 };
 
 export default function RootLayout({ children }) {
@@ -12,7 +12,7 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       </head>
-      <body className="bg-blush antialiased font-sans">
+      <body className="bg-[#FFF0F3] text-tichi-text antialiased font-sans">
         <Providers>{children}</Providers>
       </body>
     </html>

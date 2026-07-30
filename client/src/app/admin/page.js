@@ -19,13 +19,26 @@ import {
   LogOut,
   PhoneCall,
   Activity,
+  ShieldCheck,
+  Zap,
+  Sliders,
+  ArrowRight,
+  Shield,
+  Layers,
+  UserPlus,
+  Edit3,
+  X,
+  Lock,
+  Mail,
+  User,
+  Heart,
+  KeyRound,
+  Plus,
 } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
-
-export default function SuperAdminDashboardPage() {
+export default function SuperAdminOperationsPortal() {
   const [mounted, setMounted] = useState(false);
-  const { user, logout } = useAuthStore();
+  const { user, logout, fetchUser } = useAuthStore();
   const router = useRouter();
 
   const [metrics, setMetrics] = useState(null);
@@ -36,6 +49,26 @@ export default function SuperAdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('INCIDENTS');
   const [actionSuccess, setActionSuccess] = useState(null);
+
+  // CREATE USER MODAL STATE
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPhone, setNewUserPhone] = useState('');
+  const [newUserPass, setNewUserPass] = useState('');
+  const [newUserRole, setNewUserRole] = useState('USER');
+  const [newUserBlood, setNewUserBlood] = useState('O+');
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState(null);
+
+  // EDIT ADMIN PROFILE MODAL STATE
+  const [showEditAdminModal, setShowEditAdminModal] = useState(false);
+  const [adminName, setAdminName] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPhone, setAdminPhone] = useState('');
+  const [adminPass, setAdminPass] = useState('');
+  const [editAdminLoading, setEditAdminLoading] = useState(false);
+  const [editAdminError, setEditAdminError] = useState(null);
 
   useEffect(() => {
     setMounted(true);
@@ -52,6 +85,11 @@ export default function SuperAdminDashboardPage() {
       return;
     }
     loadAdminData();
+
+    // Populate initial edit admin fields
+    setAdminName(user.fullName || '');
+    setAdminEmail(user.email || '');
+    setAdminPhone(user.phone || '');
   }, [user, mounted]);
 
   const loadAdminData = async () => {
@@ -72,6 +110,66 @@ export default function SuperAdminDashboardPage() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setCreateError(null);
+    setCreateLoading(true);
+
+    try {
+      const res = await api.post('/admin/users/create', {
+        fullName: newUserName,
+        email: newUserEmail,
+        phone: newUserPhone,
+        password: newUserPass,
+        role: newUserRole,
+        bloodGroup: newUserBlood,
+      });
+
+      setActionSuccess(res.data.message);
+      setTimeout(() => setActionSuccess(null), 4000);
+
+      // Reset form & close modal
+      setNewUserName('');
+      setNewUserEmail('');
+      setNewUserPhone('');
+      setNewUserPass('');
+      setShowCreateUserModal(false);
+
+      // Refresh list
+      loadAdminData();
+    } catch (err) {
+      setCreateError(err.response?.data?.error || 'Failed to create new user.');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  const handleUpdateAdminProfile = async (e) => {
+    e.preventDefault();
+    setEditAdminError(null);
+    setEditAdminLoading(true);
+
+    try {
+      const res = await api.put('/admin/profile', {
+        fullName: adminName,
+        email: adminEmail,
+        phone: adminPhone,
+        password: adminPass || undefined,
+      });
+
+      setActionSuccess(res.data.message);
+      setTimeout(() => setActionSuccess(null), 4000);
+
+      fetchUser();
+      setShowEditAdminModal(false);
+      setAdminPass('');
+    } catch (err) {
+      setEditAdminError(err.response?.data?.error || 'Failed to update admin profile.');
+    } finally {
+      setEditAdminLoading(false);
     }
   };
 
@@ -103,168 +201,266 @@ export default function SuperAdminDashboardPage() {
 
   const filteredUsers = usersList.filter(
     (u) =>
-      u.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.phone.includes(searchQuery)
+      u.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.phone?.includes(searchQuery)
   );
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-plum-dark text-white flex items-center justify-center text-xs font-bold animate-pulse">
+      <div className="min-h-screen bg-[#FFF0F3] text-tichi-text flex items-center justify-center text-xs font-black animate-pulse">
         👑 Loading Super Admin HQ Command Center...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-plum-dark text-white selection:bg-rose selection:text-white">
-      <header className="bg-plum/90 border-b border-gold/30 sticky top-0 z-40 backdrop-blur-md px-4 py-3">
+    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden pb-16">
+      
+      {/* BACKGROUND AMBIENT GLOW MESHES */}
+      <div className="absolute w-[800px] h-[800px] rounded-full bg-rose/15 blur-[160px] top-[-100px] left-[-200px] pointer-events-none" />
+      <div className="absolute w-[800px] h-[800px] rounded-full bg-gold/15 blur-[160px] bottom-[100px] right-[-200px] pointer-events-none" />
+
+      {/* PORCELAIN BLUSH TOP HEADER */}
+      <header className="bg-white/95 border-b-2 border-[#FFCCE1] sticky top-0 z-40 backdrop-blur-md px-4 sm:px-6 py-3.5 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
+          
+          {/* BRANDING */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-gold-dark text-plum flex items-center justify-center font-black shadow-gold-glow">
-              <Crown className="w-6 h-6" />
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 shadow-md flex items-center justify-center shrink-0">
+              <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+                <Crown className="w-6 h-6 text-rose" />
+              </div>
             </div>
+
             <div>
               <div className="flex items-center space-x-2">
-                <h1 className="font-black text-lg tracking-tight text-white">Super Admin HQ Command</h1>
-                <span className="bg-gold text-plum font-black text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  SUPER ADMIN
+                <h1 className="font-black text-base sm:text-lg tracking-tight text-tichi-text">Super Admin HQ Command</h1>
+                <span className="bg-gold text-tichi-text font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-gold/40">
+                  HQ LEVEL 5
                 </span>
               </div>
-              <p className="text-xs text-gold/80 font-medium">Tichi Suraksha Emergency Operational Center</p>
+              <p className="text-xs text-tichi-muted font-bold">Sakhi Suraksha Emergency Operations Control Center</p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
+          {/* ACTION CONTROLS */}
+          <div className="flex items-center space-x-2">
+            
+            {/* ADD USER BUTTON IN HEADER */}
             <button
-              onClick={loadAdminData}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors flex items-center space-x-1.5 text-xs font-bold"
-              title="Refresh Data"
+              type="button"
+              onClick={() => setShowCreateUserModal(true)}
+              className="btn-baby-pink px-3.5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-1.5 cursor-pointer shrink-0"
+              title="Super Admin Help: Add New User via Backend"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <UserPlus className="w-4 h-4" />
+              <span>+ Add User</span>
+            </button>
+
+            {/* EDIT ADMIN PROFILE BUTTON */}
+            <button
+              type="button"
+              onClick={() => {
+                setAdminName(user?.fullName || '');
+                setAdminEmail(user?.email || '');
+                setAdminPhone(user?.phone || '');
+                setShowEditAdminModal(true);
+              }}
+              className="p-2.5 rounded-2xl bg-white border-2 border-rose text-rose hover:bg-rose hover:text-white transition-all flex items-center space-x-1.5 text-xs font-black shadow-sm cursor-pointer"
+              title="Edit Super Admin Profile"
+            >
+              <Edit3 className="w-4 h-4" />
+              <span className="hidden md:inline">Edit Profile</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={loadAdminData}
+              className="p-2.5 rounded-2xl bg-white border-2 border-[#FFCCE1] text-tichi-text hover:border-rose transition-all flex items-center space-x-1.5 text-xs font-black shadow-sm cursor-pointer"
+              title="Refresh Real-time Data"
+            >
+              <RefreshCw className={`w-4 h-4 text-rose ${loading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
 
             <Link
-              href="/"
-              className="bg-rose text-white text-xs font-extrabold px-3 py-2 rounded-xl shadow-coral-glow hover:brightness-110 transition-all"
+              href="/dashboard"
+              className="bg-white border-2 border-[#FFCCE1] text-tichi-text text-xs font-black px-4 py-2.5 rounded-2xl hover:border-rose transition-all flex items-center space-x-1.5 uppercase tracking-wider"
             >
-              App Dashboard
+              <span>User App</span>
+              <ArrowRight className="w-4 h-4 text-rose" />
             </Link>
 
             <button
+              type="button"
               onClick={() => {
                 logout();
-                router.push('/auth');
+                router.push('/admin/login');
               }}
-              className="p-2 rounded-xl bg-emergency/20 text-tichi-emergency hover:bg-emergency/30 transition-colors"
+              className="p-2.5 rounded-2xl bg-white border-2 border-[#FF2A6D] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all shadow-sm cursor-pointer"
               title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
             </button>
           </div>
+
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      {/* MAIN CONTAINER */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10 animate-fade-up">
+
+        {/* ACTION SUCCESS BANNER */}
         {actionSuccess && (
-          <div className="bg-success-bg border border-success-border text-tichi-success font-bold text-xs p-4 rounded-2xl flex items-center justify-between animate-fade-up shadow-lg">
+          <div className="bg-tichi-success/15 border-2 border-tichi-success text-tichi-success font-black text-xs p-4 rounded-2xl flex items-center justify-between shadow-md animate-fade-up">
             <div className="flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5 text-tichi-success" />
+              <CheckCircle className="w-5 h-5 text-tichi-success shrink-0" />
               <span>{actionSuccess}</span>
             </div>
-            <button onClick={() => setActionSuccess(null)} className="text-tichi-muted hover:text-tichi-text font-bold">
+            <button type="button" onClick={() => setActionSuccess(null)} className="text-tichi-success font-black hover:opacity-75">
               ✕
             </button>
           </div>
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-up">
-          <div className={`p-5 rounded-2xl border transition-all ${
+        {/* SUPER ADMIN QUICK USER ASSISTANCE ACTION BANNER */}
+        <div className="card-antique-pink border-2 border-rose p-5 rounded-3xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 rounded-2xl bg-rose/15 text-rose flex items-center justify-center shrink-0 border border-rose/30">
+              <UserPlus className="w-6 h-6 text-rose" />
+            </div>
+            <div>
+              <h3 className="font-black text-base text-tichi-text">Super Admin Direct User Registration Help</h3>
+              <p className="text-xs text-tichi-muted font-bold mt-0.5">
+                Assist users who are unable to register by creating their accounts directly via backend.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowCreateUserModal(true)}
+            className="btn-baby-pink px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-2 shrink-0 cursor-pointer"
+          >
+            <UserPlus className="w-4.5 h-4.5" />
+            <span>+ ADD NEW USER VIA BACKEND</span>
+          </button>
+        </div>
+
+        {/* 4-GRID METRICS STATS CARDS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          {/* CARD 1: ACTIVE SOS CALLS */}
+          <div className={`p-6 rounded-3xl border-2 transition-all shadow-md ${
             metrics?.activeSosCount && metrics.activeSosCount > 0
-              ? 'bg-emergency-dark/90 border-emergency text-white animate-pulse shadow-sos-glow'
-              : 'bg-plum/60 border-rose/20 text-white'
+              ? 'bg-gradient-to-r from-[#FF2A6D] to-rose border-white text-white animate-pulse shadow-coral-glow'
+              : 'card-antique-pink border-rose text-tichi-text'
           }`}>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-rose-muted uppercase tracking-wider">Active SOS Calls</span>
-              <AlertOctagon className={`w-5 h-5 ${metrics?.activeSosCount ? 'text-white' : 'text-rose'}`} />
+              <span className="text-xs font-black uppercase tracking-wider text-rose">Active SOS Emergencies</span>
+              <div className="w-10 h-10 rounded-2xl bg-rose/15 text-rose flex items-center justify-center">
+                <AlertOctagon className="w-5 h-5 text-rose" />
+              </div>
             </div>
-            <p className="text-3xl font-black mt-2 tracking-tight">
+            <p className="text-4xl font-black mt-2 tracking-tight">
               {metrics?.activeSosCount || 0}
             </p>
-            <p className="text-[11px] text-white/70 mt-1">
-              {metrics?.activeSosCount ? '🚨 Live emergency monitoring active' : 'No active emergencies currently'}
+            <p className="text-xs text-tichi-muted font-bold mt-1">
+              {metrics?.activeSosCount ? '🚨 Live emergency monitoring active' : 'No active emergency calls currently'}
             </p>
           </div>
 
-          <div className="bg-plum/60 border border-rose/20 p-5 rounded-2xl text-white">
+          {/* CARD 2: TOTAL USERS */}
+          <div className="card-antique-pink border-2 border-rose p-6 rounded-3xl shadow-md text-tichi-text">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-tichi-faint uppercase tracking-wider">Total Users</span>
-              <Users className="w-5 h-5 text-gold" />
+              <span className="text-xs font-black uppercase tracking-wider text-tichi-text">Total System Users</span>
+              <div className="w-10 h-10 rounded-2xl bg-rose/15 text-rose flex items-center justify-center">
+                <Users className="w-5 h-5 text-rose" />
+              </div>
             </div>
-            <p className="text-3xl font-black mt-2 tracking-tight">{metrics?.totalUsers || 0}</p>
-            <p className="text-[11px] text-tichi-faint mt-1">
+            <p className="text-4xl font-black mt-2 tracking-tight">{metrics?.totalUsers || 0}</p>
+            <p className="text-xs text-tichi-muted font-bold mt-1">
               👑 {metrics?.superAdminsCount || 1} Super Admin(s) Active
             </p>
           </div>
 
-          <div className="bg-plum/60 border border-rose/20 p-5 rounded-2xl text-white">
+          {/* CARD 3: ACTIVE JOURNEYS */}
+          <div className="card-antique-pink border-2 border-rose p-6 rounded-3xl shadow-md text-tichi-text">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-tichi-faint uppercase tracking-wider">Active Journeys</span>
-              <Radio className="w-5 h-5 text-rose animate-pulse" />
+              <span className="text-xs font-black uppercase tracking-wider text-tichi-text">Active Journeys</span>
+              <div className="w-10 h-10 rounded-2xl bg-rose/15 text-rose flex items-center justify-center">
+                <Radio className="w-5 h-5 text-rose animate-pulse" />
+              </div>
             </div>
-            <p className="text-3xl font-black mt-2 tracking-tight">{metrics?.activeJourneysCount || 0}</p>
-            <p className="text-[11px] text-tichi-faint mt-1">Protected real-time trips monitored</p>
+            <p className="text-4xl font-black mt-2 tracking-tight">{metrics?.activeJourneysCount || 0}</p>
+            <p className="text-xs text-tichi-muted font-bold mt-1">Real-Time Protected Trips Monitored</p>
           </div>
 
-          <div className="bg-plum/60 border border-gold/30 p-5 rounded-2xl text-white">
+          {/* CARD 4: DISPATCH SYSTEM */}
+          <div className="bg-white border-2 border-[#FFCCE1] p-6 rounded-3xl shadow-md text-tichi-text">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-gold uppercase tracking-wider">Dispatch System</span>
-              <Activity className="w-5 h-5 text-tichi-success animate-pulse" />
+              <span className="text-xs font-black uppercase tracking-wider text-tichi-text">Dispatch Engine</span>
+              <div className="w-10 h-10 rounded-2xl bg-tichi-success/15 text-tichi-success flex items-center justify-center">
+                <Activity className="w-5 h-5 text-tichi-success animate-pulse" />
+              </div>
             </div>
-            <p className="text-sm font-extrabold text-tichi-success mt-3 tracking-wide">
+            <p className="text-base font-black text-tichi-success mt-3 tracking-wide">
               {metrics?.systemStatus || '100% OPERATIONAL'}
             </p>
-            <p className="text-[11px] text-tichi-faint mt-1">Socket.IO Real-time Engine Connected</p>
+            <p className="text-xs text-tichi-muted font-bold mt-1">Socket.IO Real-time Engine Connected</p>
           </div>
+
         </div>
 
-        <div className="flex bg-plum/80 p-1.5 rounded-2xl border border-rose/20 w-full max-w-md">
+        {/* PORCELAIN SEGMENTED NAVIGATION TABS */}
+        <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm flex flex-wrap sm:flex-nowrap gap-2 w-full max-w-2xl relative z-20">
           {[
-            { key: 'INCIDENTS', label: '🚨 Active Incidents', badge: activeSos.length },
-            { key: 'USERS', label: '👥 User Roles & Management', badge: usersList.length },
-            { key: 'SYSTEM', label: '⚙️ Dispatch Settings' },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center space-x-1.5 ${
-                activeTab === tab.key
-                  ? 'bg-gradient-to-r from-rose to-plum-light text-white shadow-coral-glow'
-                  : 'text-tichi-faint hover:text-white'
-              }`}
-            >
-              <span>{tab.label}</span>
-              {tab.badge !== undefined && (
-                <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px]">{tab.badge}</span>
-              )}
-            </button>
-          ))}
+            { key: 'INCIDENTS', label: 'Active Incidents', icon: ShieldAlert, badge: activeSos.length },
+            { key: 'USERS', label: 'User Roles & Accounts', icon: UserCheck, badge: usersList.length },
+            { key: 'SYSTEM', label: 'Dispatch Settings', icon: Sliders },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex-1 py-3 px-3.5 rounded-xl font-black text-xs transition-all flex items-center justify-center space-x-1.5 uppercase tracking-wider cursor-pointer relative z-20 shrink-0 ${
+                  isActive
+                    ? 'bg-rose text-white border-2 border-rose shadow-md'
+                    : 'bg-white text-tichi-text hover:text-rose hover:bg-rose/10 border-2 border-[#FFCCE1]'
+                }`}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                <span className="truncate">{tab.label}</span>
+                {tab.badge !== undefined && (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 ${isActive ? 'bg-white text-rose' : 'bg-rose/15 text-rose'}`}>
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
+        {/* TAB 1: ACTIVE INCIDENTS STREAM */}
         {activeTab === 'INCIDENTS' && (
-          <div className="space-y-4 animate-fade-up">
-            <h2 className="text-base font-extrabold text-gold flex items-center space-x-2">
-              <ShieldAlert className="w-5 h-5 text-emergency" />
-              <span>Real-Time Incident Command Stream</span>
-            </h2>
+          <div className="space-y-6 animate-fade-up">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-black text-tichi-text flex items-center space-x-2 uppercase tracking-wider">
+                <ShieldAlert className="w-5 h-5 text-rose" />
+                <span>Real-Time Emergency Incident Command Stream</span>
+              </h2>
+            </div>
 
             {activeSos.length === 0 ? (
-              <div className="bg-plum/40 border border-rose/20 rounded-2xl p-10 text-center space-y-3">
-                <CheckCircle className="w-12 h-12 text-tichi-success mx-auto" />
-                <h3 className="font-extrabold text-base text-white">All Clear — No Active SOS Emergency Calls</h3>
-                <p className="text-xs text-tichi-faint max-w-md mx-auto">
-                  The emergency dispatch system is actively scanning. When a user triggers an SOS, live GPS location streams will appear here immediately.
+              <div className="card-antique-pink border-2 border-rose rounded-3xl p-10 text-center space-y-3 shadow-md">
+                <CheckCircle className="w-14 h-14 text-tichi-success mx-auto" />
+                <h3 className="font-black text-lg text-tichi-text">All Clear — No Active SOS Emergency Calls</h3>
+                <p className="text-xs text-tichi-muted font-bold max-w-md mx-auto leading-relaxed">
+                  The emergency dispatch system is actively scanning 24/7. When a user triggers an SOS, live GPS location streams will appear here instantly.
                 </p>
               </div>
             ) : (
@@ -272,27 +468,27 @@ export default function SuperAdminDashboardPage() {
                 {activeSos.map((session) => (
                   <div
                     key={session.id}
-                    className="bg-emergency-dark/30 border-2 border-emergency rounded-2xl p-5 shadow-sos-glow flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+                    className="bg-white border-2 border-[#FF2A6D] rounded-3xl p-6 shadow-coral-glow flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
                   >
                     <div className="space-y-2">
                       <div className="flex items-center space-x-3">
-                        <span className="bg-emergency text-white font-black text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider animate-pulse">
+                        <span className="bg-[#FF2A6D] text-white font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider animate-pulse border border-white">
                           🚨 CRITICAL SOS ACTIVE
                         </span>
-                        <span className="text-xs text-tichi-faint font-mono">
-                          Started: {new Date(session.startedAt).toLocaleTimeString()}
+                        <span className="text-xs text-tichi-muted font-bold font-mono" suppressHydrationWarning>
+                          Started: {mounted && session.startedAt ? new Date(session.startedAt).toLocaleTimeString() : ''}
                         </span>
                       </div>
 
                       <div className="space-y-0.5">
-                        <h3 className="font-extrabold text-lg text-white">{session.user?.fullName}</h3>
-                        <p className="text-xs text-rose-muted">{session.user?.email} • {session.user?.phone}</p>
+                        <h3 className="font-black text-xl text-tichi-text">{session.user?.fullName}</h3>
+                        <p className="text-xs text-tichi-muted font-bold">{session.user?.email} • {session.user?.phone}</p>
                       </div>
 
                       {session.locations && session.locations.length > 0 && (
-                        <div className="flex items-center space-x-2 text-xs font-mono text-gold bg-plum-dark/80 px-3 py-1.5 rounded-xl border border-gold/30">
-                          <MapPin className="w-3.5 h-3.5 text-gold shrink-0" />
-                          <span>Lat: {session.locations[0].latitude.toFixed(4)}, Lng: {session.locations[0].longitude.toFixed(4)} (±{session.locations[0].accuracy || 10}m)</span>
+                        <div className="flex items-center space-x-2 text-xs font-mono text-rose bg-[#FFF0F3] px-3.5 py-2 rounded-xl border border-[#FFCCE1]">
+                          <MapPin className="w-4 h-4 text-rose shrink-0" />
+                          <span className="font-bold">Lat: {session.locations[0].latitude.toFixed(4)}, Lng: {session.locations[0].longitude.toFixed(4)} (±{session.locations[0].accuracy || 10}m)</span>
                         </div>
                       )}
                     </div>
@@ -300,17 +496,18 @@ export default function SuperAdminDashboardPage() {
                     <div className="flex items-center space-x-3 shrink-0">
                       <a
                         href={`tel:${session.user?.phone}`}
-                        className="bg-plum text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-rose/30 hover:bg-rose transition-colors flex items-center space-x-1.5"
+                        className="bg-white border-2 border-[#FFCCE1] text-tichi-text font-black text-xs px-5 py-3 rounded-2xl hover:border-rose transition-all flex items-center space-x-1.5 shadow-sm"
                       >
-                        <PhoneCall className="w-3.5 h-3.5" />
+                        <PhoneCall className="w-4 h-4 text-rose" />
                         <span>Call User</span>
                       </a>
 
                       <button
+                        type="button"
                         onClick={() => handleAdminResolveSos(session.id)}
-                        className="bg-tichi-success text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow hover:brightness-110 transition-all flex items-center space-x-1.5"
+                        className="bg-tichi-success text-white font-black text-xs px-5 py-3 rounded-2xl shadow hover:brightness-110 transition-all flex items-center space-x-1.5 cursor-pointer"
                       >
-                        <CheckCircle className="w-3.5 h-3.5" />
+                        <CheckCircle className="w-4 h-4" />
                         <span>Resolve SOS</span>
                       </button>
                     </div>
@@ -319,35 +516,37 @@ export default function SuperAdminDashboardPage() {
               </div>
             )}
 
-            <div className="bg-plum/40 border border-rose/20 rounded-2xl p-5 space-y-4">
-              <h3 className="font-bold text-sm text-gold">Recent Emergency Incident Log History</h3>
+            {/* RECENT INCIDENTS LOG HISTORY TABLE */}
+            <div className="bg-white border-2 border-[#FFCCE1] rounded-3xl p-6 shadow-sm space-y-4">
+              <h3 className="font-black text-sm text-tichi-text uppercase tracking-wider">Recent Incident Log History</h3>
+              
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+                <table className="w-full text-left text-xs font-bold text-tichi-text">
                   <thead>
-                    <tr className="border-b border-rose/20 text-tichi-faint">
-                      <th className="pb-3 font-bold uppercase">User</th>
-                      <th className="pb-3 font-bold uppercase">Status</th>
-                      <th className="pb-3 font-bold uppercase">Started At</th>
-                      <th className="pb-3 font-bold uppercase">Share Token</th>
+                    <tr className="border-b-2 border-[#FFCCE1] text-tichi-muted uppercase tracking-wider text-[11px]">
+                      <th className="pb-3 px-3">User</th>
+                      <th className="pb-3 px-3">Status</th>
+                      <th className="pb-3 px-3">Started At</th>
+                      <th className="pb-3 px-3">Share Token</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-rose/10">
+                  <tbody className="divide-y divide-[#FFCCE1]">
                     {recentSos.map((item) => (
-                      <tr key={item.id} className="hover:bg-white/5 transition-colors">
-                        <td className="py-3 font-bold text-white">{item.user?.fullName}</td>
-                        <td className="py-3">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      <tr key={item.id} className="hover:bg-[#FFF0F3] transition-colors">
+                        <td className="py-3 px-3 font-black text-tichi-text">{item.user?.fullName}</td>
+                        <td className="py-3 px-3">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
                             item.status === 'ACTIVE'
-                              ? 'bg-emergency/20 text-emergency border border-emergency/40'
-                              : 'bg-tichi-success/20 text-tichi-success border border-tichi-success/40'
+                              ? 'bg-rose/15 text-rose border border-rose/30 animate-pulse'
+                              : 'bg-tichi-success/15 text-tichi-success border border-tichi-success/30'
                           }`}>
                             {item.status}
                           </span>
                         </td>
-                        <td className="py-3 text-tichi-faint font-mono">
-                          {new Date(item.startedAt).toLocaleString()}
+                        <td className="py-3 px-3 text-tichi-muted font-mono" suppressHydrationWarning>
+                          {mounted && item.startedAt ? new Date(item.startedAt).toLocaleString() : ''}
                         </td>
-                        <td className="py-3 font-mono text-tichi-faint truncate max-w-[150px]">
+                        <td className="py-3 px-3 font-mono text-tichi-muted truncate max-w-[150px]">
                           {item.shareToken}
                         </td>
                       </tr>
@@ -356,93 +555,108 @@ export default function SuperAdminDashboardPage() {
                 </table>
               </div>
             </div>
+
           </div>
         )}
 
+        {/* TAB 2: USER & SUPER ADMIN ROLE MANAGEMENT WITH CREATE USER BUTTON */}
         {activeTab === 'USERS' && (
-          <div className="space-y-4 animate-fade-up">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-6 animate-fade-up">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-base font-extrabold text-gold flex items-center space-x-2">
-                  <UserCheck className="w-5 h-5 text-gold" />
-                  <span>User & Super Admin Role Management</span>
+                <h2 className="text-base font-black text-tichi-text flex items-center space-x-2 uppercase tracking-wider">
+                  <UserCheck className="w-5 h-5 text-rose" />
+                  <span>User Accounts & Role Privilege Management</span>
                 </h2>
-                <p className="text-xs text-tichi-faint mt-0.5">
-                  View all registered accounts and promote trusted accounts to Super Admin.
+                <p className="text-xs text-tichi-muted font-bold mt-0.5">
+                  Create new user accounts directly or manage role permissions.
                 </p>
               </div>
 
-              <div className="relative w-full sm:w-64">
-                <Search className="w-4 h-4 text-tichi-faint absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search user name, email..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-plum/60 border border-rose/30 text-xs text-white placeholder-tichi-faint focus:ring-2 focus:ring-gold focus:outline-none"
-                />
+              <div className="flex items-center space-x-3">
+                {/* CREATE NEW USER BUTTON */}
+                <button
+                  type="button"
+                  onClick={() => setShowCreateUserModal(true)}
+                  className="btn-baby-pink px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-1.5 cursor-pointer shrink-0"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>+ Create User</span>
+                </button>
+
+                <div className="relative w-full sm:w-64">
+                  <Search className="w-4 h-4 text-rose absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search name, email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 rounded-2xl bg-white border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text placeholder-tichi-muted focus:border-rose focus:ring-4 focus:ring-rose/15 focus:outline-none shadow-sm"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="bg-plum/40 border border-rose/20 rounded-2xl overflow-hidden shadow-modal">
+            <div className="bg-white border-2 border-[#FFCCE1] rounded-3xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-plum/90 border-b border-rose/20 text-tichi-faint uppercase font-bold text-[11px]">
+                <table className="w-full text-left text-xs font-bold text-tichi-text">
+                  <thead className="bg-[#FFF0F3] border-b-2 border-[#FFCCE1] text-tichi-muted uppercase font-black text-[11px]">
                     <tr>
                       <th className="p-4">User Details</th>
                       <th className="p-4">Role</th>
                       <th className="p-4">Safety Status</th>
-                      <th className="p-4">Contacts</th>
+                      <th className="p-4">Guardians</th>
                       <th className="p-4">Joined Date</th>
                       <th className="p-4 text-right">Role Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-rose/10">
+                  <tbody className="divide-y divide-[#FFCCE1]">
                     {filteredUsers.map((u) => (
-                      <tr key={u.id} className="hover:bg-white/5 transition-colors">
+                      <tr key={u.id} className="hover:bg-[#FFF0F3] transition-colors">
                         <td className="p-4">
-                          <p className="font-extrabold text-white text-sm">{u.fullName}</p>
-                          <p className="text-[11px] text-tichi-faint">{u.email} • {u.phone}</p>
+                          <p className="font-black text-tichi-text text-sm">{u.fullName}</p>
+                          <p className="text-[11px] text-tichi-muted font-bold">{u.email} • {u.phone}</p>
                         </td>
 
                         <td className="p-4">
                           {u.role === 'SUPER_ADMIN' ? (
-                            <span className="inline-flex items-center space-x-1 bg-gradient-to-r from-gold to-gold-dark text-plum font-black text-[10px] px-2.5 py-1 rounded-full shadow-gold-glow">
-                              <Crown className="w-3 h-3" />
+                            <span className="inline-flex items-center space-x-1 bg-gold text-tichi-text font-black text-[10px] px-3 py-1 rounded-full shadow-sm border border-gold/40">
+                              <Crown className="w-3.5 h-3.5" />
                               <span>SUPER ADMIN</span>
                             </span>
                           ) : (
-                            <span className="bg-plum-light/50 text-rose-muted border border-rose/20 text-[10px] font-bold px-2.5 py-1 rounded-full">
+                            <span className="bg-white text-tichi-muted border border-[#FFCCE1] text-[10px] font-black px-3 py-1 rounded-full">
                               USER
                             </span>
                           )}
                         </td>
 
                         <td className="p-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black ${
                             u.safetyStatus === 'SAFE'
-                              ? 'bg-tichi-success/20 text-tichi-success border border-tichi-success/40'
-                              : 'bg-emergency/20 text-emergency border border-emergency/40 animate-pulse'
+                              ? 'bg-tichi-success/15 text-tichi-success border border-tichi-success/30'
+                              : 'bg-rose/15 text-rose border border-rose/30 animate-pulse'
                           }`}>
                             ● {u.safetyStatus}
                           </span>
                         </td>
 
-                        <td className="p-4 font-bold text-white">
+                        <td className="p-4 font-black text-tichi-text">
                           {u._count?.trustedContacts || 0} Contacts
                         </td>
 
-                        <td className="p-4 text-tichi-faint font-mono">
-                          {new Date(u.createdAt).toLocaleDateString()}
+                        <td className="p-4 text-tichi-muted font-mono" suppressHydrationWarning>
+                          {mounted && u.createdAt ? new Date(u.createdAt).toLocaleDateString() : ''}
                         </td>
 
                         <td className="p-4 text-right">
                           <button
+                            type="button"
                             onClick={() => handleRoleToggle(u.id, u.role)}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                            className={`px-4 py-2 rounded-xl text-xs font-black transition-all border-2 cursor-pointer ${
                               u.role === 'SUPER_ADMIN'
-                                ? 'bg-plum-dark text-tichi-faint border-rose/30 hover:text-white'
-                                : 'bg-gradient-to-r from-gold to-gold-dark text-plum border-gold shadow-gold-glow hover:brightness-110 font-black'
+                                ? 'bg-white text-tichi-muted border-[#FFCCE1] hover:border-rose hover:text-rose'
+                                : 'bg-gold text-tichi-text border-gold shadow-sm hover:brightness-110'
                             }`}
                           >
                             {u.role === 'SUPER_ADMIN' ? 'Demote to User' : '👑 Make Super Admin'}
@@ -457,53 +671,245 @@ export default function SuperAdminDashboardPage() {
           </div>
         )}
 
+        {/* TAB 3: DISPATCH DIAGNOSTICS & SETTINGS */}
         {activeTab === 'SYSTEM' && (
-          <div className="space-y-4 animate-fade-up">
-            <h2 className="text-base font-extrabold text-gold flex items-center space-x-2">
-              <Activity className="w-5 h-5 text-tichi-success" />
+          <div className="space-y-6 animate-fade-up">
+            <h2 className="text-base font-black text-tichi-text flex items-center space-x-2 uppercase tracking-wider">
+              <Activity className="w-5 h-5 text-rose" />
               <span>System & Emergency Dispatch Diagnostics</span>
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-plum/40 border border-rose/20 p-5 rounded-2xl space-y-3">
-                <h3 className="font-bold text-sm text-white">Real-Time Socket Engine</h3>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-rose/10">
-                    <span className="text-tichi-faint">Protocol:</span>
-                    <span className="font-mono text-tichi-success">WebSocket (Socket.IO v4)</span>
+              <div className="card-antique-pink border-2 border-rose p-6 rounded-3xl space-y-4 shadow-md">
+                <h3 className="font-black text-sm text-tichi-text uppercase tracking-wider">Real-Time Socket Engine</h3>
+                <div className="space-y-2.5 text-xs font-bold text-tichi-text">
+                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
+                    <span className="text-tichi-muted">Protocol:</span>
+                    <span className="font-mono text-tichi-success font-black">WebSocket (Socket.IO v4)</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-rose/10">
-                    <span className="text-tichi-faint">GPS Broadcast Room:</span>
-                    <span className="font-mono text-gold">track:shareToken</span>
+                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
+                    <span className="text-tichi-muted">GPS Broadcast Room:</span>
+                    <span className="font-mono text-rose font-black">track:shareToken</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-rose/10">
-                    <span className="text-tichi-faint">Admin Command Channel:</span>
-                    <span className="font-mono text-gold">admin-ops</span>
+                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
+                    <span className="text-tichi-muted">Admin Command Channel:</span>
+                    <span className="font-mono text-rose font-black">admin-ops</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-plum/40 border border-rose/20 p-5 rounded-2xl space-y-3">
-                <h3 className="font-bold text-sm text-white">Emergency Helplines Verified</h3>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-rose/10">
-                    <span className="text-tichi-faint">National Emergency Hotline:</span>
-                    <span className="font-mono text-emergency font-bold">112</span>
+              <div className="card-antique-pink border-2 border-rose p-6 rounded-3xl space-y-4 shadow-md">
+                <h3 className="font-black text-sm text-tichi-text uppercase tracking-wider">Emergency Helplines Verified</h3>
+                <div className="space-y-2.5 text-xs font-bold text-tichi-text">
+                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
+                    <span className="text-tichi-muted">National Emergency Hotline:</span>
+                    <span className="font-mono text-rose font-black">112</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-rose/10">
-                    <span className="text-tichi-faint">National Women Helpline:</span>
-                    <span className="font-mono text-rose font-bold">1091</span>
+                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
+                    <span className="text-tichi-muted">National Women Helpline:</span>
+                    <span className="font-mono text-rose font-black">1091</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-rose/10">
-                    <span className="text-tichi-faint">Police Control Center:</span>
-                    <span className="font-mono text-gold font-bold">100</span>
+                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
+                    <span className="text-tichi-muted">Police Control Center:</span>
+                    <span className="font-mono text-tichi-text font-black">100</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         )}
+
       </main>
+
+      {/* ---------------------------------------------------- */}
+      {/* 1. SUPER ADMIN CREATE USER MODAL */}
+      {/* ---------------------------------------------------- */}
+      {showCreateUserModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
+            <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <UserPlus className="w-5 h-5" />
+                <h3 className="font-black text-base">Super Admin User Onboarding</h3>
+              </div>
+              <button type="button" onClick={() => setShowCreateUserModal(false)} className="text-white/80 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateUser} className="p-6 space-y-4">
+              {createError && (
+                <div className="bg-rose/10 border border-rose text-rose text-xs font-black p-3 rounded-xl text-center">
+                  {createError}
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">User Full Name</label>
+                <input
+                  type="text"
+                  placeholder="Pooja Sharma"
+                  value={newUserName}
+                  onChange={(e) => setNewUserName(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="pooja@example.com"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Phone Number</label>
+                <input
+                  type="text"
+                  placeholder="+91 98765 43210"
+                  value={newUserPhone}
+                  onChange={(e) => setNewUserPhone(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-tichi-text">Role</label>
+                  <select
+                    value={newUserRole}
+                    onChange={(e) => setNewUserRole(e.target.value)}
+                    className="w-full px-3 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                  >
+                    <option value="USER">USER</option>
+                    <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-tichi-text">Blood Group</label>
+                  <select
+                    value={newUserBlood}
+                    onChange={(e) => setNewUserBlood(e.target.value)}
+                    className="w-full px-3 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                  >
+                    <option value="O+">O+</option>
+                    <option value="A+">A+</option>
+                    <option value="B+">B+</option>
+                    <option value="AB+">AB+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Initial Password</label>
+                <input
+                  type="password"
+                  placeholder="••••••••••••"
+                  value={newUserPass}
+                  onChange={(e) => setNewUserPass(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={createLoading}
+                className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow cursor-pointer disabled:opacity-60"
+              >
+                {createLoading ? 'CREATING ACCOUNT...' : '⚡ CREATE USER VIA BACKEND'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ---------------------------------------------------- */}
+      {/* 2. EDIT SUPER ADMIN PROFILE MODAL */}
+      {/* ---------------------------------------------------- */}
+      {showEditAdminModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
+            <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Edit3 className="w-5 h-5" />
+                <h3 className="font-black text-base">Edit Super Admin Profile</h3>
+              </div>
+              <button type="button" onClick={() => setShowEditAdminModal(false)} className="text-white/80 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateAdminProfile} className="p-6 space-y-4">
+              {editAdminError && (
+                <div className="bg-rose/10 border border-rose text-rose text-xs font-black p-3 rounded-xl text-center">
+                  {editAdminError}
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Super Admin Full Name</label>
+                <input
+                  type="text"
+                  value={adminName}
+                  onChange={(e) => setAdminName(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Admin Email Address</label>
+                <input
+                  type="email"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">Phone Number</label>
+                <input
+                  type="text"
+                  value={adminPhone}
+                  onChange={(e) => setAdminPhone(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-tichi-text">New Secret Access Key (Optional)</label>
+                <input
+                  type="password"
+                  placeholder="Leave blank to keep current password"
+                  value={adminPass}
+                  onChange={(e) => setAdminPass(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={editAdminLoading}
+                className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow cursor-pointer disabled:opacity-60"
+              >
+                {editAdminLoading ? 'SAVING CHANGES...' : 'SAVE SUPER ADMIN PROFILE'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

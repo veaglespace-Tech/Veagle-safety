@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -32,45 +32,31 @@ import {
   AlertCircle,
   FileText,
   Users,
-  Upload,
-  Camera,
-  Trash2,
 } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
-
-export default function UserAuthPage() {
+function UserAuthForm() {
   const searchParams = useSearchParams();
-  const initialMode = searchParams ? searchParams.get('mode') === 'register' : false;
-  const [isLogin, setIsLogin] = useState(!initialMode);
+  const [isLogin, setIsLogin] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (searchParams && searchParams.get('mode') === 'register') {
+      setIsLogin(false);
+    }
+  }, [searchParams]);
 
   // Comprehensive Registration Fields State
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [profilePhoto, setProfilePhoto] = useState('https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png');
-  const [showUrlInput, setShowUrlInput] = useState(false);
-
-  const handlePhotoFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Image file size exceeds 5MB limit. Please choose a smaller file.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePhoto(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
   const [bloodGroup, setBloodGroup] = useState('O+');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
+  const [address, setAddress] = useState('Not Specified');
+  const [city, setCity] = useState('Pune');
+  const [state, setState] = useState('Maharashtra');
   const [country, setCountry] = useState('India');
-  const [pincode, setPincode] = useState('');
+  const [pincode, setPincode] = useState('411001');
   const [emergencyContactName, setEmergencyContactName] = useState('');
   const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
   const [medicalNotes, setMedicalNotes] = useState('');
@@ -112,120 +98,99 @@ export default function UserAuthPage() {
           phone,
           profilePhoto,
           bloodGroup,
-          address,
-          city,
-          state,
-          country,
-          pincode,
+          address: address || 'Not Specified',
+          city: city || 'Pune',
+          state: state || 'Maharashtra',
+          country: country || 'India',
+          pincode: pincode || '411001',
           emergencyContactName,
           emergencyContactPhone,
           medicalNotes,
           password,
-          role: 'USER',
         })
       );
     }
   };
 
-  const handleVerifyOtp = (e) => {
+  const handleOtpSubmit = (e) => {
     e.preventDefault();
     dispatch(verifyEmailOtp({ email: pendingVerificationEmail || email, otp: otpCode }));
   };
 
   const handleResendOtp = () => {
-    dispatch(resendOtpCode(pendingVerificationEmail || email));
+    dispatch(resendOtpCode({ email: pendingVerificationEmail || email }));
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden">
+    <div suppressHydrationWarning className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden flex flex-col">
       <PublicNavbar />
 
-      <div className="max-w-4xl mx-auto px-4 py-12 relative z-10 space-y-6">
+      {/* BACKGROUND AMBIENT GLOW MESHES */}
+      <div className="absolute w-[700px] h-[700px] rounded-full bg-rose/15 blur-[150px] top-[-100px] left-[-200px] pointer-events-none" />
+      <div className="absolute w-[700px] h-[700px] rounded-full bg-gold/15 blur-[150px] bottom-[100px] right-[-200px] pointer-events-none" />
 
-        {/* TOP BRANDING & INTERACTIVE SAFETY SHIELD MASCOT */}
-        <div className="text-center space-y-3">
-          <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-            <div className={`absolute inset-0 rounded-full border-2 border-rose/30 ${isLoading ? 'animate-ping' : 'animate-pulse'}`} />
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 shadow-coral-glow flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center px-4 py-12 relative z-10">
+        <div className="w-full max-w-xl card-antique-pink p-8 sm:p-10 space-y-6">
+          
+          {/* HEADER EMBLEM & BRAND */}
+          <div className="text-center space-y-2">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 mx-auto shadow-coral-glow">
               <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
-                <Shield className="w-8 h-8 text-rose" />
+                <Shield className="w-7 h-7 text-rose" />
               </div>
             </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-center space-x-2">
-              <h1 className="font-black text-2xl tracking-tight text-shimmer-animated">Sakhi Suraksha SOS</h1>
-              <span className="bg-rose/10 text-rose border border-rose/30 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">v2.0</span>
-            </div>
-            <p className="text-xs text-tichi-muted font-bold mt-0.5">
-              Personal Safety & Emergency Companion
+            <h1 className="text-2xl font-black text-tichi-text">Sakhi Suraksha SOS</h1>
+            <p className="text-xs font-bold text-tichi-muted">
+              {isLogin ? 'Welcome back! Sign in to access your safety dashboard.' : 'Create your account & unlock 365-day safety protection.'}
             </p>
           </div>
-        </div>
 
-        {/* MAIN CARD (CARD-ANTIQUE-PINK PORCELAIN CARD) */}
-        <div className="card-antique-pink p-6 sm:p-8 space-y-6 max-w-2xl mx-auto">
-          
           {/* TAB SWITCHER */}
-          <div className="flex bg-blush-subtle p-1.5 rounded-2xl border border-[#FFCCE1] relative">
+          <div className="flex bg-blush-subtle p-1.5 rounded-2xl border border-[#FFCCE1]">
             <button
               type="button"
-              onClick={() => {
-                setIsLogin(true);
-                dispatch(clearAuthMessages());
-              }}
-              className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
-                isLogin ? 'btn-baby-pink' : 'text-tichi-muted hover:text-tichi-text'
+              onClick={() => setIsLogin(true)}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
+                isLogin ? 'btn-baby-pink shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
               }`}
             >
               SIGN IN
             </button>
-
             <button
               type="button"
-              onClick={() => {
-                setIsLogin(false);
-                dispatch(clearAuthMessages());
-              }}
-              className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
-                !isLogin ? 'btn-baby-pink' : 'text-tichi-muted hover:text-tichi-text'
+              onClick={() => setIsLogin(false)}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
+                !isLogin ? 'btn-baby-pink shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
               }`}
             >
-              CREATE ACCOUNT (SIGN UP)
+              CREATE ACCOUNT
             </button>
           </div>
 
-          {/* ERROR ALERT */}
+          {/* ERROR / SUCCESS NOTIFICATIONS */}
           {error && (
-            <div className="bg-emergency-bg border border-emergency text-emergency-dark text-xs font-bold p-3.5 rounded-xl flex items-center space-x-2 animate-bounce">
-              <span>🚨</span>
+            <div className="bg-rose/10 border border-rose text-rose p-4 rounded-xl text-xs font-bold flex items-center space-x-2 animate-fade-up">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* SUCCESS ALERT */}
           {successMessage && (
-            <div className="bg-rose/10 border border-rose text-rose text-xs font-bold p-3.5 rounded-xl flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-rose shrink-0" />
+            <div className="bg-tichi-success/10 border border-tichi-success text-tichi-success p-4 rounded-xl text-xs font-bold flex items-center space-x-2 animate-fade-up">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{successMessage}</span>
             </div>
           )}
 
-          {/* FORM */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* AUTH FORM */}
+          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             
-            {!isLogin ? (
-              // COMPREHENSIVE SAFETY REGISTRATION FIELDS
-              <div className="space-y-6 text-xs">
-                
-                {/* SECTION 1: PERSONAL IDENTITY & SECURITY */}
-                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-[#FFCCE1]">
-                  <div className="flex items-center space-x-2 text-rose font-black uppercase text-[11px]">
-                    <UserIcon className="w-4 h-4 text-rose" />
-                    <span>Section 1: Personal Identity & Security</span>
-                  </div>
-
+            {!isLogin && (
+              <>
+                {/* SECTION 1: PERSONAL DETAILS */}
+                <div className="space-y-3 pt-2">
+                  <span className="text-[10px] font-black text-rose uppercase tracking-wider block">Section 1: Personal Details</span>
+                  
                   <div>
                     <label className="block text-tichi-muted font-bold mb-1">Full Name *</label>
                     <div className="relative">
@@ -243,22 +208,7 @@ export default function UserAuthPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Email Address *</label>
-                      <div className="relative">
-                        <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="email"
-                          required
-                          placeholder="priya@example.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Mobile Phone *</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Mobile Number *</label>
                       <div className="relative">
                         <Phone className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
@@ -271,329 +221,170 @@ export default function UserAuthPage() {
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Account Password *</label>
-                    <div className="relative">
-                      <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type={showPass ? 'text' : 'password'}
-                        required
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-10 pr-10 py-3 input-antique-pink"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPass(!showPass)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
+                    <div>
+                      <label className="block text-tichi-muted font-bold mb-1">Blood Group</label>
+                      <select
+                        value={bloodGroup}
+                        onChange={(e) => setBloodGroup(e.target.value)}
+                        className="w-full px-4 py-3 input-antique-pink font-bold"
                       >
-                        {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
+                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bg) => (
+                          <option key={bg} value={bg}>{bg}</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
 
-                {/* SECTION 2: EMERGENCY PROFILE & HEALTH DATA */}
-                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-[#FFCCE1]">
-                  <div className="flex items-center space-x-2 text-rose font-black uppercase text-[11px]">
-                    <Heart className="w-4 h-4 text-rose" />
-                    <span>Section 2: Emergency Guardian & Health Data</span>
-                  </div>
-
+                {/* SECTION 2: ADDRESS & EMERGENCY CONTACT */}
+                <div className="space-y-3 pt-2">
+                  <span className="text-[10px] font-black text-rose uppercase tracking-wider block">Section 2: City & Emergency Contact</span>
+                  
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Blood Group *</label>
-                      <div className="relative">
-                        <Heart className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <select
-                          value={bloodGroup}
-                          onChange={(e) => setBloodGroup(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
-                        >
-                          <option value="O+">O Positive (O+)</option>
-                          <option value="O-">O Negative (O-)</option>
-                          <option value="A+">A Positive (A+)</option>
-                          <option value="A-">A Negative (A-)</option>
-                          <option value="B+">B Positive (B+)</option>
-                          <option value="B-">B Negative (B-)</option>
-                          <option value="AB+">AB Positive (AB+)</option>
-                          <option value="AB-">AB Negative (AB-)</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <label className="block text-tichi-muted font-bold mb-1.5">Profile Photo *</label>
-                      <div className="bg-blush-subtle border border-[#FFCCE1] rounded-2xl p-4 flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                        {/* Avatar Image Preview Box */}
-                        <div className="relative group shrink-0">
-                          <img
-                            src={profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png'}
-                            alt="Profile Avatar Preview"
-                            className="w-16 h-16 rounded-2xl object-cover border-2 border-rose shadow-sm bg-white"
-                          />
-                          <label
-                            className="absolute -bottom-1 -right-1 bg-rose text-white p-1.5 rounded-full cursor-pointer shadow hover:scale-110 transition-transform"
-                            title="Upload new photo"
-                          >
-                            <Camera className="w-3.5 h-3.5" />
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handlePhotoFileChange}
-                              className="hidden"
-                            />
-                          </label>
-                        </div>
-
-                        {/* Upload Controls & URL Toggle */}
-                        <div className="flex-1 space-y-2 text-center sm:text-left w-full">
-                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                            <label className="cursor-pointer bg-white text-rose font-extrabold text-xs px-4 py-2 rounded-xl border border-rose/30 hover:bg-rose hover:text-white transition-all inline-flex items-center space-x-1.5 shadow-sm">
-                              <Upload className="w-3.5 h-3.5" />
-                              <span>CHOOSE PHOTO FILE</span>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handlePhotoFileChange}
-                                className="hidden"
-                              />
-                            </label>
-
-                            <button
-                              type="button"
-                              onClick={() => setShowUrlInput(!showUrlInput)}
-                              className="text-xs font-bold text-plum hover:underline"
-                            >
-                              {showUrlInput ? 'Hide URL input' : 'Paste Image URL instead'}
-                            </button>
-                          </div>
-
-                          <p className="text-[10px] text-tichi-muted font-medium">
-                            Select an image from device (JPG, PNG, WEBP — Max 5MB)
-                          </p>
-
-                          {showUrlInput && (
-                            <div className="relative mt-2">
-                              <ImageIcon className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                              <input
-                                type="url"
-                                placeholder="https://ik.imagekit.io/avatar.png"
-                                value={profilePhoto}
-                                onChange={(e) => setProfilePhoto(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 text-xs input-antique-pink"
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* PRIMARY GUARDIAN EMERGENCY CONTACT */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-rose font-bold mb-1">Primary Guardian / Contact Name</label>
-                      <div className="relative">
-                        <Users className="w-4 h-4 text-rose absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          placeholder="Mother / Father / Spouse Name"
-                          value={emergencyContactName}
-                          onChange={(e) => setEmergencyContactName(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-rose font-bold mb-1">Guardian Emergency Phone</label>
-                      <div className="relative">
-                        <Phone className="w-4 h-4 text-rose absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="tel"
-                          placeholder="+91 98765 00000"
-                          value={emergencyContactPhone}
-                          onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 input-antique-pink"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Emergency Medical Notes / Allergies (Optional)</label>
-                    <div className="relative">
-                      <FileText className="w-4 h-4 text-tichi-muted absolute left-3.5 top-3" />
-                      <textarea
-                        rows={2}
-                        placeholder="e.g. Asthma patient, Diabetic, Penicillin allergy (Optional for first responders)"
-                        value={medicalNotes}
-                        onChange={(e) => setMedicalNotes(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 input-antique-pink"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* SECTION 3: RESIDENTIAL ADDRESS & LOCATION */}
-                <div className="space-y-3 bg-blush-subtle p-4 rounded-2xl border border-[#FFCCE1]">
-                  <div className="flex items-center space-x-2 text-rose font-black uppercase text-[11px]">
-                    <MapPin className="w-4 h-4 text-rose" />
-                    <span>Section 3: Location & Residential Dispatch Address</span>
-                  </div>
-
-                  <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Residential Address *</label>
-                    <div className="relative">
-                      <MapPin className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <label className="block text-tichi-muted font-bold mb-1">City / Region</label>
                       <input
                         type="text"
-                        required
-                        placeholder="Flat No 402, Lotus Heights, MG Road"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">City *</label>
-                      <input
-                        type="text"
-                        required
                         placeholder="Pune"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full p-2.5 input-antique-pink"
+                        className="w-full px-4 py-3 input-antique-pink"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-tichi-muted font-bold mb-1">State *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Maharashtra"
-                        value={state}
-                        onChange={(e) => setState(e.target.value)}
-                        className="w-full p-2.5 input-antique-pink"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-tichi-muted font-bold mb-1">Country *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="India"
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        className="w-full p-2.5 input-antique-pink"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-rose font-bold mb-1">Pincode</label>
+                      <label className="block text-tichi-muted font-bold mb-1">Pincode</label>
                       <input
                         type="text"
                         placeholder="411001"
                         value={pincode}
                         onChange={(e) => setPincode(e.target.value)}
-                        className="w-full p-2.5 input-antique-pink"
+                        className="w-full px-4 py-3 input-antique-pink font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-tichi-muted font-bold mb-1">Guardian Name (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="Rajesh Sharma (Father)"
+                        value={emergencyContactName}
+                        onChange={(e) => setEmergencyContactName(e.target.value)}
+                        className="w-full px-4 py-3 input-antique-pink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-tichi-muted font-bold mb-1">Guardian Phone (Optional)</label>
+                      <input
+                        type="tel"
+                        placeholder="+91 98765 00000"
+                        value={emergencyContactPhone}
+                        onChange={(e) => setEmergencyContactPhone(e.target.value)}
+                        className="w-full px-4 py-3 input-antique-pink font-mono"
                       />
                     </div>
                   </div>
                 </div>
-
-              </div>
-            ) : (
-              // LOGIN FORM
-              <div className="space-y-4 text-xs">
-                <div>
-                  <label className="block text-tichi-muted font-bold mb-1">Email Address</label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3.5 input-antique-pink"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-tichi-muted font-bold mb-1">Password</label>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type={showPass ? 'text' : 'password'}
-                      required
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-3.5 input-antique-pink"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPass(!showPass)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
-                    >
-                      {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-              </div>
+              </>
             )}
+
+            {/* ACCOUNT CREDENTIALS */}
+            <div className="space-y-3 pt-2">
+              {!isLogin && (
+                <span className="text-[10px] font-black text-rose uppercase tracking-wider block">Section 3: Login Credentials</span>
+              )}
+
+              <div>
+                <label className="block text-tichi-muted font-bold mb-1">Email Address *</label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="priya@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-tichi-muted font-bold mb-1">Password *</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-12 py-3 input-antique-pink"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPass(!showPass)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
+                  >
+                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
 
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full btn-baby-pink py-4 text-xs uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2"
+              className="w-full btn-baby-pink py-4 text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2 mt-4"
             >
-              <span>{isLoading ? 'PROCESSING FORMALITIES...' : isLogin ? 'SIGN IN' : 'REGISTER & PROCEED TO PLAN FORMALITIES'}</span>
-              {!isLoading && <ArrowRight className="w-4 h-4" />}
+              <span>{isLoading ? 'PROCESSING...' : isLogin ? 'SIGN IN TO DASHBOARD' : 'REGISTER & PROCEED'}</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
+
           </form>
 
         </div>
-
       </div>
 
-      {/* STEP 2: EMAIL OTP VERIFICATION MODAL */}
+      {/* EMAIL OTP VERIFICATION MODAL */}
       {showOtpModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="card-antique-pink p-6 sm:p-8 max-w-md w-full space-y-5 text-center shadow-2xl relative bg-white">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-md card-antique-pink p-8 space-y-5 border-2 border-rose shadow-coral-glow animate-fade-up">
             
-            <div className="w-16 h-16 rounded-2xl bg-rose/10 border border-rose/30 text-rose flex items-center justify-center mx-auto shadow-coral-glow">
-              <KeyRound className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="text-xl font-black text-tichi-text">Enter Email Verification OTP</h3>
-              <p className="text-xs text-tichi-muted">
-                A 6-digit OTP code has been sent to <span className="text-rose font-bold">{pendingVerificationEmail || email}</span>
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-rose/15 text-rose flex items-center justify-center mx-auto border border-rose/30">
+                <Mail className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-black text-tichi-text">Verify Email Address</h3>
+              <p className="text-xs text-tichi-muted font-bold">
+                Enter the 6-digit OTP code sent to <span className="font-mono text-rose">{pendingVerificationEmail || email}</span>.
               </p>
             </div>
 
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
+            <form onSubmit={handleOtpSubmit} className="space-y-4">
               <input
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 maxLength={6}
                 required
-                placeholder="123456"
+                autoFocus
+                autoComplete="one-time-code"
+                placeholder="• • • • • •"
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
-                className="w-full py-4 text-center font-mono text-2xl font-black tracking-[0.5em] input-antique-pink focus:border-rose"
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                style={{
+                  userSelect: 'text',
+                  WebkitUserSelect: 'text',
+                  pointerEvents: 'auto',
+                  cursor: 'text',
+                }}
+                className="w-full px-4 py-5 text-center font-mono text-3xl font-black tracking-[0.4em] input-antique-pink focus:border-rose"
               />
 
               <button
@@ -620,5 +411,13 @@ export default function UserAuthPage() {
       )}
 
     </div>
+  );
+}
+
+export default function UserAuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#FFF0F3] flex items-center justify-center font-bold text-rose">Loading Sakhi Suraksha Auth...</div>}>
+      <UserAuthForm />
+    </Suspense>
   );
 }

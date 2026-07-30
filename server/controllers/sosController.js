@@ -1,5 +1,8 @@
 import { prisma } from '../config/prisma.js';
 import { sendSosEmergencyAlert } from '../services/mailer.js';
+import { getIO } from '../socket.js';
+import { sendEmergencyPushToEmails } from './pushController.js';
+
 
 export const startSos = async (req, res) => {
   try {
@@ -39,8 +42,9 @@ export const startSos = async (req, res) => {
       where: { userId },
     });
 
-    const trackingUrl = `http://localhost:5173/track/${session.shareToken}`;
+    const trackingUrl = `http://localhost:3000/live-track/${session.shareToken}`;
 
+    // Send emails to trusted contacts
     for (const contact of contacts) {
       if (contact.email) {
         sendSosEmergencyAlert({
@@ -48,8 +52,8 @@ export const startSos = async (req, res) => {
           recipientName: contact.name,
           userName: req.user?.fullName || 'User',
           trackingUrl,
-          latitude: initialLat || 28.6139,
-          longitude: initialLng || 77.2090,
+          latitude: initialLat || 18.5204,
+          longitude: initialLng || 73.8567,
         });
 
         await prisma.sosAlert.create({
@@ -63,8 +67,36 @@ export const startSos = async (req, res) => {
       }
     }
 
+    // Broadcast Real-Time Emergency Siren Alarm to All Devices & Connected Contacts
+    const io = getIO();
+    if (io) {
+      io.emit('SOS_ALARM_BROADCAST', {
+        sosId: session.id,
+        victimName: req.user?.fullName || 'Sakhi Suraksha User',
+        victimPhone: req.user?.phone || '',
+        shareToken: session.shareToken,
+        trackingUrl,
+        latitude: initialLat || 18.5204,
+        longitude: initialLng || 73.8567,
+        isSilent: session.isSilent,
+        contacts: contacts.map((c) => ({ name: c.name, phone: c.phone, email: c.email })),
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    // Send Web Push Notifications to all trusted contacts' devices (even if browser is closed)
+    const contactEmails = contacts.map((c) => c.email).filter(Boolean);
+    await sendEmergencyPushToEmails({
+      emails: contactEmails,
+      victimName: req.user?.fullName || 'Sakhi Suraksha User',
+      trackingUrl,
+      latitude: initialLat || 18.5204,
+      longitude: initialLng || 73.8567,
+    });
+
+
     return res.json({
-      message: 'SOS Activated! Emergency alerts sent.',
+      message: 'SOS Activated! Emergency alerts & Siren Alarm broadcasted.',
       sosSession: {
         id: session.id,
         shareToken: session.shareToken,
@@ -100,34 +132,41 @@ export const updateSosLocation = async (req, res) => {
 
 export const resolveSos = async (req, res) => {
   try {
-    const { sosSessionId } = req.body;
+    const { sosSessionId, resolutionNote } = req.body;
+    const userId = req.user?.id;
 
     const session = await prisma.sosSession.update({
       where: { id: sosSessionId },
       data: {
         status: 'RESOLVED',
         resolvedAt: new Date(),
+        resolutionNote: resolutionNote || 'Resolved by user',
       },
     });
 
     await prisma.user.update({
-      where: { id: session.userId },
+      where: { id: userId },
       data: { safetyStatus: 'SAFE' },
     });
 
-    return res.json({ message: 'Emergency session marked safe', session });
+    // Broadcast Alarm Stop Event
+    const io = getIO();
+    if (io) {
+      io.emit('SOS_ALARM_STOP', { sosId: sosSessionId });
+    }
+
+    return res.json({ message: 'SOS session resolved safely.', session });
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to resolve emergency session' });
+    return res.status(500).json({ error: 'Failed to resolve SOS session' });
   }
 };
 
 export const getActiveSosSession = async (req, res) => {
   try {
+    const userId = req.user?.id;
     const session = await prisma.sosSession.findFirst({
-      where: { userId: req.user?.id, status: 'ACTIVE' },
-      include: {
-        locations: { orderBy: { recordedAt: 'desc' }, take: 1 },
-      },
+      where: { userId, status: 'ACTIVE' },
+      include: { locations: { orderBy: { recordedAt: 'desc' }, take: 1 } },
     });
 
     return res.json({ session });
@@ -140,20 +179,20 @@ export const getPublicSosTracking = async (req, res) => {
   try {
     const { token } = req.params;
 
-    const sosSession = await prisma.sosSession.findUnique({
+    const session = await prisma.sosSession.findUnique({
       where: { shareToken: token },
       include: {
-        user: { select: { fullName: true, phone: true } },
+        user: { select: { fullName: true, phone: true, profilePhoto: true, bloodGroup: true } },
         locations: { orderBy: { recordedAt: 'desc' }, take: 20 },
       },
     });
 
-    if (!sosSession) {
-      return res.status(404).json({ error: 'Tracking session expired or invalid' });
+    if (!session) {
+      return res.status(404).json({ error: 'Tracking session not found or expired' });
     }
 
-    return res.json({ sosSession });
+    return res.json({ session });
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to load public tracking view' });
+    return res.status(500).json({ error: 'Failed to fetch tracking data' });
   }
 };

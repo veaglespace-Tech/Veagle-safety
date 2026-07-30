@@ -1,14 +1,20 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-// Helper to extract clean env values (stripping key colons/spaces if any exist)
+// Helper to extract clean env values
 const getEnv = (key, defaultValue = '') => {
   return process.env[key] || process.env[key.trim()] || defaultValue;
 };
 
+const jwtSecretValue = process.env.JWT_KEY || process.env.JWT_SECRET || 'tichi_suraksha_super_secret_jwt_key_2026';
+
 export const config = {
   port: process.env.PORT || 5000,
-  jwtSecret: process.env.JWT_KEY || process.env.JWT_SECRET || 'tichi_suraksha_super_secret_jwt_key_2026',
+  jwtSecret: jwtSecretValue,
+  jwt: {
+    secret: jwtSecretValue,
+    expiresIn: '30d',
+  },
   emailService: {
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: Number(process.env.SMTP_PORT) || 587,

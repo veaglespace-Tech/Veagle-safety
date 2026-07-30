@@ -1,19 +1,21 @@
 import { Server as SocketIOServer } from 'socket.io';
 
+let ioInstance = null;
+
 /**
  * Initializes Socket.IO engine on the given HTTP server instance.
  * @param {import('http').Server} httpServer
  * @returns {SocketIOServer}
  */
 export function initSocketIO(httpServer) {
-  const io = new SocketIOServer(httpServer, {
+  ioInstance = new SocketIOServer(httpServer, {
     cors: {
       origin: '*',
       methods: ['GET', 'POST'],
     },
   });
 
-  io.on('connection', (socket) => {
+  ioInstance.on('connection', (socket) => {
     console.log(`[Socket.IO] Client connected: ${socket.id}`);
 
     socket.on('join-room', (room) => {
@@ -22,13 +24,13 @@ export function initSocketIO(httpServer) {
     });
 
     socket.on('sos:location-update', (data) => {
-      io.to(`track:${data.token}`).emit('location-updated', {
+      ioInstance.to(`track:${data.token}`).emit('location-updated', {
         latitude: data.lat,
         longitude: data.lng,
         accuracy: data.accuracy || 10,
         timestamp: new Date().toISOString(),
       });
-      io.to('admin-ops').emit('admin:sos-location', data);
+      ioInstance.to('admin-ops').emit('admin:sos-location', data);
     });
 
     socket.on('disconnect', () => {
@@ -36,5 +38,9 @@ export function initSocketIO(httpServer) {
     });
   });
 
-  return io;
+  return ioInstance;
+}
+
+export function getIO() {
+  return ioInstance;
 }

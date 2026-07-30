@@ -35,10 +35,10 @@ export const register = asyncHandler(async (req, res) => {
       return res.status(400).json({ error: 'fullName, email, and password are required for SuperAdmin' });
     }
   } else {
-    // USER requires all core profile details
-    if (!fullName || !email || !phone || !password || !profilePhoto || !bloodGroup || !address || !city || !state || !country) {
+    // USER requires essential details (Name, Email, Phone, Password)
+    if (!fullName || !email || !phone || !password) {
       return res.status(400).json({
-        error: 'All core fields are required: fullName, email, phone, password, profilePhoto, bloodGroup, address, city, state, country',
+        error: 'Please fill in all required fields: Full Name, Email, Phone Number, and Password.',
       });
     }
   }
@@ -58,16 +58,16 @@ export const register = asyncHandler(async (req, res) => {
     data: {
       fullName,
       email,
-      phone: phone || '+91 00000 00000',
+      phone: phone || '+91 98765 43210',
       passwordHash,
       role: assignedRole,
-      profilePhoto: profilePhoto || null,
-      bloodGroup: bloodGroup || null,
-      address: address || null,
-      city: city || null,
-      state: state || null,
-      country: country || null,
-      pincode: pincode || null,
+      profilePhoto: profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
+      bloodGroup: bloodGroup || 'O+',
+      address: address || 'Not Specified',
+      city: city || 'Pune',
+      state: state || 'Maharashtra',
+      country: country || 'India',
+      pincode: pincode || '411001',
       emergencyContactName: emergencyContactName || null,
       emergencyContactPhone: emergencyContactPhone || null,
       medicalNotes: medicalNotes || null,
@@ -98,49 +98,87 @@ export const register = asyncHandler(async (req, res) => {
 
   // Send verification email for User role
   if (assignedRole === 'USER') {
-    await sendEmailVerificationOtp({ recipientEmail: email, userName: fullName, otp });
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: email, userName: fullName, otp });
+    } catch (emailErr) {
+      console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
+    }
+
+    return res.status(201).json({
+      message: 'Account created successfully! Please enter the 6-digit OTP code sent to your email to complete registration.',
+      requiresVerification: true,
+      user: {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        subscriptionStatus: user.subscriptionStatus,
+      },
+    });
   }
 
-  return res.status(201).json({
-    message: assignedRole === 'USER'
-      ? 'Registration successful. A 6-digit verification code has been sent to your email.'
-      : 'SuperAdmin account created successfully.',
+  // SuperAdmin gets immediate JWT login
+  const token = jwt.sign(
+    { userId: user.id, role: user.role, email: user.email },
+    config.jwt.secret,
+    { expiresIn: config.jwt.expiresIn }
+  );
+
+  res.status(201).json({
+    message: 'SuperAdmin account registered successfully',
+    token,
     user: {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-      phone: user.phone,
       role: user.role,
-      isEmailVerified: user.isEmailVerified,
+      subscriptionStatus: user.subscriptionStatus,
     },
   });
 });
 
 /**
- * Verify Email OTP Endpoint
+ * Verify Email Verification OTP
  */
 export const verifyEmail = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
-    return res.status(400).json({ error: 'Email and OTP code are required' });
+    return res.status(400).json({ error: 'Email and 6-digit OTP code are required' });
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    return res.status(404).json({ error: 'User account not found' });
   }
 
   if (user.isEmailVerified) {
-    return res.status(400).json({ message: 'Email is already verified' });
+    const token = jwt.sign(
+      { id: user.id, userId: user.id, role: user.role, email: user.email },
+      config.jwt.secret,
+      { expiresIn: config.jwt.expiresIn }
+    );
+    return res.status(200).json({
+      message: 'Email is already verified',
+      token,
+      user: {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        subscriptionStatus: user.subscriptionStatus,
+      },
+    });
   }
 
-  if (!user.emailOtp || user.emailOtp !== otp) {
-    return res.status(400).json({ error: 'Invalid verification OTP code' });
+  if (user.emailOtp !== otp) {
+    return res.status(400).json({ error: 'Invalid OTP code. Please check your email and try again.' });
   }
 
   if (user.emailOtpExpiresAt && new Date() > new Date(user.emailOtpExpiresAt)) {
-    return res.status(400).json({ error: 'Verification OTP has expired. Please request a new code.' });
+    return res.status(400).json({ error: 'OTP code has expired. Please click Resend OTP.' });
   }
 
   const updatedUser = await prisma.user.update({
@@ -153,13 +191,13 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   });
 
   const token = jwt.sign(
-    { id: updatedUser.id, email: updatedUser.email, fullName: updatedUser.fullName, role: updatedUser.role },
-    config.jwtSecret,
-    { expiresIn: '7d' }
+    { id: updatedUser.id, userId: updatedUser.id, role: updatedUser.role, email: updatedUser.email },
+    config.jwt.secret,
+    { expiresIn: config.jwt.expiresIn }
   );
 
-  return res.json({
-    message: 'Email verified successfully',
+  res.status(200).json({
+    message: 'Email verified successfully!',
     token,
     user: {
       id: updatedUser.id,
@@ -167,7 +205,6 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       email: updatedUser.email,
       phone: updatedUser.phone,
       role: updatedUser.role,
-      isEmailVerified: true,
       subscriptionStatus: updatedUser.subscriptionStatus,
     },
   });
@@ -180,7 +217,7 @@ export const resendOtp = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+    return res.status(400).json({ error: 'Email address is required' });
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
@@ -189,60 +226,84 @@ export const resendOtp = asyncHandler(async (req, res) => {
   }
 
   if (user.isEmailVerified) {
-    return res.status(400).json({ message: 'Email is already verified' });
+    return res.status(400).json({ error: 'Email is already verified' });
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+  const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+  const newOtpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
   await prisma.user.update({
     where: { id: user.id },
     data: {
-      emailOtp: otp,
-      emailOtpExpiresAt: otpExpires,
+      emailOtp: newOtp,
+      emailOtpExpiresAt: newOtpExpires,
     },
   });
 
-  await sendEmailVerificationOtp({ recipientEmail: email, userName: user.fullName, otp });
+  try {
+    await sendEmailVerificationOtp({ recipientEmail: email, userName: user.fullName, otp: newOtp });
+  } catch (emailErr) {
+    console.warn('[Resend OTP Email Notice] Failed to send email:', emailErr.message);
+  }
 
-  return res.json({ message: 'A new verification OTP code has been sent to your email.' });
+  res.status(200).json({
+    message: 'A new 6-digit OTP code has been sent to your email address.',
+  });
 });
 
 /**
- * User / SuperAdmin Login (Signin)
+ * Login User / SuperAdmin
  */
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
+    return res.status(400).json({ error: 'Email address and password are required' });
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    return res.status(401).json({ error: 'Invalid email or password' });
   }
 
-  const valid = await bcrypt.compare(password, user.passwordHash);
-  if (!valid) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+  if (!isPasswordValid) {
+    return res.status(401).json({ error: 'Invalid email or password' });
   }
 
-  if (user.role === 'USER' && !user.isEmailVerified) {
+  if (!user.isEmailVerified && user.role === 'USER') {
+    // Auto-send fresh OTP on login attempt for unverified account
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { emailOtp: newOtp, emailOtpExpiresAt: otpExpires },
+    });
+
+    console.log(`🔑 [OTP RESENT on Login] Email: ${user.email} | OTP: ${newOtp}`);
+
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: user.email, userName: user.fullName, otp: newOtp });
+    } catch (e) {
+      console.warn('[Login OTP Email Notice]', e.message);
+    }
+
     return res.status(403).json({
-      error: 'Email is not verified. Please verify your email OTP before logging in.',
+      error: 'Your email is not verified. A new OTP has been sent to your email.',
       requiresVerification: true,
       email: user.email,
     });
   }
 
+
   const token = jwt.sign(
-    { id: user.id, email: user.email, fullName: user.fullName, role: user.role },
-    config.jwtSecret,
-    { expiresIn: '7d' }
+    { id: user.id, userId: user.id, role: user.role, email: user.email },
+    config.jwt.secret,
+    { expiresIn: config.jwt.expiresIn }
   );
 
-  return res.json({
+  res.status(200).json({
     message: 'Logged in successfully',
     token,
     user: {
@@ -251,88 +312,53 @@ export const login = asyncHandler(async (req, res) => {
       email: user.email,
       phone: user.phone,
       role: user.role,
+      subscriptionStatus: user.subscriptionStatus,
       profilePhoto: user.profilePhoto,
       bloodGroup: user.bloodGroup,
-      address: user.address,
-      city: user.city,
-      state: user.state,
-      country: user.country,
-      pincode: user.pincode,
-      emergencyContactName: user.emergencyContactName,
-      emergencyContactPhone: user.emergencyContactPhone,
-      medicalNotes: user.medicalNotes,
-      isEmailVerified: user.isEmailVerified,
-      subscriptionStatus: user.subscriptionStatus,
-      subscriptionExpiresAt: user.subscriptionExpiresAt,
-      safetyStatus: user.safetyStatus,
-      quickSosMode: user.quickSosMode,
-      onboardingStep: user.onboardingStep,
     },
   });
 });
 
 /**
- * Signout / Logout Endpoint
- */
-export const logout = asyncHandler(async (req, res) => {
-  return res.json({ success: true, message: 'Logged out successfully' });
-});
-
-/**
- * Get Authenticated User Profile
+ * Get Profile of Logged-in User
  */
 export const getProfile = asyncHandler(async (req, res) => {
   const user = await prisma.user.findUnique({
-    where: { id: req.user?.id },
-    include: {
-      trustedContacts: true,
-      paymentHistories: {
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-      },
+    where: { id: req.user.id },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      role: true,
+      subscriptionStatus: true,
+      profilePhoto: true,
+      bloodGroup: true,
+      address: true,
+      city: true,
+      state: true,
+      country: true,
+      pincode: true,
+      emergencyContactName: true,
+      emergencyContactPhone: true,
+      medicalNotes: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
 
   if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    return res.status(404).json({ error: 'User profile not found' });
   }
 
-  return res.json({
-    user: {
-      id: user.id,
-      fullName: user.fullName,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      profilePhoto: user.profilePhoto,
-      bloodGroup: user.bloodGroup,
-      address: user.address,
-      city: user.city,
-      state: user.state,
-      country: user.country,
-      pincode: user.pincode,
-      emergencyContactName: user.emergencyContactName,
-      emergencyContactPhone: user.emergencyContactPhone,
-      medicalNotes: user.medicalNotes,
-      isEmailVerified: user.isEmailVerified,
-      subscriptionStatus: user.subscriptionStatus,
-      subscriptionExpiresAt: user.subscriptionExpiresAt,
-      safetyStatus: user.safetyStatus,
-      quickSosMode: user.quickSosMode,
-      onboardingStep: user.onboardingStep,
-      trustedContacts: user.trustedContacts,
-      paymentHistories: user.paymentHistories,
-    },
-  });
+  res.status(200).json({ user });
 });
 
 /**
- * Update User Profile & Settings
+ * Update Profile Settings
  */
 export const updateSettings = asyncHandler(async (req, res) => {
   const {
-    quickSosMode,
-    onboardingStep,
     fullName,
     phone,
     profilePhoto,
@@ -347,28 +373,49 @@ export const updateSettings = asyncHandler(async (req, res) => {
     medicalNotes,
   } = req.body;
 
-  const updated = await prisma.user.update({
-    where: { id: req.user?.id },
+  const updatedUser = await prisma.user.update({
+    where: { id: req.user.id },
     data: {
-      ...(quickSosMode && { quickSosMode }),
-      ...(onboardingStep && { onboardingStep }),
       ...(fullName && { fullName }),
       ...(phone && { phone }),
-      ...(profilePhoto && { profilePhoto }),
-      ...(bloodGroup && { bloodGroup }),
-      ...(address && { address }),
-      ...(city && { city }),
-      ...(state && { state }),
-      ...(country && { country }),
-      ...(pincode && { pincode }),
-      ...(emergencyContactName && { emergencyContactName }),
-      ...(emergencyContactPhone && { emergencyContactPhone }),
-      ...(medicalNotes && { medicalNotes }),
+      ...(profilePhoto !== undefined && { profilePhoto }),
+      ...(bloodGroup !== undefined && { bloodGroup }),
+      ...(address !== undefined && { address }),
+      ...(city !== undefined && { city }),
+      ...(state !== undefined && { state }),
+      ...(country !== undefined && { country }),
+      ...(pincode !== undefined && { pincode }),
+      ...(emergencyContactName !== undefined && { emergencyContactName }),
+      ...(emergencyContactPhone !== undefined && { emergencyContactPhone }),
+      ...(medicalNotes !== undefined && { medicalNotes }),
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      role: true,
+      subscriptionStatus: true,
+      profilePhoto: true,
+      bloodGroup: true,
+      address: true,
+      city: true,
+      state: true,
+      country: true,
+      pincode: true,
+      emergencyContactName: true,
+      emergencyContactPhone: true,
+      medicalNotes: true,
     },
   });
 
-  return res.json({
-    message: 'Profile updated successfully',
-    user: updated,
-  });
+  res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
 });
+
+/**
+ * Logout User
+ */
+export const logout = asyncHandler(async (req, res) => {
+  res.status(200).json({ message: 'Logged out successfully' });
+});
+

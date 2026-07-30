@@ -1,5 +1,6 @@
 import { prisma } from '../config/prisma.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import bcrypt from 'bcryptjs';
 
 /**
  * Super Admin Command Center Overview
@@ -275,5 +276,83 @@ export const getPaymentHistory = asyncHandler(async (req, res) => {
   return res.json({
     summary: totals,
     payments,
+  });
+});
+
+/**
+ * Super Admin Create User Directly
+ */
+export const createUserByAdmin = asyncHandler(async (req, res) => {
+  const { fullName, email, phone, password, role, bloodGroup } = req.body;
+
+  if (!fullName || !email || !password) {
+    return res.status(400).json({ error: 'Full name, email, and password are required.' });
+  }
+
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  if (existingUser) {
+    return res.status(400).json({ error: 'User with this email already exists.' });
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  const newUser = await prisma.user.create({
+    data: {
+      fullName,
+      email,
+      phone: phone || '+91 90000 00000',
+      passwordHash,
+      role: role === 'SUPER_ADMIN' ? 'SUPER_ADMIN' : 'USER',
+      bloodGroup: bloodGroup || 'O+',
+      isEmailVerified: true,
+      onboardingStep: 7,
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      role: true,
+      bloodGroup: true,
+      createdAt: true,
+    },
+  });
+
+  return res.status(201).json({
+    message: `Account created successfully for ${newUser.fullName} (${newUser.role})`,
+    user: newUser,
+  });
+});
+
+/**
+ * Update Super Admin Profile Details
+ */
+export const updateSuperAdminProfile = asyncHandler(async (req, res) => {
+  const { fullName, email, phone, password } = req.body;
+  const adminId = req.user.id;
+
+  const updateData = {};
+  if (fullName) updateData.fullName = fullName;
+  if (email) updateData.email = email;
+  if (phone) updateData.phone = phone;
+  if (password && password.length >= 6) {
+    updateData.passwordHash = await bcrypt.hash(password, 10);
+  }
+
+  const updatedAdmin = await prisma.user.update({
+    where: { id: adminId },
+    data: updateData,
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      role: true,
+      profilePhoto: true,
+    },
+  });
+
+  return res.json({
+    message: 'Super Admin profile updated successfully',
+    user: updatedAdmin,
   });
 });

@@ -20,8 +20,6 @@ import {
   X,
 } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
-
 export default function ActiveSOSLivePage() {
   const { activeSession, resolveSos, isAlarmPlaying, toggleAlarm } = useSOSStore();
   const { latitude, longitude, accuracy } = useLocationStore();

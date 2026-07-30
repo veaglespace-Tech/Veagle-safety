@@ -13,7 +13,7 @@ const SINGLE_YEARLY_PLAN = {
 
 export const fetchPlans = createAsyncThunk('plan/fetchPlans', async (_, { rejectWithValue }) => {
   try {
-    const res = await api.get('/admin/plans');
+    const res = await api.get('/plans');
     if (res.data.plans && res.data.plans.length > 0) {
       return res.data.plans;
     }

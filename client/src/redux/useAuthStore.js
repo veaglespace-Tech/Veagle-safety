@@ -1,8 +1,26 @@
 import { create } from 'zustand';
 import { api } from '../utils/api.js';
 
+const getSavedUser = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const u = localStorage.getItem('tichi_user');
+    return u ? JSON.parse(u) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+const saveUserLocally = (user) => {
+  if (typeof window !== 'undefined' && user) {
+    try {
+      localStorage.setItem('tichi_user', JSON.stringify(user));
+    } catch (e) {}
+  }
+};
+
 export const useAuthStore = create((set) => ({
-  user: null,
+  user: getSavedUser(),
   token: typeof window !== 'undefined' ? localStorage.getItem('tichi_token') : null,
   isLoading: false,
   error: null,
@@ -13,7 +31,13 @@ export const useAuthStore = create((set) => ({
       const res = await api.post('/auth/login', { email, password });
       const { token, user } = res.data;
       if (typeof window !== 'undefined') localStorage.setItem('tichi_token', token);
-      set({ token, user, isLoading: false });
+      
+      // Load saved custom avatar if available
+      const savedAvatar = typeof window !== 'undefined' ? localStorage.getItem(`tichi_avatar_${user.id || user.email}`) : null;
+      const finalUser = savedAvatar ? { ...user, avatar: savedAvatar } : user;
+
+      saveUserLocally(finalUser);
+      set({ token, user: finalUser, isLoading: false });
       return true;
     } catch (err) {
       set({
@@ -30,6 +54,8 @@ export const useAuthStore = create((set) => ({
       const res = await api.post('/auth/register', { fullName, email, phone, password, role });
       const { token, user } = res.data;
       if (typeof window !== 'undefined') localStorage.setItem('tichi_token', token);
+      
+      saveUserLocally(user);
       set({ token, user, isLoading: false });
       return true;
     } catch (err) {
@@ -42,7 +68,10 @@ export const useAuthStore = create((set) => ({
   },
 
   logout: () => {
-    if (typeof window !== 'undefined') localStorage.removeItem('tichi_token');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('tichi_token');
+      localStorage.removeItem('tichi_user');
+    }
     set({ user: null, token: null });
   },
 
@@ -54,9 +83,19 @@ export const useAuthStore = create((set) => ({
     }
     try {
       const res = await api.get('/auth/me');
-      set({ user: res.data.user, isLoading: false });
+      const fetchedUser = res.data.user;
+      
+      // Restore saved avatar if exists
+      const savedAvatar = typeof window !== 'undefined' ? localStorage.getItem(`tichi_avatar_${fetchedUser.id || fetchedUser.email}`) : null;
+      const finalUser = savedAvatar ? { ...fetchedUser, avatar: savedAvatar } : fetchedUser;
+
+      saveUserLocally(finalUser);
+      set({ user: finalUser, isLoading: false });
     } catch (err) {
-      if (typeof window !== 'undefined') localStorage.removeItem('tichi_token');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('tichi_token');
+        localStorage.removeItem('tichi_user');
+      }
       set({ user: null, token: null, isLoading: false });
     }
   },
@@ -64,7 +103,25 @@ export const useAuthStore = create((set) => ({
   updateUserStatus: (safetyStatus) => {
     set((state) => {
       if (!state.user) return state;
-      return { user: { ...state.user, safetyStatus } };
+      const updated = { ...state.user, safetyStatus };
+      saveUserLocally(updated);
+      return { user: updated };
+    });
+  },
+
+  updateUserAvatar: (avatarUrl) => {
+    set((state) => {
+      if (!state.user) return state;
+      const updated = { ...state.user, avatar: avatarUrl };
+      if (typeof window !== 'undefined') {
+        if (avatarUrl) {
+          localStorage.setItem(`tichi_avatar_${state.user.id || state.user.email}`, avatarUrl);
+        } else {
+          localStorage.removeItem(`tichi_avatar_${state.user.id || state.user.email}`);
+        }
+      }
+      saveUserLocally(updated);
+      return { user: updated };
     });
   },
 }));

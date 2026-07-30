@@ -6,6 +6,7 @@ import * as journeyController from '../controllers/journeyController.js';
 import * as checkinController from '../controllers/checkinController.js';
 import * as adminController from '../controllers/adminController.js';
 import * as paymentController from '../controllers/paymentController.js';
+import * as pushController from '../controllers/pushController.js';
 import { authenticateToken, requireSuperAdmin } from '../middleware/auth.js';
 
 const router = Router();
@@ -18,6 +19,9 @@ router.post('/auth/login', authController.login);
 router.post('/auth/logout', authController.logout);
 router.get('/auth/me', authenticateToken, authController.getProfile);
 router.put('/auth/settings', authenticateToken, authController.updateSettings);
+
+// Public Plans & Pricing
+router.get('/plans', adminController.getPlans);
 
 // PayU Payment Routes
 router.post('/payment/payu-initiate', authenticateToken, paymentController.initiatePayUPayment);
@@ -52,6 +56,8 @@ router.get('/checkin/active', authenticateToken, checkinController.getActiveChec
 // Super Admin Operations Command Portal
 router.get('/admin/overview', authenticateToken, requireSuperAdmin, adminController.getAdminOverview);
 router.get('/admin/users', authenticateToken, requireSuperAdmin, adminController.getAllUsers);
+router.post('/admin/users/create', authenticateToken, requireSuperAdmin, adminController.createUserByAdmin);
+router.put('/admin/profile', authenticateToken, requireSuperAdmin, adminController.updateSuperAdminProfile);
 router.put('/admin/user/role', authenticateToken, requireSuperAdmin, adminController.updateUserRole);
 router.post('/admin/sos/resolve', authenticateToken, requireSuperAdmin, adminController.adminResolveSos);
 router.get('/admin/plans', authenticateToken, requireSuperAdmin, adminController.getPlans);
@@ -59,5 +65,10 @@ router.post('/admin/plans', authenticateToken, requireSuperAdmin, adminControlle
 router.get('/admin/gst', authenticateToken, requireSuperAdmin, adminController.getGstSettings);
 router.put('/admin/gst', authenticateToken, requireSuperAdmin, adminController.updateGstSettings);
 router.get('/admin/payments', authenticateToken, requireSuperAdmin, adminController.getPaymentHistory);
+
+// Web Push Notifications
+router.get('/push/vapid-key', pushController.getVapidPublicKey);
+router.post('/push/subscribe', authenticateToken, pushController.savePushSubscription);
+router.post('/push/subscribe-email', pushController.savePushSubscriptionByEmail);
 
 export default router;

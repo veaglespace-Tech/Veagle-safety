@@ -4,15 +4,26 @@ import React, { useEffect } from 'react';
 import { Provider, useDispatch } from 'react-redux';
 import { store } from '../redux/store.js';
 import { fetchUser } from '../redux/slices/authSlice.js';
+import { EmergencyAlarmListener } from '../components/common/EmergencyAlarmListener.js';
+import { usePushNotification } from '../hooks/usePushNotification.js';
 
 function AuthInitializer({ children }) {
   const dispatch = useDispatch();
+
+  // Auto-register Service Worker & push subscription for all logged-in users
+  usePushNotification();
 
   useEffect(() => {
     dispatch(fetchUser());
   }, [dispatch]);
 
-  return <>{children}</>;
+  return (
+    <>
+      {/* Global real-time alarm listener (Socket.io - browser open) */}
+      <EmergencyAlarmListener />
+      {children}
+    </>
+  );
 }
 
 export function Providers({ children }) {

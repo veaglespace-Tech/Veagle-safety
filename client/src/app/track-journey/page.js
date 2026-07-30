@@ -4,17 +4,18 @@ import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { useLocationStore } from '../../redux/useLocationStore.js';
 import { api } from '../../utils/api.js';
-import { Navigation, Clock, ShieldCheck, Info } from 'lucide-react';
-
-export const dynamic = 'force-dynamic';
+import { Navigation, Clock, ShieldCheck, Info, MapPin, ArrowRight, Shield, CheckCircle2, Sliders } from 'lucide-react';
 
 export default function UserTrackJourneyPage() {
   const { latitude, longitude } = useLocationStore();
   const [activeTab, setActiveTab] = useState('JOURNEY');
   const [destination, setDestination] = useState('');
   const [minutes, setMinutes] = useState('30');
+  const [isCustomMinutes, setIsCustomMinutes] = useState(false);
   const [journey, setJourney] = useState(null);
+  
   const [checkinInterval, setCheckinInterval] = useState('15');
+  const [isCustomCheckin, setIsCustomCheckin] = useState(false);
   const [checkin, setCheckin] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -24,253 +25,360 @@ export default function UserTrackJourneyPage() {
   }, []);
 
   const loadActiveJourney = async () => {
-    try { const res = await api.get('/journey/active'); setJourney(res.data.journey); } catch (err) {}
+    try {
+      const res = await api.get('/journey/active');
+      setJourney(res.data.journey);
+    } catch (err) {}
   };
+
   const loadActiveCheckin = async () => {
-    try { const res = await api.get('/checkin/active'); setCheckin(res.data.checkin); } catch (err) {}
+    try {
+      const res = await api.get('/checkin/active');
+      setCheckin(res.data.checkin);
+    } catch (err) {}
   };
 
   const handleStartJourney = async (e) => {
     e.preventDefault();
-    if (!destination) return;
+    if (!destination || !minutes || Number(minutes) <= 0) {
+      alert('Please enter a valid destination and travel duration in minutes.');
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.post('/journey/start', {
         destinationName: destination,
-        originLat: latitude || 28.6139,
-        originLng: longitude || 77.2090,
-        destLat: 28.5355,
-        destLng: 77.3910,
+        originLat: latitude || 18.5204,
+        originLng: longitude || 73.8567,
+        destLat: 18.5355,
+        destLng: 73.8910,
         minutesToArrive: minutes,
       });
       setJourney(res.data.journey);
-    } catch (err) { alert('Failed to start journey. Please try again.'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      alert('Failed to start journey. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCompleteJourney = async () => {
     if (!journey) return;
-    try { await api.post('/journey/complete', { journeyId: journey.id }); setJourney(null); } catch (err) {}
+    try {
+      await api.post('/journey/complete', { journeyId: journey.id });
+      setJourney(null);
+    } catch (err) {}
   };
 
   const handleStartCheckin = async () => {
+    if (!checkinInterval || Number(checkinInterval) <= 0) {
+      alert('Please enter a valid check-in interval in minutes.');
+      return;
+    }
     setLoading(true);
-    try { const res = await api.post('/checkin/start', { intervalMins: checkinInterval }); setCheckin(res.data.checkin); }
-    catch (err) {} finally { setLoading(false); }
+    try {
+      const res = await api.post('/checkin/start', { intervalMins: checkinInterval });
+      setCheckin(res.data.checkin);
+    } catch (err) {} finally {
+      setLoading(false);
+    }
   };
 
   const handleConfirmSafeCheckin = async () => {
     if (!checkin) return;
-    try { await api.post('/checkin/safe', { checkinId: checkin.id }); setCheckin(null); } catch (err) {}
+    try {
+      await api.post('/checkin/safe', { checkinId: checkin.id });
+      setCheckin(null);
+    } catch (err) {}
   };
 
   return (
     <AppLayout>
-      <div className="max-w-xl mx-auto px-4 pt-5 pb-6 space-y-5 lg:max-w-2xl">
-        <div className="animate-fade-up">
-          <h1 className="text-xl font-extrabold text-tichi-text tracking-tight">Stay Protected</h1>
-          <p className="text-xs text-tichi-muted mt-0.5">Journey tracking & safety check-ins</p>
-        </div>
+      <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden pb-16">
+        
+        {/* BACKGROUND AMBIENT GLOW MESHES */}
+        <div className="absolute w-[700px] h-[700px] rounded-full bg-rose/15 blur-[150px] top-[-100px] left-[-200px] pointer-events-none" />
+        <div className="absolute w-[700px] h-[700px] rounded-full bg-gold/15 blur-[150px] bottom-[100px] right-[-200px] pointer-events-none" />
 
-        <div className="flex bg-white p-1 rounded-card border border-blush-border shadow-card gap-1">
-          {[
-            { key: 'JOURNEY', label: 'Track Journey', icon: Navigation },
-            { key: 'CHECKIN', label: 'Check On Me', icon: Clock },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center space-x-2 ${
-                  isActive ? 'bg-plum text-white shadow-sm' : 'text-tichi-muted hover:text-plum'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 relative z-10 animate-fade-up">
 
-        {activeTab === 'JOURNEY' && (
-          <div className="space-y-4 animate-fade-up">
-            {journey ? (
-              <div className="bg-white border border-blush-border rounded-2xl p-5 space-y-5 shadow-card">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-tichi-success animate-pulse"></span>
-                    <h3 className="font-extrabold text-sm text-plum">Protected Journey Active</h3>
-                  </div>
-                  <span className="text-xs font-semibold text-tichi-muted bg-blush-subtle px-2.5 py-1 rounded-full">
-                    ETA {new Date(journey.expectedArrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-
-                <div className="bg-blush-subtle rounded-xl p-4 space-y-3 border border-blush-border">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-plum mt-1.5 shrink-0"></div>
-                    <div>
-                      <p className="text-[10px] font-extrabold text-tichi-muted uppercase tracking-widest">Starting Point</p>
-                      <p className="text-xs font-bold text-tichi-text mt-0.5">{journey.originName}</p>
-                    </div>
-                  </div>
-                  <div className="w-px h-5 bg-plum/20 ml-1.5"></div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-tichi-emergency mt-1.5 shrink-0"></div>
-                    <div>
-                      <p className="text-[10px] font-extrabold text-tichi-muted uppercase tracking-widest">Destination</p>
-                      <p className="text-xs font-bold text-tichi-text mt-0.5">{journey.destinationName}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleCompleteJourney}
-                  className="w-full bg-tichi-success text-white font-extrabold py-3.5 rounded-card text-sm flex items-center justify-center space-x-2 shadow hover:brightness-105 transition-all active:scale-[0.98]"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>I'VE ARRIVED SAFELY</span>
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleStartJourney} className="bg-white border border-blush-border rounded-2xl p-5 space-y-4 shadow-card">
-                <div>
-                  <h3 className="font-extrabold text-base text-tichi-text">Start Protected Journey</h3>
-                  <p className="text-xs text-tichi-muted mt-1">
-                    Your trusted contacts can track your live progress. An alert fires if you don't arrive on time.
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-bold text-tichi-text mb-1.5">Where are you heading?</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Home, Office, Metro Station"
-                      value={destination}
-                      onChange={(e) => setDestination(e.target.value)}
-                      required
-                      className="w-full px-3.5 py-2.5 rounded-control border border-blush-border text-sm focus:ring-2 focus:ring-plum focus:border-transparent focus:outline-none bg-blush-subtle transition-all"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-tichi-text mb-1.5">How long will it take?</label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {['15', '30', '45', '60'].map((m) => (
-                        <button
-                          key={m}
-                          type="button"
-                          onClick={() => setMinutes(m)}
-                          className={`py-2.5 rounded-control text-xs font-bold border transition-all ${
-                            minutes === m
-                              ? 'bg-plum text-white border-plum shadow-sm'
-                              : 'bg-white text-tichi-text border-blush-border hover:bg-plum-50 hover:border-plum/30'
-                          }`}
-                        >
-                          {m === '60' ? '1h' : `${m}m`}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading || !destination}
-                  className="w-full bg-plum text-white font-extrabold py-3.5 rounded-card text-sm shadow hover:bg-plum-dark transition-colors flex items-center justify-center space-x-2 disabled:opacity-60 active:scale-[0.98]"
-                >
-                  <Navigation className="w-4 h-4" />
-                  <span>{loading ? 'STARTING...' : 'START PROTECTED JOURNEY'}</span>
-                </button>
-              </form>
-            )}
-
-            <div className="flex items-start space-x-3 bg-plum-50 p-4 rounded-card border border-plum-200">
-              <Info className="w-4 h-4 text-plum shrink-0 mt-0.5" />
-              <p className="text-xs text-plum font-medium">
-                Journey tracking continuously updates your location every 30 seconds. Your trusted contacts can view live progress via the shared tracking link.
-              </p>
+          {/* PAGE TITLE HEADER */}
+          <div className="text-center space-y-2">
+            <div className="w-14 h-14 rounded-2xl bg-rose/15 text-rose border-2 border-rose/30 flex items-center justify-center mx-auto shadow-sm">
+              <Navigation className="w-7 h-7 text-rose" />
             </div>
+            <h1 className="text-3xl font-black text-tichi-text tracking-tight">Stay Protected</h1>
+            <p className="text-xs font-bold text-tichi-muted max-w-md mx-auto">
+              Real-time GPS trip tracking & custom safety check-in timer alarms
+            </p>
           </div>
-        )}
 
-        {activeTab === 'CHECKIN' && (
-          <div className="space-y-4 animate-fade-up">
-            {checkin ? (
-              <div className="bg-white border border-blush-border rounded-2xl p-6 space-y-5 shadow-card text-center">
-                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-full mx-auto flex items-center justify-center border border-amber-200">
-                  <Clock className="w-7 h-7" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-base text-tichi-text">Safety Timer Running</h3>
-                  <p className="text-xs text-tichi-muted mt-1">
-                    You'll be asked to confirm safety at:
-                  </p>
-                  <p className="text-2xl font-black text-plum mt-1.5">
-                    {new Date(checkin.triggerAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-
-                <p className="text-xs text-tichi-muted bg-blush-subtle p-3 rounded-xl border border-blush-border">
-                  If you don't respond by the scheduled time, your trusted contacts will be automatically notified.
-                </p>
-
+          {/* DUAL TAB SWITCHER */}
+          <div className="card-antique-pink p-2 border-2 border-rose shadow-md flex gap-2 rounded-2xl">
+            {[
+              { key: 'JOURNEY', label: 'Track Journey', icon: Navigation },
+              { key: 'CHECKIN', label: 'Check On Me', icon: Clock },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.key;
+              return (
                 <button
-                  onClick={handleConfirmSafeCheckin}
-                  className="w-full bg-tichi-success text-white font-extrabold py-3.5 rounded-card text-sm shadow hover:brightness-105 transition-all flex items-center justify-center space-x-2 active:scale-[0.98]"
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex-1 py-3 rounded-xl font-black text-xs transition-all flex items-center justify-center space-x-2 uppercase tracking-wider ${
+                    isActive
+                      ? 'btn-baby-pink shadow-coral-glow'
+                      : 'bg-white text-tichi-muted hover:text-rose hover:bg-rose/5 border border-[#FFCCE1]'
+                  }`}
                 >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>YES, I'M SAFE NOW</span>
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
                 </button>
-              </div>
-            ) : (
-              <div className="bg-white border border-blush-border rounded-2xl p-5 space-y-5 shadow-card">
-                <div>
-                  <h3 className="font-extrabold text-base text-tichi-text">Safety Check-In Timer</h3>
-                  <p className="text-xs text-tichi-muted mt-1">
-                    Set a timer. We'll ask if you're safe. No response triggers automatic escalation to your trusted contacts.
-                  </p>
-                </div>
+              );
+            })}
+          </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-tichi-text mb-2">Check-in Reminder</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { val: '15', label: '15 min' },
-                      { val: '30', label: '30 min' },
-                      { val: '60', label: '1 hour' },
-                    ].map((opt) => (
-                      <button
-                        key={opt.val}
-                        type="button"
-                        onClick={() => setCheckinInterval(opt.val)}
-                        className={`py-3 rounded-control text-xs font-bold border transition-all ${
-                          checkinInterval === opt.val
-                            ? 'bg-plum text-white border-plum shadow-sm'
-                            : 'bg-white text-tichi-text border-blush-border hover:bg-plum-50 hover:border-plum/30'
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
+          {/* TAB 1: TRACK JOURNEY */}
+          {activeTab === 'JOURNEY' && (
+            <div className="space-y-4 animate-fade-up">
+              {journey ? (
+                <div className="card-antique-pink p-6 sm:p-8 border-2 border-rose shadow-coral-glow space-y-6">
+                  <div className="flex items-center justify-between border-b border-[#FFCCE1] pb-4">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-3 h-3 rounded-full bg-tichi-success animate-ping"></span>
+                      <h3 className="font-black text-base text-tichi-text">Protected Journey Active</h3>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-rose bg-white px-3 py-1 rounded-full border border-rose/30 shadow-sm">
+                      ETA {new Date(journey.expectedArrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
-                </div>
 
-                <button
-                  onClick={handleStartCheckin}
-                  disabled={loading}
-                  className="w-full bg-plum text-white font-extrabold py-3.5 rounded-card text-sm shadow hover:bg-plum-dark transition-colors flex items-center justify-center space-x-2 disabled:opacity-60"
-                >
-                  <Clock className="w-4 h-4" />
-                  <span>{loading ? 'STARTING...' : 'START SAFETY CHECK'}</span>
-                </button>
+                  {/* ROUTE STEPS */}
+                  <div className="bg-blush-subtle rounded-2xl p-5 space-y-4 border border-[#FFCCE1]">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-3 h-3 rounded-full bg-rose mt-1 shrink-0 shadow-sm"></div>
+                      <div>
+                        <p className="text-[10px] font-black text-tichi-muted uppercase tracking-widest">Starting Point</p>
+                        <p className="text-sm font-black text-tichi-text mt-0.5">{journey.originName || 'Current GPS Location'}</p>
+                      </div>
+                    </div>
+                    <div className="w-0.5 h-6 bg-rose/30 ml-1.5"></div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-3 h-3 rounded-full bg-[#FF2A6D] mt-1 shrink-0 shadow-sm"></div>
+                      <div>
+                        <p className="text-[10px] font-black text-tichi-muted uppercase tracking-widest">Destination</p>
+                        <p className="text-sm font-black text-tichi-text mt-0.5">{journey.destinationName}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleCompleteJourney}
+                    className="w-full bg-tichi-success text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-lg hover:brightness-105 transition-all"
+                  >
+                    <ShieldCheck className="w-5 h-5" />
+                    <span>I'VE ARRIVED SAFELY</span>
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleStartJourney} className="card-antique-pink p-6 sm:p-8 border-2 border-rose shadow-coral-glow space-y-6">
+                  <div>
+                    <h3 className="font-black text-lg text-tichi-text">Start Protected Journey</h3>
+                    <p className="text-xs text-tichi-muted font-bold mt-1">
+                      Your trusted guardians can track your live progress. An alert fires if you don't arrive on time.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-wider text-tichi-text mb-2">Where are you heading?</label>
+                      <div className="relative">
+                        <MapPin className="w-5 h-5 text-rose absolute left-3.5 top-3" />
+                        <input
+                          type="text"
+                          placeholder="e.g. Home, Office, Metro Station"
+                          value={destination}
+                          onChange={(e) => setDestination(e.target.value)}
+                          required
+                          className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:ring-2 focus:ring-rose focus:border-transparent focus:outline-none bg-white transition-all text-tichi-text"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-black uppercase tracking-wider text-tichi-text">Travel Duration (Minutes)</label>
+                        <button
+                          type="button"
+                          onClick={() => setIsCustomMinutes(!isCustomMinutes)}
+                          className="text-[11px] font-black text-rose hover:underline flex items-center space-x-1"
+                        >
+                          <Sliders className="w-3.5 h-3.5" />
+                          <span>{isCustomMinutes ? 'Use Presets' : 'Custom Duration'}</span>
+                        </button>
+                      </div>
+
+                      {/* QUICK PRESETS OR CUSTOM INPUT */}
+                      {isCustomMinutes ? (
+                        <div className="relative">
+                          <Clock className="w-5 h-5 text-rose absolute left-3.5 top-3" />
+                          <input
+                            type="number"
+                            min="1"
+                            max="720"
+                            placeholder="Enter custom minutes (e.g. 10, 25, 90)"
+                            value={minutes}
+                            onChange={(e) => setMinutes(e.target.value)}
+                            required
+                            className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:ring-2 focus:ring-rose focus:border-transparent focus:outline-none bg-white transition-all text-tichi-text font-mono"
+                          />
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-4 gap-2.5">
+                          {['15', '30', '45', '60'].map((m) => (
+                            <button
+                              key={m}
+                              type="button"
+                              onClick={() => { setMinutes(m); setIsCustomMinutes(false); }}
+                              className={`py-3 rounded-xl text-xs font-black border-2 transition-all ${
+                                minutes === m && !isCustomMinutes
+                                  ? 'bg-rose text-white border-rose shadow-md'
+                                  : 'bg-white text-tichi-text border-[#FFCCE1] hover:bg-rose/10'
+                              }`}
+                            >
+                              {m === '60' ? '1 Hour' : `${m} Mins`}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading || !destination}
+                    className="w-full btn-baby-pink py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-coral-glow font-black disabled:opacity-60"
+                  >
+                    <Navigation className="w-5 h-5" />
+                    <span>{loading ? 'STARTING...' : `START JOURNEY (${minutes || '30'} MINS)`}</span>
+                  </button>
+                </form>
+              )}
+
+              <div className="flex items-start space-x-3 bg-white p-4 rounded-2xl border border-[#FFCCE1] shadow-sm">
+                <Info className="w-5 h-5 text-rose shrink-0 mt-0.5" />
+                <p className="text-xs text-tichi-muted font-bold leading-relaxed">
+                  Journey tracking continuously updates your location every 30 seconds. Your trusted contacts can view live progress via the shared tracking link.
+                </p>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+
+          {/* TAB 2: CHECK ON ME */}
+          {activeTab === 'CHECKIN' && (
+            <div className="space-y-4 animate-fade-up">
+              {checkin ? (
+                <div className="card-antique-pink p-6 sm:p-8 border-2 border-rose shadow-coral-glow space-y-6 text-center">
+                  <div className="w-16 h-16 bg-rose/15 text-rose rounded-full mx-auto flex items-center justify-center border-2 border-rose/30 shadow-sm">
+                    <Clock className="w-8 h-8 animate-pulse" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-lg text-tichi-text">Safety Timer Running</h3>
+                    <p className="text-xs text-tichi-muted font-bold mt-1">
+                      You'll be asked to confirm safety at:
+                    </p>
+                    <p className="text-3xl font-black text-rose mt-2 font-mono">
+                      {new Date(checkin.triggerAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+
+                  <p className="text-xs text-tichi-muted font-bold bg-white p-4 rounded-2xl border border-[#FFCCE1]">
+                    If you don't respond by the scheduled time, your trusted contacts will be automatically notified.
+                  </p>
+
+                  <button
+                    onClick={handleConfirmSafeCheckin}
+                    className="w-full bg-tichi-success text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-lg hover:brightness-105 transition-all"
+                  >
+                    <ShieldCheck className="w-5 h-5" />
+                    <span>YES, I'M SAFE NOW</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="card-antique-pink p-6 sm:p-8 border-2 border-rose shadow-coral-glow space-y-6">
+                  <div>
+                    <h3 className="font-black text-lg text-tichi-text">Safety Check-In Timer</h3>
+                    <p className="text-xs text-tichi-muted font-bold mt-1">
+                      Set a timer. We'll ask if you're safe. No response triggers automatic escalation to your trusted contacts.
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs font-black uppercase tracking-wider text-tichi-text">Check-in Interval (Minutes)</label>
+                      <button
+                        type="button"
+                        onClick={() => setIsCustomCheckin(!isCustomCheckin)}
+                        className="text-[11px] font-black text-rose hover:underline flex items-center space-x-1"
+                      >
+                        <Sliders className="w-3.5 h-3.5" />
+                        <span>{isCustomCheckin ? 'Use Presets' : 'Custom Interval'}</span>
+                      </button>
+                    </div>
+
+                    {/* QUICK PRESETS OR CUSTOM INPUT FOR CHECKIN */}
+                    {isCustomCheckin ? (
+                      <div className="relative">
+                        <Clock className="w-5 h-5 text-rose absolute left-3.5 top-3" />
+                        <input
+                          type="number"
+                          min="1"
+                          max="360"
+                          placeholder="Enter custom check-in minutes (e.g. 5, 20, 90)"
+                          value={checkinInterval}
+                          onChange={(e) => setCheckinInterval(e.target.value)}
+                          required
+                          className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:ring-2 focus:ring-rose focus:border-transparent focus:outline-none bg-white transition-all text-tichi-text font-mono"
+                        />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { val: '15', label: '15 Mins' },
+                          { val: '30', label: '30 Mins' },
+                          { val: '60', label: '1 Hour' },
+                        ].map((opt) => (
+                          <button
+                            key={opt.val}
+                            type="button"
+                            onClick={() => { setCheckinInterval(opt.val); setIsCustomCheckin(false); }}
+                            className={`py-3.5 rounded-2xl text-xs font-black border-2 transition-all ${
+                              checkinInterval === opt.val && !isCustomCheckin
+                                ? 'bg-rose text-white border-rose shadow-md'
+                                : 'bg-white text-tichi-text border-[#FFCCE1] hover:bg-rose/10'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={handleStartCheckin}
+                    disabled={loading}
+                    className="w-full btn-baby-pink py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-coral-glow font-black disabled:opacity-60"
+                  >
+                    <Clock className="w-5 h-5" />
+                    <span>{loading ? 'STARTING...' : `START SAFETY CHECK (${checkinInterval || '15'} MINS)`}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+        </div>
       </div>
     </AppLayout>
   );

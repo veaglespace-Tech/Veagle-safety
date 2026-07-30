@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { ShieldAlert, VolumeX, Volume2, Radio, Sparkles } from 'lucide-react';
 import { useSOSStore } from '../../redux/useSOSStore.js';
 import { useLocationStore } from '../../redux/useLocationStore.js';
 import { useRouter } from 'next/navigation';
@@ -32,7 +32,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
     startTimeRef.current = Date.now();
 
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate(50);
+      navigator.vibrate([80, 50, 80]);
     }
 
     progressIntervalRef.current = setInterval(() => {
@@ -47,7 +47,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
         clearInterval(progressIntervalRef.current);
         handleTriggered();
       }
-    }, 50);
+    }, 40);
   };
 
   const endHold = () => {
@@ -63,9 +63,9 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
   const handleTriggered = async () => {
     setHolding(false);
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate([200, 100, 300]);
+      navigator.vibrate([300, 100, 300, 100, 400]);
     }
-    const success = await triggerSos(isSilent, latitude || 28.6139, longitude || 77.2090);
+    const success = await triggerSos(isSilent, latitude || 18.5204, longitude || 73.8567);
     if (success) {
       if (onTriggerComplete) onTriggerComplete();
       router.push('/active-sos');
@@ -78,83 +78,120 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
     };
   }, []);
 
-  const circumference = 2 * Math.PI * 80;
+  const circumference = 2 * Math.PI * 120; // Radius = 120px
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center justify-center my-6">
-      <div className="relative flex items-center justify-center">
+    <div className="flex flex-col items-center justify-center my-6 relative select-none">
+      
+      {/* 3D PORCELAIN EMBLEM CONTAINER (ZERO OVERLAPPING GAP) */}
+      <div className="relative w-80 h-80 flex items-center justify-center">
+        
+        {/* SOFT RADAR AURA WAVES */}
         <div
-          className={`absolute inset-0 rounded-full bg-tichi-emergency/15 ${
-            holding ? 'animate-none scale-125 bg-tichi-emergency/30' : 'animate-radar'
+          className={`absolute inset-4 rounded-full transition-all duration-500 ${
+            holding
+              ? 'bg-[#FF2A6D]/30 scale-110 blur-xl animate-pulse'
+              : activeSession
+              ? 'bg-[#FF2A6D]/20 blur-xl animate-ping'
+              : 'bg-rose/15 blur-2xl'
           }`}
-          style={{ width: '220px', height: '220px', margin: '-10px' }}
-        ></div>
+        />
 
-        <svg className="w-52 h-52 transform -rotate-90 pointer-events-none z-10">
+        {/* ELEGANT OUTER ANTIQUE GOLD ACCENT RING */}
+        <div className="absolute w-[290px] h-[290px] rounded-full border-2 border-gold/40 shadow-sm pointer-events-none" />
+
+        {/* HIGH-PRECISION SVG TIMER RING (CLEANLY ORBITING AT RADIUS 120) */}
+        <svg className="w-72 h-72 transform -rotate-90 pointer-events-none z-10">
+          {/* TRACK BACKGROUND */}
           <circle
-            cx="104"
-            cy="104"
-            r="80"
+            cx="144"
+            cy="144"
+            r="120"
             stroke="currentColor"
-            strokeWidth="10"
+            strokeWidth="8"
             fill="transparent"
-            className="text-rose/40"
+            className="text-rose/20"
           />
+          {/* PROGRESS NEON FILL */}
           <circle
-            cx="104"
-            cy="104"
-            r="80"
-            stroke="currentColor"
+            cx="144"
+            cy="144"
+            r="120"
+            stroke="url(#sosLuxuryGradient)"
             strokeWidth="10"
             fill="transparent"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
-            className="text-tichi-emergency transition-all duration-75"
+            className="transition-all duration-75 drop-shadow-[0_0_12px_rgba(255,42,109,0.9)]"
           />
+          <defs>
+            <linearGradient id="sosLuxuryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FF2A6D" />
+              <stop offset="50%" stopColor="#FF5C8A" />
+              <stop offset="100%" stopColor="#FFD700" />
+            </linearGradient>
+          </defs>
         </svg>
 
+        {/* MAIN 3D PORCELAIN CRYSTAL SOS BUTTON CORE */}
         <button
           onMouseDown={startHold}
           onMouseUp={endHold}
           onMouseLeave={endHold}
           onTouchStart={startHold}
           onTouchEnd={endHold}
-          className={`absolute w-44 h-44 rounded-full flex flex-col items-center justify-center shadow-sos-glow z-20 transition-transform active:scale-95 select-none cursor-pointer ${
+          className={`absolute w-52 h-52 rounded-full flex flex-col items-center justify-center z-30 transition-all duration-300 transform active:scale-95 cursor-pointer shadow-2xl border-4 ${
             holding
-              ? 'bg-tichi-emergency text-white shadow-sos-holding scale-105'
+              ? 'bg-gradient-to-b from-[#FF2A6D] via-[#FF5C8A] to-[#D90429] text-white border-white scale-105 shadow-coral-glow'
               : activeSession
-              ? 'bg-tichi-emergency text-white animate-pulse'
-              : 'bg-tichi-emergency text-white hover:brightness-105'
+              ? 'bg-gradient-to-b from-[#FF2A6D] to-[#D90429] text-white border-white animate-pulse shadow-coral-glow'
+              : 'bg-gradient-to-br from-[#FF2A6D] via-[#FF5C8A] to-[#FF80A0] text-white border-white hover:scale-105 shadow-[0_15px_35px_rgba(255,92,138,0.5)]'
           }`}
         >
-          <AlertTriangle className={`w-10 h-10 mb-1 ${holding ? 'animate-bounce' : ''}`} />
-          <span className="text-3xl font-extrabold tracking-wider">
-            {holding ? `${countdown}s` : activeSession ? 'ACTIVE' : 'SOS'}
-          </span>
-          <span className="text-[11px] font-semibold text-white/90 uppercase tracking-widest mt-1">
-            {holding ? 'KEEP HOLDING' : activeSession ? 'VIEW STATUS' : 'HOLD 3 SECONDS'}
-          </span>
+          {/* INNER SHIELD ICON & TYPOGRAPHY */}
+          <div className="relative z-10 flex flex-col items-center justify-center space-y-1 text-center">
+            
+            <ShieldAlert className={`w-9 h-9 text-white drop-shadow-md mb-0.5 ${
+              holding ? 'animate-bounce' : ''
+            }`} />
+
+            <span className="text-3xl font-black tracking-widest text-white drop-shadow-md">
+              {holding ? `${countdown}s` : activeSession ? 'ACTIVE' : 'SOS'}
+            </span>
+
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/95 bg-black/25 px-3.5 py-1 rounded-full border border-white/20 backdrop-blur-sm shadow-sm">
+              {holding ? 'DISPATCHING...' : activeSession ? 'VIEW STATUS' : 'HOLD 3 SECONDS'}
+            </span>
+
+          </div>
         </button>
+
       </div>
 
-      <div className="mt-6 flex flex-col items-center space-y-2">
-        <p className="text-xs text-rose-muted font-medium text-center">
-          Press & hold for 3 seconds to instantly alert contacts
+      {/* FOOTER SILENT MODE SWITCH */}
+      <div className="mt-4 flex flex-col items-center space-y-3 z-30">
+        <p className="text-xs font-bold text-tichi-muted text-center tracking-wide flex items-center space-x-1.5">
+          <Radio className="w-4 h-4 text-rose animate-pulse" />
+          <span>Press & hold for 3 seconds to broadcast live GPS location</span>
         </p>
 
         <button
+          type="button"
           onClick={() => setIsSilent(!isSilent)}
-          className={`flex items-center space-x-2 text-xs font-semibold px-4 py-1.5 rounded-full transition-all border ${
+          className={`flex items-center space-x-2 text-xs font-black px-5 py-2.5 rounded-full transition-all border-2 shadow-sm cursor-pointer ${
             isSilent
-              ? 'bg-rose text-white border-rose shadow-coral-glow'
-              : 'bg-white/10 text-white/90 border-white/20 hover:bg-white/20'
+              ? 'bg-[#FF2A6D] text-white border-white shadow-coral-glow'
+              : 'bg-white text-tichi-text border-[#FFCCE1] hover:border-rose'
           }`}
         >
-          <span>Silent SOS Mode: {isSilent ? 'ON (No Loud Siren)' : 'OFF'}</span>
+          {isSilent ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-rose" />}
+          <span>Silent Emergency Mode: {isSilent ? 'ON (Discreet Alert)' : 'OFF (Loud Siren)'}</span>
+          <span className={`w-2 h-2 rounded-full ${isSilent ? 'bg-white animate-ping' : 'bg-tichi-success'}`} />
         </button>
       </div>
+
     </div>
   );
 };
