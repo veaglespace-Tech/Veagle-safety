@@ -96,6 +96,7 @@ export const PublicNavbar = () => {
 
           {/* RIGHT SIDE ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            {/* Show Sign In only when NOT logged in on public page */}
             {!isLoggedIn && (
               <>
                 <Link href="/auth?mode=login" style={{
@@ -128,7 +129,7 @@ export const PublicNavbar = () => {
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               style={{
-                background: '#FFF0F3', border: '1px solid #FFCCE1',
+                background: '#FFF0F3', border: '1.5px solid #FFCCE1',
                 borderRadius: '12px', width: '36px', height: '36px',
                 cursor: 'pointer', display: 'flex',
                 alignItems: 'center', justifyContent: 'center',
@@ -163,20 +164,35 @@ export const PublicNavbar = () => {
               </Link>
             ))}
 
-            {isLoggedIn && (
+            {isLoggedIn ? (
               <button
                 onClick={handleLogout}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '10px',
                   width: '100%', padding: '10px 14px', borderRadius: '12px',
                   fontSize: '13px', fontWeight: 800,
-                  border: '1px solid #FFCCE1', background: '#FFFFFF',
+                  border: '1.5px solid #FFCCE1', background: '#FFF0F3',
                   color: '#FF2A6D', cursor: 'pointer', marginTop: '8px',
+                  boxShadow: '0 2px 8px rgba(255,92,138,0.1)',
                 }}
               >
-                <LogOut size={16} />
-                <span>Sign Out</span>
+                <LogOut size={16} color="#FF2A6D" />
+                <span>Sign Out / Logout</span>
               </button>
+            ) : (
+              <Link
+                href="/auth?mode=login"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  width: '100%', padding: '10px 14px', borderRadius: '12px',
+                  fontSize: '13px', fontWeight: 800,
+                  border: '1px solid #FFCCE1', background: '#FFFFFF',
+                  color: '#2A0826', textDecoration: 'none', marginTop: '8px',
+                }}
+              >
+                <UserCheck size={16} color="#FF5C8A" />
+                <span>Sign In</span>
+              </Link>
             )}
           </div>
         )}

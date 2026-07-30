@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Shield, Crown, Home, Zap, Info, Image as ImageIcon,
-  PhoneCall, LogOut, Menu, X, UserCheck
+  PhoneCall, LogOut, Menu, X
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -31,7 +31,7 @@ export const Header = () => {
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
-  // Clean Navigation Links for the Menu Toggle Dropdown
+  // Navigation Links for the Menu Toggle Dropdown
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/pricing', label: 'Pricing', icon: Zap },
@@ -45,7 +45,6 @@ export const Header = () => {
   }
 
   const isActive = (path) => pathname === path;
-  const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
 
   return (
     <>
@@ -122,28 +121,8 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* RIGHT SIDE USER ACTIONS */}
+          {/* RIGHT SIDE ACTIONS: ONLY MENU TOGGLE BUTTON (No Sign In button on App pages!) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            
-            {/* NON LOGGED IN VISITOR: SIGN IN BUTTON */}
-            {!isLoggedIn && (
-              <Link 
-                href="/auth?mode=login" 
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '5px',
-                  color: '#2A0826', fontWeight: 800, fontSize: '11px',
-                  padding: '7px 14px', borderRadius: '12px',
-                  textDecoration: 'none', border: '1px solid #FFCCE1',
-                  background: 'rgba(255,255,255,0.9)',
-                  whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }}
-              >
-                <UserCheck size={13} color="#FF5C8A" />
-                <span>Sign In</span>
-              </Link>
-            )}
-
-            {/* MENU TOGGLE BUTTON */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
@@ -160,7 +139,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* COLLAPSED MENU DROPDOWN */}
+        {/* COLLAPSED MENU DROPDOWN (Contains Sign Out / Logout button!) */}
         {mobileMenuOpen && (
           <div 
             style={{
@@ -188,21 +167,21 @@ export const Header = () => {
               </Link>
             ))}
 
-            {isLoggedIn && (
-              <button
-                onClick={handleLogout}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  width: '100%', padding: '10px 14px', borderRadius: '12px',
-                  fontSize: '13px', fontWeight: 800,
-                  border: '1px solid #FFCCE1', background: '#FFFFFF',
-                  color: '#FF2A6D', cursor: 'pointer', marginTop: '8px',
-                }}
-              >
-                <LogOut size={16} />
-                <span>Sign Out</span>
-              </button>
-            )}
+            {/* LOGOUT / SIGN OUT BUTTON INSIDE MENU DROPDOWN */}
+            <button
+              onClick={handleLogout}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                width: '100%', padding: '10px 14px', borderRadius: '12px',
+                fontSize: '13px', fontWeight: 800,
+                border: '1.5px solid #FFCCE1', background: '#FFF0F3',
+                color: '#FF2A6D', cursor: 'pointer', marginTop: '8px',
+                boxShadow: '0 2px 8px rgba(255,92,138,0.1)',
+              }}
+            >
+              <LogOut size={16} color="#FF2A6D" />
+              <span>Sign Out / Logout</span>
+            </button>
           </div>
         )}
       </header>
