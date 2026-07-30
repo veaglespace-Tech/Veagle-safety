@@ -23,20 +23,15 @@ import {
   UserPlus,
   Heart,
   ArrowRight,
-<<<<<<< HEAD
-  CheckCircle2,
-  AlertCircle,
-  FileText,
-  Users,
-  Building,
-  Map,
-=======
   ShieldCheck,
   KeyRound,
   CheckCircle2,
   AlertCircle,
   Zap,
->>>>>>> ede48e2d317563faf48fc363e9034fc305157350
+  Building,
+  MapPin,
+  Map,
+  Users,
 } from 'lucide-react';
 
 function UserAuthForm() {
@@ -56,7 +51,7 @@ function UserAuthForm() {
     }
   }, [searchParams]);
 
-  // Clean Registration Fields State (No pre-filled defaults)
+  // Registration Fields State
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -76,15 +71,17 @@ function UserAuthForm() {
   // OTP State
   const [otpCode, setOtpCode] = useState('');
 
-<<<<<<< HEAD
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const { token, user, registrationToken, pendingToken, isLoading, error, successMessage, showOtpModal, pendingVerificationEmail } = useSelector(
-=======
-  const { token, user, isLoading, error, successMessage, showOtpModal, pendingVerificationEmail } = useSelector(
->>>>>>> ede48e2d317563faf48fc363e9034fc305157350
-    (state) => state?.auth || {}
-  );
+  const {
+    token,
+    user,
+    registrationToken,
+    pendingToken,
+    isLoading,
+    error,
+    successMessage,
+    showOtpModal,
+    pendingVerificationEmail,
+  } = useSelector((state) => state?.auth || {});
 
   const [wasOtpModalOpened, setWasOtpModalOpened] = useState(false);
 
@@ -110,7 +107,13 @@ function UserAuthForm() {
     }
   }, [token, user, router]);
 
-<<<<<<< HEAD
+  const toggleMode = (loginMode) => {
+    setIsLogin(loginMode);
+    setValidationError('');
+    dispatch(clearAuthMessages());
+    router.push(loginMode ? '/auth?mode=login' : '/auth?mode=register', { scroll: false });
+  };
+
   const validateForm = () => {
     setValidationError('');
 
@@ -122,7 +125,6 @@ function UserAuthForm() {
       return true;
     }
 
-    // Comprehensive Registration Validation
     if (
       !fullName.trim() ||
       !email.trim() ||
@@ -140,14 +142,12 @@ function UserAuthForm() {
       return false;
     }
 
-    // Email Regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setValidationError('Please enter a valid email address.');
       return false;
     }
 
-    // Indian 10-Digit Phone Regex
     const phoneRegex = /^[6-9]\d{9}$/;
     const cleanPhone = phone.replace(/\D/g, '');
     if (!phoneRegex.test(cleanPhone)) {
@@ -161,7 +161,6 @@ function UserAuthForm() {
       return false;
     }
 
-    // 6-Digit Pincode Regex
     const pincodeRegex = /^\d{6}$/;
     if (!pincodeRegex.test(pincode.trim())) {
       setValidationError('Please enter a valid 6-digit Pincode.');
@@ -174,12 +173,6 @@ function UserAuthForm() {
     }
 
     return true;
-=======
-  const toggleMode = (loginMode) => {
-    setIsLogin(loginMode);
-    dispatch(clearAuthMessages());
-    router.push(loginMode ? '/auth?mode=login' : '/auth?mode=register', { scroll: false });
->>>>>>> ede48e2d317563faf48fc363e9034fc305157350
   };
 
   const handleSubmit = async (e) => {
@@ -224,19 +217,11 @@ function UserAuthForm() {
     dispatch(resendOtpCode({ email: pendingVerificationEmail || email }));
   };
 
-  const handleQuickDemo = (demoEmail, demoPass) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setIsLogin(true);
-    dispatch(clearAuthMessages());
-    dispatch(loginUser({ email: demoEmail, password: demoPass }));
-  };
-
   return (
     <div suppressHydrationWarning className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden flex flex-col">
       <PublicNavbar />
 
-      {/* BACKGROUND ANIMATED AMBIENT GLOW MESHES */}
+      {/* BACKGROUND AMBIENT GLOW MESHES */}
       <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF5C8A]/15 blur-[170px] top-[-120px] left-[-220px] pointer-events-none animate-pulse" />
       <div className="absolute w-[750px] h-[750px] rounded-full bg-[#FFCCE1]/30 blur-[160px] bottom-[40px] right-[-200px] pointer-events-none animate-pulse" />
 
@@ -246,9 +231,8 @@ function UserAuthForm() {
           {/* TOP DECORATIVE ACCENT STRIP */}
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] rounded-t-3xl" />
 
-          {/* ANIMATED TOP HEADER LUCIDE ICON EMBLEM & BRAND - PERFECTLY CENTERED */}
+          {/* HEADER */}
           <div className="flex flex-col items-center justify-center text-center space-y-3 pt-2">
-            {/* ROTATING LOGO EMBLEM CENTERED */}
             <div className="relative flex items-center justify-center">
               <div className="absolute -inset-3 rounded-2xl bg-[#FF5C8A]/20 animate-pulse blur-lg" />
               <div className="relative z-10 p-3 rounded-2xl bg-gradient-to-br from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FFCCE1] shadow-md flex items-center justify-center">
@@ -256,7 +240,6 @@ function UserAuthForm() {
               </div>
             </div>
 
-            {/* DYNAMIC BADGE — LOCK FOR SIGN IN, USERPLUS FOR REGISTER */}
             <div className="inline-flex items-center space-x-1.5 bg-[#FFF0F3] border border-[#FFCCE1] px-4 py-1.5 rounded-full text-[10px] font-black text-[#FF2A6D] uppercase tracking-widest shadow-sm mt-1">
               {isLogin
                 ? <Lock className="w-3.5 h-3.5 text-[#FF5C8A]" />
@@ -275,21 +258,15 @@ function UserAuthForm() {
             </p>
           </div>
 
-          {/* SLIDING ANIMATED TAB SWITCHER */}
+          {/* TAB SWITCHER */}
           <div className="flex bg-[#FFF0F3] p-1.5 rounded-2xl border-1.5 border-[#FFCCE1] shadow-inner relative">
             <button
               type="button"
-<<<<<<< HEAD
-              onClick={() => { setIsLogin(true); setValidationError(''); }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
-                isLogin ? 'btn-baby-pink shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
-=======
               onClick={() => toggleMode(true)}
               className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${
                 isLogin
                   ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-[0_4px_16px_rgba(255,42,109,0.35)] scale-[1.02]'
                   : 'text-[#684E67] hover:text-[#2A0826]'
->>>>>>> ede48e2d317563faf48fc363e9034fc305157350
               }`}
             >
               <Lock className="w-3.5 h-3.5" />
@@ -297,17 +274,11 @@ function UserAuthForm() {
             </button>
             <button
               type="button"
-<<<<<<< HEAD
-              onClick={() => { setIsLogin(false); setValidationError(''); }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
-                !isLogin ? 'btn-baby-pink shadow-coral-glow' : 'text-tichi-muted hover:text-tichi-text'
-=======
               onClick={() => toggleMode(false)}
               className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${
                 !isLogin
                   ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-[0_4px_16px_rgba(255,42,109,0.35)] scale-[1.02]'
                   : 'text-[#684E67] hover:text-[#2A0826]'
->>>>>>> ede48e2d317563faf48fc363e9034fc305157350
               }`}
             >
               <UserPlus className="w-3.5 h-3.5" />
@@ -315,19 +286,11 @@ function UserAuthForm() {
             </button>
           </div>
 
-<<<<<<< HEAD
-          {/* ERROR / VALIDATION / SUCCESS NOTIFICATIONS */}
+          {/* NOTIFICATIONS */}
           {(validationError || error) && (
-            <div className="bg-rose/10 border border-rose text-rose p-4 rounded-xl text-xs font-bold flex items-center space-x-2 animate-fade-up">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{validationError || error}</span>
-=======
-          {/* ERROR / SUCCESS NOTIFICATIONS */}
-          {error && (
-            <div className="bg-[#FFF0F3] border-1.5 border-[#FF2A6D] text-[#FF2A6D] p-4 rounded-2xl text-xs font-black flex items-center space-x-2 animate-bounce shadow-sm">
+            <div className="bg-[#FFF0F3] border-1.5 border-[#FF2A6D] text-[#FF2A6D] p-4 rounded-2xl text-xs font-black flex items-center space-x-2 shadow-sm">
               <AlertCircle className="w-4 h-4 shrink-0 text-[#FF2A6D]" />
-              <span>{error}</span>
->>>>>>> ede48e2d317563faf48fc363e9034fc305157350
+              <span>{validationError || error}</span>
             </div>
           )}
 
@@ -341,22 +304,21 @@ function UserAuthForm() {
           {/* AUTH FORM */}
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             
-<<<<<<< HEAD
             {!isLogin ? (
               <div className="space-y-4">
                 
                 {/* FULL NAME */}
                 <div>
-                  <label className="block text-tichi-muted font-bold mb-1">Full Name *</label>
+                  <label className="block text-[#684E67] font-extrabold mb-1">Full Name *</label>
                   <div className="relative">
-                    <UserIcon className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <UserIcon className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       required
                       placeholder="e.g. Priya Sharma"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                      className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                     />
                   </div>
                 </div>
@@ -364,49 +326,24 @@ function UserAuthForm() {
                 {/* EMAIL & MOBILE */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Email Address *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Email Address *</label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-=======
-            {!isLogin && (
-              <>
-                {/* SECTION 1: PERSONAL DETAILS */}
-                <div className="space-y-3 pt-2 border-t border-[#FFCCE1]">
-                  <div className="flex items-center space-x-2">
-                    <ShieldCheck className="w-4 h-4 text-[#FF2A6D]" />
-                    <span className="text-[11px] font-black text-[#FF2A6D] uppercase tracking-wider">
-                      Section 1: Personal Profile
-                    </span>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Full Name *</label>
-                    <div className="relative">
-                      <UserIcon className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
->>>>>>> ede48e2d317563faf48fc363e9034fc305157350
+                      <Mail className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="email"
                         required
-<<<<<<< HEAD
                         placeholder="priya@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
-=======
-                        placeholder="Priya Sharma"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
->>>>>>> ede48e2d317563faf48fc363e9034fc305157350
                       />
                     </div>
                   </div>
 
-<<<<<<< HEAD
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Mobile Number *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Mobile Number *</label>
                     <div className="relative">
-                      <Phone className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Phone className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="tel"
                         required
@@ -414,93 +351,7 @@ function UserAuthForm() {
                         placeholder="10-digit number"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                        className="w-full pl-10 pr-4 py-3 input-antique-pink font-mono"
-=======
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[#684E67] font-extrabold mb-1">Mobile Number *</label>
-                      <div className="relative">
-                        <Phone className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="tel"
-                          required
-                          placeholder="+91 98765 43210"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-[#684E67] font-extrabold mb-1">Blood Group</label>
-                      <select
-                        value={bloodGroup}
-                        onChange={(e) => setBloodGroup(e.target.value)}
-                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                      >
-                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bg) => (
-                          <option key={bg} value={bg}>{bg}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SECTION 2: ADDRESS & EMERGENCY CONTACT */}
-                <div className="space-y-3 pt-2 border-t border-[#FFCCE1]">
-                  <div className="flex items-center space-x-2">
-                    <Heart className="w-4 h-4 text-[#FF2A6D]" />
-                    <span className="text-[11px] font-black text-[#FF2A6D] uppercase tracking-wider">
-                      Section 2: Emergency Contacts
-                    </span>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[#684E67] font-extrabold mb-1">City / Region</label>
-                      <input
-                        type="text"
-                        placeholder="Pune"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[#684E67] font-extrabold mb-1">Pincode</label>
-                      <input
-                        type="text"
-                        placeholder="411001"
-                        value={pincode}
-                        onChange={(e) => setPincode(e.target.value)}
-                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[#684E67] font-extrabold mb-1">Guardian Name (Optional)</label>
-                      <input
-                        type="text"
-                        placeholder="Rajesh Sharma (Father)"
-                        value={emergencyContactName}
-                        onChange={(e) => setEmergencyContactName(e.target.value)}
-                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[#684E67] font-extrabold mb-1">Guardian Phone (Optional)</label>
-                      <input
-                        type="tel"
-                        placeholder="+91 98765 00000"
-                        value={emergencyContactPhone}
-                        onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
->>>>>>> ede48e2d317563faf48fc363e9034fc305157350
+                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                       />
                     </div>
                   </div>
@@ -509,12 +360,12 @@ function UserAuthForm() {
                 {/* BLOOD GROUP & PASSWORD */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Blood Group *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Blood Group *</label>
                     <select
                       required
                       value={bloodGroup}
                       onChange={(e) => setBloodGroup(e.target.value)}
-                      className="w-full px-4 py-3 input-antique-pink font-bold"
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                     >
                       <option value="" disabled>Select Blood Group</option>
                       {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bg) => (
@@ -524,21 +375,21 @@ function UserAuthForm() {
                   </div>
 
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Password *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Password *</label>
                     <div className="relative">
-                      <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Lock className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type={showPass ? 'text' : 'password'}
                         required
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-10 pr-12 py-3 input-antique-pink"
+                        className="w-full pl-10 pr-12 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPass(!showPass)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#684E67] hover:text-[#FF2A6D] transition-colors"
                       >
                         {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -549,31 +400,31 @@ function UserAuthForm() {
                 {/* ADDRESS & CITY */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Full Address *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Full Address *</label>
                     <div className="relative">
-                      <MapPin className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <MapPin className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         required
                         placeholder="House no, Street area"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">City *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">City *</label>
                     <div className="relative">
-                      <Building className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Building className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         required
                         placeholder="e.g. Pune"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                       />
                     </div>
                   </div>
@@ -582,22 +433,22 @@ function UserAuthForm() {
                 {/* STATE & PINCODE */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">State *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">State *</label>
                     <div className="relative">
-                      <Map className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Map className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         required
                         placeholder="e.g. Maharashtra"
                         value={state}
                         onChange={(e) => setState(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Pincode *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Pincode *</label>
                     <input
                       type="text"
                       required
@@ -605,7 +456,7 @@ function UserAuthForm() {
                       placeholder="e.g. 411001"
                       value={pincode}
                       onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                      className="w-full px-4 py-3 input-antique-pink font-mono"
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                     />
                   </div>
                 </div>
@@ -613,24 +464,24 @@ function UserAuthForm() {
                 {/* EMERGENCY GUARDIAN CONTACT */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Guardian Name *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Guardian Name *</label>
                     <div className="relative">
-                      <Users className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Users className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         required
                         placeholder="e.g. Rajesh Sharma"
                         value={emergencyContactName}
                         onChange={(e) => setEmergencyContactName(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-tichi-muted font-bold mb-1">Guardian Mobile Number *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Guardian Mobile Number *</label>
                     <div className="relative">
-                      <Phone className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Phone className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="tel"
                         required
@@ -638,7 +489,7 @@ function UserAuthForm() {
                         placeholder="10-digit number"
                         value={emergencyContactPhone}
                         onChange={(e) => setEmergencyContactPhone(e.target.value.replace(/\D/g, ''))}
-                        className="w-full pl-10 pr-4 py-3 input-antique-pink font-mono"
+                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                       />
                     </div>
                   </div>
@@ -649,36 +500,36 @@ function UserAuthForm() {
               /* LOGIN FORM */
               <div className="space-y-4">
                 <div>
-                  <label className="block text-tichi-muted font-bold mb-1">Email Address *</label>
+                  <label className="block text-[#684E67] font-extrabold mb-1">Email Address *</label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       required
                       placeholder="priya@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 input-antique-pink"
+                      className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-tichi-muted font-bold mb-1">Password *</label>
+                  <label className="block text-[#684E67] font-extrabold mb-1">Password *</label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-tichi-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Lock className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type={showPass ? 'text' : 'password'}
                       required
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-12 py-3 input-antique-pink"
+                      className="w-full pl-10 pr-12 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPass(!showPass)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-tichi-muted hover:text-rose"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#684E67] hover:text-[#FF2A6D] transition-colors"
                     >
                       {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -691,15 +542,14 @@ function UserAuthForm() {
             <button
               type="submit"
               disabled={mounted && isLoading}
-              className="w-full btn-baby-pink py-4 text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2 mt-6"
+              className="w-full btn-3d-rose-pop py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2.5 mt-6 cursor-pointer"
             >
+              <Zap className="w-4 h-4 text-white animate-pulse" />
               <span>{(mounted && isLoading) ? 'PROCESSING...' : isLogin ? 'SIGN IN TO DASHBOARD' : 'REGISTER & PROCEED TO OTP'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+              <ArrowRight className="w-4 h-4 text-white" />
             </button>
 
           </form>
-
 
         </div>
       </div>
