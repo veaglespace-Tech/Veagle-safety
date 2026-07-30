@@ -144,7 +144,7 @@ export const Header = () => {
               <MagneticButton pullStrength={0.3}>
                 <button
                   onClick={handleLogout}
-                  className="group hidden md:flex items-center gap-2 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-5 py-2.5 rounded-full cursor-pointer hover:bg-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#FF2A6D]/30 active:scale-95"
+                  className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-extrabold px-5 py-2.5 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.20)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.45)] active:scale-95"
                   title="Sign Out"
                 >
                   <span className="tracking-wide">Sign Out</span>
@@ -155,10 +155,10 @@ export const Header = () => {
               <MagneticButton pullStrength={0.35}>
                 <Link 
                   href="/auth?mode=login" 
-                  className="group hidden md:flex items-center gap-2 bg-white/95 border-1.5 border-[#FFCCE1] text-[#2A0826] text-xs font-black px-5 py-2.5 rounded-full hover:bg-[#FFF0F3] hover:text-[#FF5C8A] hover:border-[#FF5C8A] transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-[#FF5C8A]/20 active:scale-95"
+                  className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
                 >
                   <span className="tracking-wide">Sign In</span>
-                  <UserCheck size={15} color="#FF5C8A" className="group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" />
+                  <UserCheck size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" />
                 </Link>
               </MagneticButton>
             )}
