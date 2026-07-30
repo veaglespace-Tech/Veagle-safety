@@ -76,14 +76,7 @@ export const Header = () => {
           {/* BRAND LOGO + TITLE + STATUS */}
           <Link 
             href="/" 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '10px', 
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-            }}
+            className="group flex items-center gap-2.5 no-underline shrink-0 whitespace-nowrap transition-transform duration-300 hover:scale-105"
           >
             <div style={{
               width: '38px', height: '38px', borderRadius: '12px',
@@ -91,7 +84,7 @@ export const Header = () => {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 12px rgba(255, 92, 138, 0.35)',
               flexShrink: 0,
-            }}>
+            }} className="group-hover:rotate-6 transition-transform duration-300">
               <Shield size={19} color="#FFFFFF" />
             </div>
             <div style={{ lineHeight: 1.15 }}>
@@ -113,8 +106,8 @@ export const Header = () => {
                 <span style={{
                   width: '6px', height: '6px', borderRadius: '50%',
                   background: status === 'LIVE' ? '#059669' : '#F59E0B',
-                  boxShadow: status === 'LIVE' ? '0 0 6px #059669' : 'none'
-                }} />
+                  boxShadow: status === 'LIVE' ? '0 0 8px #059669' : 'none'
+                }} className="animate-pulse" />
                 <span style={{ fontSize: '10px', color: '#684E67', fontWeight: 800 }}>
                   {status === 'LIVE' ? 'Protected · GPS Active' : 'GPS Active'}
                 </span>
@@ -122,18 +115,18 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* DESKTOP HORIZONTAL NAVIGATION CAPSULE (Visible ONLY on desktop md:flex) */}
-          <nav className="hidden md:flex items-center gap-1 bg-[#FFF0F3] p-1.5 rounded-2xl border border-[#FFCCE1]">
+          {/* DESKTOP ANIMATED NAV CHIPS CAPSULE */}
+          <nav className="hidden md:flex items-center gap-1.5 nav-chip-capsule">
             {navLinks.map(({ href, label }) => {
               const active = isActive(href);
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-300 ${
                     active
-                      ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30'
-                      : 'text-[#2A0826] hover:bg-white/80 hover:text-[#FF5C8A]'
+                      ? 'nav-chip-active'
+                      : 'nav-chip-hover'
                   }`}
                 >
                   {label}
@@ -145,48 +138,50 @@ export const Header = () => {
           {/* RIGHT SIDE ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* DESKTOP DYNAMIC CTA BUTTON (Sign Out if logged in, Sign In if not logged in) */}
+            {/* DESKTOP DYNAMIC CTA BUTTON WITH HOVER ANIMATION */}
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="hidden md:flex items-center gap-1.5 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-3.5 py-1.5 rounded-xl cursor-pointer hover:bg-[#FFCCE1]/30 transition-all shadow-sm"
+                className="hidden md:flex items-center gap-2 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-4 py-2 rounded-xl cursor-pointer hover:bg-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#FF2A6D]/30 group hover:scale-105 active:scale-95"
                 title="Sign Out"
               >
-                <LogOut size={13} color="#FF2A6D" />
+                <LogOut size={14} className="group-hover:-translate-x-0.5 transition-transform" />
                 <span>Sign Out</span>
               </button>
             ) : (
               <Link 
                 href="/auth?mode=login" 
-                className="hidden md:flex items-center gap-1.5 bg-[#FFF0F3] border border-[#FFCCE1] text-[#2A0826] text-xs font-bold px-3.5 py-1.5 rounded-xl hover:bg-white transition-all"
+                className="hidden md:flex items-center gap-2 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#2A0826] text-xs font-black px-4 py-2 rounded-xl hover:bg-[#FF5C8A] hover:text-white hover:border-transparent transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#FF5C8A]/30 group hover:scale-105 active:scale-95"
               >
-                <UserCheck size={13} color="#FF5C8A" />
+                <UserCheck size={14} className="text-[#FF5C8A] group-hover:text-white transition-colors" />
                 <span>Sign In</span>
               </Link>
             )}
 
-            {/* MOBILE MENU TOGGLE BUTTON (Visible ONLY on mobile md:hidden - HIDDEN ON DESKTOP!) */}
+            {/* MOBILE MENU TOGGLE BUTTON (WITH ROTATION ANIMATION) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden w-9 h-9 rounded-xl bg-[#FFF0F3] border border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer"
+              className="md:hidden w-10 h-10 rounded-xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 active:scale-90 shadow-sm"
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              <div className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </div>
             </button>
           </div>
         </div>
 
-        {/* MOBILE COLLAPSED MENU DROPDOWN (Visible ONLY when opened on mobile md:hidden) */}
+        {/* MOBILE COLLAPSED MENU DROPDOWN (WITH ANIMATED ENTRANCE) */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t-1.5 border-[#FFCCE1] bg-white/99 p-3 shadow-xl">
+          <div className="md:hidden border-t-1.5 border-[#FFCCE1] bg-white/99 p-3.5 shadow-2xl animate-fade-up">
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-extrabold mb-1 ${
+                className={`flex items-center gap-3 p-3 rounded-xl text-xs font-black mb-1.5 transition-all duration-200 ${
                   isActive(href)
-                    ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white'
-                    : 'bg-[#FFF0F3] text-[#2A0826]'
+                    ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30'
+                    : 'bg-[#FFF0F3] text-[#2A0826] hover:bg-white hover:text-[#FF5C8A]'
                 }`}
               >
                 <Icon size={16} />
@@ -197,17 +192,17 @@ export const Header = () => {
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2.5 w-full p-2.5 rounded-xl text-xs font-extrabold border border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] cursor-pointer mt-2"
+                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all duration-200 mt-2 shadow-sm active:scale-98"
               >
-                <LogOut size={16} color="#FF2A6D" />
+                <LogOut size={16} />
                 <span>Sign Out</span>
               </button>
             ) : (
               <Link
                 href="/auth?mode=login"
-                className="flex items-center gap-2.5 w-full p-2.5 rounded-xl text-xs font-extrabold border border-[#FFCCE1] bg-white text-[#2A0826] cursor-pointer mt-2"
+                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-white text-[#2A0826] hover:bg-[#FF5C8A] hover:text-white transition-all duration-200 mt-2 shadow-sm active:scale-98"
               >
-                <UserCheck size={16} color="#FF5C8A" />
+                <UserCheck size={16} />
                 <span>Sign In</span>
               </Link>
             )}
