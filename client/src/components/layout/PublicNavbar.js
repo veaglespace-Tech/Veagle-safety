@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   Shield, Zap, ArrowRight, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
-  LayoutDashboard, LogOut, Menu, X, Crown, Home
+  LayoutDashboard, LogOut, Menu, X, Crown, Home, MapPin, Users, User
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -40,19 +40,25 @@ export const PublicNavbar = () => {
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/pricing', label: 'Pricing', icon: Zap },
-    { href: '/about', label: 'About', icon: Info },
-    { href: '/gallery', label: 'Gallery', icon: ImageIcon },
-    { href: '/contact', label: 'Contact', icon: PhoneCall },
   ];
 
   if (mounted && token) {
-    navLinks.splice(1, 0, { 
+    navLinks.push({ 
       href: isSuperAdmin ? '/admin' : '/dashboard', 
       label: isSuperAdmin ? 'Admin Panel' : 'Dashboard', 
       icon: isSuperAdmin ? Crown : LayoutDashboard 
     });
+    navLinks.push({ href: '/track-journey', label: 'Track Journey', icon: MapPin });
+    navLinks.push({ href: '/contacts', label: 'Contacts', icon: Users });
+    navLinks.push({ href: '/profile', label: 'Profile', icon: User });
   }
+
+  navLinks.push(
+    { href: '/pricing', label: 'Pricing', icon: Zap },
+    { href: '/about', label: 'About', icon: Info },
+    { href: '/gallery', label: 'Gallery', icon: ImageIcon },
+    { href: '/contact', label: 'Contact', icon: PhoneCall }
+  );
 
   return (
     <>
@@ -132,7 +138,7 @@ export const PublicNavbar = () => {
                   textDecoration: 'none',
                   boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
                   whiteSpace: 'nowrap',
-                }}>
+                }} className="hidden md:flex">
                   {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
                   <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
                 </Link>
@@ -156,7 +162,7 @@ export const PublicNavbar = () => {
                   textDecoration: 'none', border: '1px solid #FFCCE1',
                   background: 'rgba(255,255,255,0.9)',
                   whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }}>
+                }} className="hidden md:flex">
                   <UserCheck size={13} color="#FF5C8A" />
                   <span>Sign In</span>
                 </Link>
@@ -193,7 +199,7 @@ export const PublicNavbar = () => {
           </div>
         </div>
 
-        {/* MOBILE DROPDOWN MENU */}
+        {/* MOBILE COLLAPSED DROPDOWN MENU */}
         {menuOpen && (
           <div style={{
             borderTop: '1.5px solid #FFCCE1',

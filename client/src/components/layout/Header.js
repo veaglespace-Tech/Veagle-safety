@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Shield, Bell, Crown, Home, Zap, Info, Image as ImageIcon,
-  PhoneCall, LayoutDashboard, LogOut, Menu, X, UserCheck, ArrowRight
+  PhoneCall, LayoutDashboard, LogOut, Menu, X, UserCheck, ArrowRight,
+  MapPin, Users, User
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -37,21 +38,28 @@ export const Header = () => {
     ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'SS';
 
+  // Navigation Links array for collapsed dropdown and desktop navbar
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/pricing', label: 'Pricing', icon: Zap },
-    { href: '/about', label: 'About', icon: Info },
-    { href: '/gallery', label: 'Gallery', icon: ImageIcon },
-    { href: '/contact', label: 'Contact', icon: PhoneCall },
   ];
 
   if (mounted && token) {
-    navLinks.splice(1, 0, { 
-      href: isSuperAdmin ? '/admin' : '/dashboard', 
-      label: isSuperAdmin ? 'Admin Panel' : 'Dashboard', 
-      icon: isSuperAdmin ? Crown : LayoutDashboard 
+    navLinks.push({
+      href: isSuperAdmin ? '/admin' : '/dashboard',
+      label: isSuperAdmin ? 'Admin Panel' : 'Dashboard',
+      icon: isSuperAdmin ? Crown : LayoutDashboard,
     });
+    navLinks.push({ href: '/track-journey', label: 'Track Journey', icon: MapPin });
+    navLinks.push({ href: '/contacts', label: 'Contacts', icon: Users });
+    navLinks.push({ href: '/profile', label: 'Profile', icon: User });
   }
+
+  navLinks.push(
+    { href: '/pricing', label: 'Pricing', icon: Zap },
+    { href: '/about', label: 'About', icon: Info },
+    { href: '/gallery', label: 'Gallery', icon: ImageIcon },
+    { href: '/contact', label: 'Contact', icon: PhoneCall }
+  );
 
   const isActive = (path) => pathname === path;
 
@@ -130,7 +138,7 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* CENTER DESKTOP NAVIGATION TABS (Visible on screens >= 768px, NO Hamburger on Desktop) */}
+          {/* DESKTOP FULL HORIZONTAL NAVIGATION BAR (>= 768px ONLY, NO HAMBURGER ON DESKTOP) */}
           <nav 
             style={{
               display: 'flex', alignItems: 'center', gap: '3px',
@@ -162,93 +170,42 @@ export const Header = () => {
             ))}
           </nav>
 
-          {/* RIGHT SIDE USER ACTION CONTROLS */}
+          {/* RIGHT SIDE USER ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* Dynamic CTA Button for Logged-In User / Super Admin */}
+            {/* Desktop CTA Button (>= 768px) */}
             {mounted && token ? (
-              <>
-                <Link
-                  href={isSuperAdmin ? '/admin' : '/dashboard'}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                    color: '#FFFFFF', fontSize: '11px', fontWeight: 900,
-                    padding: '7px 14px', borderRadius: '12px',
-                    textDecoration: 'none', boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
-                  <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
-                </Link>
-                
-                {/* Avatar Badge */}
-                {user && (
-                  <Link
-                    href="/profile"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '6px',
-                      padding: '3px 8px 3px 4px', borderRadius: '999px',
-                      background: '#FFF0F3', border: '1.5px solid #FFCCE1',
-                      textDecoration: 'none', transition: 'all 0.2s ease',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <div style={{
-                      width: '30px', height: '30px', borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                      color: '#FFFFFF', display: 'flex', alignItems: 'center',
-                      justifyContent: 'center', fontWeight: 900, fontSize: '11px',
-                      boxShadow: '0 2px 8px rgba(255,92,138,0.3)',
-                    }}>
-                      {initials}
-                    </div>
-                  </Link>
-                )}
-
-                {/* Logout Button (Desktop >= 768px) */}
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    background: 'none', border: '1px solid #FFCCE1',
-                    color: '#684E67', fontSize: '11px', fontWeight: 800,
-                    padding: '7px 12px', borderRadius: '10px',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px',
-                    whiteSpace: 'nowrap', transition: 'all 0.2s',
-                  }}
-                  className="hidden md:flex"
-                >
-                  <LogOut size={13} />
-                  <span>Logout</span>
-                </button>
-              </>
+              <Link
+                href={isSuperAdmin ? '/admin' : '/dashboard'}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+                  color: '#FFFFFF', fontSize: '11px', fontWeight: 900,
+                  padding: '7px 14px', borderRadius: '12px',
+                  textDecoration: 'none', boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
+                  whiteSpace: 'nowrap',
+                }}
+                className="hidden md:flex"
+              >
+                {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
+                <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
+              </Link>
             ) : (
-              <>
-                <Link href="/auth?mode=login" style={{
+              <Link 
+                href="/auth?mode=login" 
+                style={{
                   display: 'flex', alignItems: 'center', gap: '5px',
                   color: '#2A0826', fontWeight: 800, fontSize: '11px',
                   padding: '7px 14px', borderRadius: '12px',
                   textDecoration: 'none', border: '1px solid #FFCCE1',
                   background: 'rgba(255,255,255,0.9)',
                   whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }}>
-                  <UserCheck size={13} color="#FF5C8A" />
-                  <span>Sign In</span>
-                </Link>
-                <Link href="/auth?mode=register" style={{
-                  display: 'flex', alignItems: 'center', gap: '5px',
-                  background: 'linear-gradient(135deg,#FF5C8A,#FF2A6D)',
-                  color: '#fff', fontWeight: 900, fontSize: '11px',
-                  padding: '7px 14px', borderRadius: '12px',
-                  textDecoration: 'none',
-                  boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
-                  whiteSpace: 'nowrap',
-                }} className="hidden sm:flex">
-                  <span>Sign Up</span>
-                  <ArrowRight size={13} />
-                </Link>
-              </>
+                }}
+                className="hidden md:flex"
+              >
+                <UserCheck size={13} color="#FF5C8A" />
+                <span>Sign In</span>
+              </Link>
             )}
 
             {/* Emergency Alarm Siren Button */}
@@ -267,7 +224,49 @@ export const Header = () => {
               <Bell size={18} />
             </Link>
 
-            {/* Mobile Hamburger Menu Toggle (ONLY on Mobile < 768px) */}
+            {/* User Profile Avatar */}
+            {mounted && user && (
+              <Link
+                href="/profile"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '3px', borderRadius: '50%',
+                  background: '#FFF0F3', border: '1.5px solid #FFCCE1',
+                  textDecoration: 'none', transition: 'all 0.2s ease',
+                  flexShrink: 0,
+                }}
+              >
+                <div style={{
+                  width: '30px', height: '30px', borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+                  color: '#FFFFFF', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', fontWeight: 900, fontSize: '11px',
+                  boxShadow: '0 2px 8px rgba(255,92,138,0.3)',
+                }}>
+                  {initials}
+                </div>
+              </Link>
+            )}
+
+            {/* Logout Button (Desktop >= 768px) */}
+            {mounted && token && (
+              <button
+                onClick={handleLogout}
+                style={{
+                  background: 'none', border: '1px solid #FFCCE1',
+                  color: '#684E67', fontSize: '11px', fontWeight: 800,
+                  padding: '7px 12px', borderRadius: '10px',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px',
+                  whiteSpace: 'nowrap', transition: 'all 0.2s',
+                }}
+                className="hidden md:flex"
+              >
+                <LogOut size={13} />
+                <span>Logout</span>
+              </button>
+            )}
+
+            {/* MOBILE MENU TOGGLE BUTTON (ONLY ON MOBILE < 768px) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
@@ -285,7 +284,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* MOBILE DROPDOWN MENU (ONLY on Mobile < 768px) */}
+        {/* MOBILE COLLAPSED DROPDOWN MENU CONTAINING ALL TABS (< 768px) */}
         {mobileMenuOpen && (
           <div 
             style={{
