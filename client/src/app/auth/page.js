@@ -339,10 +339,10 @@ function UserAuthForm() {
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={mounted && isLoading}
               className="w-full btn-baby-pink py-4 text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2 mt-4"
             >
-              <span>{isLoading ? 'PROCESSING...' : isLogin ? 'SIGN IN TO DASHBOARD' : 'REGISTER & PROCEED'}</span>
+              <span>{(mounted && isLoading) ? 'PROCESSING...' : isLogin ? 'SIGN IN TO DASHBOARD' : 'REGISTER & PROCEED'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
