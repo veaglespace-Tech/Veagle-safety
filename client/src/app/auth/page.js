@@ -143,7 +143,7 @@ function UserAuthForm() {
       <div className="absolute w-[750px] h-[750px] rounded-full bg-[#FFCCE1]/30 blur-[160px] bottom-[40px] right-[-200px] pointer-events-none animate-pulse" />
 
       <div className="flex-1 flex items-center justify-center px-4 py-8 sm:py-14 relative z-10">
-        <div className="w-full max-w-xl bg-white/95 backdrop-blur-2xl border-1.5 border-[#FFCCE1] rounded-3xl p-6 sm:p-10 space-y-6 shadow-[0_20px_60px_rgba(255,92,138,0.20)] hover:shadow-[0_24px_70px_rgba(255,42,109,0.28)] transition-all duration-500 relative">
+        <div className="w-full max-w-xl bg-white/95 backdrop-blur-2xl border-1.5 border-[#FFCCE1] rounded-3xl p-6 sm:p-10 space-y-6 shadow-[0_20px_60px_rgba(255,92,138,0.20)] hover:shadow-[0_24px_70px_rgba(255,42,109,0.28)] transition-all duration-500 relative overflow-hidden">
           
           {/* TOP DECORATIVE ACCENT STRIP */}
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] rounded-t-3xl" />
