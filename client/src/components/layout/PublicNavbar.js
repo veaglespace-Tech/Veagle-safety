@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Shield, Zap, ArrowRight, PhoneCall,
+  Zap, ArrowRight, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
   LogOut, Menu, X, Crown, Home
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
 import { MagneticButton } from '../ui/MagneticButton.js';
+import { Logo3DFlip } from '../ui/Logo3DFlip.js';
 
 export const PublicNavbar = () => {
   const pathname = usePathname();
@@ -72,17 +73,10 @@ export const PublicNavbar = () => {
           gap: '12px',
         }}>
 
-          {/* BRAND LOGO WITH MAGNETIC EFFECT */}
+          {/* BRAND LOGO WITH 3D ROTATING COIN FLIP (FRONT & BACK LOGOS) */}
           <MagneticButton pullStrength={0.15}>
             <Link href="/" className="group flex items-center gap-2.5 no-underline shrink-0 whitespace-nowrap">
-              <div style={{
-                width: '38px', height: '38px', borderRadius: '12px',
-                background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(255,92,138,0.35)', flexShrink: 0,
-              }} className="group-hover:rotate-6 transition-transform duration-300">
-                <Shield size={19} color="#fff" />
-              </div>
+              <Logo3DFlip size={40} />
               <div style={{ lineHeight: 1.15 }}>
                 <div style={{ fontWeight: 900, fontSize: '15px', color: '#2A0826', letterSpacing: '-0.01em' }}>
                   Sakhi Suraksha SOS
@@ -120,34 +114,34 @@ export const PublicNavbar = () => {
               <MagneticButton pullStrength={0.3}>
                 <button
                   onClick={handleLogout}
-                  className="group hidden md:flex items-center gap-2 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] text-[#FF2A6D] text-xs font-black px-4.5 py-2.5 rounded-full cursor-pointer hover:bg-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.12)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.35)] active:scale-95"
+                  className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-extrabold px-5 py-2.5 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.20)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.45)] active:scale-95"
                   title="Sign Out"
                 >
-                  <LogOut size={15} className="group-hover:-translate-x-0.5 transition-transform duration-300" />
                   <span className="tracking-wide">Sign Out</span>
+                  <LogOut size={15} className="group-hover:translate-x-0.5 transition-transform duration-300" />
                 </button>
               </MagneticButton>
             ) : (
               <div className="hidden md:flex items-center gap-2.5">
-                {/* CLEAN SLEEK MAGNETIC SIGN IN BUTTON */}
+                {/* ULTRA-MODERN SIGN IN BUTTON */}
                 <MagneticButton pullStrength={0.35}>
                   <Link 
                     href="/auth?mode=login" 
-                    className="group flex items-center gap-2 bg-white/95 backdrop-blur-md border-1.5 border-[#FFCCE1] text-[#2A0826] text-xs font-black px-4.5 py-2.5 rounded-full hover:bg-[#FF5C8A] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.12)] hover:shadow-[0_8px_25px_rgba(255,92,138,0.35)] active:scale-95"
+                    className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
                   >
-                    <UserCheck size={15} className="text-[#FF5C8A] group-hover:text-white group-hover:scale-110 transition-all duration-300" />
                     <span className="tracking-wide">Sign In</span>
+                    <UserCheck size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" />
                   </Link>
                 </MagneticButton>
 
-                {/* CLEAN SLEEK MAGNETIC SIGN UP BUTTON */}
+                {/* ULTRA-MODERN SIGN UP BUTTON */}
                 <MagneticButton pullStrength={0.4}>
                   <Link 
                     href="/auth?mode=register" 
-                    className="group flex items-center gap-2 bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-xs font-black px-5 py-2.5 rounded-full shadow-[0_4px_18px_rgba(255,92,138,0.35)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] transition-all duration-300 active:scale-95"
+                    className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
                   >
                     <span className="tracking-wide">Sign Up</span>
-                    <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform duration-300" />
+                    <ArrowRight size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-1 transition-all duration-300" />
                   </Link>
                 </MagneticButton>
               </div>
