@@ -172,7 +172,7 @@ export default function LandingPage() {
             Empowering women & girls with 24/7 encrypted emergency safety network across India.
           </p>
           <div className="text-xs text-[#684E67] font-extrabold pt-2">
-            © {new Date().getFullYear()} Sakhi Suraksha SOS · All Rights Reserved.
+            Designed & Developed by Veagle Space Technology Pvt. Ltd. | © 2026 All Rights Reserved.
           </div>
         </div>
       </footer>
