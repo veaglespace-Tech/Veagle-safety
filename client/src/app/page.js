@@ -172,6 +172,11 @@ export default function LandingPage() {
             <Logo3DFlip size={30} />
             <span className="text-sm font-black text-[#2A0826] tracking-tight">Sakhi Suraksha SOS</span>
           </div>
+          <div className="flex items-center space-x-4 text-[11px] font-black tracking-wide text-[#684E67]">
+            <Link href="/terms" className="hover:text-[#FF2A6D] transition-colors">Terms of Service</Link>
+            <span className="text-[#FFCCE1]">|</span>
+            <Link href="/privacy" className="hover:text-[#FF2A6D] transition-colors">Privacy Policy</Link>
+          </div>
           <div className="text-[11px] font-black tracking-wide text-[#684E67]">
             Designed & Developed by{' '}
             <a
