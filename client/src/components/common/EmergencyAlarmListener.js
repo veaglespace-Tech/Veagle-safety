@@ -14,7 +14,8 @@ export const EmergencyAlarmListener = () => {
     const connectSocket = async () => {
       try {
         const { io } = await import('socket.io-client');
-        socket = io('http://localhost:5000', {
+        const { SERVER_URL } = await import('../../utils/api.js');
+        socket = io(SERVER_URL, {
           transports: ['websocket', 'polling'],
           reconnectionAttempts: 5,
           timeout: 10000,
