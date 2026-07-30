@@ -160,27 +160,6 @@ export default function LandingPage() {
 
       </section>
 
-      {/* FULL-SCREEN WIDTH STATS SECTION */}
-      <section className="w-full bg-white/95 backdrop-blur-xl border-y-1.5 border-[#FFCCE1] py-12 shadow-[0_10px_35px_rgba(255,92,138,0.12)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[
-            { value: '50,000+', label: 'Protected Sakhi Members', icon: Heart },
-            { value: '99.9%', label: 'Emergency Signal Delivery', icon: Zap },
-            { value: '< 3 Sec', label: 'Alert Dispatch Time', icon: Bell },
-            { value: '24/7/365', label: 'Active Command Monitoring', icon: ShieldCheck },
-          ].map((stat, i) => (
-            <div key={i} className="bg-[#FFF0F3]/80 p-6 rounded-2xl border-1.5 border-[#FFCCE1] shadow-sm space-y-1.5 hover:-translate-y-1 transition-transform">
-              <stat.icon className="w-6 h-6 text-[#FF5C8A] mx-auto" />
-              <div className="text-3xl sm:text-4xl font-black text-[#FF2A6D]">
-                {stat.value}
-              </div>
-              <div className="text-xs font-black text-[#684E67] uppercase tracking-wider">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* 100% BLACK FREE ROYAL ANTIQUE FOOTER */}
       <footer className="bg-white/95 backdrop-blur-xl border-t-1.5 border-[#FFCCE1] py-12 text-center text-[#2A0826] shadow-sm">
