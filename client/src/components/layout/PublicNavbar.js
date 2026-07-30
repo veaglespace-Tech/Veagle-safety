@@ -129,7 +129,7 @@ export const PublicNavbar = () => {
               </MagneticButton>
             ) : (
               <div className="hidden md:flex items-center gap-2.5">
-                {/* ULTRA-MODERN UNIQUE SIGN IN BUTTON */}
+                {/* ULTRA-MODERN SIGN IN BUTTON */}
                 <MagneticButton pullStrength={0.35}>
                   <Link 
                     href="/auth?mode=login" 
@@ -140,14 +140,14 @@ export const PublicNavbar = () => {
                   </Link>
                 </MagneticButton>
 
-                {/* ULTRA-MODERN UNIQUE SIGN UP BUTTON */}
+                {/* ULTRA-MODERN SIGN UP BUTTON (EXACT TWIN STYLE AS SIGN IN) */}
                 <MagneticButton pullStrength={0.4}>
                   <Link 
                     href="/auth?mode=register" 
-                    className="group flex items-center gap-2 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black px-5.5 py-2.5 rounded-full shadow-[0_6px_22px_rgba(255,92,138,0.40)] hover:shadow-[0_10px_32px_rgba(255,42,109,0.65)] border border-white/30 hover:border-white/70 transition-all duration-300 active:scale-95"
+                    className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
                   >
-                    <span className="tracking-wide uppercase text-[11px]">Sign Up</span>
-                    <ArrowRight size={15} className="group-hover:translate-x-1.5 transition-transform duration-300" />
+                    <span className="tracking-wide">Sign Up</span>
+                    <ArrowRight size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-1 transition-all duration-300" />
                   </Link>
                 </MagneticButton>
               </div>
