@@ -81,15 +81,13 @@ export default function ContactSupportPage() {
                     <span className="font-black text-[#2A0826] text-sm block">National Emergency Number</span>
                     <span className="text-[11px] text-[#684E67] font-bold">Police, Ambulance, Fire Dispatch</span>
                   </div>
-                  <MagneticButton pullStrength={0.25}>
-                    <a
-                      href="tel:112"
-                      className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-xs font-black px-4 py-2.5 rounded-full shadow-[0_4px_16px_rgba(255,92,138,0.35)] hover:shadow-[0_6px_22px_rgba(255,42,109,0.55)] transition-all flex items-center space-x-1.5"
-                    >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>CALL 112</span>
-                    </a>
-                  </MagneticButton>
+                  <a
+                    href="tel:112"
+                    className="btn-3d-rose-pop inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full text-xs font-black text-white no-underline shrink-0"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>CALL 112</span>
+                  </a>
                 </li>
 
                 {/* 1091 HELPLINE */}
@@ -98,15 +96,13 @@ export default function ContactSupportPage() {
                     <span className="font-black text-[#2A0826] text-sm block">Women Helpline (All India)</span>
                     <span className="text-[11px] text-[#684E67] font-bold">24/7 National Women Safety Support</span>
                   </div>
-                  <MagneticButton pullStrength={0.25}>
-                    <a
-                      href="tel:1091"
-                      className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-xs font-black px-4 py-2.5 rounded-full shadow-[0_4px_16px_rgba(255,92,138,0.35)] hover:shadow-[0_6px_22px_rgba(255,42,109,0.55)] transition-all flex items-center space-x-1.5"
-                    >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>CALL 1091</span>
-                    </a>
-                  </MagneticButton>
+                  <a
+                    href="tel:1091"
+                    className="btn-3d-rose-pop inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full text-xs font-black text-white no-underline shrink-0"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>CALL 1091</span>
+                  </a>
                 </li>
 
                 {/* 181 HELPLINE */}
@@ -115,15 +111,13 @@ export default function ContactSupportPage() {
                     <span className="font-black text-[#2A0826] text-sm block">Domestic Abuse & Violence</span>
                     <span className="text-[11px] text-[#684E67] font-bold">NCW Women Support Line</span>
                   </div>
-                  <MagneticButton pullStrength={0.25}>
-                    <a
-                      href="tel:181"
-                      className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-xs font-black px-4 py-2.5 rounded-full shadow-[0_4px_16px_rgba(255,92,138,0.35)] hover:shadow-[0_6px_22px_rgba(255,42,109,0.55)] transition-all flex items-center space-x-1.5"
-                    >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>CALL 181</span>
-                    </a>
-                  </MagneticButton>
+                  <a
+                    href="tel:181"
+                    className="btn-3d-rose-pop inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full text-xs font-black text-white no-underline shrink-0"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>CALL 181</span>
+                  </a>
                 </li>
 
                 {/* 100 HELPLINE */}
@@ -132,15 +126,13 @@ export default function ContactSupportPage() {
                     <span className="font-black text-[#2A0826] text-sm block">Police Control Room</span>
                     <span className="text-[11px] text-[#684E67] font-bold">Local City Police Dispatch</span>
                   </div>
-                  <MagneticButton pullStrength={0.25}>
-                    <a
-                      href="tel:100"
-                      className="bg-[#FFF0F3] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-black px-4 py-2.5 rounded-full hover:bg-[#FF5C8A] hover:text-white transition-all flex items-center space-x-1.5 shadow-sm"
-                    >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>CALL 100</span>
-                    </a>
-                  </MagneticButton>
+                  <a
+                    href="tel:100"
+                    className="btn-3d-white-pop inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full text-xs font-black text-[#FF2A6D] no-underline shrink-0"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>CALL 100</span>
+                  </a>
                 </li>
               </ul>
             </div>
