@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
 import { Footer } from '../components/layout/Footer.js';
 
-import { MagneticButton } from '../components/ui/MagneticButton.jsx';
+import { MagneticButton } from '../components/ui/MagneticButton.js';
 
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
