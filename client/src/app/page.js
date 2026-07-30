@@ -92,14 +92,14 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* MAGNETIC HERO CTA BUTTONS */}
-        <div className="flex flex-wrap justify-center gap-4 pt-2">
+        {/* MAGNETIC HERO CTA BUTTONS WITH 3D POP-UP EFFECT */}
+        <div className="flex flex-wrap justify-center gap-6 pt-3">
           {isLoggedIn ? (
             <>
               <MagneticButton pullStrength={0.4}>
                 <Link 
                   href={isSuperAdmin ? '/admin' : '/dashboard'} 
-                  className="bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] flex items-center justify-center space-x-3 cursor-pointer active:scale-95 whitespace-nowrap"
+                  className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
                 >
                   {isSuperAdmin ? <Crown size={18} /> : <LayoutDashboard size={18} />}
                   <span>{isSuperAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}</span>
@@ -110,7 +110,7 @@ export default function LandingPage() {
               <MagneticButton pullStrength={0.35}>
                 <Link 
                   href="/profile" 
-                  className="bg-white/95 border-1.5 border-[#FFCCE1] text-[#2A0826] hover:border-[#FF5C8A] hover:text-[#FF2A6D] px-8 py-4 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-sm flex items-center justify-center space-x-2 whitespace-nowrap"
+                  className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
                 >
                   <Shield size={16} className="text-[#FF5C8A]" />
                   <span>MY PROFILE</span>
@@ -122,17 +122,17 @@ export default function LandingPage() {
               <MagneticButton pullStrength={0.4}>
                 <Link 
                   href="/auth?mode=register" 
-                  className="bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] flex items-center justify-center space-x-3 cursor-pointer active:scale-95 whitespace-nowrap"
+                  className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
                 >
                   <span>PROTECT YOURSELF NOW</span>
-                  <ArrowRight size={16} className="text-[#FF2A6D] group-hover:text-white shrink-0" />
+                  <ArrowRight size={16} className="shrink-0" />
                 </Link>
               </MagneticButton>
 
               <MagneticButton pullStrength={0.35}>
                 <Link 
                   href="/about" 
-                  className="bg-white/95 border-1.5 border-[#FFCCE1] text-[#2A0826] hover:border-[#FF5C8A] hover:text-[#FF2A6D] px-8 py-4 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-sm flex items-center justify-center space-x-2 whitespace-nowrap"
+                  className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
                 >
                   <Shield size={16} className="text-[#FF5C8A]" />
                   <span>HOW IT WORKS</span>
