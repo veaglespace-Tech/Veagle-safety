@@ -83,7 +83,7 @@ export default function ContactSupportPage() {
                   </div>
                   <a
                     href="tel:112"
-                    className="btn-3d-rose-pop inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full text-xs font-black text-white no-underline shrink-0"
+                    className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-xs font-black px-4 py-2.5 rounded-full shadow-[0_4px_14px_rgba(255,92,138,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.50)] hover:scale-105 hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center space-x-1.5 no-underline shrink-0"
                   >
                     <Phone className="w-3.5 h-3.5" />
                     <span>CALL 112</span>
@@ -98,7 +98,7 @@ export default function ContactSupportPage() {
                   </div>
                   <a
                     href="tel:1091"
-                    className="btn-3d-rose-pop inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full text-xs font-black text-white no-underline shrink-0"
+                    className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-xs font-black px-4 py-2.5 rounded-full shadow-[0_4px_14px_rgba(255,92,138,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.50)] hover:scale-105 hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center space-x-1.5 no-underline shrink-0"
                   >
                     <Phone className="w-3.5 h-3.5" />
                     <span>CALL 1091</span>
@@ -113,7 +113,7 @@ export default function ContactSupportPage() {
                   </div>
                   <a
                     href="tel:181"
-                    className="btn-3d-rose-pop inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full text-xs font-black text-white no-underline shrink-0"
+                    className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-xs font-black px-4 py-2.5 rounded-full shadow-[0_4px_14px_rgba(255,92,138,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.50)] hover:scale-105 hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center space-x-1.5 no-underline shrink-0"
                   >
                     <Phone className="w-3.5 h-3.5" />
                     <span>CALL 181</span>
@@ -128,7 +128,7 @@ export default function ContactSupportPage() {
                   </div>
                   <a
                     href="tel:100"
-                    className="btn-3d-white-pop inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full text-xs font-black text-[#FF2A6D] no-underline shrink-0"
+                    className="bg-[#FFF0F3] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-black px-4 py-2.5 rounded-full shadow-sm hover:shadow-[0_8px_22px_rgba(255,92,138,0.35)] hover:scale-105 hover:-translate-y-1 active:scale-95 hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 flex items-center space-x-1.5 no-underline shrink-0"
                   >
                     <Phone className="w-3.5 h-3.5" />
                     <span>CALL 100</span>
