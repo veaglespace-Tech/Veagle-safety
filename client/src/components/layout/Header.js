@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Shield, Crown, Home, Zap, Info, Image as ImageIcon,
-  PhoneCall, LogOut, Menu, X, UserCheck
+  PhoneCall, LayoutDashboard, LogOut, Menu, X
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -26,12 +26,12 @@ export const Header = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    router.push('/');
+    router.push('/auth?mode=login');
   };
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
-  // Clean Navigation Links for the Menu Toggle Dropdown (NO repeated app tabs!)
+  // Navigation Links for Collapsed Menu Dropdown
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/pricing', label: 'Pricing', icon: Zap },
@@ -45,7 +45,6 @@ export const Header = () => {
   }
 
   const isActive = (path) => pathname === path;
-  const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
 
   return (
     <>
@@ -125,52 +124,34 @@ export const Header = () => {
           {/* RIGHT SIDE USER ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* LOGGED IN: SHOW LOGOUT BUTTON */}
-            {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                style={{
-                  background: '#FFF0F3',
-                  border: '1.5px solid #FFCCE1',
-                  color: '#FF2A6D',
-                  fontSize: '11px',
-                  fontWeight: 900,
-                  padding: '7px 14px',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.2s ease',
-                  boxShadow: '0 2px 8px rgba(255,92,138,0.12)',
-                  flexShrink: 0,
-                }}
-                title="Logout / Sign Out"
-                aria-label="Logout"
-              >
-                <LogOut size={14} color="#FF2A6D" />
-                <span>Logout</span>
-              </button>
-            ) : (
-              /* NON LOGGED IN VISITOR: SIGN IN BUTTON */
-              <Link 
-                href="/auth?mode=login" 
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '5px',
-                  color: '#2A0826', fontWeight: 800, fontSize: '11px',
-                  padding: '7px 14px', borderRadius: '12px',
-                  textDecoration: 'none', border: '1px solid #FFCCE1',
-                  background: 'rgba(255,255,255,0.9)',
-                  whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }}
-              >
-                <UserCheck size={13} color="#FF5C8A" />
-                <span>Sign In</span>
-              </Link>
-            )}
+            {/* SIGN OUT / LOGOUT BUTTON (REPLACES SIGN IN BUTTON) */}
+            <button
+              onClick={handleLogout}
+              style={{
+                background: '#FFF0F3',
+                border: '1.5px solid #FFCCE1',
+                color: '#FF2A6D',
+                fontSize: '11px',
+                fontWeight: 900,
+                padding: '7px 14px',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(255,92,138,0.12)',
+                flexShrink: 0,
+              }}
+              title="Sign Out / Logout"
+              aria-label="Sign Out"
+            >
+              <LogOut size={14} color="#FF2A6D" />
+              <span>Sign Out</span>
+            </button>
 
-            {/* MENU TOGGLE BUTTON (OPENS COLLAPSED DROPDOWN) */}
+            {/* MENU TOGGLE BUTTON (OPENS ALL TABS DROPDOWN) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
@@ -215,21 +196,19 @@ export const Header = () => {
               </Link>
             ))}
 
-            {isLoggedIn && (
-              <button
-                onClick={handleLogout}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  width: '100%', padding: '10px 14px', borderRadius: '12px',
-                  fontSize: '13px', fontWeight: 800,
-                  border: '1px solid #FFCCE1', background: '#FFFFFF',
-                  color: '#FF2A6D', cursor: 'pointer', marginTop: '8px',
-                }}
-              >
-                <LogOut size={16} />
-                <span>Sign Out</span>
-              </button>
-            )}
+            <button
+              onClick={handleLogout}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                width: '100%', padding: '10px 14px', borderRadius: '12px',
+                fontSize: '13px', fontWeight: 800,
+                border: '1px solid #FFCCE1', background: '#FFFFFF',
+                color: '#FF2A6D', cursor: 'pointer', marginTop: '8px',
+              }}
+            >
+              <LogOut size={16} />
+              <span>Sign Out</span>
+            </button>
           </div>
         )}
       </header>
