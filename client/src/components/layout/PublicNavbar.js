@@ -96,12 +96,12 @@ export const PublicNavbar = () => {
             </div>
           </Link>
 
-          {/* CENTER NAV — Desktop only (>= 1024px) */}
+          {/* CENTER NAV — Desktop only (>= 768px, NO Hamburger on Desktop) */}
           <nav style={{
             display: 'flex', alignItems: 'center', gap: '3px',
             background: '#FFF0F3', borderRadius: '16px',
             border: '1px solid #FFCCE1', padding: '4px', flexShrink: 0,
-          }} className="hidden lg:flex">
+          }} className="hidden md:flex">
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link key={href} href={href} style={{
                 display: 'flex', alignItems: 'center', gap: '5px',
@@ -142,7 +142,7 @@ export const PublicNavbar = () => {
                   padding: '7px 12px', borderRadius: '10px',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px',
                   whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }} className="hidden lg:flex">
+                }} className="hidden md:flex">
                   <LogOut size={13} />
                   <span>Logout</span>
                 </button>
@@ -175,7 +175,7 @@ export const PublicNavbar = () => {
               </>
             )}
 
-            {/* HAMBURGER — Mobile/Tablet (< 1024px) */}
+            {/* HAMBURGER — Mobile only (< 768px) */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               style={{
@@ -185,7 +185,7 @@ export const PublicNavbar = () => {
                 alignItems: 'center', justifyContent: 'center',
                 color: '#FF5C8A', flexShrink: 0,
               }}
-              className="lg:hidden"
+              className="md:hidden"
               aria-label="Toggle menu"
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -193,14 +193,14 @@ export const PublicNavbar = () => {
           </div>
         </div>
 
-        {/* MOBILE & TABLET DROPDOWN MENU */}
+        {/* MOBILE DROPDOWN MENU */}
         {menuOpen && (
           <div style={{
             borderTop: '1.5px solid #FFCCE1',
             background: 'rgba(255,255,255,0.99)',
             padding: '12px 16px 16px',
             boxShadow: '0 10px 25px rgba(255,92,138,0.12)',
-          }} className="lg:hidden">
+          }} className="md:hidden">
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link key={href} href={href} style={{
                 display: 'flex', alignItems: 'center', gap: '10px',

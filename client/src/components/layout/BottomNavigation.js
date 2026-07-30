@@ -28,7 +28,7 @@ export const BottomNavigation = () => {
 
   return (
     <>
-      {/* 3D MAGIC FLOATING NAVIGATION DOCK */}
+      {/* COMPACT ELEGANT 3D MAGIC FLOATING DOCK */}
       <div 
         style={{
           position: 'fixed',
@@ -36,26 +36,26 @@ export const BottomNavigation = () => {
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 100,
-          width: 'calc(100% - 24px)',
-          maxWidth: '440px',
+          width: 'min(360px, 88vw)',
+          maxWidth: '360px',
           fontFamily: 'Manrope, sans-serif',
-          filter: 'drop-shadow(0 12px 24px rgba(255, 92, 138, 0.22)) drop-shadow(0 4px 10px rgba(42, 8, 38, 0.08))',
+          filter: 'drop-shadow(0 10px 22px rgba(255, 92, 138, 0.25)) drop-shadow(0 4px 8px rgba(42, 8, 38, 0.08))',
         }} 
         className="lg:hidden"
       >
         {/* NAV CONTAINER BAR */}
         <div style={{
           position: 'relative',
-          background: 'rgba(255, 255, 255, 0.95)',
+          background: 'rgba(255, 255, 255, 0.96)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '26px',
+          borderRadius: '999px',
           border: '1.5px solid rgba(255, 204, 225, 0.95)',
-          padding: '6px 8px 8px 8px',
+          padding: '5px 10px 6px 10px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -2px 6px rgba(255, 92, 138, 0.06)',
+          boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -2px 5px rgba(255, 92, 138, 0.05)',
         }}>
 
           {navItems.map((item) => {
@@ -63,7 +63,7 @@ export const BottomNavigation = () => {
             const isActive = pathname === item.path;
 
             /* ========================================================
-               CENTER 3D FLOATING SOS BUTTON WITH NEON PULSE AURA
+               CENTER 3D FLOATING SOS BUTTON
                ======================================================== */
             if (item.isCenter) {
               return (
@@ -75,7 +75,7 @@ export const BottomNavigation = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     position: 'relative',
-                    marginTop: '-34px',
+                    marginTop: '-30px',
                     textDecoration: 'none',
                     zIndex: 10,
                     width: '20%',
@@ -90,9 +90,9 @@ export const BottomNavigation = () => {
                     <>
                       <div style={{
                         position: 'absolute',
-                        top: '28px', left: '50%',
+                        top: '26px', left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: '90px', height: '90px',
+                        width: '84px', height: '84px',
                         borderRadius: '50%',
                         background: 'radial-gradient(circle, rgba(255,0,67,0.35) 0%, rgba(255,42,109,0) 70%)',
                         animation: 'sos3DPulse1 1.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite',
@@ -100,9 +100,9 @@ export const BottomNavigation = () => {
                       }} />
                       <div style={{
                         position: 'absolute',
-                        top: '28px', left: '50%',
+                        top: '26px', left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: '76px', height: '76px',
+                        width: '70px', height: '70px',
                         borderRadius: '50%',
                         background: 'radial-gradient(circle, rgba(255,92,138,0.4) 0%, rgba(255,92,138,0) 70%)',
                         animation: 'sos3DPulse2 1.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite 0.4s',
@@ -115,9 +115,9 @@ export const BottomNavigation = () => {
                   {!activeSession && (
                     <div style={{
                       position: 'absolute',
-                      top: '28px', left: '50%',
+                      top: '26px', left: '50%',
                       transform: 'translate(-50%, -50%)',
-                      width: '72px', height: '72px',
+                      width: '66px', height: '66px',
                       borderRadius: '50%',
                       background: 'radial-gradient(circle, rgba(255,92,138,0.22) 0%, rgba(255,92,138,0) 75%)',
                       animation: 'ambient3DGlow 3s ease-in-out infinite',
@@ -125,10 +125,10 @@ export const BottomNavigation = () => {
                     }} />
                   )}
 
-                  {/* Main 3D SOS Sphere Button */}
+                  {/* Main 3D SOS Button */}
                   <div style={{
-                    width: '60px',
-                    height: '60px',
+                    width: '54px',
+                    height: '54px',
                     borderRadius: '50%',
                     background: activeSession
                       ? 'linear-gradient(145deg, #FF0043 0%, #FF2A6D 50%, #B80031 100%)'
@@ -137,15 +137,15 @@ export const BottomNavigation = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     boxShadow: activeSession
-                      ? '0 10px 26px rgba(255, 0, 67, 0.55), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.35)'
-                      : '0 8px 22px rgba(255, 42, 109, 0.42), inset 0 2px 4px rgba(255, 255, 255, 0.85), inset 0 -3px 6px rgba(180, 20, 70, 0.4)',
-                    border: '3.5px solid #FFFFFF',
+                      ? '0 8px 22px rgba(255, 0, 67, 0.55), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.35)'
+                      : '0 6px 18px rgba(255, 42, 109, 0.42), inset 0 2px 4px rgba(255, 255, 255, 0.85), inset 0 -3px 6px rgba(180, 20, 70, 0.4)',
+                    border: '3px solid #FFFFFF',
                     transform: pressingSOS ? 'scale(0.92) translateY(2px)' : 'scale(1) translateY(0)',
                     transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     position: 'relative',
                     cursor: 'pointer',
                   }}>
-                    {/* Top 3D Glass Light Reflection */}
+                    {/* Top 3D Light Reflection */}
                     <div style={{
                       position: 'absolute',
                       top: '3px',
@@ -158,7 +158,7 @@ export const BottomNavigation = () => {
                     }} />
 
                     <AlertTriangle
-                      size={26}
+                      size={24}
                       color="#FFFFFF"
                       strokeWidth={2.6}
                       style={{ 
@@ -169,19 +169,18 @@ export const BottomNavigation = () => {
                     />
                   </div>
 
-                  {/* 3D Label Badge */}
+                  {/* 3D SOS Label Badge */}
                   <div style={{
-                    marginTop: '3px',
-                    padding: '2px 8px',
+                    marginTop: '2px',
+                    padding: '1px 7px',
                     borderRadius: '999px',
                     background: activeSession ? '#FF0043' : '#FF2A6D',
-                    boxShadow: '0 2px 6px rgba(255,42,109,0.3)',
+                    boxShadow: '0 2px 5px rgba(255,42,109,0.3)',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '3px',
                   }}>
                     <span style={{
-                      fontSize: '9px',
+                      fontSize: '8.5px',
                       fontWeight: 900,
                       color: '#FFFFFF',
                       letterSpacing: '0.08em',
@@ -195,7 +194,7 @@ export const BottomNavigation = () => {
             }
 
             /* ========================================================
-               REGULAR PERFECTLY ALIGNED 3D TAB ITEMS
+               REGULAR 3D TAB ITEMS
                ======================================================== */
             return (
               <Link
@@ -206,7 +205,7 @@ export const BottomNavigation = () => {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '6px 0',
+                  padding: '4px 0',
                   textDecoration: 'none',
                   position: 'relative',
                   zIndex: 2,
@@ -218,9 +217,9 @@ export const BottomNavigation = () => {
                 {/* 3D Active Pill Container Frame */}
                 <div style={{
                   position: 'relative',
-                  width: '46px',
-                  height: '38px',
-                  borderRadius: '16px',
+                  width: '42px',
+                  height: '34px',
+                  borderRadius: '14px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -228,11 +227,11 @@ export const BottomNavigation = () => {
                     ? 'linear-gradient(135deg, #FF5C8A 0%, #FF2A6D 100%)'
                     : 'transparent',
                   boxShadow: isActive
-                    ? '0 6px 16px rgba(255, 92, 138, 0.38), inset 0 1px 1.5px rgba(255,255,255,0.75)'
+                    ? '0 5px 14px rgba(255, 92, 138, 0.38), inset 0 1px 1.5px rgba(255,255,255,0.75)'
                     : 'none',
                   transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 }}>
-                  {/* Subtle 3D Glass Light Highlight for active state */}
+                  {/* Glass Light Highlight */}
                   {isActive && (
                     <div style={{
                       position: 'absolute',
@@ -247,7 +246,7 @@ export const BottomNavigation = () => {
                   )}
 
                   <Icon
-                    size={20}
+                    size={18}
                     color={isActive ? '#FFFFFF' : '#8A6987'}
                     strokeWidth={isActive ? 2.4 : 1.8}
                     style={{
@@ -259,24 +258,23 @@ export const BottomNavigation = () => {
 
                 {/* Text Label */}
                 <span style={{
-                  fontSize: '10px',
+                  fontSize: '9.5px',
                   fontWeight: isActive ? 900 : 700,
                   color: isActive ? '#FF2A6D' : '#8A6987',
-                  marginTop: '3px',
+                  marginTop: '2px',
                   transition: 'color 0.2s ease',
-                  letterSpacing: isActive ? '0.02em' : 'normal',
                 }}>
                   {item.label}
                 </span>
 
                 {/* Active Indicator Underline Dot */}
                 <div style={{
-                  width: isActive ? '12px' : '0px',
-                  height: '3px',
+                  width: isActive ? '10px' : '0px',
+                  height: '2.5px',
                   borderRadius: '999px',
                   background: 'linear-gradient(90deg, #FF5C8A, #FF2A6D)',
                   marginTop: '2px',
-                  boxShadow: isActive ? '0 2px 6px rgba(255,92,138,0.6)' : 'none',
+                  boxShadow: isActive ? '0 2px 5px rgba(255,92,138,0.6)' : 'none',
                   transition: 'width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 }} />
               </Link>
@@ -287,7 +285,7 @@ export const BottomNavigation = () => {
       </div>
 
       {/* Spacer so page content is not blocked */}
-      <div style={{ height: '90px' }} className="lg:hidden" />
+      <div style={{ height: '85px' }} className="lg:hidden" />
 
       {/* 3D KEYFRAME ANIMATIONS */}
       <style>{`

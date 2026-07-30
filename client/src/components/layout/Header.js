@@ -39,15 +39,18 @@ export const Header = () => {
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/pricing', label: 'Pricing', icon: Zap },
     { href: '/about', label: 'About', icon: Info },
     { href: '/gallery', label: 'Gallery', icon: ImageIcon },
     { href: '/contact', label: 'Contact', icon: PhoneCall },
   ];
 
-  if (isSuperAdmin) {
-    navLinks.splice(1, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
+  if (mounted && token) {
+    navLinks.splice(1, 0, { 
+      href: isSuperAdmin ? '/admin' : '/dashboard', 
+      label: isSuperAdmin ? 'Admin Panel' : 'Dashboard', 
+      icon: isSuperAdmin ? Crown : LayoutDashboard 
+    });
   }
 
   const isActive = (path) => pathname === path;
@@ -78,7 +81,7 @@ export const Header = () => {
           gap: '12px',
         }}>
 
-          {/* BRAND LOGO + TITLE + STATUS (NOWRAP) */}
+          {/* BRAND LOGO + TITLE + STATUS */}
           <Link 
             href="/" 
             style={{ 
@@ -127,7 +130,7 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* CENTER DESKTOP NAVIGATION TABS (Visible ONLY on Desktop >= 1024px) */}
+          {/* CENTER DESKTOP NAVIGATION TABS (Visible on screens >= 768px, NO Hamburger on Desktop) */}
           <nav 
             style={{
               display: 'flex', alignItems: 'center', gap: '3px',
@@ -135,7 +138,7 @@ export const Header = () => {
               border: '1px solid #FFCCE1', padding: '4px',
               flexShrink: 0,
             }}
-            className="hidden lg:flex"
+            className="hidden md:flex"
           >
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link
@@ -143,7 +146,7 @@ export const Header = () => {
                 href={href}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '5px',
-                  padding: '6px 13px', borderRadius: '11px',
+                  padding: '6px 12px', borderRadius: '10px',
                   fontSize: '12px', fontWeight: 800,
                   textDecoration: 'none',
                   transition: 'all 0.2s ease',
@@ -162,25 +165,93 @@ export const Header = () => {
           {/* RIGHT SIDE USER ACTION CONTROLS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* Logged-in Quick Dashboard / Admin HQ Button */}
-            {mounted && token && (
-              <Link
-                href={isSuperAdmin ? '/admin' : '/dashboard'}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                  color: '#FFFFFF', fontSize: '11px', fontWeight: 900,
+            {/* Dynamic CTA Button for Logged-In User / Super Admin */}
+            {mounted && token ? (
+              <>
+                <Link
+                  href={isSuperAdmin ? '/admin' : '/dashboard'}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+                    color: '#FFFFFF', fontSize: '11px', fontWeight: 900,
+                    padding: '7px 14px', borderRadius: '12px',
+                    textDecoration: 'none', boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
+                  <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
+                </Link>
+                
+                {/* Avatar Badge */}
+                {user && (
+                  <Link
+                    href="/profile"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '6px',
+                      padding: '3px 8px 3px 4px', borderRadius: '999px',
+                      background: '#FFF0F3', border: '1.5px solid #FFCCE1',
+                      textDecoration: 'none', transition: 'all 0.2s ease',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div style={{
+                      width: '30px', height: '30px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+                      color: '#FFFFFF', display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', fontWeight: 900, fontSize: '11px',
+                      boxShadow: '0 2px 8px rgba(255,92,138,0.3)',
+                    }}>
+                      {initials}
+                    </div>
+                  </Link>
+                )}
+
+                {/* Logout Button (Desktop >= 768px) */}
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    background: 'none', border: '1px solid #FFCCE1',
+                    color: '#684E67', fontSize: '11px', fontWeight: 800,
+                    padding: '7px 12px', borderRadius: '10px',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px',
+                    whiteSpace: 'nowrap', transition: 'all 0.2s',
+                  }}
+                  className="hidden md:flex"
+                >
+                  <LogOut size={13} />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth?mode=login" style={{
+                  display: 'flex', alignItems: 'center', gap: '5px',
+                  color: '#2A0826', fontWeight: 800, fontSize: '11px',
                   padding: '7px 14px', borderRadius: '12px',
-                  textDecoration: 'none', boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
+                  textDecoration: 'none', border: '1px solid #FFCCE1',
+                  background: 'rgba(255,255,255,0.9)',
+                  whiteSpace: 'nowrap', transition: 'all 0.2s',
+                }}>
+                  <UserCheck size={13} color="#FF5C8A" />
+                  <span>Sign In</span>
+                </Link>
+                <Link href="/auth?mode=register" style={{
+                  display: 'flex', alignItems: 'center', gap: '5px',
+                  background: 'linear-gradient(135deg,#FF5C8A,#FF2A6D)',
+                  color: '#fff', fontWeight: 900, fontSize: '11px',
+                  padding: '7px 14px', borderRadius: '12px',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
                   whiteSpace: 'nowrap',
-                }}
-              >
-                {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
-                <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
-              </Link>
+                }} className="hidden sm:flex">
+                  <span>Sign Up</span>
+                  <ArrowRight size={13} />
+                </Link>
+              </>
             )}
 
-            {/* Emergency Alarm Quick Siren Button */}
+            {/* Emergency Alarm Siren Button */}
             <Link
               href="/alarm"
               style={{
@@ -196,49 +267,7 @@ export const Header = () => {
               <Bell size={18} />
             </Link>
 
-            {/* User Profile Avatar */}
-            {mounted && user && (
-              <Link
-                href="/profile"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '3px 8px 3px 4px', borderRadius: '999px',
-                  background: '#FFF0F3', border: '1.5px solid #FFCCE1',
-                  textDecoration: 'none', transition: 'all 0.2s ease',
-                  flexShrink: 0,
-                }}
-              >
-                <div style={{
-                  width: '30px', height: '30px', borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                  color: '#FFFFFF', display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', fontWeight: 900, fontSize: '11px',
-                  boxShadow: '0 2px 8px rgba(255,92,138,0.3)',
-                }}>
-                  {initials}
-                </div>
-              </Link>
-            )}
-
-            {/* Logout Button (Desktop only) */}
-            {mounted && token && (
-              <button
-                onClick={handleLogout}
-                style={{
-                  background: 'none', border: '1px solid #FFCCE1',
-                  color: '#684E67', fontSize: '11px', fontWeight: 800,
-                  padding: '7px 12px', borderRadius: '10px',
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px',
-                  whiteSpace: 'nowrap', transition: 'all 0.2s',
-                }}
-                className="hidden lg:flex"
-              >
-                <LogOut size={13} />
-                <span>Logout</span>
-              </button>
-            )}
-
-            {/* Mobile / Tablet Hamburger Menu Toggle (< 1024px) */}
+            {/* Mobile Hamburger Menu Toggle (ONLY on Mobile < 768px) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
@@ -248,7 +277,7 @@ export const Header = () => {
                 color: '#FF5C8A', cursor: 'pointer',
                 flexShrink: 0,
               }}
-              className="lg:hidden"
+              className="md:hidden"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -256,7 +285,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* MOBILE & TABLET DROPDOWN MENU */}
+        {/* MOBILE DROPDOWN MENU (ONLY on Mobile < 768px) */}
         {mobileMenuOpen && (
           <div 
             style={{
@@ -265,7 +294,7 @@ export const Header = () => {
               padding: '12px 16px 16px',
               boxShadow: '0 10px 25px rgba(255, 92, 138, 0.12)',
             }} 
-            className="lg:hidden"
+            className="md:hidden"
           >
             {navLinks.map(({ href, label, icon: Icon }) => (
               <Link
