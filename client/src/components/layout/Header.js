@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Shield, Bell, Crown, Home, Zap, Info, Image as ImageIcon,
+  Shield, Bell, BellRing, Crown, Home, Zap, Info, Image as ImageIcon,
   PhoneCall, LayoutDashboard, LogOut, Menu, X, UserCheck, ArrowRight,
   MapPin, Users, User
 } from 'lucide-react';
@@ -23,6 +23,7 @@ export const Header = () => {
 
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(true);
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
@@ -141,23 +142,94 @@ export const Header = () => {
           {/* RIGHT SIDE USER ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             
-            {/* Logged in CTA Button */}
+            {/* LOGGED IN USER ACTIONS (NO Sign In button!) */}
             {mounted && token ? (
-              <Link
-                href={isSuperAdmin ? '/admin' : '/dashboard'}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                  color: '#FFFFFF', fontSize: '11px', fontWeight: 900,
-                  padding: '7px 14px', borderRadius: '12px',
-                  textDecoration: 'none', boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
-                <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
-              </Link>
+              <>
+                {/* Dashboard / Admin Panel Button */}
+                <Link
+                  href={isSuperAdmin ? '/admin' : '/dashboard'}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+                    color: '#FFFFFF', fontSize: '11px', fontWeight: 900,
+                    padding: '7px 14px', borderRadius: '12px',
+                    textDecoration: 'none', boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
+                  <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
+                </Link>
+
+                {/* Push Notification Toggle Button */}
+                <button
+                  onClick={() => setPushEnabled(!pushEnabled)}
+                  style={{
+                    width: '36px', height: '36px', borderRadius: '12px',
+                    background: pushEnabled ? '#FFF0F3' : '#F3F4F6',
+                    border: '1px solid #FFCCE1',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: pushEnabled ? '#FF2A6D' : '#9CA3AF',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0,
+                  }}
+                  title={pushEnabled ? 'Push Notifications Active' : 'Push Notifications Muted'}
+                >
+                  <BellRing size={17} />
+                  {pushEnabled && (
+                    <span style={{
+                      position: 'absolute', top: '7px', right: '7px',
+                      width: '6px', height: '6px', borderRadius: '50%',
+                      background: '#FF2A6D', boxShadow: '0 0 6px #FF2A6D',
+                    }} />
+                  )}
+                </button>
+
+                {/* User Profile Avatar */}
+                {user && (
+                  <Link
+                    href="/profile"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '6px',
+                      padding: '3px', borderRadius: '50%',
+                      background: '#FFF0F3', border: '1.5px solid #FFCCE1',
+                      textDecoration: 'none', transition: 'all 0.2s ease',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div style={{
+                      width: '30px', height: '30px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+                      color: '#FFFFFF', display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', fontWeight: 900, fontSize: '11px',
+                      boxShadow: '0 2px 8px rgba(255,92,138,0.3)',
+                    }}>
+                      {initials}
+                    </div>
+                  </Link>
+                )}
+
+                {/* Logout Toggle Button */}
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '36px', height: '36px', borderRadius: '12px',
+                    background: '#FFF0F3', border: '1px solid #FFCCE1',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#684E67', cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0,
+                  }}
+                  title="Sign Out"
+                  aria-label="Sign Out"
+                >
+                  <LogOut size={16} color="#FF2A6D" />
+                </button>
+              </>
             ) : (
+              /* NON LOGGED IN VISITOR (Sign In) */
               <Link 
                 href="/auth?mode=login" 
                 style={{
@@ -174,47 +246,7 @@ export const Header = () => {
               </Link>
             )}
 
-            {/* Emergency Alarm Siren Button */}
-            <Link
-              href="/alarm"
-              style={{
-                width: '36px', height: '36px', borderRadius: '12px',
-                background: '#FFF0F3', border: '1px solid #FFCCE1',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#FF2A6D', textDecoration: 'none',
-                transition: 'all 0.2s ease',
-                flexShrink: 0,
-              }}
-              title="Emergency Siren Alarm"
-            >
-              <Bell size={18} />
-            </Link>
-
-            {/* User Profile Avatar */}
-            {mounted && user && (
-              <Link
-                href="/profile"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '3px', borderRadius: '50%',
-                  background: '#FFF0F3', border: '1.5px solid #FFCCE1',
-                  textDecoration: 'none', transition: 'all 0.2s ease',
-                  flexShrink: 0,
-                }}
-              >
-                <div style={{
-                  width: '30px', height: '30px', borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
-                  color: '#FFFFFF', display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', fontWeight: 900, fontSize: '11px',
-                  boxShadow: '0 2px 8px rgba(255,92,138,0.3)',
-                }}>
-                  {initials}
-                </div>
-              </Link>
-            )}
-
-            {/* MENU TOGGLE BUTTON (OPENS ALL TABS DROPDOWN) */}
+            {/* MENU TOGGLE BUTTON (OPENS ALL NAVIGATION TABS DROPDOWN) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{

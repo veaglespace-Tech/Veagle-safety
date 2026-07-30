@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   Shield, Zap, ArrowRight, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
-  LayoutDashboard, LogOut, Menu, X, Crown, Home, MapPin, Users, User
+  LayoutDashboard, LogOut, Menu, X, Crown, Home, MapPin, Users, User, BellRing
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -19,6 +19,7 @@ export const PublicNavbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(true);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -37,6 +38,10 @@ export const PublicNavbar = () => {
 
   const isActive = (path) => pathname === path;
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+
+  const initials = user?.fullName
+    ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'SS';
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
@@ -105,19 +110,90 @@ export const PublicNavbar = () => {
           {/* RIGHT SIDE ACTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             {mounted && token ? (
-              <Link href={isSuperAdmin ? '/admin' : '/dashboard'} style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                background: 'linear-gradient(135deg,#FF5C8A,#FF2A6D)',
-                color: '#fff', fontWeight: 900, fontSize: '11px',
-                padding: '7px 14px', borderRadius: '12px',
-                textDecoration: 'none',
-                boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
-                whiteSpace: 'nowrap',
-              }}>
-                {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
-                <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
-              </Link>
+              <>
+                {/* Dashboard / Admin Panel Button */}
+                <Link href={isSuperAdmin ? '/admin' : '/dashboard'} style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  background: 'linear-gradient(135deg,#FF5C8A,#FF2A6D)',
+                  color: '#fff', fontWeight: 900, fontSize: '11px',
+                  padding: '7px 14px', borderRadius: '12px',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 14px rgba(255,92,138,0.35)',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {isSuperAdmin ? <Crown size={13} /> : <LayoutDashboard size={13} />}
+                  <span>{isSuperAdmin ? 'Admin Panel' : 'Dashboard'}</span>
+                </Link>
+
+                {/* Push Notification Toggle Button */}
+                <button
+                  onClick={() => setPushEnabled(!pushEnabled)}
+                  style={{
+                    width: '36px', height: '36px', borderRadius: '12px',
+                    background: pushEnabled ? '#FFF0F3' : '#F3F4F6',
+                    border: '1px solid #FFCCE1',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: pushEnabled ? '#FF2A6D' : '#9CA3AF',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0,
+                  }}
+                  title={pushEnabled ? 'Push Notifications Active' : 'Push Notifications Muted'}
+                >
+                  <BellRing size={17} />
+                  {pushEnabled && (
+                    <span style={{
+                      position: 'absolute', top: '7px', right: '7px',
+                      width: '6px', height: '6px', borderRadius: '50%',
+                      background: '#FF2A6D', boxShadow: '0 0 6px #FF2A6D',
+                    }} />
+                  )}
+                </button>
+
+                {/* User Profile Avatar */}
+                {user && (
+                  <Link
+                    href="/profile"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '6px',
+                      padding: '3px', borderRadius: '50%',
+                      background: '#FFF0F3', border: '1.5px solid #FFCCE1',
+                      textDecoration: 'none', transition: 'all 0.2s ease',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div style={{
+                      width: '30px', height: '30px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #FF5C8A, #FF2A6D)',
+                      color: '#FFFFFF', display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', fontWeight: 900, fontSize: '11px',
+                      boxShadow: '0 2px 8px rgba(255,92,138,0.3)',
+                    }}>
+                      {initials}
+                    </div>
+                  </Link>
+                )}
+
+                {/* Logout Toggle Button */}
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '36px', height: '36px', borderRadius: '12px',
+                    background: '#FFF0F3', border: '1px solid #FFCCE1',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#FF2A6D', cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0,
+                  }}
+                  title="Sign Out"
+                  aria-label="Sign Out"
+                >
+                  <LogOut size={16} color="#FF2A6D" />
+                </button>
+              </>
             ) : (
+              /* NON LOGGED IN VISITOR */
               <>
                 <Link href="/auth?mode=login" style={{
                   display: 'flex', alignItems: 'center', gap: '5px',
@@ -162,7 +238,7 @@ export const PublicNavbar = () => {
           </div>
         </div>
 
-        {/* MOBILE & DESKTOP COLLAPSED DROPDOWN MENU */}
+        {/* COLLAPSED DROPDOWN MENU */}
         {menuOpen && (
           <div style={{
             borderTop: '1.5px solid #FFCCE1',
