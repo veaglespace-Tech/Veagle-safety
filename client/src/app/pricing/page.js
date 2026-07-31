@@ -90,11 +90,9 @@ export default function PlatformPricingPage() {
             {/* TOP DECORATIVE ACCENT STRIP */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
 
-            {/* PLAN TITLE & HEADER WITH INTEGRATED ROYAL BADGE */}
+            {/* PLAN TITLE & HEADER */}
             <div className="flex items-start space-x-3.5 pt-1">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] border border-[#FFCCE1] text-[#FF2A6D] flex items-center justify-center shrink-0 shadow-sm mt-1">
-                <ShieldCheck className="w-7 h-7 text-[#FF2A6D]" />
-              </div>
+              <Logo3DFlip size={44} />
               <div className="space-y-1">
                 <h2 className="text-lg sm:text-xl font-black text-[#2A0826] tracking-tight">
                   {activePlan.name}
