@@ -85,6 +85,10 @@ export default function SuperAdminOperationsPortal() {
   }, []);
 
   useEffect(() => {
+    setUsersPage(1);
+  }, [searchQuery]);
+
+  useEffect(() => {
     if (!mounted) return;
     if (!user) {
       router.push('/admin/login');
@@ -696,7 +700,7 @@ export default function SuperAdminOperationsPortal() {
               </div>
 
               {/* PAGINATION CONTROLS FOR INCIDENT LOG HISTORY */}
-              {recentSos.length > LOGS_PER_PAGE && (
+              {recentSos.length > 0 && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#FFCCE1] text-xs font-bold text-tichi-muted">
                   <div>
                     Showing <span className="font-black text-[#2A0826]">{(sosPage - 1) * LOGS_PER_PAGE + 1}</span> to{' '}
@@ -855,7 +859,7 @@ export default function SuperAdminOperationsPortal() {
               </div>
 
               {/* PAGINATION CONTROLS FOR USER ACCOUNTS */}
-              {filteredUsers.length > LOGS_PER_PAGE && (
+              {filteredUsers.length > 0 && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#FFF0F3]/60 border-t border-[#FFCCE1] text-xs font-bold text-tichi-muted">
                   <div>
                     Showing <span className="font-black text-[#2A0826]">{(usersPage - 1) * LOGS_PER_PAGE + 1}</span> to{' '}
