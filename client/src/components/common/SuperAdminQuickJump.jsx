@@ -61,10 +61,8 @@ export const SuperAdminQuickJump = () => {
         <div className="absolute top-0 left-6 right-6 h-[2px] bg-gradient-to-r from-transparent via-[#FF2A6D] to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
 
         {/* LEFT LOGO & BADGE */}
-        <div className="flex items-center space-x-3 shrink-0">
-          <div className="p-1 rounded-full bg-white shadow-sm border border-[#FFCCE1] group-hover:scale-110 transition-transform duration-300">
-            <Logo3DFlip size={34} />
-          </div>
+        <div className="flex items-center shrink-0">
+          <Logo3DFlip size={36} />
         </div>
 
         {/* CENTER CONTENT */}
