@@ -7,7 +7,7 @@ import * as checkinController from '../controllers/checkinController.js';
 import * as adminController from '../controllers/adminController.js';
 import * as paymentController from '../controllers/paymentController.js';
 import * as pushController from '../controllers/pushController.js';
-import { authenticateToken, requireSuperAdmin } from '../middleware/auth.js';
+import { authenticateToken, optionalAuthToken, requireSuperAdmin } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -24,7 +24,7 @@ router.put('/auth/settings', authenticateToken, authController.updateSettings);
 router.get('/plans', adminController.getPlans);
 
 // PayU Payment Routes
-router.post('/payment/payu-initiate', authenticateToken, paymentController.initiatePayUPayment);
+router.post('/payment/payu-initiate', optionalAuthToken, paymentController.initiatePayUPayment);
 router.post('/payment/payu-success', paymentController.handlePayUSuccess);
 router.get('/payment/payu-success', paymentController.handlePayUSuccess);
 router.post('/payment/payu-failure', paymentController.handlePayUFailure);

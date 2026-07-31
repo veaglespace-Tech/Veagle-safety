@@ -18,6 +18,21 @@ export const authenticateToken = (req, res, next) => {
   }
 };
 
+export const optionalAuthToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, config.jwtSecret);
+      req.user = decoded;
+    } catch (err) {
+      // Ignore token verification errors for optional auth (e.g. pending registration flow)
+    }
+  }
+  next();
+};
+
 export const requireSuperAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== 'SUPER_ADMIN') {
     return res.status(403).json({ error: 'Access denied. Super Admin privileges required.' });
