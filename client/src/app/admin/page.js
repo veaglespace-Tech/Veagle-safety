@@ -842,6 +842,8 @@ export default function SuperAdminOperationsPortal() {
           </div>
         )}
 
+        {/* CENTERED SUPER ADMIN QUICK JUMP BUTTON BELOW CARDS */}
+        <SuperAdminQuickJump />
       </main>
 
       {/* ---------------------------------------------------- */}
@@ -1032,9 +1034,6 @@ export default function SuperAdminOperationsPortal() {
           </div>
         </div>
       )}
-
-      {/* SUPER ADMIN QUICK JUMP FLOATING DOCK */}
-      <SuperAdminQuickJump />
     </div>
   );
 }
