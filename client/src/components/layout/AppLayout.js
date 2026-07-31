@@ -5,6 +5,7 @@ import { Header } from './Header.js';
 import { BottomNavigation } from './BottomNavigation.js';
 import { DesktopSidebar } from './DesktopSidebar.js';
 import { Footer } from './Footer.js';
+import { SuperAdminQuickJump } from '../common/SuperAdminQuickJump.jsx';
 
 export const AppLayout = ({ children, fullScreen = false }) => {
   const [mounted, setMounted] = useState(false);
@@ -14,7 +15,7 @@ export const AppLayout = ({ children, fullScreen = false }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-blush flex flex-col">
+    <div className="min-h-screen bg-blush flex flex-col relative">
       {/* Desktop sidebar (hidden on mobile) */}
       <DesktopSidebar />
 
@@ -29,6 +30,9 @@ export const AppLayout = ({ children, fullScreen = false }) => {
         {!fullScreen && <Footer />}
         {!fullScreen && <BottomNavigation />}
       </div>
+
+      {/* Super Admin Quick Jump Floating Dock */}
+      <SuperAdminQuickJump />
     </div>
   );
 };

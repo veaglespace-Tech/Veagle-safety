@@ -6,6 +6,7 @@ import { api } from '../../utils/api.js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
+import { SuperAdminQuickJump } from '../../components/common/SuperAdminQuickJump.jsx';
 import {
   Crown,
   AlertOctagon,
@@ -1032,6 +1033,8 @@ export default function SuperAdminOperationsPortal() {
         </div>
       )}
 
+      {/* SUPER ADMIN QUICK JUMP FLOATING DOCK */}
+      <SuperAdminQuickJump />
     </div>
   );
 }
