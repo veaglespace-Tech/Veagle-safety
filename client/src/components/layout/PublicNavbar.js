@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  ShieldAlert, Radio, Users, PhoneCall, 
-  Info, Image as ImageIcon, UserCheck, 
+import {
+  ShieldAlert, Radio, Users, PhoneCall,
+  Info, Image as ImageIcon, UserCheck,
   LogOut, Menu, X, ArrowRight, ShieldCheck, Crown, Home, Zap
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -89,11 +89,10 @@ export const PublicNavbar = () => {
               <Link
                 key={href}
                 href={href}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-300 ${
-                  active
+                className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-300 ${active
                     ? 'nav-chip-active'
                     : 'nav-chip-hover'
-                }`}
+                  }`}
               >
                 {label}
               </Link>
@@ -106,17 +105,15 @@ export const PublicNavbar = () => {
           {isLoggedIn ? (
             <div className="flex items-center gap-2">
               <Link
-                href="/dashboard"
-                className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black px-4 py-2 rounded-full cursor-pointer shadow-[0_4px_16px_rgba(255,42,109,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/40 uppercase tracking-wider"
+                href={isSuperAdmin ? '/admin' : '/dashboard'}
+                className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black px-4 py-2 sm:px-5 sm:py-2.5 rounded-full cursor-pointer shadow-[0_4px_12px_rgba(255,42,109,0.3)] hover:shadow-[0_8px_20px_rgba(255,42,109,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/30 uppercase tracking-wider text-decoration-none"
               >
-                <ShieldAlert size={15} className="animate-pulse text-white" />
-                <span className="tracking-wide">My Dashboard</span>
+                <LayoutDashboard size={14} className="text-white" />
+                <span className="tracking-wide">Dashboard</span>
               </Link>
-
               <button
-                type="button"
                 onClick={handleLogout}
-                className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-extrabold px-4 py-2 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md active:scale-95"
+                className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-extrabold px-4 py-2 sm:px-5 sm:py-2.5 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-sm active:scale-95"
                 title="Sign Out"
               >
                 <span className="tracking-wide">Sign Out</span>
@@ -124,28 +121,27 @@ export const PublicNavbar = () => {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link 
-                href="/auth?mode=register" 
-                className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black px-4 py-2 rounded-full cursor-pointer shadow-[0_4px_16px_rgba(255,42,109,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/40 uppercase tracking-wider"
-              >
-                <Zap size={15} className="animate-pulse text-white" />
-                <span className="tracking-wide">Protect Now</span>
-              </Link>
-
-              <Link 
-                href="/auth?mode=login" 
-                className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-4 py-2 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md active:scale-95"
+            <div className="hidden md:flex items-center gap-2.5">
+              <Link
+                href="/auth?mode=login"
+                className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
               >
                 <span className="tracking-wide">Sign In</span>
-                <UserCheck size={14} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" />
+                <UserCheck size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" />
+              </Link>
+
+              <Link
+                href="/auth?mode=register"
+                className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-5 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-[0_4px_16px_rgba(255,92,138,0.22)] hover:shadow-[0_8px_28px_rgba(255,42,109,0.50)] active:scale-95"
+              >
+                <span className="tracking-wide">Sign Up</span>
+                <ArrowRight size={15} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-1 transition-all duration-300" />
               </Link>
             </div>
           )}
 
           {/* MOBILE MENU TOGGLE BUTTON (SHRINK-0 ALWAYS INSIDE VIEWPORT) */}
           <button
-            type="button"
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm shrink-0"
             aria-label="Toggle menu"
@@ -161,24 +157,32 @@ export const PublicNavbar = () => {
       {menuOpen && (
         <div className="md:hidden border-t-1.5 border-[#FFCCE1] bg-white/99 p-3.5 shadow-2xl animate-fade-up">
           {navLinks.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className={`flex items-center gap-3 p-3 rounded-xl text-xs font-black mb-1.5 transition-all duration-200 ${
-              isActive(href)
+            <Link key={href} href={href} className={`flex items-center gap-3 p-3 rounded-xl text-xs font-black mb-1.5 transition-all duration-200 ${isActive(href)
                 ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30'
                 : 'bg-[#FFF0F3] text-[#2A0826] hover:bg-white hover:text-[#FF5C8A]'
-            }`}>
+              }`}>
               <Icon size={16} />
               <span>{label}</span>
             </Link>
           ))}
 
           {isLoggedIn ? (
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all duration-200 mt-2 shadow-sm"
-            >
-              <LogOut size={16} />
-              <span>Sign Out</span>
-            </button>
+            <div className="space-y-2 mt-2 pt-2 border-t border-[#FFCCE1]">
+              <Link
+                href={isSuperAdmin ? '/admin' : '/dashboard'}
+                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30 text-decoration-none"
+              >
+                <LayoutDashboard size={16} />
+                <span>Go to Dashboard</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all duration-200 shadow-sm"
+              >
+                <LogOut size={16} />
+                <span>Sign Out</span>
+              </button>
+            </div>
           ) : (
             <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-[#FFCCE1]">
               <Link
