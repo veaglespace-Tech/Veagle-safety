@@ -77,8 +77,9 @@ export default function PlatformPricingPage() {
             <span>365-Day Women Safety Protection</span>
           </div>
 
-          <AnimatedHeading as="h1" variant="shimmer" className="text-2xl sm:text-4xl font-black tracking-tight">
-            Protection Plan
+          <AnimatedHeading as="h1" variant="shimmer" className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+            <span className="heading-gradient-hero">Women Safety </span>
+            <span className="heading-highlight-pill">Protection Plan</span>
           </AnimatedHeading>
         </div>
 
