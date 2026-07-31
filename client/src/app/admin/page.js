@@ -236,12 +236,7 @@ export default function SuperAdminOperationsPortal() {
             </div>
 
             <div>
-              <div className="flex items-center space-x-2">
-                <h1 className="font-black text-sm sm:text-lg tracking-tight text-tichi-text">Super Admin HQ</h1>
-                <span className="bg-gold text-tichi-text font-black text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-gold/40 shrink-0">
-                  HQ LEVEL 5
-                </span>
-              </div>
+              <h1 className="font-black text-sm sm:text-lg tracking-tight text-tichi-text">Super Admin HQ</h1>
               <p className="text-[11px] sm:text-xs text-tichi-muted font-bold line-clamp-1">Sakhi Suraksha Control Center</p>
             </div>
           </div>
