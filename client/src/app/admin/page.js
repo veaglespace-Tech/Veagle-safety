@@ -528,8 +528,8 @@ export default function SuperAdminOperationsPortal() {
 
         </div>
 
-        {/* PORCELAIN SEGMENTED NAVIGATION TABS */}
-        <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm hidden sm:flex overflow-x-auto gap-2 w-full max-w-2xl relative z-20 scrollbar-none">
+        {/* PORCELAIN SEGMENTED NAVIGATION TABS (DESKTOP) */}
+        <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm hidden md:flex items-center gap-2 w-full max-w-2xl mx-auto relative z-20">
           {[
             { key: 'INCIDENTS', label: 'Active Incidents', icon: ShieldAlert, badge: activeSos.length },
             { key: 'USERS', label: 'User Roles & Accounts', icon: UserCheck, badge: usersList.length },
@@ -552,6 +552,38 @@ export default function SuperAdminOperationsPortal() {
                 <span className="truncate">{tab.label}</span>
                 {tab.badge !== undefined && (
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 ${isActive ? 'bg-white text-rose' : 'bg-rose/15 text-rose'}`}>
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* PORCELAIN COMPACT NAVIGATION TABS (MOBILE & SMALL SCREENS) */}
+        <div className="md:hidden grid grid-cols-3 gap-1.5 p-1.5 rounded-2xl bg-white border-2 border-[#FFCCE1] shadow-sm w-full relative z-20">
+          {[
+            { key: 'INCIDENTS', label: 'Incidents', icon: ShieldAlert, badge: activeSos.length },
+            { key: 'USERS', label: 'Users', icon: UserCheck, badge: usersList.length },
+            { key: 'SYSTEM', label: 'Settings', icon: Sliders },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className={`py-2.5 px-2 rounded-xl font-black text-[11px] transition-all flex items-center justify-center space-x-1 uppercase tracking-wider cursor-pointer relative z-20 truncate ${
+                  isActive
+                    ? 'bg-rose text-white border-1.5 border-rose shadow-sm'
+                    : 'bg-[#FFF0F3] text-tichi-text hover:bg-rose/10 border border-[#FFCCE1]'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{tab.label}</span>
+                {tab.badge !== undefined && (
+                  <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black shrink-0 ${isActive ? 'bg-white text-rose' : 'bg-rose/20 text-rose'}`}>
                     {tab.badge}
                   </span>
                 )}
