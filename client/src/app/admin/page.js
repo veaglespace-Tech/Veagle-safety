@@ -220,7 +220,7 @@ export default function SuperAdminOperationsPortal() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden pb-16">
+    <div className="flex flex-col min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden">
       
       {/* BACKGROUND AMBIENT GLOW MESHES */}
       <div className="absolute w-[800px] h-[800px] rounded-full bg-rose/15 blur-[160px] top-[-100px] left-[-200px] pointer-events-none" />
@@ -401,7 +401,7 @@ export default function SuperAdminOperationsPortal() {
       </header>
 
       {/* MAIN CONTAINER */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10 animate-fade-up">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10 animate-fade-up">
 
         {/* ACTION SUCCESS BANNER */}
         {actionSuccess && (
