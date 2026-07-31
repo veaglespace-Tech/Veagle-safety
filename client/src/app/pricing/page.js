@@ -7,7 +7,7 @@ import { Footer } from '../../components/layout/Footer.js';
 import { fetchPlans } from '../../redux/slices/planSlice.js';
 import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
 import { 
-  ShieldCheck, Check, ArrowRight, Zap, Crown, Sparkles, 
+  ShieldCheck, ArrowRight, Zap, Crown, Sparkles, 
   Radio, MapPin, Users, Volume2, Headphones, Lock, CheckCircle2, Shield
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -89,18 +89,16 @@ export default function PlatformPricingPage() {
             {/* TOP DECORATIVE ACCENT STRIP */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
 
-            {/* FLOATING TOP CORNER BADGE */}
-            <div className="absolute top-3.5 right-4 bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center space-x-1 border border-white/30">
-              <Crown className="w-3 h-3 text-yellow-300" />
-              <span>365 DAYS COVERAGE</span>
-            </div>
-
-            {/* PLAN TITLE & HEADER */}
-            <div className="flex items-center space-x-3.5 pt-1">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] border border-[#FFCCE1] text-[#FF2A6D] flex items-center justify-center shrink-0 shadow-sm">
+            {/* PLAN TITLE & HEADER WITH INTEGRATED ROYAL BADGE */}
+            <div className="flex items-start space-x-3.5 pt-1">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] border border-[#FFCCE1] text-[#FF2A6D] flex items-center justify-center shrink-0 shadow-sm mt-1">
                 <ShieldCheck className="w-7 h-7 text-[#FF2A6D]" />
               </div>
-              <div>
+              <div className="space-y-1">
+                <div className="inline-flex items-center space-x-1.5 bg-[#FFF0F3] border border-[#FFCCE1] px-2.5 py-0.5 rounded-lg text-[10px] font-black text-[#FF2A6D] uppercase tracking-wider">
+                  <Crown className="w-3 h-3 text-[#FF2A6D]" />
+                  <span>365 DAYS FULL COVERAGE</span>
+                </div>
                 <h2 className="text-lg sm:text-xl font-black text-[#2A0826] tracking-tight">
                   {activePlan.name}
                 </h2>
