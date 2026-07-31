@@ -2,10 +2,16 @@
 
 import React, { useState } from 'react';
 import { useAuthStore } from '../../../redux/useAuthStore.js';
+import { PublicNavbar } from '../../../components/layout/PublicNavbar.js';
 import { Footer } from '../../../components/layout/Footer.js';
+import { Logo3DFlip } from '../../../components/ui/Logo3DFlip.js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Crown, Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, Activity, Terminal, Shield, Radio, KeyRound, Sparkles, ShieldAlert } from 'lucide-react';
+import { 
+  Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, 
+  Zap, Sparkles, KeyRound, ShieldAlert, ArrowLeft
+} from 'lucide-react';
+import { AnimatedHeading } from '../../../components/common/AnimatedHeading.jsx';
 
 export default function SuperAdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -32,166 +38,149 @@ export default function SuperAdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
-      
-      {/* HIGH-TECH DYNAMIC FLOATING AMBIENT LIGHT MESHES */}
-      <div className="absolute w-[650px] h-[650px] rounded-full bg-gradient-to-tr from-rose/25 via-rose-light/20 to-gold/20 blur-[150px] top-[-150px] right-[-150px] animate-pulse pointer-events-none" />
-      <div className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-br from-gold/25 via-amber-400/20 to-rose/20 blur-[150px] bottom-[-150px] left-[-150px] animate-pulse pointer-events-none" style={{ animationDuration: '7s' }} />
+    <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans flex flex-col justify-between relative overflow-hidden">
+      <PublicNavbar />
 
-      {/* BACKGROUND CYBER GRID OVERLAY */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#FF5C8A0D_1px,transparent_1px),linear-gradient(to_bottom,#FF5C8A0D_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+      {/* BACKGROUND ANIMATED AMBIENT GLOW MESHES */}
+      <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF5C8A]/12 blur-[170px] top-[-140px] left-[-240px] pointer-events-none animate-pulse" />
+      <div className="absolute w-[750px] h-[750px] rounded-full bg-[#FFCCE1]/25 blur-[160px] bottom-[60px] right-[-220px] pointer-events-none animate-pulse" />
 
-      <div className="w-full max-w-md space-y-6 relative z-10 animate-fade-up">
+      {/* MAIN CENTER CONTENT AREA */}
+      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-10 sm:py-16 relative z-10">
+        <div className="w-full max-w-md space-y-6">
 
-        {/* LOGO & BRANDING HEADER */}
-        <div className="text-center space-y-4">
-          
-          {/* PORCELAIN ROSE-GOLD COMMAND SHIELD EMBLEM */}
-          <div className="relative inline-block group">
-            <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-rose via-rose-light to-gold opacity-50 blur-lg group-hover:opacity-80 transition duration-500 animate-pulse" />
-            <div className="relative w-20 h-20 rounded-3xl bg-white/95 border-2 border-rose p-1 shadow-coral-glow flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
-              <div className="w-full h-full rounded-[22px] bg-gradient-to-br from-[#FFF0F3] via-white to-[#FFE4EC] flex items-center justify-center border border-rose/30 relative">
-                <ShieldCheck className="w-10 h-10 text-rose stroke-[2.2px] drop-shadow-sm" />
-                <span className="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-gold to-amber-500 text-white rounded-full p-1 shadow-sm border border-white">
-                  <Crown className="w-3.5 h-3.5 fill-white" />
-                </span>
+          {/* TOP EMBLEM & HEADER */}
+          <div className="flex flex-col items-center justify-center text-center space-y-3">
+            
+            {/* ROTATING 3D EMBLEM */}
+            <div className="relative flex items-center justify-center mb-1">
+              <div className="absolute -inset-3 rounded-2xl bg-[#FF5C8A]/20 animate-pulse blur-lg" />
+              <div className="relative z-10 p-3 rounded-2xl bg-white border-1.5 border-[#FFCCE1] shadow-md flex items-center justify-center">
+                <Logo3DFlip size={48} />
               </div>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <div className="inline-flex items-center space-x-2 bg-white/95 border-2 border-[#FFCCE1] text-tichi-text px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest shadow-md">
-              <Activity className="w-3.5 h-3.5 text-rose animate-pulse" />
-              <span>COMMAND CENTER AUTHORIZATION REQUIRED</span>
+            <div className="inline-flex items-center space-x-2 bg-white/90 border border-[#FFCCE1] px-3.5 py-1 rounded-full text-[10px] font-black text-[#FF2A6D] uppercase tracking-widest shadow-sm">
+              <Sparkles className="w-3 h-3 text-[#FF5C8A] animate-pulse" />
+              <span>HQ Operations Clearance Required</span>
             </div>
-            
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-tichi-text drop-shadow-sm">
-              Super Admin HQ Portal
-            </h1>
 
-            <p className="text-xs text-tichi-muted font-bold max-w-sm mx-auto leading-relaxed">
-              Restricted high-priority access for operations & emergency dispatch
+            <AnimatedHeading as="h1" variant="shimmer" className="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
+              <span className="heading-gradient-hero">Super Admin </span>
+              <span className="heading-highlight-pill">HQ Portal</span>
+            </AnimatedHeading>
+
+            <p className="text-xs text-[#684E67] font-bold max-w-xs leading-relaxed">
+              Restricted high-priority access for emergency dispatch and control operations.
             </p>
           </div>
 
-          {/* LIVE SYSTEM STATUS MINI INDICATOR */}
-          <div className="inline-flex items-center space-x-4 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-2xl border border-[#FFCCE1] text-[10px] font-extrabold text-tichi-muted shadow-sm">
-            <div className="flex items-center space-x-1.5">
-              <span className="w-2 h-2 rounded-full bg-tichi-success animate-ping"></span>
-              <span>HQ SYSTEM: 100% ONLINE</span>
-            </div>
-            <span className="text-rose font-black">•</span>
-            <div className="flex items-center space-x-1">
-              <Shield className="w-3 h-3 text-rose" />
-              <span>SECURITY LEVEL 5</span>
-            </div>
-          </div>
-
-        </div>
-
-        {/* LOGIN FORM CARD */}
-        <div className="card-antique-pink rounded-3xl p-6 sm:p-8 border-2 border-rose shadow-coral-glow space-y-6 relative overflow-hidden">
-          
-          {/* TOP DECORATIVE ACCENT GRADIENT LINE */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-rose via-gold to-rose animate-pulse" />
-
-          {(error || localError) && (
-            <div className="bg-rose/10 border-2 border-rose text-rose text-xs font-black p-4 rounded-2xl text-center animate-shake flex items-center justify-center space-x-2">
-              <ShieldAlert className="w-4 h-4 shrink-0" />
-              <span>{error || localError}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleAdminSubmit} className="space-y-5">
+          {/* ANTIQUE GLASSMORPHIC LOGIN FORM CARD */}
+          <div className="bg-white/95 backdrop-blur-2xl border-2 border-[#FFCCE1] rounded-3xl p-6 sm:p-8 space-y-6 shadow-[0_20px_60px_rgba(255,92,138,0.18)] hover:shadow-[0_25px_70px_rgba(255,42,109,0.25)] transition-all duration-500 relative overflow-hidden">
             
-            {/* EMAIL FIELD */}
-            <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-wider text-tichi-text flex items-center justify-between">
-                <span>SUPER ADMIN EMAIL</span>
-                <Terminal className="w-3.5 h-3.5 text-rose" />
-              </label>
-              
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-rose">
-                  <Mail className="w-4.5 h-4.5" />
-                </div>
-                
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@veaglesafety.org"
-                  required
-                  className="w-full bg-white border-2 border-[#FFCCE1] rounded-2xl py-3.5 pl-11 pr-4 text-xs font-bold text-tichi-text placeholder-tichi-muted/60 focus:outline-none focus:border-rose focus:ring-4 focus:ring-rose/15 transition-all shadow-sm"
-                />
+            {/* TOP DECORATIVE ACCENT GRADIENT STRIP */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
+
+            {(error || localError) && (
+              <div className="bg-[#FFF0F3] border border-[#FF2A6D] text-[#FF2A6D] text-xs font-black p-3.5 rounded-2xl text-center flex items-center justify-center space-x-2 shadow-sm animate-shake">
+                <ShieldAlert className="w-4 h-4 shrink-0" />
+                <span>{error || localError}</span>
               </div>
+            )}
+
+            <form onSubmit={handleAdminSubmit} className="space-y-5">
+              
+              {/* EMAIL FIELD */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase tracking-wider text-[#2A0826] flex items-center justify-between">
+                  <span>SUPER ADMIN EMAIL</span>
+                  <Mail className="w-3.5 h-3.5 text-[#FF2A6D]" />
+                </label>
+                
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#FF2A6D]">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@veaglesafety.org"
+                    required
+                    className="w-full bg-[#FFF0F3]/60 focus:bg-white border-1.5 border-[#FFCCE1] rounded-2xl py-3 pl-10 pr-4 text-xs font-bold text-[#2A0826] placeholder-[#684E67]/60 focus:outline-none focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF5C8A]/15 transition-all shadow-sm"
+                  />
+                </div>
+              </div>
+
+              {/* PASSWORD FIELD */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase tracking-wider text-[#2A0826] flex items-center justify-between">
+                  <span>SECRET ACCESS KEY</span>
+                  <KeyRound className="w-3.5 h-3.5 text-[#FF2A6D]" />
+                </label>
+                
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#FF2A6D]">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    required
+                    className="w-full bg-[#FFF0F3]/60 focus:bg-white border-1.5 border-[#FFCCE1] rounded-2xl py-3 pl-10 pr-10 text-xs font-bold text-[#2A0826] placeholder-[#684E67]/60 focus:outline-none focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF5C8A]/15 transition-all shadow-sm font-mono"
+                  />
+                  
+                  <button
+                    type="button"
+                    onClick={() => setShowPass(!showPass)}
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#684E67] hover:text-[#FF2A6D] transition-colors"
+                  >
+                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* 3D GRADIENT SUBMIT BUTTON */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white py-4 rounded-2xl text-xs font-black uppercase tracking-wider shadow-[0_8px_25px_rgba(255,42,109,0.35)] hover:shadow-[0_12px_35px_rgba(255,42,109,0.50)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-2.5 cursor-pointer border border-white/20 disabled:opacity-60"
+              >
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>VERIFYING CLEARANCE...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4 text-white animate-pulse" />
+                    <span>AUTHORIZE SUPER ADMIN ACCESS</span>
+                    <ArrowRight className="w-4 h-4 text-white" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* BACK TO MAIN WEBSITE LINK */}
+            <div className="pt-2 text-center border-t border-[#FFCCE1]">
+              <Link
+                href="/"
+                className="text-xs font-bold text-[#684E67] hover:text-[#FF2A6D] transition-colors inline-flex items-center space-x-1.5"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Return to Public Website</span>
+              </Link>
             </div>
 
-            {/* PASSWORD FIELD */}
-            <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-wider text-tichi-text flex items-center justify-between">
-                <span>SECRET ACCESS KEY</span>
-                <KeyRound className="w-3.5 h-3.5 text-rose" />
-              </label>
-              
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-rose">
-                  <Lock className="w-4.5 h-4.5" />
-                </div>
-                
-                <input
-                  type={showPass ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className="w-full bg-white border-2 border-[#FFCCE1] rounded-2xl py-3.5 pl-11 pr-11 text-xs font-bold text-tichi-text placeholder-tichi-muted/60 focus:outline-none focus:border-rose focus:ring-4 focus:ring-rose/15 transition-all shadow-sm font-mono"
-                />
-                
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-tichi-muted hover:text-rose transition-colors"
-                >
-                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* SUBMIT BUTTON */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full btn-baby-pink py-4 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow flex items-center justify-center space-x-2 disabled:opacity-60 transition-all hover:scale-[1.01]"
-            >
-              {isLoading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>VERIFYING CLEARANCE...</span>
-                </div>
-              ) : (
-                <>
-                  <ShieldCheck className="w-4.5 h-4.5" />
-                  <span>AUTHORIZE SUPER ADMIN ACCESS</span>
-                  <ArrowRight className="w-4.5 h-4.5" />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* BACK TO MAIN WEBSITE LINK */}
-          <div className="pt-2 text-center border-t border-[#FFCCE1]">
-            <Link
-              href="/"
-              className="text-xs font-bold text-tichi-muted hover:text-rose transition-colors inline-flex items-center space-x-1.5"
-            >
-              <span>← Back to Public Website</span>
-            </Link>
           </div>
 
         </div>
+      </main>
 
-      </div>
       <Footer />
     </div>
   );
