@@ -60,11 +60,11 @@ export default function UserTrustedContactsPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-xl mx-auto px-4 pt-5 pb-6 space-y-5 lg:max-w-2xl">
+      <div className="max-w-xl mx-auto px-4 pt-6 pb-12 space-y-6 lg:max-w-2xl">
         <div className="flex items-end justify-between animate-fade-up">
           <div>
-            <h1 className="text-xl font-extrabold text-tichi-text tracking-tight">Trusted Contacts</h1>
-            <p className="text-xs text-tichi-muted mt-0.5">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#2A0826] tracking-tight">Trusted Contacts</h1>
+            <p className="text-xs sm:text-sm font-extrabold text-[#684E67] mt-0.5">
               {contacts.length > 0
                 ? `${contacts.length} of ${MAX_CONTACTS} emergency contacts connected`
                 : 'Add contacts to enable emergency alerts'}
@@ -73,30 +73,32 @@ export default function UserTrustedContactsPage() {
 
           {contacts.length < MAX_CONTACTS && (
             <button
+              type="button"
               onClick={() => setShowAddModal(true)}
-              className="flex items-center space-x-1.5 bg-plum text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow hover:bg-plum-dark transition-colors"
+              className="flex items-center space-x-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-4 py-2.5 rounded-full text-xs shadow-[0_6px_20px_rgba(255,42,109,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
             >
-              <UserPlus className="w-3.5 h-3.5" />
+              <UserPlus className="w-4 h-4" />
               <span>Add</span>
             </button>
           )}
         </div>
 
-        <div className="space-y-2.5 animate-fade-up">
+        <div className="space-y-3.5 animate-fade-up">
           {contacts.length === 0 ? (
-            <div className="bg-white border border-blush-border rounded-2xl p-10 text-center space-y-4 shadow-card">
-              <div className="w-14 h-14 rounded-full bg-rose/20 text-plum mx-auto flex items-center justify-center">
-                <Shield className="w-7 h-7" />
+            <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white border-2 border-[#FFCCE1] hover:border-[#FF5C8A] rounded-3xl p-8 sm:p-12 text-center space-y-5 shadow-[0_16px_50px_rgba(255,92,138,0.18)] transition-all duration-500">
+              <div className="w-16 h-16 rounded-3xl bg-[#FFF0F3] text-[#FF2A6D] border-2 border-[#FFCCE1] mx-auto flex items-center justify-center shadow-md animate-bounce">
+                <Shield className="w-8 h-8 text-[#FF2A6D]" />
               </div>
               <div>
-                <h3 className="font-extrabold text-sm text-tichi-text">No Contacts Added</h3>
-                <p className="text-xs text-tichi-muted mt-1.5 max-w-xs mx-auto leading-relaxed">
+                <h3 className="font-black text-base text-[#2A0826]">No Contacts Added</h3>
+                <p className="text-xs sm:text-sm text-[#684E67] font-extrabold mt-1.5 max-w-sm mx-auto leading-relaxed">
                   Add trusted family members or friends. They'll receive instant emergency emails with your live location link when SOS is activated.
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setShowAddModal(true)}
-                className="bg-plum text-white font-bold px-5 py-2.5 rounded-card text-xs shadow hover:bg-plum-dark transition-colors"
+                className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-7 py-3.5 rounded-full text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(255,42,109,0.38)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 + Add First Contact
               </button>
@@ -109,10 +111,11 @@ export default function UserTrustedContactsPage() {
 
               {contacts.length < MAX_CONTACTS && (
                 <button
+                  type="button"
                   onClick={() => setShowAddModal(true)}
-                  className="w-full border-2 border-dashed border-blush-border hover:border-plum/40 text-tichi-muted hover:text-plum py-4 rounded-card text-xs font-bold transition-all flex items-center justify-center space-x-2"
+                  className="w-full border-2 border-dashed border-[#FFCCE1] hover:border-[#FF2A6D] text-[#684E67] hover:text-[#FF2A6D] bg-white hover:bg-[#FFF0F3] py-4 rounded-2xl text-xs font-black transition-all flex items-center justify-center space-x-2 shadow-xs cursor-pointer"
                 >
-                  <UserPlus className="w-4 h-4" />
+                  <UserPlus className="w-4 h-4 text-[#FF2A6D]" />
                   <span>Add Another Trusted Contact</span>
                 </button>
               )}
@@ -120,62 +123,90 @@ export default function UserTrustedContactsPage() {
           )}
         </div>
 
-        <div className="bg-blush-subtle border border-blush-border rounded-card p-4 text-xs text-tichi-muted font-medium animate-fade-up">
-          <p className="font-bold text-tichi-text mb-1">🔒 Privacy & Safety</p>
-          <p>Emergency alerts are sent only to people you explicitly add here. Location is only shared during active SOS sessions — not in the background.</p>
+        <div className="bg-white border-2 border-[#FFCCE1] rounded-2xl p-5 text-xs text-[#684E67] font-bold shadow-xs space-y-1 animate-fade-up">
+          <p className="font-black text-[#2A0826] text-xs flex items-center space-x-1.5">
+            <span>🔒 Privacy & Safety</span>
+          </p>
+          <p className="leading-relaxed">Emergency alerts are sent only to people you explicitly add here. Location is only shared during active SOS sessions — not in the background.</p>
         </div>
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal space-y-4 animate-slide-in-bottom overflow-hidden">
-            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-blush-border">
-              <h3 className="font-extrabold text-base text-plum">Add Trusted Contact</h3>
-              <button onClick={() => setShowAddModal(false)} className="w-8 h-8 flex items-center justify-center rounded-xl text-tichi-muted hover:bg-blush-subtle hover:text-plum transition-colors">
-                <X className="w-4 h-4" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white rounded-3xl w-full max-w-md border-2 border-[#FFCCE1] shadow-[0_25px_70px_rgba(0,0,0,0.3)] space-y-4 animate-slide-in-bottom overflow-hidden">
+            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#FFCCE1]">
+              <h3 className="font-black text-lg text-[#2A0826]">Add Trusted Contact</h3>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-xl text-[#684E67] hover:bg-[#FFF0F3] hover:text-[#FF2A6D] transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             {saved ? (
-              <div className="px-5 pb-5 text-center py-8 space-y-3">
-                <CheckCircle className="w-12 h-12 text-tichi-success mx-auto animate-bounce" />
-                <p className="font-extrabold text-tichi-text">Contact Saved!</p>
-                <p className="text-xs text-tichi-muted">They'll receive emergency alerts when SOS is activated.</p>
+              <div className="px-6 pb-6 text-center py-8 space-y-3">
+                <CheckCircle className="w-14 h-14 text-emerald-500 mx-auto animate-bounce" />
+                <p className="font-black text-base text-[#2A0826]">Contact Saved!</p>
+                <p className="text-xs text-[#684E67] font-bold">They'll receive emergency alerts when SOS is activated.</p>
               </div>
             ) : (
-              <form onSubmit={handleAddContact} className="px-5 pb-5 space-y-3.5">
-                <div className="grid grid-cols-2 gap-3">
+              <form onSubmit={handleAddContact} className="px-6 pb-6 space-y-4">
+                <div className="grid grid-cols-2 gap-3.5">
                   <div className="col-span-2">
-                    <label className="block text-xs font-bold text-tichi-text mb-1">Full Name *</label>
-                    <input type="text" placeholder="Ananya Sharma" value={name} onChange={(e) => setName(e.target.value)} required
-                      className="w-full px-3 py-2.5 rounded-control border border-blush-border text-xs focus:ring-2 focus:ring-plum focus:border-transparent focus:outline-none bg-blush-subtle" />
+                    <label className="block text-xs font-black uppercase tracking-wider text-[#2A0826] mb-1.5">Full Name *</label>
+                    <input
+                      type="text"
+                      placeholder="Ananya Sharma"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF2A6D]/15 focus:outline-none bg-white text-[#2A0826] shadow-xs"
+                    />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-tichi-text mb-1">Relationship</label>
-                    <select value={relationship} onChange={(e) => setRelationship(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-control border border-blush-border text-xs focus:ring-2 focus:ring-plum focus:border-transparent focus:outline-none bg-blush-subtle">
+                    <label className="block text-xs font-black uppercase tracking-wider text-[#2A0826] mb-1.5">Relationship</label>
+                    <select
+                      value={relationship}
+                      onChange={(e) => setRelationship(e.target.value)}
+                      className="w-full px-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF2A6D]/15 focus:outline-none bg-white text-[#2A0826] shadow-xs cursor-pointer"
+                    >
                       {RELATIONSHIPS.map((r) => <option key={r} value={r}>{r}</option>)}
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-tichi-text mb-1">Mobile Number *</label>
-                    <input type="tel" placeholder="+91 98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} required
-                      className="w-full px-3 py-2.5 rounded-control border border-blush-border text-xs focus:ring-2 focus:ring-plum focus:border-transparent focus:outline-none bg-blush-subtle" />
+                    <label className="block text-xs font-black uppercase tracking-wider text-[#2A0826] mb-1.5">Mobile Number *</label>
+                    <input
+                      type="tel"
+                      placeholder="+91 98765 43210"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF2A6D]/15 focus:outline-none bg-white text-[#2A0826] shadow-xs"
+                    />
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-xs font-bold text-tichi-text mb-1">Email <span className="text-tichi-muted font-normal">(For instant SOS alerts & live link)</span></label>
-                    <input type="email" placeholder="contact@example.com" value={email} onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-control border border-blush-border text-xs focus:ring-2 focus:ring-plum focus:border-transparent focus:outline-none bg-blush-subtle" />
+                    <label className="block text-xs font-black uppercase tracking-wider text-[#2A0826] mb-1.5">
+                      Email <span className="text-[#684E67] font-normal normal-case">(For instant SOS alerts & live link)</span>
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="contact@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF2A6D]/15 focus:outline-none bg-white text-[#2A0826] shadow-xs"
+                    />
                   </div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading || !name || !phone}
-                  className="w-full bg-plum text-white font-extrabold py-3 rounded-card text-xs shadow hover:bg-plum-dark transition-colors disabled:opacity-60 active:scale-[0.98]"
+                  className="w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black py-4 rounded-full text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(255,42,109,0.38)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-60 cursor-pointer"
                 >
                   {loading ? 'SAVING...' : 'SAVE TRUSTED CONTACT'}
                 </button>
