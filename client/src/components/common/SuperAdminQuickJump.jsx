@@ -38,9 +38,12 @@ export const SuperAdminQuickJump = () => {
     isSuperAdmin = reduxRole === 'SUPER_ADMIN' || localRole === 'SUPER_ADMIN';
   }
 
-  const isAdminPage = pathname?.startsWith('/admin');
+  const isLoginPage = pathname === '/admin/login' || pathname === '/auth' || pathname?.includes('login');
+  if (isLoginPage) return null;
 
-  // Show button on all /admin pages OR whenever Super Admin is logged in
+  const isAdminPage = pathname === '/admin';
+
+  // Show button only on /admin dashboard or when Super Admin is logged in
   if (!isAdminPage && (!isSuperAdmin || !hasToken)) {
     return null;
   }
