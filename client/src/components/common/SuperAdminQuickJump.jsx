@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { 
   Home, Crown, ShieldAlert, Sparkles, ChevronUp, 
-  ExternalLink, Layers, ArrowRight, X, Compass, ShieldCheck
+  ArrowRight, X, ShieldCheck
 } from 'lucide-react';
 import { Logo3DFlip } from '../ui/Logo3DFlip.js';
 
@@ -15,7 +15,8 @@ export const SuperAdminQuickJump = () => {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const { token, user } = useSelector((state) => state?.auth || {});
+  const reduxRole = useSelector((state) => state?.auth?.user?.role);
+  const reduxToken = useSelector((state) => state?.auth?.token);
 
   useEffect(() => {
     setMounted(true);
@@ -23,12 +24,30 @@ export const SuperAdminQuickJump = () => {
 
   if (!mounted) return null;
 
-  // Check if user is SuperAdmin from Redux or localStorage
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN' || (typeof window !== 'undefined' && localStorage.getItem('tichi_user_role') === 'SUPER_ADMIN');
+  let isSuperAdmin = false;
+  let hasToken = false;
 
-  if (!isSuperAdmin || !token) return null;
+  if (typeof window !== 'undefined') {
+    const localToken = localStorage.getItem('tichi_token');
+    const localUserRaw = localStorage.getItem('tichi_user');
+    let localRole = null;
+    try {
+      if (localUserRaw) {
+        const parsed = JSON.parse(localUserRaw);
+        localRole = parsed?.role;
+      }
+    } catch (e) {}
+
+    hasToken = Boolean(localToken || reduxToken);
+    isSuperAdmin = reduxRole === 'SUPER_ADMIN' || localRole === 'SUPER_ADMIN';
+  }
 
   const isAdminPage = pathname?.startsWith('/admin');
+
+  // Show button on all /admin pages OR whenever Super Admin is logged in
+  if (!isAdminPage && (!isSuperAdmin || !hasToken)) {
+    return null;
+  }
 
   const destinations = [
     { href: '/', label: 'Main Landing Page', desc: 'Public Website & Features', icon: Home },
@@ -38,7 +57,7 @@ export const SuperAdminQuickJump = () => {
   ];
 
   return (
-    <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 font-sans">
+    <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-[9999] font-sans">
       
       {/* QUICK JUMP DROPDOWN MENU */}
       {open && (
@@ -51,7 +70,7 @@ export const SuperAdminQuickJump = () => {
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="text-[#684E67] hover:text-[#FF2A6D] p-1 rounded-full hover:bg-[#FFF0F3] transition-colors"
+              className="text-[#684E67] hover:text-[#FF2A6D] p-1 rounded-full hover:bg-[#FFF0F3] transition-colors cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>

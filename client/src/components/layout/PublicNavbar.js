@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
 import { MagneticButton } from '../ui/MagneticButton.js';
 import { Logo3DFlip } from '../ui/Logo3DFlip.js';
+import { SuperAdminQuickJump } from '../common/SuperAdminQuickJump.jsx';
 
 export const PublicNavbar = () => {
   const pathname = usePathname();
@@ -185,6 +186,8 @@ export const PublicNavbar = () => {
           )}
         </div>
       )}
+      {/* FLOATING SUPER ADMIN QUICK JUMP */}
+      <SuperAdminQuickJump />
     </header>
   );
 };
