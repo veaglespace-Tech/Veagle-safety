@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   ShieldAlert, Radio, Users, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
-  LogOut, Menu, X, Crown, Home
+  LogOut, Menu, X, Crown, Home, Zap
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -43,15 +43,20 @@ export const Header = () => {
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   const navLinks = [
-    { href: '/dashboard', label: 'Dashboard', icon: Home },
+    { href: '/', label: 'Home', icon: Home },
+    { href: '/dashboard', label: 'Dashboard', icon: UserCheck },
     { href: '/active-sos', label: 'Emergency SOS', icon: ShieldAlert },
     { href: '/track-journey', label: 'Live GPS', icon: Radio },
     { href: '/guardians', label: 'Guardians', icon: Users },
     { href: '/helplines', label: 'Helplines', icon: PhoneCall },
+    { href: '/pricing', label: 'Pricing', icon: Zap },
+    { href: '/about', label: 'About', icon: Info },
+    { href: '/gallery', label: 'Gallery', icon: ImageIcon },
+    { href: '/contact', label: 'Contact', icon: PhoneCall },
   ];
 
   if (mounted && token && isSuperAdmin) {
-    navLinks.splice(1, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
+    navLinks.splice(2, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
   }
 
   const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
@@ -95,7 +100,7 @@ export const Header = () => {
         </Link>
 
         {/* DESKTOP ANIMATED NAV CHIPS CAPSULE */}
-        <nav className="hidden md:flex items-center gap-1.5 nav-chip-capsule">
+        <nav className="hidden md:flex items-center gap-1 sm:gap-1.5 nav-chip-capsule overflow-x-auto scrollbar-none py-1 max-w-[60vw] lg:max-w-none shrink">
           {navLinks.map(({ href, label }) => {
             const active = isActive(href);
             return (
