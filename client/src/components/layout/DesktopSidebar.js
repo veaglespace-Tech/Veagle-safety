@@ -31,7 +31,13 @@ export const DesktopSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
 
   const navItems = [
     { path: '/dashboard', label: 'Home', icon: Home, desc: 'Safety Dashboard' },
