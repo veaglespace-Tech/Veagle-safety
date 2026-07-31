@@ -160,7 +160,15 @@ export default function UserProfileSettingsPage() {
     : 'PS';
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
-  const isVibrationSupported = typeof window !== 'undefined' && 'vibrate' in navigator;
+  const [isVibrationSupported, setIsVibrationSupported] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      setIsVibrationSupported(true);
+    } else {
+      setIsVibrationSupported(false);
+    }
+  }, []);
 
   const diagnostics = [
     { icon: MapPin, label: 'GPS Location Access', status: status === 'LIVE', value: status === 'LIVE' ? `✓ Active (±${accuracy || '10'}m)` : '⚠ Permission Required' },
