@@ -180,15 +180,15 @@ export default function UserProfileSettingsPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 animate-fade-up">
 
           {/* SINGLE MASTER UNIFIED LUXURY PORCELAIN HUB PANEL */}
-          <div className="card-antique-pink border-2 border-rose shadow-coral-glow overflow-hidden rounded-[36px] relative">
+          <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white border-2 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_16px_50px_rgba(255,92,138,0.18)] hover:shadow-[0_20px_60px_rgba(255,42,109,0.25)] overflow-hidden rounded-[36px] relative transition-all duration-500">
             
             {/* TOP GRADIENT HEADER BANNER */}
-            <div className="bg-gradient-to-r from-rose via-rose-light to-gold h-32 relative flex items-start justify-center pt-3">
+            <div className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] h-36 relative flex items-start justify-center pt-3.5">
               <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_80%_50%,#FF2A6D_0%,transparent_70%)]" />
               
               {/* CENTERED 365-DAY ACTIVE PROTECTION CHIP */}
-              <div className="bg-white/95 backdrop-blur-md border-2 border-[#FFCCE1] text-tichi-text font-black text-xs px-5 py-2 rounded-full shadow-md uppercase tracking-wider flex items-center space-x-2 relative z-10">
-                <ShieldCheck className="w-4.5 h-4.5 text-tichi-success" />
+              <div className="bg-white/95 backdrop-blur-md border-2 border-[#FFCCE1] text-[#2A0826] font-black text-xs px-5 py-2 rounded-full shadow-md uppercase tracking-wider flex items-center space-x-2 relative z-10">
+                <ShieldCheck className="w-4.5 h-4.5 text-emerald-500 animate-pulse" />
                 <span>365-DAY PROTECTION ACTIVE</span>
               </div>
             </div>
@@ -200,8 +200,8 @@ export default function UserProfileSettingsPage() {
                 
                 {/* AVATAR RING WITH INTERACTIVE CAMERA EDIT BUTTON */}
                 <div className="relative group">
-                  <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 shadow-xl relative overflow-hidden">
-                    <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center font-black text-3xl text-tichi-text overflow-hidden relative">
+                  <div className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] p-0.5 shadow-xl relative overflow-hidden">
+                    <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center font-black text-3xl text-[#2A0826] overflow-hidden relative">
                       {user?.avatar ? (
                         <img src={user.avatar} alt="Profile Avatar" className="w-full h-full object-cover" />
                       ) : (
@@ -213,7 +213,7 @@ export default function UserProfileSettingsPage() {
                   {/* INTERACTIVE UPLOAD CAMERA BADGE */}
                   <label
                     title="Upload New Profile Photo"
-                    className="absolute -bottom-1 -right-1 bg-rose text-white p-2 rounded-2xl shadow-lg border-2 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center justify-center group-hover:bg-[#FF2A6D]"
+                    className="absolute -bottom-1 -right-1 bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white p-2 rounded-2xl shadow-lg border-2 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center justify-center group-hover:brightness-110"
                   >
                     <Camera className="w-4 h-4" />
                     <input
@@ -229,52 +229,52 @@ export default function UserProfileSettingsPage() {
                       type="button"
                       onClick={handleRemoveImage}
                       title="Remove Profile Photo"
-                      className="absolute -top-1 -left-1 bg-white text-rose border border-[#FFCCE1] p-1.5 rounded-full shadow hover:bg-rose/10 transition-all text-[10px] font-black"
+                      className="absolute -top-1 -left-1 bg-white text-[#FF2A6D] border-2 border-[#FFCCE1] p-1.5 rounded-full shadow hover:bg-[#FFF0F3] transition-all text-[10px] font-black cursor-pointer"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
 
                 {/* AVATAR TOAST FEEDBACK NOTIFICATION */}
                 {avatarToast && (
-                  <div className={`text-xs font-black px-4 py-1.5 rounded-full shadow-sm animate-shake ${avatarToast.type === 'error' ? 'bg-rose/10 text-rose border border-rose' : 'bg-tichi-success/15 text-tichi-success border border-tichi-success'}`}>
+                  <div className={`text-xs font-black px-4 py-1.5 rounded-full shadow-xs animate-shake ${avatarToast.type === 'error' ? 'bg-rose-50 text-[#FF2A6D] border border-[#FF2A6D]' : 'bg-emerald-50 text-emerald-600 border border-emerald-300'}`}>
                     {avatarToast.text}
                   </div>
                 )}
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-center space-x-2">
-                    <h1 className="font-black text-2xl sm:text-3xl text-tichi-text">
+                    <h1 className="font-black text-2xl sm:text-3xl text-[#2A0826]">
                       {user?.fullName || user?.name || (user?.email ? user.email.split('@')[0] : 'Sakhi Member')}
                     </h1>
                     {isSuperAdmin && (
-                      <span className="bg-gold text-tichi-text font-black text-[10px] px-3 py-1 rounded-full uppercase flex items-center space-x-1 shadow-gold-glow border border-gold/40">
-                        <Crown className="w-3.5 h-3.5" />
+                      <span className="bg-gradient-to-r from-[#FFD700] to-[#E6A100] text-[#2A0826] font-black text-[10px] px-3 py-1 rounded-full uppercase flex items-center space-x-1 shadow-md border border-gold/40">
+                        <Crown className="w-3.5 h-3.5 text-[#2A0826]" />
                         <span>SUPER ADMIN</span>
                       </span>
                     )}
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-tichi-muted pt-1">
-                    <div className="flex items-center space-x-1.5 bg-white px-3 py-1 rounded-full border border-[#FFCCE1] shadow-sm">
-                      <Mail className="w-3.5 h-3.5 text-rose" />
+                  <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-[#684E67] pt-1">
+                    <div className="flex items-center space-x-1.5 bg-white px-3.5 py-1.5 rounded-full border-2 border-[#FFCCE1] text-[#2A0826] font-black shadow-xs">
+                      <Mail className="w-3.5 h-3.5 text-[#FF2A6D]" />
                       <span>{user?.email || 'sakhi@suraksha.org'}</span>
                     </div>
-                    <div className="flex items-center space-x-1.5 bg-white px-3 py-1 rounded-full border border-[#FFCCE1] shadow-sm">
-                      <PhoneCall className="w-3.5 h-3.5 text-rose" />
+                    <div className="flex items-center space-x-1.5 bg-white px-3.5 py-1.5 rounded-full border-2 border-[#FFCCE1] text-[#2A0826] font-black shadow-xs">
+                      <PhoneCall className="w-3.5 h-3.5 text-[#FF2A6D]" />
                       <span>{user?.phone || '+91 98765 43210'}</span>
                     </div>
-                    <div className="flex items-center space-x-1.5 bg-rose/10 px-3 py-1 rounded-full text-rose font-black border border-rose/20 shadow-sm">
-                      <Heart className="w-3.5 h-3.5" />
+                    <div className="flex items-center space-x-1.5 bg-[#FFF0F3] px-3.5 py-1.5 rounded-full text-[#FF2A6D] font-black border-2 border-[#FFCCE1] shadow-xs">
+                      <Heart className="w-3.5 h-3.5 fill-[#FF2A6D]/20" />
                       <span>Blood Group: {user?.bloodGroup || 'O+'}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* INTEGRATED SEGMENTED NAVIGATION TABS (100% INSTANT CLICKABLE SWITCHER) */}
-              <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm flex gap-2 relative z-20">
+              {/* INTEGRATED SEGMENTED NAVIGATION TABS */}
+              <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-xs flex gap-2 relative z-20">
                 {[
                   { key: 'DIAGNOSTICS', label: 'Safety Health & Drill', icon: Shield },
                   { key: 'SETTINGS', label: 'App Settings', icon: Sliders },
@@ -287,10 +287,10 @@ export default function UserProfileSettingsPage() {
                       key={tab.key}
                       type="button"
                       onClick={() => setActiveTab(tab.key)}
-                      className={`flex-1 py-3 px-2 rounded-xl font-black text-xs transition-all flex items-center justify-center space-x-1.5 uppercase tracking-wider cursor-pointer relative z-20 ${
+                      className={`flex-1 py-3.5 px-2 rounded-xl font-black text-xs transition-all duration-300 flex items-center justify-center space-x-1.5 uppercase tracking-wider cursor-pointer relative z-20 ${
                         isActive
-                          ? 'bg-rose text-white border-2 border-rose shadow-md'
-                          : 'bg-white text-tichi-text hover:text-rose hover:bg-rose/10 border-2 border-[#FFCCE1]'
+                          ? 'bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white shadow-[0_8px_25px_rgba(255,42,109,0.38)]'
+                          : 'bg-white text-[#2A0826] hover:text-[#FF2A6D] hover:bg-[#FFF0F3] border border-[#FFCCE1]'
                       }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -307,22 +307,22 @@ export default function UserProfileSettingsPage() {
                   {/* DIAGNOSTICS METRICS GRID */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-black uppercase tracking-wider text-rose">24/7 System Health Metrics</h3>
-                      <span className="text-[11px] font-bold text-tichi-success">100% Operational</span>
+                      <h3 className="text-xs font-black uppercase tracking-wider text-[#FF2A6D]">24/7 System Health Metrics</h3>
+                      <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">100% Operational</span>
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {diagnostics.map((item) => {
                         const Icon = item.icon;
                         return (
-                          <div key={item.label} className="bg-white border-2 border-[#FFCCE1] rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                          <div key={item.label} className="bg-white border-2 border-[#FFCCE1] hover:border-[#FF2A6D] rounded-2xl p-4 flex items-center justify-between shadow-xs hover:shadow-md transition-all">
                             <div className="flex items-center space-x-3">
-                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${item.status ? 'bg-tichi-success/15 text-tichi-success' : 'bg-amber-500/15 text-amber-500'}`}>
-                                <Icon className="w-4 h-4" />
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.status ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-amber-50 text-amber-600 border border-amber-200'}`}>
+                                <Icon className="w-5 h-5" />
                               </div>
                               <div>
-                                <p className="text-xs font-black text-tichi-text">{item.label}</p>
-                                <p className={`text-[11px] font-bold mt-0.5 ${item.status ? 'text-tichi-success' : 'text-amber-600'}`}>
+                                <p className="text-xs font-black text-[#2A0826]">{item.label}</p>
+                                <p className={`text-[11px] font-extrabold mt-0.5 ${item.status ? 'text-emerald-600' : 'text-amber-600'}`}>
                                   {item.value}
                                 </p>
                               </div>
@@ -334,14 +334,14 @@ export default function UserProfileSettingsPage() {
                   </div>
 
                   {/* INTEGRATED SOS DRILL ACTION BANNER */}
-                  <div className="bg-gradient-to-r from-tichi-text via-[#3D0C38] to-tichi-text text-white p-6 rounded-2xl shadow-lg space-y-4 border-2 border-rose">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-10 h-10 rounded-xl bg-rose/20 text-rose flex items-center justify-center shrink-0 border border-white/20">
-                        <Play className="w-5 h-5 text-rose animate-pulse" />
+                  <div className="bg-gradient-to-r from-[#2A0826] via-[#3D0C38] to-[#2A0826] text-white p-6 sm:p-7 rounded-3xl shadow-[0_12px_35px_rgba(42,8,38,0.35)] space-y-4 border-2 border-[#FF2A6D]">
+                    <div className="flex items-start space-x-3.5">
+                      <div className="w-11 h-11 rounded-2xl bg-[#FF2A6D]/20 text-[#FF5C8A] flex items-center justify-center shrink-0 border border-[#FF2A6D]/40">
+                        <Play className="w-5 h-5 text-[#FF5C8A] animate-pulse" />
                       </div>
                       <div>
                         <h4 className="font-black text-base text-white">Run SOS Emergency Drill</h4>
-                        <p className="text-xs text-white/80 font-bold mt-0.5 leading-relaxed">
+                        <p className="text-xs text-white/80 font-extrabold mt-0.5 leading-relaxed">
                           Test device vibration, siren audio & GPS stream safely without notifying guardians.
                         </p>
                       </div>
@@ -350,7 +350,7 @@ export default function UserProfileSettingsPage() {
                     <button
                       type="button"
                       onClick={() => setShowTestModal(true)}
-                      className="w-full btn-baby-pink py-3.5 rounded-xl text-xs uppercase tracking-wider font-black shadow-coral-glow flex items-center justify-center space-x-2"
+                      className="w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white py-4 rounded-full text-xs uppercase tracking-wider font-black shadow-[0_8px_25px_rgba(255,42,109,0.4)] flex items-center justify-center space-x-2 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
                     >
                       <Play className="w-4 h-4" />
                       <span>START DRILL READINESS TEST</span>
@@ -360,10 +360,10 @@ export default function UserProfileSettingsPage() {
                 </div>
               )}
 
-              {/* TAB 2: APP SETTINGS & PRIVACY (100% WORKING MODAL INTERACTION) */}
+              {/* TAB 2: APP SETTINGS & PRIVACY */}
               {activeTab === 'SETTINGS' && (
-                <div className="bg-white border-2 border-[#FFCCE1] rounded-2xl p-4 shadow-sm space-y-2 animate-fade-up">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-rose pb-2 px-2">Privacy & Security Preferences</div>
+                <div className="bg-white border-2 border-[#FFCCE1] rounded-3xl p-4 shadow-xs space-y-2 animate-fade-up">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-[#FF2A6D] pb-2 px-2">Privacy & Security Preferences</div>
                   {[
                     { type: 'PRIVACY', label: 'Privacy & Data Purge Controls', desc: 'Encrypted location logs & data purge' },
                     { type: 'NOTIFICATIONS', label: 'Notification & Alert Preferences', desc: 'Real-time push, email & siren alerts' },
@@ -374,13 +374,13 @@ export default function UserProfileSettingsPage() {
                       key={item.type}
                       type="button"
                       onClick={() => setActiveModal(item.type)}
-                      className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-[#FFF0F3] transition-all border border-transparent hover:border-[#FFCCE1] text-left group cursor-pointer"
+                      className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-[#FFF0F3] transition-all border border-transparent hover:border-[#FFCCE1] text-left group cursor-pointer"
                     >
                       <div>
-                        <p className="text-xs font-black text-tichi-text group-hover:text-rose transition-colors">{item.label}</p>
-                        <p className="text-[11px] text-tichi-muted font-bold mt-0.5">{item.desc}</p>
+                        <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">{item.label}</p>
+                        <p className="text-[11px] text-[#684E67] font-bold mt-0.5">{item.desc}</p>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-rose transform group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="w-4 h-4 text-[#FF2A6D] transform group-hover:translate-x-1 transition-transform" />
                     </button>
                   ))}
                 </div>
@@ -388,29 +388,29 @@ export default function UserProfileSettingsPage() {
 
               {/* TAB 3: DIGITAL SAFETY MEMBER PASS */}
               {activeTab === 'PASS' && (
-                <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white border-2 border-rose rounded-2xl p-6 shadow-md space-y-4 animate-fade-up text-center relative overflow-hidden">
-                  <div className="w-14 h-14 rounded-2xl bg-rose/15 text-rose flex items-center justify-center mx-auto border border-rose/30">
-                    <QrCode className="w-7 h-7 text-rose" />
+                <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white border-2 border-[#FFCCE1] rounded-3xl p-6 sm:p-8 shadow-md space-y-5 animate-fade-up text-center relative overflow-hidden">
+                  <div className="w-16 h-16 rounded-3xl bg-[#FFF0F3] text-[#FF2A6D] border-2 border-[#FFCCE1] flex items-center justify-center mx-auto shadow-sm">
+                    <QrCode className="w-8 h-8 text-[#FF2A6D]" />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg text-tichi-text">Digital Emergency Member Card</h3>
-                    <p className="text-xs text-tichi-muted font-bold mt-0.5">
-                      Verified Safety Protection Pass • ID: <span className="font-mono text-rose font-black">SS-2026-9812</span>
+                    <h3 className="font-black text-lg text-[#2A0826]">Digital Emergency Member Card</h3>
+                    <p className="text-xs text-[#684E67] font-extrabold mt-0.5">
+                      Verified Safety Protection Pass • ID: <span className="font-mono text-[#FF2A6D] font-black">SS-2026-9812</span>
                     </p>
                   </div>
 
-                  <div className="bg-white p-4 rounded-xl border border-[#FFCCE1] max-w-xs mx-auto space-y-2 text-left text-xs font-bold text-tichi-text">
-                    <div className="flex justify-between border-b border-[#FFCCE1] pb-1.5">
-                      <span className="text-tichi-muted">Member Name:</span>
+                  <div className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] max-w-xs mx-auto space-y-2.5 text-left text-xs font-bold text-[#2A0826] shadow-xs">
+                    <div className="flex justify-between border-b border-[#FFCCE1] pb-2">
+                      <span className="text-[#684E67]">Member Name:</span>
                       <span className="font-black">{user?.fullName || 'Sakhi Member'}</span>
                     </div>
-                    <div className="flex justify-between border-b border-[#FFCCE1] pb-1.5">
-                      <span className="text-tichi-muted">Blood Group:</span>
-                      <span className="font-black text-rose">{user?.bloodGroup || 'O+'}</span>
+                    <div className="flex justify-between border-b border-[#FFCCE1] pb-2">
+                      <span className="text-[#684E67]">Blood Group:</span>
+                      <span className="font-black text-[#FF2A6D]">{user?.bloodGroup || 'O+'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-tichi-muted">Emergency Dispatch:</span>
-                      <span className="font-black text-tichi-success">24/7 Verified</span>
+                      <span className="text-[#684E67]">Emergency Dispatch:</span>
+                      <span className="font-black text-emerald-600">24/7 Verified</span>
                     </div>
                   </div>
                 </div>
@@ -421,7 +421,7 @@ export default function UserProfileSettingsPage() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full bg-white border-2 border-[#FF2A6D] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-sm transition-all cursor-pointer"
+                  className="w-full bg-white border-2 border-[#FF2A6D] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white font-black py-4 rounded-full text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-xs hover:shadow-md transition-all cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>SIGN OUT OF ACCOUNT</span>
