@@ -44,11 +44,6 @@ export const Header = () => {
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/dashboard', label: 'Dashboard', icon: UserCheck },
-    { href: '/active-sos', label: 'Emergency SOS', icon: ShieldAlert },
-    { href: '/track-journey', label: 'Live GPS', icon: Radio },
-    { href: '/guardians', label: 'Guardians', icon: Users },
-    { href: '/helplines', label: 'Helplines', icon: PhoneCall },
     { href: '/pricing', label: 'Pricing', icon: Zap },
     { href: '/about', label: 'About', icon: Info },
     { href: '/gallery', label: 'Gallery', icon: ImageIcon },
@@ -56,7 +51,7 @@ export const Header = () => {
   ];
 
   if (mounted && token && isSuperAdmin) {
-    navLinks.splice(2, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
+    navLinks.splice(1, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
   }
 
   const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
