@@ -13,8 +13,14 @@ export function usePushNotification() {
   const { token, user } = useSelector((state) => state.auth || {});
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      console.log('[PushNotification] Not supported in this browser');
+    // Only attempt push notification subscription for authenticated users
+    if (!token) return;
+
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+      return;
+    }
+
+    if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
       return;
     }
 
@@ -22,7 +28,6 @@ export function usePushNotification() {
       try {
         // Register service worker
         const registration = await navigator.serviceWorker.register('/sw.js');
-        console.log('[PushNotification] Service Worker registered:', registration.scope);
 
         // Get VAPID public key from server
         const keyRes = await apiClient.get('/push/vapid-key');
@@ -32,11 +37,10 @@ export function usePushNotification() {
         // Convert VAPID key to Uint8Array
         const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
 
-        // Request notification permission
-        const permission = await Notification.requestPermission();
-        if (permission !== 'granted') {
-          console.log('[PushNotification] Permission denied');
-          return;
+        // Request notification permission if default
+        if (Notification.permission === 'default') {
+          const permission = await Notification.requestPermission();
+          if (permission !== 'granted') return;
         }
 
         // Subscribe to push
@@ -45,13 +49,13 @@ export function usePushNotification() {
           applicationServerKey,
         });
 
-        // Save subscription to server (authenticated user)
-        if (token) {
+        // Save subscription to server
+        if (subscription) {
           await apiClient.post('/push/subscribe', { subscription });
-          console.log('[PushNotification] Push subscription saved for user:', user?.email);
+          console.log('[PushNotification] Subscribed successfully for:', user?.email || 'user');
         }
       } catch (error) {
-        console.warn('[PushNotification] Subscription failed:', error.message);
+        // Silently ignore optional push notification failures
       }
     }
 
