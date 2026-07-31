@@ -6,10 +6,29 @@ const prisma = new PrismaClient();
 export async function seedDatabase() {
   console.log('🌱 Starting Database Seeding...');
 
-  // 1. Seed SuperAdmin Account
-  const superAdminEmail = 'abhijeetambhore4@gmail.com';
+  // 1. Clean up & Seed SINGLE Official SuperAdmin Account
+  const superAdminEmail = 'admin@veaglesafety.org';
   const passwordHash = await bcrypt.hash('Veagle@123', 10);
 
+  // Demote any extra SUPER_ADMIN accounts in database
+  await prisma.user.updateMany({
+    where: {
+      role: 'SUPER_ADMIN',
+      email: { not: superAdminEmail },
+    },
+    data: {
+      role: 'USER',
+    },
+  });
+
+  // Remove previous legacy super admin account
+  await prisma.user.deleteMany({
+    where: {
+      email: 'abhijeetambhore4@gmail.com',
+    },
+  });
+
+  // Upsert single SuperAdmin Account
   const superAdmin = await prisma.user.upsert({
     where: { email: superAdminEmail },
     update: {
@@ -29,7 +48,7 @@ export async function seedDatabase() {
       onboardingStep: 7,
     },
   });
-  console.log(`✅ [Seed] SuperAdmin Account Ready: ${superAdmin.email} (Password: Veagle@123)`);
+  console.log(`✅ [Seed] Single SuperAdmin Account Ready: ${superAdmin.email} (Password: Veagle@123)`);
 
   // 2. Clean up old/extra plans — keep ONLY the single 365-Day Protection Plan
   const singlePlanData = {
