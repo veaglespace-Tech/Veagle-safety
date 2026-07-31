@@ -132,7 +132,7 @@ export default function UserTrustedContactsPage() {
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
           <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white rounded-3xl w-full max-w-md border-2 border-[#FFCCE1] shadow-[0_25px_70px_rgba(0,0,0,0.3)] space-y-4 animate-slide-in-bottom overflow-hidden">
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#FFCCE1]">
               <h3 className="font-black text-lg text-[#2A0826]">Add Trusted Contact</h3>

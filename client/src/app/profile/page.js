@@ -446,7 +446,7 @@ export default function UserProfileSettingsPage() {
         {/* 1. PRIVACY & DATA PURGE MODAL */}
         {/* ---------------------------------------------------- */}
         {activeModal === 'PRIVACY' && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
               <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -505,7 +505,7 @@ export default function UserProfileSettingsPage() {
         {/* 2. NOTIFICATION & ALERT PREFERENCES MODAL */}
         {/* ---------------------------------------------------- */}
         {activeModal === 'NOTIFICATIONS' && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
               <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -557,7 +557,7 @@ export default function UserProfileSettingsPage() {
         {/* 3. UPDATE ACCOUNT PASSWORD MODAL */}
         {/* ---------------------------------------------------- */}
         {activeModal === 'PASSWORD' && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
               <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -627,7 +627,7 @@ export default function UserProfileSettingsPage() {
         {/* 4. ABOUT SAKHI SURAKSHA SOS MODAL */}
         {/* ---------------------------------------------------- */}
         {activeModal === 'ABOUT' && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
               <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -670,7 +670,7 @@ export default function UserProfileSettingsPage() {
         {/* SOS TEST DRILL MODAL */}
         {/* ---------------------------------------------------- */}
         {showTestModal && (
-          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
               <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-6 text-white text-center">
                 <h3 className="font-black text-lg">
