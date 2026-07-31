@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
 import { SuperAdminQuickJump } from '../../components/common/SuperAdminQuickJump.jsx';
+import { Footer } from '../../components/layout/Footer.js';
 import {
   Crown,
   AlertOctagon,
@@ -1034,6 +1035,9 @@ export default function SuperAdminOperationsPortal() {
           </div>
         </div>
       )}
+
+      {/* FOOTER */}
+      <Footer />
     </div>
   );
 }
