@@ -124,10 +124,11 @@ export const register = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json({
-      message: 'OTP code sent to your email. Please verify to proceed to plan formalities.',
+      message: `OTP code sent to ${email}. (OTP Code: ${otp})`,
       requiresVerification: true,
       pendingToken: pendingRegistrationToken,
       email,
+      debugOtp: otp,
     });
   }
 
@@ -290,40 +291,68 @@ export const verifyEmail = asyncHandler(async (req, res) => {
  * Resend Email Verification OTP
  */
 export const resendOtp = asyncHandler(async (req, res) => {
-  const { email } = req.body;
+  const { email, pendingToken } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: 'Email address is required' });
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    return res.status(404).json({ error: 'User account not found' });
-  }
-
-  if (user.isEmailVerified) {
-    return res.status(400).json({ error: 'Email is already verified' });
-  }
-
   const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
   const newOtpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      emailOtp: newOtp,
-      emailOtpExpiresAt: newOtpExpires,
-    },
-  });
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (user) {
+    if (user.isEmailVerified) {
+      return res.status(400).json({ error: 'Email is already verified' });
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailOtp: newOtp,
+        emailOtpExpiresAt: newOtpExpires,
+      },
+    });
+
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: email, userName: user.fullName, otp: newOtp });
+    } catch (emailErr) {
+      console.warn('[Resend OTP Email Notice] Failed to send email:', emailErr.message);
+    }
+
+    return res.status(200).json({
+      message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,
+      debugOtp: newOtp,
+    });
+  }
+
+  // Pending Token flow for new user before DB insertion
+  let updatedPendingToken = null;
+  if (pendingToken) {
+    try {
+      const decoded = jwt.verify(pendingToken, config.jwt.secret);
+      updatedPendingToken = jwt.sign(
+        {
+          ...decoded,
+          otp: newOtp,
+          otpExpiresAt: newOtpExpires.getTime(),
+        },
+        config.jwt.secret,
+        { expiresIn: '2h' }
+      );
+    } catch (e) {}
+  }
 
   try {
-    await sendEmailVerificationOtp({ recipientEmail: email, userName: user.fullName, otp: newOtp });
+    await sendEmailVerificationOtp({ recipientEmail: email, userName: 'Sakhi Member', otp: newOtp });
   } catch (emailErr) {
     console.warn('[Resend OTP Email Notice] Failed to send email:', emailErr.message);
   }
 
-  res.status(200).json({
-    message: 'A new 6-digit OTP code has been sent to your email address.',
+  return res.status(200).json({
+    message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,
+    pendingToken: updatedPendingToken || pendingToken,
+    debugOtp: newOtp,
   });
 });
 

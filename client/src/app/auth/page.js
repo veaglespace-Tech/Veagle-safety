@@ -215,7 +215,8 @@ function UserAuthForm() {
   };
 
   const handleResendOtp = () => {
-    dispatch(resendOtpCode({ email: pendingVerificationEmail || email }));
+    const currentPendingToken = pendingToken || (typeof window !== 'undefined' ? localStorage.getItem('tichi_pending_token') : null);
+    dispatch(resendOtpCode({ email: pendingVerificationEmail || email, pendingToken: currentPendingToken }));
   };
 
   return (
@@ -569,6 +570,18 @@ function UserAuthForm() {
                 Enter the 6-digit OTP code sent to <span className="font-mono text-[#FF2A6D] font-black">{pendingVerificationEmail || email}</span>.
               </p>
             </div>
+
+            {successMessage && (
+              <div className="bg-[#FFF0F3] border border-[#FFCCE1] text-[#FF2A6D] text-xs font-black p-3.5 rounded-2xl text-center shadow-xs">
+                {successMessage}
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-rose-50 border border-rose-200 text-rose-600 text-xs font-black p-3.5 rounded-2xl text-center">
+                {error}
+              </div>
+            )}
 
             <form onSubmit={handleOtpSubmit} className="space-y-4">
               <input

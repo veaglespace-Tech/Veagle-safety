@@ -11,8 +11,9 @@ export const authApi = {
     return response.data;
   },
 
-  resendOtp: async (email) => {
-    const response = await apiClient.post('/auth/resend-otp', { email });
+  resendOtp: async (payload) => {
+    const body = typeof payload === 'string' ? { email: payload } : payload;
+    const response = await apiClient.post('/auth/resend-otp', body);
     return response.data;
   },
 
