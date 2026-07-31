@@ -28,6 +28,7 @@ import {
   UserPlus,
   Edit3,
   X,
+  Menu,
   Lock,
   Mail,
   User,
@@ -48,6 +49,7 @@ export default function SuperAdminOperationsPortal() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('INCIDENTS');
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const [actionSuccess, setActionSuccess] = useState(null);
 
   // CREATE USER MODAL STATE
@@ -235,77 +237,190 @@ export default function SuperAdminOperationsPortal() {
 
             <div>
               <div className="flex items-center space-x-2">
-                <h1 className="font-black text-base sm:text-lg tracking-tight text-tichi-text">Super Admin HQ Command</h1>
-                <span className="bg-gold text-tichi-text font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-gold/40">
+                <h1 className="font-black text-sm sm:text-lg tracking-tight text-tichi-text">Super Admin HQ</h1>
+                <span className="bg-gold text-tichi-text font-black text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-gold/40 shrink-0">
                   HQ LEVEL 5
                 </span>
               </div>
-              <p className="text-xs text-tichi-muted font-bold">Sakhi Suraksha Emergency Operations Control Center</p>
+              <p className="text-[11px] sm:text-xs text-tichi-muted font-bold line-clamp-1">Sakhi Suraksha Control Center</p>
             </div>
           </div>
 
           {/* ACTION CONTROLS */}
           <div className="flex items-center space-x-2">
             
-            {/* ADD USER BUTTON IN HEADER */}
+            {/* DESKTOP QUICK ACTIONS */}
+            <div className="hidden lg:flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={() => setShowCreateUserModal(true)}
+                className="btn-baby-pink px-3.5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-1.5 cursor-pointer shrink-0"
+                title="Super Admin Help: Add New User via Backend"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span>+ Add User</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminName(user?.fullName || '');
+                  setAdminEmail(user?.email || '');
+                  setAdminPhone(user?.phone || '');
+                  setShowEditAdminModal(true);
+                }}
+                className="p-2.5 rounded-2xl bg-white border-2 border-rose text-rose hover:bg-rose hover:text-white transition-all flex items-center space-x-1.5 text-xs font-black shadow-sm cursor-pointer"
+                title="Edit Super Admin Profile"
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>Edit Profile</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={loadAdminData}
+                className="p-2.5 rounded-2xl bg-white border-2 border-[#FFCCE1] text-tichi-text hover:border-rose transition-all flex items-center space-x-1.5 text-xs font-black shadow-sm cursor-pointer"
+                title="Refresh Real-time Data"
+              >
+                <RefreshCw className={`w-4 h-4 text-rose ${loading ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
+              </button>
+
+              <Link
+                href="/dashboard"
+                className="bg-white border-2 border-[#FFCCE1] text-tichi-text text-xs font-black px-4 py-2.5 rounded-2xl hover:border-rose transition-all flex items-center space-x-1.5 uppercase tracking-wider"
+              >
+                <span>User App</span>
+                <ArrowRight className="w-4 h-4 text-rose" />
+              </Link>
+            </div>
+
+            {/* MOBILE MENU TOGGLE BUTTON (VISIBLE ON MOBILE/TABLET < LG) */}
             <button
               type="button"
-              onClick={() => setShowCreateUserModal(true)}
-              className="btn-baby-pink px-3.5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-1.5 cursor-pointer shrink-0"
-              title="Super Admin Help: Add New User via Backend"
+              onClick={() => setAdminMenuOpen(!adminMenuOpen)}
+              className="lg:hidden p-2.5 rounded-2xl bg-[#FFF0F3] border-2 border-[#FFCCE1] text-rose hover:bg-rose hover:text-white transition-all shadow-sm cursor-pointer"
+              aria-label="Toggle Admin Navigation Menu"
             >
-              <UserPlus className="w-4 h-4" />
-              <span>+ Add User</span>
+              {adminMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            {/* EDIT ADMIN PROFILE BUTTON */}
-            <button
-              type="button"
-              onClick={() => {
-                setAdminName(user?.fullName || '');
-                setAdminEmail(user?.email || '');
-                setAdminPhone(user?.phone || '');
-                setShowEditAdminModal(true);
-              }}
-              className="p-2.5 rounded-2xl bg-white border-2 border-rose text-rose hover:bg-rose hover:text-white transition-all flex items-center space-x-1.5 text-xs font-black shadow-sm cursor-pointer"
-              title="Edit Super Admin Profile"
-            >
-              <Edit3 className="w-4 h-4" />
-              <span className="hidden md:inline">Edit Profile</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={loadAdminData}
-              className="p-2.5 rounded-2xl bg-white border-2 border-[#FFCCE1] text-tichi-text hover:border-rose transition-all flex items-center space-x-1.5 text-xs font-black shadow-sm cursor-pointer"
-              title="Refresh Real-time Data"
-            >
-              <RefreshCw className={`w-4 h-4 text-rose ${loading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Refresh</span>
-            </button>
-
-            <Link
-              href="/dashboard"
-              className="bg-white border-2 border-[#FFCCE1] text-tichi-text text-xs font-black px-4 py-2.5 rounded-2xl hover:border-rose transition-all flex items-center space-x-1.5 uppercase tracking-wider"
-            >
-              <span>User App</span>
-              <ArrowRight className="w-4 h-4 text-rose" />
-            </Link>
-
+            {/* LOGOUT BUTTON - ALWAYS OUTSIDE ON RIGHT FOR 1-TAP ACCESSIBILITY */}
             <button
               type="button"
               onClick={() => {
                 logout();
                 router.push('/admin/login');
               }}
-              className="p-2.5 rounded-2xl bg-white border-2 border-[#FF2A6D] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all shadow-sm cursor-pointer"
+              className="p-2.5 rounded-2xl bg-white border-2 border-[#FF2A6D] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all shadow-sm cursor-pointer shrink-0"
               title="Sign Out"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4.5 h-4.5" />
             </button>
           </div>
 
         </div>
+
+        {/* MOBILE COLLAPSIBLE ADMIN NAVIGATION DROPDOWN */}
+        {adminMenuOpen && (
+          <div className="lg:hidden border-t-2 border-[#FFCCE1] bg-white/99 p-4 mt-3 rounded-2xl shadow-xl space-y-4 animate-fade-up">
+            
+            {/* ADMIN TABS IN MOBILE MENU */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-black uppercase text-tichi-muted tracking-wider px-1">Navigation Tabs</span>
+              {[
+                { key: 'INCIDENTS', label: 'Active Incidents', icon: ShieldAlert, badge: activeSos.length },
+                { key: 'USERS', label: 'User Roles & Accounts', icon: UserCheck, badge: usersList.length },
+                { key: 'SYSTEM', label: 'Dispatch Settings', icon: Sliders },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => {
+                      setActiveTab(tab.key);
+                      setAdminMenuOpen(false);
+                    }}
+                    className={`w-full p-3 rounded-xl font-black text-xs transition-all flex items-center justify-between uppercase tracking-wider cursor-pointer ${
+                      isActive
+                        ? 'bg-rose text-white shadow-md'
+                        : 'bg-[#FFF0F3] text-tichi-text hover:bg-rose/10 border border-[#FFCCE1]'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2.5">
+                      <Icon className="w-4 h-4" />
+                      <span>{tab.label}</span>
+                    </div>
+                    {tab.badge !== undefined && (
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${isActive ? 'bg-white text-rose' : 'bg-rose/20 text-rose'}`}>
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* QUICK ACTIONS IN MOBILE MENU */}
+            <div className="pt-2 border-t border-[#FFCCE1] space-y-2">
+              <span className="text-[10px] font-black uppercase text-tichi-muted tracking-wider px-1">Quick Admin Actions</span>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateUserModal(true);
+                    setAdminMenuOpen(false);
+                  }}
+                  className="btn-baby-pink py-3 px-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1.5 cursor-pointer"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>+ Add User</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdminName(user?.fullName || '');
+                    setAdminEmail(user?.email || '');
+                    setAdminPhone(user?.phone || '');
+                    setShowEditAdminModal(true);
+                    setAdminMenuOpen(false);
+                  }}
+                  className="py-3 px-3 rounded-xl bg-white border-2 border-rose text-rose font-black text-xs flex items-center justify-center space-x-1.5 cursor-pointer shadow-sm"
+                >
+                  <Edit3 className="w-4 h-4" />
+                  <span>Edit Profile</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    loadAdminData();
+                    setAdminMenuOpen(false);
+                  }}
+                  className="py-3 px-3 rounded-xl bg-white border-2 border-[#FFCCE1] text-tichi-text font-black text-xs flex items-center justify-center space-x-1.5 cursor-pointer shadow-sm"
+                >
+                  <RefreshCw className={`w-4 h-4 text-rose ${loading ? 'animate-spin' : ''}`} />
+                  <span>Refresh Data</span>
+                </button>
+
+                <Link
+                  href="/dashboard"
+                  onClick={() => setAdminMenuOpen(false)}
+                  className="py-3 px-3 rounded-xl bg-white border-2 border-[#FFCCE1] text-tichi-text font-black text-xs flex items-center justify-center space-x-1.5 uppercase cursor-pointer text-center"
+                >
+                  <span>User App</span>
+                  <ArrowRight className="w-4 h-4 text-rose" />
+                </Link>
+              </div>
+            </div>
+
+          </div>
+        )}
+
       </header>
 
       {/* MAIN CONTAINER */}
@@ -414,7 +529,7 @@ export default function SuperAdminOperationsPortal() {
         </div>
 
         {/* PORCELAIN SEGMENTED NAVIGATION TABS */}
-        <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm flex flex-wrap sm:flex-nowrap gap-2 w-full max-w-2xl relative z-20">
+        <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm hidden sm:flex overflow-x-auto gap-2 w-full max-w-2xl relative z-20 scrollbar-none">
           {[
             { key: 'INCIDENTS', label: 'Active Incidents', icon: ShieldAlert, badge: activeSos.length },
             { key: 'USERS', label: 'User Roles & Accounts', icon: UserCheck, badge: usersList.length },
