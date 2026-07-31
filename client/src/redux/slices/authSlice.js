@@ -6,11 +6,16 @@ const initialRegToken = typeof window !== 'undefined' ? localStorage.getItem('ti
 const initialPendingToken = typeof window !== 'undefined' ? localStorage.getItem('tichi_pending_token') : null;
 
 export const fetchUser = createAsyncThunk('auth/fetchUser', async (_, { rejectWithValue }) => {
+  if (typeof window !== 'undefined' && !localStorage.getItem('tichi_token')) {
+    return rejectWithValue('No auth token');
+  }
   try {
     const data = await authApi.getProfile();
     return data.user;
   } catch (err) {
-    localStorage.removeItem('tichi_token');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('tichi_token');
+    }
     return rejectWithValue(err.response?.data?.error || 'Session expired');
   }
 });
