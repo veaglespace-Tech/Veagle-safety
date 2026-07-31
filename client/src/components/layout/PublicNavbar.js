@@ -6,7 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   ShieldAlert, Radio, Users, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
-  LogOut, Menu, X, ArrowRight, ShieldCheck, Crown, Home, Zap
+  LogOut, Menu, X, ArrowRight, ShieldCheck, Crown, Home, Zap,
+  LayoutDashboard
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
