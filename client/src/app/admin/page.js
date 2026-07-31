@@ -277,14 +277,6 @@ export default function SuperAdminOperationsPortal() {
                 <RefreshCw className={`w-4 h-4 text-rose ${loading ? 'animate-spin' : ''}`} />
                 <span>Refresh</span>
               </button>
-
-              <Link
-                href="/dashboard"
-                className="bg-white border-2 border-[#FFCCE1] text-tichi-text text-xs font-black px-4 py-2.5 rounded-2xl hover:border-rose transition-all flex items-center space-x-1.5 uppercase tracking-wider"
-              >
-                <span>User App</span>
-                <ArrowRight className="w-4 h-4 text-rose" />
-              </Link>
             </div>
 
             {/* MOBILE MENU TOGGLE BUTTON (VISIBLE ON MOBILE/TABLET < LG) */}
@@ -359,17 +351,17 @@ export default function SuperAdminOperationsPortal() {
             <div className="pt-2 border-t border-[#FFCCE1] space-y-2">
               <span className="text-[10px] font-black uppercase text-tichi-muted tracking-wider px-1">Quick Admin Actions</span>
               
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => {
                     setShowCreateUserModal(true);
                     setAdminMenuOpen(false);
                   }}
-                  className="btn-baby-pink py-3 px-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1.5 cursor-pointer"
+                  className="btn-baby-pink py-3 px-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1 cursor-pointer"
                 >
-                  <UserPlus className="w-4 h-4" />
-                  <span>+ Add User</span>
+                  <UserPlus className="w-4 h-4 shrink-0" />
+                  <span className="truncate">+ Add User</span>
                 </button>
 
                 <button
@@ -381,10 +373,10 @@ export default function SuperAdminOperationsPortal() {
                     setShowEditAdminModal(true);
                     setAdminMenuOpen(false);
                   }}
-                  className="py-3 px-3 rounded-xl bg-white border-2 border-rose text-rose font-black text-xs flex items-center justify-center space-x-1.5 cursor-pointer shadow-sm"
+                  className="py-3 px-2 rounded-xl bg-white border-2 border-rose text-rose font-black text-xs flex items-center justify-center space-x-1 cursor-pointer shadow-sm"
                 >
-                  <Edit3 className="w-4 h-4" />
-                  <span>Edit Profile</span>
+                  <Edit3 className="w-4 h-4 shrink-0" />
+                  <span className="truncate">Edit Profile</span>
                 </button>
 
                 <button
@@ -393,20 +385,11 @@ export default function SuperAdminOperationsPortal() {
                     loadAdminData();
                     setAdminMenuOpen(false);
                   }}
-                  className="py-3 px-3 rounded-xl bg-white border-2 border-[#FFCCE1] text-tichi-text font-black text-xs flex items-center justify-center space-x-1.5 cursor-pointer shadow-sm"
+                  className="py-3 px-2 rounded-xl bg-white border-2 border-[#FFCCE1] text-tichi-text font-black text-xs flex items-center justify-center space-x-1 cursor-pointer shadow-sm"
                 >
-                  <RefreshCw className={`w-4 h-4 text-rose ${loading ? 'animate-spin' : ''}`} />
-                  <span>Refresh Data</span>
+                  <RefreshCw className={`w-4 h-4 text-rose shrink-0 ${loading ? 'animate-spin' : ''}`} />
+                  <span className="truncate">Refresh</span>
                 </button>
-
-                <Link
-                  href="/dashboard"
-                  onClick={() => setAdminMenuOpen(false)}
-                  className="py-3 px-3 rounded-xl bg-white border-2 border-[#FFCCE1] text-tichi-text font-black text-xs flex items-center justify-center space-x-1.5 uppercase cursor-pointer text-center"
-                >
-                  <span>User App</span>
-                  <ArrowRight className="w-4 h-4 text-rose" />
-                </Link>
               </div>
             </div>
 
