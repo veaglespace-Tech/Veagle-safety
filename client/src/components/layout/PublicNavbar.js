@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
   ShieldAlert, Radio, Users, PhoneCall, 
   Info, Image as ImageIcon, UserCheck, 
-  LogOut, Menu, X, ArrowRight, ShieldCheck, Crown, Home
+  LogOut, Menu, X, ArrowRight, ShieldCheck, Crown, Home, Zap
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -44,13 +44,14 @@ export const PublicNavbar = () => {
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/pricing', label: 'Pricing', icon: ShieldCheck },
-    { href: '/helplines', label: 'Helplines', icon: PhoneCall },
-    { href: '/terms', label: 'Terms', icon: Info },
+    { href: '/pricing', label: 'Pricing', icon: Zap },
+    { href: '/about', label: 'About', icon: Info },
+    { href: '/gallery', label: 'Gallery', icon: ImageIcon },
+    { href: '/contact', label: 'Contact', icon: PhoneCall },
   ];
 
   if (mounted && token && isSuperAdmin) {
-    navLinks.push({ href: '/admin', label: 'Admin HQ', icon: Crown });
+    navLinks.splice(1, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
   }
 
   const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
