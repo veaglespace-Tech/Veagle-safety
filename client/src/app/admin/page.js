@@ -55,6 +55,11 @@ export default function SuperAdminOperationsPortal() {
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const [actionSuccess, setActionSuccess] = useState(null);
 
+  // PAGINATION STATES (7 items per page)
+  const [sosPage, setSosPage] = useState(1);
+  const [usersPage, setUsersPage] = useState(1);
+  const LOGS_PER_PAGE = 7;
+
   // CREATE USER MODAL STATE
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [newUserName, setNewUserName] = useState('');
@@ -210,6 +215,12 @@ export default function SuperAdminOperationsPortal() {
       u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.phone?.includes(searchQuery)
   );
+
+  const totalSosPages = Math.ceil((recentSos?.length || 0) / LOGS_PER_PAGE) || 1;
+  const paginatedSos = recentSos.slice((sosPage - 1) * LOGS_PER_PAGE, sosPage * LOGS_PER_PAGE);
+
+  const totalUsersPages = Math.ceil((filteredUsers?.length || 0) / LOGS_PER_PAGE) || 1;
+  const paginatedUsers = filteredUsers.slice((usersPage - 1) * LOGS_PER_PAGE, usersPage * LOGS_PER_PAGE);
 
   if (!mounted) {
     return (
@@ -642,7 +653,12 @@ export default function SuperAdminOperationsPortal() {
 
             {/* RECENT INCIDENTS LOG HISTORY TABLE */}
             <div className="bg-white border-2 border-[#FFCCE1] rounded-3xl p-6 shadow-sm space-y-4">
-              <h3 className="font-black text-sm text-tichi-text uppercase tracking-wider">Recent Incident Log History</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#FFCCE1] pb-3">
+                <h3 className="font-black text-sm text-tichi-text uppercase tracking-wider">Recent Incident Log History</h3>
+                <span className="text-[11px] font-extrabold text-[#FF2A6D] bg-[#FFF0F3] px-3 py-1 rounded-full border border-[#FFCCE1] self-start sm:self-auto">
+                  7 Logs per Page (Total: {recentSos.length})
+                </span>
+              </div>
               
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs font-bold text-tichi-text">
@@ -655,7 +671,7 @@ export default function SuperAdminOperationsPortal() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#FFCCE1]">
-                    {recentSos.map((item) => (
+                    {paginatedSos.map((item) => (
                       <tr key={item.id} className="hover:bg-[#FFF0F3] transition-colors">
                         <td className="py-3 px-3 font-black text-tichi-text">{item.user?.fullName}</td>
                         <td className="py-3 px-3">
@@ -678,6 +694,52 @@ export default function SuperAdminOperationsPortal() {
                   </tbody>
                 </table>
               </div>
+
+              {/* PAGINATION CONTROLS FOR INCIDENT LOG HISTORY */}
+              {recentSos.length > LOGS_PER_PAGE && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#FFCCE1] text-xs font-bold text-tichi-muted">
+                  <div>
+                    Showing <span className="font-black text-[#2A0826]">{(sosPage - 1) * LOGS_PER_PAGE + 1}</span> to{' '}
+                    <span className="font-black text-[#2A0826]">{Math.min(sosPage * LOGS_PER_PAGE, recentSos.length)}</span> of{' '}
+                    <span className="font-black text-[#2A0826]">{recentSos.length}</span> entries
+                  </div>
+
+                  <div className="flex items-center space-x-1.5">
+                    <button
+                      type="button"
+                      disabled={sosPage === 1}
+                      onClick={() => setSosPage((prev) => Math.max(prev - 1, 1))}
+                      className="px-3 py-1.5 rounded-xl border border-[#FFCCE1] bg-white text-[#2A0826] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FFF0F3] transition-colors font-black cursor-pointer shadow-xs"
+                    >
+                      Previous
+                    </button>
+
+                    {Array.from({ length: totalSosPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => setSosPage(pageNum)}
+                        className={`w-8 h-8 rounded-xl font-black text-xs transition-colors cursor-pointer ${
+                          sosPage === pageNum
+                            ? 'bg-[#FF2A6D] text-white shadow-sm'
+                            : 'bg-white text-[#2A0826] border border-[#FFCCE1] hover:bg-[#FFF0F3]'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      disabled={sosPage === totalSosPages}
+                      onClick={() => setSosPage((prev) => Math.min(prev + 1, totalSosPages))}
+                      className="px-3 py-1.5 rounded-xl border border-[#FFCCE1] bg-white text-[#2A0826] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FFF0F3] transition-colors font-black cursor-pointer shadow-xs"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>
@@ -735,7 +797,7 @@ export default function SuperAdminOperationsPortal() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#FFCCE1]">
-                    {filteredUsers.map((u) => (
+                    {paginatedUsers.map((u) => (
                       <tr key={u.id} className="hover:bg-[#FFF0F3] transition-colors">
                         <td className="p-4">
                           <p className="font-black text-tichi-text text-sm">{u.fullName}</p>
@@ -791,6 +853,52 @@ export default function SuperAdminOperationsPortal() {
                   </tbody>
                 </table>
               </div>
+
+              {/* PAGINATION CONTROLS FOR USER ACCOUNTS */}
+              {filteredUsers.length > LOGS_PER_PAGE && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#FFF0F3]/60 border-t border-[#FFCCE1] text-xs font-bold text-tichi-muted">
+                  <div>
+                    Showing <span className="font-black text-[#2A0826]">{(usersPage - 1) * LOGS_PER_PAGE + 1}</span> to{' '}
+                    <span className="font-black text-[#2A0826]">{Math.min(usersPage * LOGS_PER_PAGE, filteredUsers.length)}</span> of{' '}
+                    <span className="font-black text-[#2A0826]">{filteredUsers.length}</span> user accounts
+                  </div>
+
+                  <div className="flex items-center space-x-1.5">
+                    <button
+                      type="button"
+                      disabled={usersPage === 1}
+                      onClick={() => setUsersPage((prev) => Math.max(prev - 1, 1))}
+                      className="px-3 py-1.5 rounded-xl border border-[#FFCCE1] bg-white text-[#2A0826] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FFF0F3] transition-colors font-black cursor-pointer shadow-xs"
+                    >
+                      Previous
+                    </button>
+
+                    {Array.from({ length: totalUsersPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => setUsersPage(pageNum)}
+                        className={`w-8 h-8 rounded-xl font-black text-xs transition-colors cursor-pointer ${
+                          usersPage === pageNum
+                            ? 'bg-[#FF2A6D] text-white shadow-sm'
+                            : 'bg-white text-[#2A0826] border border-[#FFCCE1] hover:bg-[#FFF0F3]'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      disabled={usersPage === totalUsersPages}
+                      onClick={() => setUsersPage((prev) => Math.min(prev + 1, totalUsersPages))}
+                      className="px-3 py-1.5 rounded-xl border border-[#FFCCE1] bg-white text-[#2A0826] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FFF0F3] transition-colors font-black cursor-pointer shadow-xs"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
