@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './Header.js';
 import { BottomNavigation } from './BottomNavigation.js';
 import { DesktopSidebar } from './DesktopSidebar.js';
+import { Footer } from './Footer.js';
 
 export const AppLayout = ({ children, fullScreen = false }) => {
   const [mounted, setMounted] = useState(false);
@@ -13,18 +14,19 @@ export const AppLayout = ({ children, fullScreen = false }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-blush">
+    <div className="min-h-screen bg-blush flex flex-col">
       {/* Desktop sidebar (hidden on mobile) */}
       <DesktopSidebar />
 
       {/* Main content area — offset by sidebar on desktop */}
-      <div className="lg:ml-64">
+      <div className="lg:ml-64 flex-1 flex flex-col">
         {!fullScreen && <Header />}
 
-        <main className={`${!fullScreen ? 'pb-28 lg:pb-8' : ''}`}>
+        <main className={`flex-1 ${!fullScreen ? 'pb-28 lg:pb-8' : ''}`}>
           {children}
         </main>
 
+        {!fullScreen && <Footer />}
         {!fullScreen && <BottomNavigation />}
       </div>
     </div>

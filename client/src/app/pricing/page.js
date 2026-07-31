@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
+import { Footer } from '../../components/layout/Footer.js';
 import { fetchPlans } from '../../redux/slices/planSlice.js';
 import { Shield, Check, ArrowRight, Award, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -130,6 +131,7 @@ export default function PlatformPricingPage() {
         </div>
 
       </section>
+      <Footer />
     </div>
   );
 }

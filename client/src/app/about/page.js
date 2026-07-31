@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
+import { Footer } from '../../components/layout/Footer.js';
 import { Shield, Heart, Lock, Award, Users, Globe, Zap, Radio, CheckCircle2, ArrowRight, Activity, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { AnimatedHeading } from '../../components/common/AnimatedHeading.jsx';
@@ -155,6 +156,7 @@ export default function AboutUsPage() {
         </div>
 
       </section>
+      <Footer />
     </div>
   );
 }

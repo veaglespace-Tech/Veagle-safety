@@ -4,6 +4,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
+import { Footer } from '../../components/layout/Footer.js';
 import { fetchPlans } from '../../redux/slices/planSlice.js';
 import { fetchUser } from '../../redux/slices/authSlice.js';
 import { Shield, Lock, CreditCard, ArrowRight, AlertCircle, User, Phone, Mail, ExternalLink, Sparkles } from 'lucide-react';
@@ -300,6 +301,8 @@ function CheckoutContent() {
         </div>
 
       </div>
+
+      <Footer />
     </div>
   );
 }

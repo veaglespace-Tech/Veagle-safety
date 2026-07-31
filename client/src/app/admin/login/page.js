@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import { useAuthStore } from '../../../redux/useAuthStore.js';
+import { Footer } from '../../../components/layout/Footer.js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Crown, Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, Activity, Terminal, Shield, Radio, KeyRound, Sparkles } from 'lucide-react';
+import { Crown, Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, Activity, Terminal, Shield, Radio, KeyRound, Sparkles, ShieldAlert } from 'lucide-react';
 
 export default function SuperAdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -191,6 +192,7 @@ export default function SuperAdminLoginPage() {
         </div>
 
       </div>
+      <Footer />
     </div>
   );
 }

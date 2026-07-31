@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
+import { Footer } from '../../components/layout/Footer.js';
 
 export default function PrivacyPage() {
   return (
@@ -80,9 +81,7 @@ export default function PrivacyPage() {
       </div>
 
       {/* FOOTER */}
-      <div className="border-t-1.5 border-[#FFCCE1] py-4 text-center text-[10px] font-black text-[#684E67]">
-        © 2026 Veagle Space Technology Pvt. Ltd. All Rights Reserved.
-      </div>
+      <Footer />
     </div>
   );
 }

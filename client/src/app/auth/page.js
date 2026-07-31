@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
+import { Footer } from '../../components/layout/Footer.js';
 import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
 import {
   registerUser,
@@ -607,6 +608,7 @@ function UserAuthForm() {
         </div>
       )}
 
+      <Footer />
     </div>
   );
 }

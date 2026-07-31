@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
+import { Footer } from '../../components/layout/Footer.js';
 import { 
   PhoneCall, Mail, MapPin, Send, ShieldCheck, 
   Clock, User, MessageSquare, CheckCircle2, Phone, 
@@ -291,6 +292,7 @@ export default function ContactSupportPage() {
 
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

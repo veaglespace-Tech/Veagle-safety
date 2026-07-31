@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PublicNavbar } from '../../../components/layout/PublicNavbar.js';
+import { Footer } from '../../../components/layout/Footer.js';
 import { CheckCircle2, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { fetchUser } from '../../../redux/slices/authSlice.js';
@@ -108,6 +109,7 @@ function SuccessContent() {
 
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

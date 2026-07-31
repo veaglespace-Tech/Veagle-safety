@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
+import { Footer } from '../../components/layout/Footer.js';
 import {
   Image as ImageIcon,
   Shield,
@@ -341,6 +342,9 @@ export default function PlatformGalleryPage() {
           </div>
         </div>
       )}
+
+      {/* FOOTER */}
+      <Footer />
 
     </div>
   );
