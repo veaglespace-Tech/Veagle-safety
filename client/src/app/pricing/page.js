@@ -64,8 +64,8 @@ export default function PlatformPricingPage() {
           </p>
         </div>
 
-        {/* PLAN CARDS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
+        {/* SINGLE PLAN CARD */}
+        <div className="max-w-lg mx-auto w-full">
           {activePlans.map((plan) => (
             <div
               key={plan.id}

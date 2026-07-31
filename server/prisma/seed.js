@@ -31,55 +31,31 @@ export async function seedDatabase() {
   });
   console.log(`✅ [Seed] SuperAdmin Account Ready: ${superAdmin.email} (Password: Veagle@123)`);
 
-  // 2. Seed Plans with Clean Numeric IDs (1, 2, 3)
-  const plans = [
-    {
-      id: '1',
-      name: 'Sakhi Suraksha 365 Yearly Protection Plan',
-      description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
-      basePrice: 24.0,
-      gstPercentage: 18.0,
-      totalPrice: 28.32,
-      durationDays: 365,
-      isActive: true,
-    },
-    {
-      id: '2',
-      name: 'Sakhi Monthly Protection Plan',
-      description: '30-Day Emergency SOS Broadcast, Live GPS Location Sharing, and Guardian Alerts',
-      basePrice: 2.0,
-      gstPercentage: 18.0,
-      totalPrice: 2.36,
-      durationDays: 30,
-      isActive: true,
-    },
-    {
-      id: '3',
-      name: 'Sakhi Quarterly Protection Plan',
-      description: '90-Day Emergency SOS Broadcast, Live GPS Location Sharing, and Guardian Alerts',
-      basePrice: 6.0,
-      gstPercentage: 18.0,
-      totalPrice: 7.08,
-      durationDays: 90,
-      isActive: true,
-    },
-    {
-      id: 'plan_yearly_24',
-      name: 'Sakhi Suraksha 365 Yearly Protection Plan',
-      description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
-      basePrice: 24.0,
-      gstPercentage: 18.0,
-      totalPrice: 28.32,
-      durationDays: 365,
-      isActive: true,
-    },
-  ];
+  // 2. Clean up old/extra plans — keep ONLY the single 365-Day Protection Plan
+  const singlePlanData = {
+    id: 'plan_yearly_24',
+    name: 'Sakhi Suraksha 365 Yearly Protection Plan',
+    description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
+    basePrice: 24.0,
+    gstPercentage: 18.0,
+    totalPrice: 28.32,
+    durationDays: 365,
+    isActive: true,
+  };
 
-  for (const planData of plans) {
+  // Remove any legacy plans ('2', '3', etc.)
+  await prisma.plan.deleteMany({
+    where: {
+      id: { notIn: ['plan_yearly_24', '1'] }
+    }
+  });
+
+  // Seed the single yearly plan for both 'plan_yearly_24' and '1' for backwards compatibility
+  for (const id of ['plan_yearly_24', '1']) {
     const p = await prisma.plan.upsert({
-      where: { id: planData.id },
-      update: planData,
-      create: planData,
+      where: { id },
+      update: { ...singlePlanData, id },
+      create: { ...singlePlanData, id },
     });
     console.log(`✅ [Seed] Plan ID '${p.id}' Ready: ${p.name} (Base: ₹${p.basePrice}, Total: ₹${p.totalPrice})`);
   }
