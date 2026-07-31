@@ -7,7 +7,7 @@ import { Footer } from '../../components/layout/Footer.js';
 import { fetchPlans } from '../../redux/slices/planSlice.js';
 import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
 import { 
-  ShieldCheck, ArrowRight, Zap, Crown, Sparkles, 
+  ShieldCheck, ArrowRight, Zap, Sparkles, 
   Radio, MapPin, Users, Volume2, Headphones, Lock, CheckCircle2, Shield
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -95,10 +95,6 @@ export default function PlatformPricingPage() {
                 <ShieldCheck className="w-7 h-7 text-[#FF2A6D]" />
               </div>
               <div className="space-y-1">
-                <div className="inline-flex items-center space-x-1.5 bg-[#FFF0F3] border border-[#FFCCE1] px-2.5 py-0.5 rounded-lg text-[10px] font-black text-[#FF2A6D] uppercase tracking-wider">
-                  <Crown className="w-3 h-3 text-[#FF2A6D]" />
-                  <span>365 DAYS FULL COVERAGE</span>
-                </div>
                 <h2 className="text-lg sm:text-xl font-black text-[#2A0826] tracking-tight">
                   {activePlan.name}
                 </h2>
