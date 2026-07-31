@@ -5,6 +5,7 @@ import { useAuthStore } from '../../redux/useAuthStore.js';
 import { api } from '../../utils/api.js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
 import {
   Crown,
   AlertOctagon,
@@ -229,11 +230,7 @@ export default function SuperAdminOperationsPortal() {
           
           {/* BRANDING */}
           <div className="flex items-center space-x-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose via-rose-light to-gold p-0.5 shadow-md flex items-center justify-center shrink-0">
-              <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
-                <Crown className="w-6 h-6 text-rose" />
-              </div>
-            </div>
+            <Logo3DFlip size={40} />
 
             <div>
               <h1 className="font-black text-sm sm:text-lg tracking-tight text-tichi-text">Super Admin HQ</h1>
