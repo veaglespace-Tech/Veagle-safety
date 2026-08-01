@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MapPin, AlertTriangle, Users, ShieldCheck, Crown, Sliders, CreditCard } from 'lucide-react';
+import { User, MapPin, AlertTriangle, Users, ShieldCheck, Crown, Sliders, CreditCard } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useSOSStore } from '../../redux/useSOSStore.js';
 
@@ -19,7 +19,7 @@ export const BottomNavigation = () => {
   const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
 
   const memberNavItems = [
-    { path: isLoggedIn ? '/dashboard' : '/', label: 'Home', icon: Home },
+    { path: '/profile', label: 'Profile', icon: User },
     { path: '/track-journey', label: 'Track', icon: MapPin },
     { path: '/active-sos', label: 'SOS', icon: AlertTriangle, isCenter: true },
     { path: '/contacts', label: 'Contacts', icon: Users },
@@ -35,8 +35,8 @@ export const BottomNavigation = () => {
 
   const navItems = isSuperAdmin ? adminNavItems : memberNavItems;
 
-  useEffect(() => { 
-    setMounted(true); 
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
   if (!mounted) return null;
@@ -44,7 +44,7 @@ export const BottomNavigation = () => {
   return (
     <>
       {/* COMPACT ELEGANT 3D MAGIC FLOATING DOCK */}
-      <div 
+      <div
         style={{
           position: 'fixed',
           bottom: '16px',
@@ -55,7 +55,7 @@ export const BottomNavigation = () => {
           maxWidth: '360px',
           fontFamily: 'Manrope, sans-serif',
           filter: 'drop-shadow(0 10px 22px rgba(255, 92, 138, 0.25)) drop-shadow(0 4px 8px rgba(42, 8, 38, 0.08))',
-        }} 
+        }}
         className="lg:hidden"
       >
         {/* NAV CONTAINER BAR */}
@@ -176,7 +176,7 @@ export const BottomNavigation = () => {
                       size={24}
                       color="#FFFFFF"
                       strokeWidth={2.6}
-                      style={{ 
+                      style={{
                         filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
                         transform: activeSession ? 'scale(1.1)' : 'scale(1)',
                         transition: 'transform 0.3s ease',
