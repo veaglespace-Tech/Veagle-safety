@@ -98,8 +98,10 @@ const authSlice = createSlice({
     logout: (state) => {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('tichi_token');
+        localStorage.removeItem('tichi_user');
         localStorage.removeItem('tichi_reg_token');
         localStorage.removeItem('tichi_pending_token');
+        localStorage.removeItem('token');
       }
       state.token = null;
       state.user = null;

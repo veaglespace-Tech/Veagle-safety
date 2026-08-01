@@ -44,6 +44,15 @@ export const DesktopSidebar = () => {
   const isSuperAdmin = mounted && currentUser?.role === 'SUPER_ADMIN';
   const currentAdminTab = searchParams?.get('tab') || 'overview';
 
+  const handleLogout = () => {
+    dispatch(reduxLogout());
+    if (typeof window !== 'undefined') {
+      window.location.href = '/auth?mode=login';
+    } else {
+      router.push('/auth?mode=login');
+    }
+  };
+
   const memberNavItems = [
     { path: '/dashboard', label: 'Home', icon: Home, desc: 'Safety Dashboard' },
     { path: '/track-journey', label: 'Track Journey', icon: MapPin, desc: 'Journey & Check-ins' },
@@ -52,11 +61,13 @@ export const DesktopSidebar = () => {
   ];
 
   const adminNavItems = [
-    { path: '/admin?tab=overview', tabKey: 'overview', label: 'Admin Overview', icon: Crown, desc: 'Incident Command' },
+    { path: '/admin?tab=overview', tabKey: 'overview', label: 'Emergency Command', icon: AlertOctagon, desc: 'Active SOS & Incident HQ' },
     { path: '/admin?tab=users', tabKey: 'users', label: 'User Management', icon: Users, desc: 'All Users & Free Grants' },
     { path: '/admin?tab=plans', tabKey: 'plans', label: 'Plans & Dynamic GST', icon: Sliders, desc: 'DB Plans & Global GST' },
     { path: '/admin?tab=payments', tabKey: 'payments', label: 'Payment Receipts', icon: CreditCard, desc: 'Txn History & Revenue' },
-    { path: '/admin?tab=enquiries', tabKey: 'enquiries', label: 'Contact Enquiries', icon: HelpCircle, desc: 'Support & Inquiries' },
+    { path: '/admin?tab=enquiries', tabKey: 'enquiries', label: 'Contact Support', icon: HelpCircle, desc: 'Support & Inquiries' },
+    { path: '/contacts', label: 'My Guardians', icon: Users, desc: 'Personal Safety Contacts' },
+    { path: '/track-journey', label: 'Track My Journey', icon: MapPin, desc: 'Live Route Sharing' },
   ];
 
   const displayName = mounted
@@ -96,16 +107,18 @@ export const DesktopSidebar = () => {
       {/* NAVIGATION LINKS LIST */}
       <nav className="flex-1 px-5 py-6 space-y-6 overflow-y-auto scrollbar-none">
         {isSuperAdmin ? (
-          /* SUPERADMIN HQ MANAGEMENT SECTION ONLY */
+          /* SUPERADMIN UNIFIED NAVIGATION LIST */
           <div className="space-y-3">
-            <div className="flex items-center space-x-2 px-2 pb-1 text-[11px] font-black text-[#E6A100] uppercase tracking-wider">
-              <Crown className="w-4 h-4" />
-              <span>SuperAdmin Control HQ</span>
+            <div className="flex items-center space-x-2 px-2 pb-1 text-[11px] font-black text-[#FF2A6D] uppercase tracking-wider">
+              <Crown className="w-4 h-4 text-[#FF2A6D]" />
+              <span>SuperAdmin Command HQ</span>
             </div>
 
             {adminNavItems.map((item) => {
               const Icon = item.icon;
-              const isActive = (pathname === '/admin' || pathname.startsWith('/admin')) && currentAdminTab === item.tabKey;
+              const isActive = item.tabKey
+                ? (pathname === '/admin' || pathname.startsWith('/admin')) && currentAdminTab === item.tabKey
+                : pathname === item.path;
 
               return (
                 <Link
@@ -113,19 +126,21 @@ export const DesktopSidebar = () => {
                   href={item.path}
                   className={`flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-xs font-bold transition-all duration-300 group border ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#E6A100] text-[#2A0826] font-black shadow-md shadow-[#E6A100]/20 border-white scale-[1.02]'
-                      : 'bg-[#FFF9E6]/60 text-[#2A0826] border-[#FFE29A]/80 hover:border-[#E6A100] hover:bg-[#FFE29A]/40'
+                      ? 'bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black shadow-md shadow-[#FF2A6D]/20 border-white scale-[1.02]'
+                      : 'bg-white/80 text-[#2A0826] border-[#FFCCE1]/60 hover:border-[#FF2A6D]/60 hover:bg-[#FFF0F3]/80'
                   }`}
                 >
-                  <div className={`p-2.5 rounded-xl shrink-0 ${
-                    isActive ? 'bg-white/40 text-[#2A0826]' : 'bg-[#FFE29A]/60 text-[#E6A100]'
+                  <div className={`p-2.5 rounded-xl shrink-0 transition-transform group-hover:scale-105 ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-[#FFF0F3] text-[#FF2A6D]'
                   }`}>
                     <Icon className="w-4 h-4" />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-black text-xs tracking-tight truncate">{item.label}</p>
-                    <p className={`text-[10px] font-semibold truncate mt-0.5 ${isActive ? 'text-[#2A0826]/80' : 'text-[#684E67]'}`}>
+                    <p className={`font-black text-xs tracking-tight truncate ${isActive ? 'text-white' : 'text-[#2A0826] group-hover:text-[#FF2A6D]'}`}>
+                      {item.label}
+                    </p>
+                    <p className={`text-[10px] font-semibold truncate mt-0.5 ${isActive ? 'text-white/90' : 'text-[#684E67]'}`}>
                       {item.desc}
                     </p>
                   </div>
@@ -174,19 +189,16 @@ export const DesktopSidebar = () => {
       {/* FOOTER USER PROFILE AREA */}
       <div className="px-5 py-5 border-t border-[#FFCCE1]/60 bg-white/70 backdrop-blur-md space-y-3">
         <Link
-          href={activeSession ? '/active-sos' : '/dashboard'}
+          href={isSuperAdmin ? '/admin?tab=overview' : (activeSession ? '/active-sos' : '/dashboard')}
           className="flex items-center justify-center space-x-2.5 w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-4 py-3.5 rounded-2xl text-xs shadow-md shadow-[#FF2A6D]/25 hover:shadow-lg hover:shadow-[#FF2A6D]/35 hover:scale-[1.01] active:scale-95 transition-all uppercase tracking-wider border border-white/30"
         >
           <AlertTriangle className="w-4 h-4 animate-pulse" />
-          <span>{activeSession ? '🚨 VIEW SOS STATUS' : 'EMERGENCY SOS'}</span>
+          <span>{isSuperAdmin ? '🚨 EMERGENCY COMMAND' : (activeSession ? '🚨 VIEW SOS STATUS' : 'EMERGENCY SOS')}</span>
         </Link>
 
-        {/* LOGGED IN USER CARD WITH PROFILE LINK */}
-        <Link
-          href="/settings"
-          className="bg-[#FFF0F3]/60 border border-[#FFCCE1]/80 hover:border-[#FF2A6D]/60 p-3 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-md transition-all group cursor-pointer"
-        >
-          <div className="flex items-center space-x-3 min-w-0">
+        {/* LOGGED IN USER CARD WITH SIGN OUT */}
+        <div className="bg-[#FFF0F3]/80 border border-[#FFCCE1] p-3 rounded-2xl flex items-center justify-between shadow-xs">
+          <Link href="/settings" className="flex items-center space-x-3 min-w-0 group cursor-pointer flex-1">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
               {initials}
             </div>
@@ -198,9 +210,17 @@ export const DesktopSidebar = () => {
                 {isSuperAdmin ? 'Super Admin' : 'Active Protection'}
               </p>
             </div>
-          </div>
-          <ChevronRight className="w-4 h-4 text-[#FF2A6D] transform group-hover:translate-x-0.5 transition-transform" />
-        </Link>
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Sign Out"
+            className="p-2 rounded-xl text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </aside>
   );

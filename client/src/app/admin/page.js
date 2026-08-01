@@ -41,13 +41,38 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { startEmergencySos, checkActiveSos } from '../../redux/slices/sosSlice.js';
 
 function SuperAdminHQContent() {
+  const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { activeSession } = useSelector((state) => state?.sos || {});
+  const { latitude = 18.5204, longitude = 73.8567 } = useSelector((state) => state?.location || {});
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'users', 'plans', 'payments', 'enquiries'
   const [isLoading, setIsLoading] = useState(true);
+
+  const handleAdminTriggerSos = async () => {
+    if (activeSession) {
+      router.push('/active-sos');
+      return;
+    }
+    if (confirm('🚨 ACTIVATE SUPERADMIN EMERGENCY SOS BROADCAST?\nThis will alert your guardian network with real-time GPS location.')) {
+      try {
+        await dispatch(startEmergencySos({
+          isSilent: false,
+          latitude,
+          longitude,
+          emergencyMessage: 'SUPERADMIN EMERGENCY SOS BROADCAST! URGENT ASSISTANCE REQUIRED!'
+        })).unwrap();
+        router.push('/active-sos');
+      } catch (err) {
+        showToast('error', err || 'Failed to dispatch SuperAdmin SOS');
+      }
+    }
+  };
   const [toast, setToast] = useState(null);
 
   // CONTACT ENQUIRIES DATA
@@ -406,7 +431,20 @@ function SuperAdminHQContent() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+            <div className="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
+              <button
+                type="button"
+                onClick={handleAdminTriggerSos}
+                className={`font-black text-xs px-5 py-3.5 rounded-2xl border shadow-md flex items-center space-x-2.5 transition-all hover:scale-105 cursor-pointer uppercase tracking-wider ${
+                  activeSession
+                    ? 'bg-gradient-to-r from-[#FF2A6D] to-[#D90429] text-white border-white animate-pulse shadow-[#FF2A6D]/40'
+                    : 'bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white border-white/30 hover:shadow-lg shadow-[#FF2A6D]/30'
+                }`}
+              >
+                <AlertOctagon className="w-4 h-4 animate-bounce text-white" />
+                <span>{activeSession ? '🚨 VIEW ACTIVE SOS' : '🚨 TRIGGER EMERGENCY SOS'}</span>
+              </button>
+
               <button
                 type="button"
                 onClick={loadAllAdminData}

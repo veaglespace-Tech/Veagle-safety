@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Home, MapPin, AlertTriangle, Users, ShieldCheck, Crown, Sliders, CreditCard, User } from 'lucide-react';
+import { Home, MapPin, AlertTriangle, AlertOctagon, Users, ShieldCheck, Crown, Sliders, CreditCard, User } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 export const BottomNavigation = () => {
@@ -27,7 +27,7 @@ export const BottomNavigation = () => {
   ];
 
   const adminNavItems = [
-    { path: '/admin?tab=overview', tabKey: 'overview', label: 'HQ', icon: Crown },
+    { path: '/admin?tab=overview', tabKey: 'overview', label: 'SOS HQ', icon: AlertOctagon },
     { path: '/admin?tab=users', tabKey: 'users', label: 'Users', icon: Users },
     { path: '/admin?tab=plans', tabKey: 'plans', label: 'Plans', icon: Sliders },
     { path: '/admin?tab=payments', tabKey: 'payments', label: 'Pay', icon: CreditCard },

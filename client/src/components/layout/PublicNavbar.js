@@ -208,8 +208,6 @@ export const PublicNavbar = () => {
           )}
         </div>
       )}
-      {/* FLOATING SUPER ADMIN QUICK JUMP */}
-      <SuperAdminQuickJump />
     </header>
   );
 };

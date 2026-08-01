@@ -36,7 +36,11 @@ export const Header = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    router.push('/auth?mode=login');
+    if (typeof window !== 'undefined') {
+      window.location.href = '/auth?mode=login';
+    } else {
+      router.push('/auth?mode=login');
+    }
   };
 
   const isActive = (path) => pathname === path;

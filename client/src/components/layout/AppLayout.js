@@ -6,8 +6,6 @@ import { useSelector } from 'react-redux';
 import { Header } from './Header.js';
 import { BottomNavigation } from './BottomNavigation.js';
 import { DesktopSidebar } from './DesktopSidebar.js';
-import { Footer } from './Footer.js';
-import { SuperAdminQuickJump } from '../common/SuperAdminQuickJump.jsx';
 
 export const AppLayout = ({ children, fullScreen = false }) => {
   const pathname = usePathname();
@@ -37,18 +35,23 @@ export const AppLayout = ({ children, fullScreen = false }) => {
 
     const hasAuthToken =
       Boolean(token) ||
-      Boolean(user?.email) ||
       (typeof window !== 'undefined' &&
-        (Boolean(localStorage.getItem('tichi_token')) ||
-          Boolean(localStorage.getItem('token')) ||
-          Boolean(localStorage.getItem('tichi_user'))));
+        (Boolean(localStorage.getItem('tichi_token')) || Boolean(localStorage.getItem('token'))));
 
     if (isProtected && !hasAuthToken) {
       router.push('/auth?mode=login');
       return;
     }
 
-    const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+    let isSuperAdmin = user?.role === 'SUPER_ADMIN';
+    if (!isSuperAdmin && typeof window !== 'undefined') {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem('tichi_user') || '{}');
+        if (storedUser?.role === 'SUPER_ADMIN') {
+          isSuperAdmin = true;
+        }
+      } catch (e) {}
+    }
 
     // Non-admin trying to access /admin -> redirect to /dashboard
     if (hasAuthToken && pathname.startsWith('/admin') && !isSuperAdmin) {
@@ -56,8 +59,8 @@ export const AppLayout = ({ children, fullScreen = false }) => {
       return;
     }
 
-    // SuperAdmin trying to access member workspace pages -> redirect to /admin
-    const memberOnlyPaths = ['/dashboard', '/subscription', '/contacts', '/track-journey'];
+    // SuperAdmin trying to access member-only pages -> redirect to /admin
+    const memberOnlyPaths = ['/dashboard', '/subscription'];
     if (hasAuthToken && isSuperAdmin && memberOnlyPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
       router.push('/admin');
       return;
@@ -79,12 +82,8 @@ export const AppLayout = ({ children, fullScreen = false }) => {
           {children}
         </main>
 
-        {!fullScreen && <Footer />}
         {!fullScreen && <Suspense fallback={null}><BottomNavigation /></Suspense>}
       </div>
-
-      {/* Super Admin Quick Jump Floating Dock */}
-      <SuperAdminQuickJump />
     </div>
   );
 };
