@@ -106,15 +106,8 @@ export const Header = () => {
           </div>
         </Link>
 
-        {/* CENTER HEADER: LOGGED IN USER WELCOME CHIP OR PUBLIC NAV LINKS */}
-        {isLoggedIn ? (
-          <div className="hidden md:flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#FFF0F3] via-white to-[#FFF0F3] border-2 border-[#FFCCE1] shadow-xs">
-            <Sparkles size={16} className="text-[#FF2A6D] animate-pulse shrink-0" />
-            <span className="font-black text-xs sm:text-sm text-[#2A0826] tracking-tight truncate">
-              {displayName}'s Safety Command
-            </span>
-          </div>
-        ) : (
+        {/* CENTER HEADER: NAVIGATION LINKS (ONLY FOR PUBLIC/GUEST USERS) */}
+        {!isLoggedIn && (
           <nav className="hidden md:flex items-center gap-1 sm:gap-1.5 nav-chip-capsule overflow-x-auto scrollbar-none py-1 max-w-[60vw] lg:max-w-none shrink">
             {navLinks.map(({ href, label }) => {
               const active = isActive(href);
@@ -170,54 +163,68 @@ export const Header = () => {
             </div>
           )}
 
-          {/* MOBILE MENU TOGGLE BUTTON (SHRINK-0 ALWAYS INSIDE VIEWPORT) */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm shrink-0"
-            aria-label="Toggle navigation menu"
-          >
-            <div className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
-              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-            </div>
-          </button>
+          {/* MOBILE MENU TOGGLE BUTTON (ONLY FOR PUBLIC GUESTS) */}
+          {!isLoggedIn && (
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm shrink-0"
+              aria-label="Toggle navigation menu"
+            >
+              <div className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
+                {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              </div>
+            </button>
+          )}
         </div>
       </div>
 
       {/* MOBILE COLLAPSED MENU DROPDOWN */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t-1.5 border-[#FFCCE1] bg-white/99 p-3.5 shadow-2xl animate-fade-up">
-          {navLinks.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-3 p-3 rounded-xl text-xs font-black mb-1.5 transition-all duration-200 ${
-                isActive(href)
-                  ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30'
-                  : 'bg-[#FFF0F3] text-[#2A0826] hover:bg-white hover:text-[#FF5C8A]'
-              }`}
-            >
-              <Icon size={16} />
-              <span>{label}</span>
-            </Link>
-          ))}
+          {!isLoggedIn ? (
+            <>
+              {navLinks.map(({ href, label, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center gap-3 p-3 rounded-xl text-xs font-black mb-1.5 transition-all duration-200 ${
+                    isActive(href)
+                      ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30'
+                      : 'bg-[#FFF0F3] text-[#2A0826] hover:bg-white hover:text-[#FF5C8A]'
+                  }`}
+                >
+                  <Icon size={16} />
+                  <span>{label}</span>
+                </Link>
+              ))}
 
-          {isLoggedIn ? (
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all duration-200 mt-2 shadow-sm"
-            >
-              <LogOut size={16} />
-              <span>Sign Out</span>
-            </button>
+              <Link
+                href="/auth?mode=login"
+                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-white text-[#2A0826] hover:bg-[#FF5C8A] hover:text-white transition-all duration-200 mt-2 shadow-sm"
+              >
+                <UserCheck size={16} />
+                <span>Sign In</span>
+              </Link>
+            </>
           ) : (
-            <Link
-              href="/auth?mode=login"
-              className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-white text-[#2A0826] hover:bg-[#FF5C8A] hover:text-white transition-all duration-200 mt-2 shadow-sm"
-            >
-              <UserCheck size={16} />
-              <span>Sign In</span>
-            </Link>
+            <div className="space-y-2">
+              <Link
+                href={isSuperAdmin ? '/admin' : '/dashboard'}
+                className="flex items-center gap-3 p-3 rounded-xl text-xs font-black bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30"
+              >
+                <Home size={16} />
+                <span>{isSuperAdmin ? 'Admin HQ Command' : 'My Safety Dashboard'}</span>
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-2.5 w-full p-3 rounded-xl text-xs font-black border-1.5 border-[#FFCCE1] bg-[#FFF0F3] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all duration-200 mt-2 shadow-sm"
+              >
+                <LogOut size={16} />
+                <span>Sign Out</span>
+              </button>
+            </div>
           )}
         </div>
       )}
