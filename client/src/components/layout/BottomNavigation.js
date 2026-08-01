@@ -47,7 +47,7 @@ export const BottomNavigation = () => {
       <div
         style={{
           position: 'fixed',
-          bottom: '4px',
+          bottom: '10px',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 100,
