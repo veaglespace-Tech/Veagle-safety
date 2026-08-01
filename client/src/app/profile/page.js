@@ -42,12 +42,14 @@ import {
 export default function UserProfileSettingsPage() {
   const { user, logout, updateUserAvatar, fetchUser } = useAuthStore();
   const { status, accuracy } = useLocationStore();
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('DIAGNOSTICS');
   const [showTestModal, setShowTestModal] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
   const [isVibrationSupported, setIsVibrationSupported] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     fetchUser();
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
       setIsVibrationSupported(true);
@@ -157,13 +159,16 @@ export default function UserProfileSettingsPage() {
     }, 2000);
   };
 
-  const initials = user?.fullName
-    ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
-    : user?.name
-    ? user.name.slice(0, 2).toUpperCase()
+  const initials = mounted && (user?.fullName || user?.name)
+    ? (user.fullName || user.name).split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'PS';
 
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
+  const displayAvatar = mounted ? user?.avatar : null;
+  const displayName = mounted ? (user?.fullName || user?.name || (user?.email ? user.email.split('@')[0] : 'Sakhi Member')) : 'Sakhi Member';
+  const displayEmail = mounted ? (user?.email || 'sakhi@suraksha.org') : 'sakhi@suraksha.org';
+  const displayPhone = mounted ? (user?.phone || '+91 98765 43210') : '+91 98765 43210';
+  const displayBloodGroup = mounted ? (user?.bloodGroup || 'O+') : 'O+';
 
   const diagnostics = [
     { icon: MapPin, label: 'GPS Location Access', status: status === 'LIVE', value: status === 'LIVE' ? `✓ Active (±${accuracy || '10'}m)` : '⚠ Permission Required' },
@@ -205,8 +210,8 @@ export default function UserProfileSettingsPage() {
                 <div className="relative group">
                   <div className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] p-0.5 shadow-xl relative overflow-hidden">
                     <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center font-black text-3xl text-[#2A0826] overflow-hidden relative">
-                      {user?.avatar ? (
-                        <img src={user.avatar} alt="Profile Avatar" className="w-full h-full object-cover" />
+                      {displayAvatar ? (
+                        <img src={displayAvatar} alt="Profile Avatar" className="w-full h-full object-cover" />
                       ) : (
                         <span>{initials}</span>
                       )}
@@ -227,7 +232,7 @@ export default function UserProfileSettingsPage() {
                     />
                   </label>
 
-                  {user?.avatar && (
+                  {displayAvatar && (
                     <button
                       type="button"
                       onClick={handleRemoveImage}
@@ -249,7 +254,7 @@ export default function UserProfileSettingsPage() {
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-center space-x-2">
                     <h1 className="font-black text-2xl sm:text-3xl text-[#2A0826]">
-                      {user?.fullName || user?.name || (user?.email ? user.email.split('@')[0] : 'Sakhi Member')}
+                      {displayName}
                     </h1>
                     {isSuperAdmin && (
                       <span className="bg-gradient-to-r from-[#FFD700] to-[#E6A100] text-[#2A0826] font-black text-[10px] px-3 py-1 rounded-full uppercase flex items-center space-x-1 shadow-md border border-gold/40">
@@ -262,15 +267,15 @@ export default function UserProfileSettingsPage() {
                   <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-[#684E67] pt-1">
                     <div className="flex items-center space-x-1.5 bg-white px-3.5 py-1.5 rounded-full border-2 border-[#FFCCE1] text-[#2A0826] font-black shadow-xs">
                       <Mail className="w-3.5 h-3.5 text-[#FF2A6D]" />
-                      <span>{user?.email || 'sakhi@suraksha.org'}</span>
+                      <span>{displayEmail}</span>
                     </div>
                     <div className="flex items-center space-x-1.5 bg-white px-3.5 py-1.5 rounded-full border-2 border-[#FFCCE1] text-[#2A0826] font-black shadow-xs">
                       <PhoneCall className="w-3.5 h-3.5 text-[#FF2A6D]" />
-                      <span>{user?.phone || '+91 98765 43210'}</span>
+                      <span>{displayPhone}</span>
                     </div>
                     <div className="flex items-center space-x-1.5 bg-[#FFF0F3] px-3.5 py-1.5 rounded-full text-[#FF2A6D] font-black border-2 border-[#FFCCE1] shadow-xs">
                       <Heart className="w-3.5 h-3.5 fill-[#FF2A6D]/20" />
-                      <span>Blood Group: {user?.bloodGroup || 'O+'}</span>
+                      <span>Blood Group: {displayBloodGroup}</span>
                     </div>
                   </div>
                 </div>
@@ -402,15 +407,15 @@ export default function UserProfileSettingsPage() {
                     </p>
                   </div>
 
-                  <div className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] max-w-xs mx-auto space-y-2.5 text-left text-xs font-bold text-[#2A0826] shadow-xs">
-                    <div className="flex justify-between border-b border-[#FFCCE1] pb-2">
-                      <span className="text-[#684E67]">Member Name:</span>
-                      <span className="font-black">{user?.fullName || 'Sakhi Member'}</span>
-                    </div>
-                    <div className="flex justify-between border-b border-[#FFCCE1] pb-2">
-                      <span className="text-[#684E67]">Blood Group:</span>
-                      <span className="font-black text-[#FF2A6D]">{user?.bloodGroup || 'O+'}</span>
-                    </div>
+                    <div className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] max-w-xs mx-auto space-y-2.5 text-left text-xs font-bold text-[#2A0826] shadow-xs">
+                      <div className="flex justify-between border-b border-[#FFCCE1] pb-2">
+                        <span className="text-[#684E67]">Member Name:</span>
+                        <span className="font-black">{displayName}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-[#FFCCE1] pb-2">
+                        <span className="text-[#684E67]">Blood Group:</span>
+                        <span className="font-black text-[#FF2A6D]">{displayBloodGroup}</span>
+                      </div>
                     <div className="flex justify-between">
                       <span className="text-[#684E67]">Emergency Dispatch:</span>
                       <span className="font-black text-emerald-600">24/7 Verified</span>
