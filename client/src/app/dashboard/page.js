@@ -220,9 +220,9 @@ export default function DashboardAppPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-2">
               <Link
                 href="/track-journey"
-                className="bg-white p-4.5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
+                className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2.5 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
               >
-                <div className="w-11 h-11 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
+                <div className="w-12 h-12 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
                   <Navigation className="w-5 h-5" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Track Journey</p>
@@ -231,9 +231,9 @@ export default function DashboardAppPage() {
 
               <Link
                 href="/track-journey"
-                className="bg-white p-4.5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
+                className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2.5 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
               >
-                <div className="w-11 h-11 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
+                <div className="w-12 h-12 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
                   <Clock className="w-5 h-5" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Check On Me</p>
@@ -242,9 +242,9 @@ export default function DashboardAppPage() {
 
               <Link
                 href="/contacts"
-                className="bg-white p-4.5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
+                className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2.5 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
               >
-                <div className="w-11 h-11 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
+                <div className="w-12 h-12 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
                   <Users className="w-5 h-5" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Guardians</p>
@@ -253,9 +253,9 @@ export default function DashboardAppPage() {
 
               <Link
                 href="/help"
-                className="bg-white p-4.5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
+                className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2.5 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
               >
-                <div className="w-11 h-11 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
+                <div className="w-12 h-12 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
                   <PhoneCall className="w-5 h-5" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Helplines</p>
