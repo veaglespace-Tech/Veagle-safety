@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { Footer } from '../../components/layout/Footer.js';
+import { api } from '../../utils/api.js';
 import { 
   PhoneCall, Mail, MapPin, Send, ShieldCheck, 
   Clock, User, MessageSquare, CheckCircle2, Phone, 
@@ -15,15 +16,33 @@ export const dynamic = 'force-dynamic';
 
 export default function ContactSupportPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorNotice, setErrorNotice] = useState(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [subject, setSubject] = useState('General Safety Inquiry');
   const [message, setMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setErrorNotice(null);
+    setLoading(true);
+
+    try {
+      await api.post('/contact', {
+        fullName: name,
+        email,
+        phone,
+        subject,
+        message,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setErrorNotice(err.response?.data?.error || 'Failed to submit inquiry. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -59,6 +59,7 @@ export const DesktopSidebar = () => {
     { path: '/admin?tab=users', tabKey: 'users', label: 'User Management', icon: Users, desc: 'All Users & Free Grants' },
     { path: '/admin?tab=plans', tabKey: 'plans', label: 'Plans & Dynamic GST', icon: Sliders, desc: 'DB Plans & Global GST' },
     { path: '/admin?tab=payments', tabKey: 'payments', label: 'Payment Receipts', icon: CreditCard, desc: 'Txn History & Revenue' },
+    { path: '/admin?tab=enquiries', tabKey: 'enquiries', label: 'Contact Enquiries', icon: HelpCircle, desc: 'Support & Inquiries' },
   ];
 
   const displayName = mounted

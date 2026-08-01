@@ -27,6 +27,8 @@ model User {
   isEmailVerified       Boolean           @default(false)
   emailOtp              String?
   emailOtpExpiresAt     DateTime?
+  resetPasswordToken    String?
+  resetPasswordExpiresAt DateTime?
   subscriptionStatus    String            @default("INACTIVE") // INACTIVE, ACTIVE, EXPIRED
   subscriptionExpiresAt DateTime?
   currentPlanId         Int?
@@ -213,4 +215,18 @@ model PushSubscription {
   auth        String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model ContactEnquiry {
+  id             Int       @id @default(autoincrement())
+  fullName       String
+  email          String
+  phone          String?
+  subject        String?
+  message        String    @db.Text
+  status         String    @default("PENDING") // PENDING, RESOLVED
+  resolutionNote String?   @db.Text
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }

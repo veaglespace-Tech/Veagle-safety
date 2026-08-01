@@ -60,6 +60,10 @@ function UserAuthForm() {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
+
+  // FORGOT PASSWORD STATE
+  const [isForgotMode, setIsForgotMode] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
   const [pincode, setPincode] = useState('');
   const [emergencyContactName, setEmergencyContactName] = useState('');
   const [emergencyContactRelation, setEmergencyContactRelation] = useState('Parent');
@@ -245,50 +249,56 @@ function UserAuthForm() {
             </div>
 
             <div className="inline-flex items-center space-x-1.5 bg-[#FFF0F3] border border-[#FFCCE1] px-4 py-1.5 rounded-full text-[10px] font-black text-[#FF2A6D] uppercase tracking-widest shadow-sm mt-1">
-              {isLogin
-                ? <Lock className="w-3.5 h-3.5 text-[#FF5C8A]" />
-                : <UserPlus className="w-3.5 h-3.5 text-[#FF5C8A]" />
+              {isForgotMode 
+                ? <ShieldCheck className="w-3.5 h-3.5 text-[#FF5C8A]" />
+                : isLogin
+                  ? <Lock className="w-3.5 h-3.5 text-[#FF5C8A]" />
+                  : <UserPlus className="w-3.5 h-3.5 text-[#FF5C8A]" />
               }
               <span>24/7 Encrypted Sakhi Safety</span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black text-[#2A0826] tracking-tight pt-1">
-              Sakhi Suraksha <span className="text-[#FF2A6D]">SOS</span>
+              {isForgotMode ? 'Password Recovery' : 'Sakhi Suraksha SOS'}
             </h1>
             <p className="text-xs font-bold text-[#684E67] max-w-md mx-auto leading-relaxed">
-              {isLogin
+              {isForgotMode
+                ? 'Enter your registered email address and we will send you a 1-hour password reset link.'
+                : isLogin
                 ? 'Welcome back! Sign in to access your live protection dashboard & guardian emergency alerts.'
                 : 'Create your account & unlock instant 365-day women safety dispatch.'}
             </p>
           </div>
 
           {/* TAB SWITCHER */}
-          <div className="flex bg-[#FFF0F3] p-1.5 rounded-2xl border-1.5 border-[#FFCCE1] shadow-inner relative">
-            <button
-              type="button"
-              onClick={() => toggleMode(true)}
-              className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${
-                isLogin
-                  ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-[0_4px_16px_rgba(255,42,109,0.35)] scale-[1.02]'
-                  : 'text-[#684E67] hover:text-[#2A0826]'
-              }`}
-            >
-              <Lock className="w-3.5 h-3.5" />
-              <span>SIGN IN</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => toggleMode(false)}
-              className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${
-                !isLogin
-                  ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-[0_4px_16px_rgba(255,42,109,0.35)] scale-[1.02]'
-                  : 'text-[#684E67] hover:text-[#2A0826]'
-              }`}
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>CREATE ACCOUNT</span>
-            </button>
-          </div>
+          {!isForgotMode && (
+            <div className="flex bg-[#FFF0F3] p-1.5 rounded-2xl border-1.5 border-[#FFCCE1] shadow-inner relative">
+              <button
+                type="button"
+                onClick={() => toggleMode(true)}
+                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${
+                  isLogin
+                    ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-[0_4px_16px_rgba(255,42,109,0.35)] scale-[1.02]'
+                    : 'text-[#684E67] hover:text-[#2A0826]'
+                }`}
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>SIGN IN</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleMode(false)}
+                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${
+                  !isLogin
+                    ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-[0_4px_16px_rgba(255,42,109,0.35)] scale-[1.02]'
+                    : 'text-[#684E67] hover:text-[#2A0826]'
+                }`}
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>CREATE ACCOUNT</span>
+              </button>
+            </div>
+          )}
 
           {/* NOTIFICATIONS */}
           {(validationError || error) && (
@@ -306,29 +316,255 @@ function UserAuthForm() {
           )}
 
           {/* AUTH FORM */}
-          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-            
-            {!isLogin ? (
-              <div className="space-y-4">
-                
-                {/* FULL NAME */}
-                <div>
-                  <label className="block text-[#684E67] font-extrabold mb-1">Full Name *</label>
-                  <div className="relative">
-                    <UserIcon className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Priya Sharma"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                    />
-                  </div>
+          {isForgotMode ? (
+            <form onSubmit={handleForgotPassword} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-[#684E67] font-extrabold mb-1">Registered Email Address *</label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="Enter your registered email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                  />
                 </div>
+              </div>
 
-                {/* EMAIL & MOBILE */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="submit"
+                disabled={isSendingReset}
+                className="w-full btn-3d-rose-pop py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2.5 mt-6 cursor-pointer"
+              >
+                <Zap className="w-4 h-4 text-white animate-pulse" />
+                <span>{isSendingReset ? 'SENDING RESET LINK...' : 'SEND RESET PASSWORD LINK'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsForgotMode(false)}
+                className="w-full text-center text-[#684E67] font-bold hover:text-[#FF2A6D] transition-colors"
+              >
+                ← Back to Login
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+              
+              {!isLogin ? (
+                <div className="space-y-4">
+                  
+                  {/* FULL NAME */}
+                  <div>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Full Name *</label>
+                    <div className="relative">
+                      <UserIcon className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Priya Sharma"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* EMAIL & MOBILE */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">Email Address *</label>
+                      <div className="relative">
+                        <Mail className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="email"
+                          required
+                          placeholder="priya@example.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">Mobile Number *</label>
+                      <div className="relative">
+                        <Phone className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="tel"
+                          required
+                          maxLength={10}
+                          placeholder="10-digit number"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                          className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BLOOD GROUP & PASSWORD */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">Blood Group *</label>
+                      <select
+                        required
+                        value={bloodGroup}
+                        onChange={(e) => setBloodGroup(e.target.value)}
+                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                      >
+                        <option value="" disabled>Select Blood Group</option>
+                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bg) => (
+                          <option key={bg} value={bg}>{bg}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">Password *</label>
+                      <div className="relative">
+                        <Lock className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type={showPass ? 'text' : 'password'}
+                          required
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full pl-10 pr-12 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPass(!showPass)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#684E67] hover:text-[#FF2A6D] transition-colors"
+                        >
+                          {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ADDRESS & CITY */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">Full Address *</label>
+                      <div className="relative">
+                        <MapPin className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          required
+                          placeholder="House no, Street area"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">City *</label>
+                      <div className="relative">
+                        <Building className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Pune"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* STATE & PINCODE */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">State *</label>
+                      <div className="relative">
+                        <Map className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Maharashtra"
+                          value={state}
+                          onChange={(e) => setState(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">Pincode *</label>
+                      <input
+                        type="text"
+                        required
+                        maxLength={6}
+                        placeholder="e.g. 411001"
+                        value={pincode}
+                        onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* EMERGENCY GUARDIAN CONTACT & RELATIONSHIP */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">Guardian Name *</label>
+                      <div className="relative">
+                        <Users className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Rajesh Sharma"
+                          value={emergencyContactName}
+                          onChange={(e) => setEmergencyContactName(e.target.value)}
+                          className="w-full pl-10 pr-3 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">Relationship *</label>
+                      <select
+                        value={emergencyContactRelation}
+                        onChange={(e) => setEmergencyContactRelation(e.target.value)}
+                        className="w-full px-3 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs cursor-pointer"
+                      >
+                        <option value="Parent">Parent</option>
+                        <option value="Spouse">Spouse</option>
+                        <option value="Sibling">Sibling</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Guardian">Guardian</option>
+                        <option value="Relative">Relative</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#684E67] font-extrabold mb-1">Mobile Number *</label>
+                      <div className="relative">
+                        <Phone className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="tel"
+                          required
+                          maxLength={10}
+                          placeholder="10-digit number"
+                          value={emergencyContactPhone}
+                          onChange={(e) => setEmergencyContactPhone(e.target.value.replace(/\D/g, ''))}
+                          className="w-full pl-10 pr-3 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              ) : (
+                /* LOGIN FORM */
+                <div className="space-y-4">
                   <div>
                     <label className="block text-[#684E67] font-extrabold mb-1">Email Address *</label>
                     <div className="relative">
@@ -345,41 +581,16 @@ function UserAuthForm() {
                   </div>
 
                   <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Mobile Number *</label>
-                    <div className="relative">
-                      <Phone className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="tel"
-                        required
-                        maxLength={10}
-                        placeholder="10-digit number"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                      />
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-[#684E67] font-extrabold">Password *</label>
+                      <button 
+                        type="button" 
+                        onClick={() => setIsForgotMode(true)}
+                        className="text-[10px] font-black text-[#FF2A6D] hover:underline"
+                      >
+                        Forgot Password?
+                      </button>
                     </div>
-                  </div>
-                </div>
-
-                {/* BLOOD GROUP & PASSWORD */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Blood Group *</label>
-                    <select
-                      required
-                      value={bloodGroup}
-                      onChange={(e) => setBloodGroup(e.target.value)}
-                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                    >
-                      <option value="" disabled>Select Blood Group</option>
-                      {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bg) => (
-                        <option key={bg} value={bg}>{bg}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Password *</label>
                     <div className="relative">
                       <Lock className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
@@ -400,177 +611,21 @@ function UserAuthForm() {
                     </div>
                   </div>
                 </div>
+              )}
 
-                {/* ADDRESS & CITY */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Full Address *</label>
-                    <div className="relative">
-                      <MapPin className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        required
-                        placeholder="House no, Street area"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                      />
-                    </div>
-                  </div>
+              {/* SUBMIT BUTTON */}
+              <button
+                type="submit"
+                disabled={mounted && isLoading}
+                className="w-full btn-3d-rose-pop py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2.5 mt-6 cursor-pointer"
+              >
+                <Zap className="w-4 h-4 text-white animate-pulse" />
+                <span>{(mounted && isLoading) ? 'PROCESSING...' : isLogin ? 'SIGN IN TO DASHBOARD' : 'REGISTER & PROCEED TO OTP'}</span>
+                <ArrowRight className="w-4 h-4 text-white" />
+              </button>
 
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">City *</label>
-                    <div className="relative">
-                      <Building className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Pune"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* STATE & PINCODE */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">State *</label>
-                    <div className="relative">
-                      <Map className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Maharashtra"
-                        value={state}
-                        onChange={(e) => setState(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Pincode *</label>
-                    <input
-                      type="text"
-                      required
-                      maxLength={6}
-                      placeholder="e.g. 411001"
-                      value={pincode}
-                      onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* EMERGENCY GUARDIAN CONTACT & RELATIONSHIP */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Guardian Name *</label>
-                    <div className="relative">
-                      <Users className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Rajesh Sharma"
-                        value={emergencyContactName}
-                        onChange={(e) => setEmergencyContactName(e.target.value)}
-                        className="w-full pl-10 pr-3 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Relationship *</label>
-                    <select
-                      value={emergencyContactRelation}
-                      onChange={(e) => setEmergencyContactRelation(e.target.value)}
-                      className="w-full px-3 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs cursor-pointer"
-                    >
-                      <option value="Parent">Parent</option>
-                      <option value="Spouse">Spouse</option>
-                      <option value="Sibling">Sibling</option>
-                      <option value="Friend">Friend</option>
-                      <option value="Guardian">Guardian</option>
-                      <option value="Relative">Relative</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Mobile Number *</label>
-                    <div className="relative">
-                      <Phone className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="tel"
-                        required
-                        maxLength={10}
-                        placeholder="10-digit number"
-                        value={emergencyContactPhone}
-                        onChange={(e) => setEmergencyContactPhone(e.target.value.replace(/\D/g, ''))}
-                        className="w-full pl-10 pr-3 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            ) : (
-              /* LOGIN FORM */
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-[#684E67] font-extrabold mb-1">Email Address *</label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="priya@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[#684E67] font-extrabold mb-1">Password *</label>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type={showPass ? 'text' : 'password'}
-                      required
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-12 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPass(!showPass)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#684E67] hover:text-[#FF2A6D] transition-colors"
-                    >
-                      {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* SUBMIT BUTTON */}
-            <button
-              type="submit"
-              disabled={mounted && isLoading}
-              className="w-full btn-3d-rose-pop py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2.5 mt-6 cursor-pointer"
-            >
-              <Zap className="w-4 h-4 text-white animate-pulse" />
-              <span>{(mounted && isLoading) ? 'PROCESSING...' : isLogin ? 'SIGN IN TO DASHBOARD' : 'REGISTER & PROCEED TO OTP'}</span>
-              <ArrowRight className="w-4 h-4 text-white" />
-            </button>
-
-          </form>
+            </form>
+          )}
 
         </div>
       </div>

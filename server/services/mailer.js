@@ -126,3 +126,105 @@ export const sendSosEmergencyAlert = async ({
     return false;
   }
 };
+
+/**
+ * Send Welcome Email on User Registration
+ */
+export const sendWelcomeEmail = async ({ recipientEmail, userName }) => {
+  console.log(`🌸 [WELCOME EMAIL] Sending welcome email to ${recipientEmail}`);
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"Sakhi Suraksha SOS" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: `🌸 Welcome to Sakhi Suraksha SOS - 24/7 Personal Protection Active`,
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 32px; background-color: #FFF0F3;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h1 style="color: #2A0826; font-size: 26px; font-weight: 900; margin: 0;">Sakhi Suraksha SOS</h1>
+            <p style="color: #FF5C8A; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;">Welcome to Your Personal Safety Command</p>
+          </div>
+          
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 24px; border: 1px solid #FFCCE1;">
+            <p style="font-size: 16px; color: #2A0826; margin-top: 0;">Dear <strong>${userName || 'Sakhi Member'}</strong>,</p>
+            <p style="font-size: 14px; color: #555555; line-height: 1.6;">
+              Welcome to <strong>Sakhi Suraksha SOS</strong>! Your account has been registered successfully. You now have access to 24/7 encrypted GPS emergency broadcasts, instant siren alerts, and your trusted guardian network.
+            </p>
+
+            <div style="background-color: #FFF0F3; border-radius: 12px; padding: 16px; margin: 20px 0; border: 1.5px solid #FF5C8A;">
+              <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #FF2A6D;">🛡️ Next Steps to Ensure 100% Protection:</h3>
+              <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #2A0826;">
+                <li>Add up to 5 Trusted Emergency Guardians in your profile.</li>
+                <li>Test your SOS Drill and Emergency Siren Audio.</li>
+                <li>Activate your Sakhi Suraksha 365 Protection Plan.</li>
+              </ul>
+            </div>
+
+            <div style="text-align: center; margin-top: 24px;">
+              <a href="${config.clientUrl || 'http://localhost:3000'}/dashboard" style="background: linear-gradient(135deg, #FF5C8A, #FF2A6D); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 999px; font-weight: 900; font-size: 13px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+                GO TO SAFETY DASHBOARD
+              </a>
+            </div>
+          </div>
+        </div>
+      `,
+    });
+
+    console.log(`[Email Service] Welcome email sent to ${recipientEmail} (ID: ${info.messageId})`);
+    return true;
+  } catch (err) {
+    console.error(`[Email Service Notice] Welcome email failed for ${recipientEmail}:`, err.message);
+    return false;
+  }
+};
+
+/**
+ * Send Password Reset Link Email
+ */
+export const sendPasswordResetEmail = async ({ recipientEmail, userName, resetLink }) => {
+  console.log(`🔐 [RESET PASSWORD EMAIL] Sending reset link to ${recipientEmail}`);
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"Sakhi Suraksha SOS" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: `🔐 Reset Your Sakhi Suraksha Password`,
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 32px; background-color: #FFF0F3;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h1 style="color: #2A0826; font-size: 26px; font-weight: 900; margin: 0;">Sakhi Suraksha SOS</h1>
+            <p style="color: #FF5C8A; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;">Password Reset Request</p>
+          </div>
+          
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 24px; border: 1px solid #FFCCE1;">
+            <p style="font-size: 16px; color: #2A0826; margin-top: 0;">Hi <strong>${userName || 'Sakhi Member'}</strong>,</p>
+            <p style="font-size: 14px; color: #555555; line-height: 1.6;">
+              We received a request to reset your password for your Sakhi Suraksha account. Click the button below to set a new password:
+            </p>
+            
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${resetLink}" style="background: linear-gradient(135deg, #FF5C8A, #FF2A6D); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 999px; font-weight: 900; font-size: 13px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+                RESET PASSWORD NOW
+              </a>
+            </div>
+
+            <p style="font-size: 12px; color: #684E67;">
+              Or copy & paste this link in your browser:<br />
+              <a href="${resetLink}" style="color: #FF2A6D; word-break: break-all;">${resetLink}</a>
+            </p>
+            
+            <p style="font-size: 12px; color: #888888; margin-bottom: 0;">
+              ⏰ This link is valid for 1 hour. If you did not request a password reset, please ignore this email.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
+    console.log(`[Email Service] Reset password email sent to ${recipientEmail} (ID: ${info.messageId})`);
+    return true;
+  } catch (err) {
+    console.error(`[Email Service Notice] Reset password email failed for ${recipientEmail}:`, err.message);
+    return false;
+  }
+};

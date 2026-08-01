@@ -22,6 +22,12 @@ router.put('/auth/settings', authenticateToken, authController.updateSettings);
 router.post('/auth/send-email-change-otp', authenticateToken, authController.sendEmailChangeOtp);
 router.post('/auth/verify-new-email', authenticateToken, authController.verifyNewEmail);
 
+router.post('/auth/forgot-password', authController.forgotPassword);
+router.post('/auth/reset-password', authController.resetPassword);
+
+// Public Contact Form Submission
+router.post('/contact', adminController.submitContactEnquiry);
+
 // Public Plans & Pricing
 router.get('/plans', adminController.getPlans);
 
@@ -71,6 +77,8 @@ router.post('/admin/plans/:id/toggle', authenticateToken, requireSuperAdmin, adm
 router.get('/admin/gst', authenticateToken, requireSuperAdmin, adminController.getGstSettings);
 router.put('/admin/gst', authenticateToken, requireSuperAdmin, adminController.updateGstSettings);
 router.get('/admin/payments', authenticateToken, requireSuperAdmin, adminController.getPaymentHistory);
+router.get('/admin/enquiries', authenticateToken, requireSuperAdmin, adminController.getContactEnquiries);
+router.post('/admin/enquiries/:id/resolve', authenticateToken, requireSuperAdmin, adminController.resolveContactEnquiry);
 
 // Web Push Notifications
 router.get('/push/vapid-key', pushController.getVapidPublicKey);

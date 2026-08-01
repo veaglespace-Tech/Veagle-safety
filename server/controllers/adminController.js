@@ -549,3 +549,64 @@ export const updateSuperAdminProfile = asyncHandler(async (req, res) => {
     user: updatedAdmin,
   });
 });
+
+/**
+ * Public Contact Us Form Submission
+ */
+export const submitContactEnquiry = asyncHandler(async (req, res) => {
+  const { fullName, email, phone, subject, message } = req.body;
+
+  if (!fullName || !email || !message) {
+    return res.status(400).json({ error: 'Full Name, Email, and Message are required fields.' });
+  }
+
+  const enquiry = await prisma.contactEnquiry.create({
+    data: {
+      fullName: fullName.trim(),
+      email: email.toLowerCase().trim(),
+      phone: phone ? phone.trim() : null,
+      subject: subject ? subject.trim() : 'General Support Inquiry',
+      message: message.trim(),
+      status: 'PENDING',
+    },
+  });
+
+  return res.status(201).json({
+    message: '🎉 Thank you! Your message has been received by our 24/7 Support Team. We will contact you shortly.',
+    enquiry,
+  });
+});
+
+/**
+ * Get All Contact Enquiries for SuperAdmin Support Tab
+ */
+export const getContactEnquiries = asyncHandler(async (req, res) => {
+  const enquiries = await prisma.contactEnquiry.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return res.json({ enquiries });
+});
+
+/**
+ * Resolve Contact Enquiry by SuperAdmin
+ */
+export const resolveContactEnquiry = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { note } = req.body;
+  const targetId = parseInt(id, 10);
+
+  const updated = await prisma.contactEnquiry.update({
+    where: { id: targetId },
+    data: {
+      status: 'RESOLVED',
+      resolutionNote: note || 'Resolved by SuperAdmin Support Team',
+      resolvedAt: new Date(),
+    },
+  });
+
+  return res.json({
+    message: `Contact Enquiry #${updated.id} marked as RESOLVED`,
+    enquiry: updated,
+  });
+});

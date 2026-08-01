@@ -37,6 +37,8 @@ import {
   Printer,
   X,
   TrendingUp,
+  HelpCircle,
+  MessageSquare,
 } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -44,13 +46,18 @@ function SuperAdminHQContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'users', 'plans', 'payments'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'users', 'plans', 'payments', 'enquiries'
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null);
 
+  // CONTACT ENQUIRIES DATA
+  const [enquiries, setEnquiries] = useState([]);
+  const [enquirySearch, setEnquirySearch] = useState('');
+  const [enquiryStatusFilter, setEnquiryStatusFilter] = useState('ALL');
+
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl && ['overview', 'users', 'plans', 'payments'].includes(tabFromUrl)) {
+    if (tabFromUrl && ['overview', 'users', 'plans', 'payments', 'enquiries'].includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
   }, [searchParams]);
@@ -133,6 +140,7 @@ function SuperAdminHQContent() {
         fetchPlansData(),
         fetchGstData(),
         fetchPaymentsData(),
+        fetchEnquiriesData(),
       ]);
     } catch (err) {
       showToast('error', 'Failed to load SuperAdmin dashboard metrics');
@@ -171,6 +179,25 @@ function SuperAdminHQContent() {
     const res = await api.get('/admin/payments');
     setPayments(res.data.payments || []);
     setPaymentSummary(res.data.summary || null);
+  };
+
+  const fetchEnquiriesData = async () => {
+    try {
+      const res = await api.get('/admin/enquiries');
+      setEnquiries(res.data.enquiries || []);
+    } catch (err) {
+      console.warn('[Enquiries Notice]:', err.message);
+    }
+  };
+
+  const handleResolveEnquiry = async (id) => {
+    try {
+      const res = await api.post(`/admin/enquiries/${id}/resolve`);
+      showToast('success', res.data.message || `Contact Enquiry #${id} marked as RESOLVED`);
+      fetchEnquiriesData();
+    } catch (err) {
+      showToast('error', err.response?.data?.error || 'Failed to resolve contact enquiry.');
+    }
   };
 
   // HANDLERS FOR USER MANAGEMENT
@@ -407,6 +434,7 @@ function SuperAdminHQContent() {
               { id: 'users', label: 'User Management', icon: Users, badge: users.length },
               { id: 'plans', label: 'Plans & Dynamic GST', icon: Sliders, badge: plans.length },
               { id: 'payments', label: 'Payment Receipts & Revenue', icon: CreditCard, badge: payments.length },
+              { id: 'enquiries', label: 'Contact Enquiries & Support', icon: HelpCircle, badge: enquiries.filter(e => e.status === 'PENDING').length },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -1055,6 +1083,135 @@ function SuperAdminHQContent() {
                   >
                     Next
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: CONTACT ENQUIRIES & SUPPORT MESSAGES */}
+          {activeTab === 'enquiries' && (
+            <div className="space-y-6 animate-fade-up">
+              {/* TOP HEADER & SEARCH */}
+              <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <h3 className="font-black text-xl text-[#2A0826]">Contact Enquiries & Support Messages</h3>
+                  <p className="text-xs text-[#684E67] font-bold">Manage inquiries received from website visitors & Sakhi members</p>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="relative flex-1 sm:w-64">
+                    <Search className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Search name, email, phone..."
+                      value={enquirySearch}
+                      onChange={(e) => setEnquirySearch(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 bg-[#FFF0F3] border border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
+                  </div>
+
+                  <select
+                    value={enquiryStatusFilter}
+                    onChange={(e) => setEnquiryStatusFilter(e.target.value)}
+                    className="px-4 py-2.5 bg-[#FFF0F3] border border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none cursor-pointer"
+                  >
+                    <option value="ALL">All Status</option>
+                    <option value="PENDING">Pending Only</option>
+                    <option value="RESOLVED">Resolved Only</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* ENQUIRIES LIST TABLE */}
+              <div className="bg-white rounded-3xl border-2 border-[#FFCCE1] shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-[#FFF0F3] border-b-2 border-[#FFCCE1] text-[11px] font-black uppercase text-[#2A0826] tracking-wider">
+                        <th className="p-4">ID & Date</th>
+                        <th className="p-4">Sender Details</th>
+                        <th className="p-4">Topic / Subject</th>
+                        <th className="p-4">Message</th>
+                        <th className="p-4">Status</th>
+                        <th className="p-4 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#FFCCE1]/50 text-xs font-bold text-[#2A0826]">
+                      {enquiries.length > 0 ? (
+                        enquiries
+                          .filter((e) => {
+                            const matchSearch =
+                              e.fullName?.toLowerCase().includes(enquirySearch.toLowerCase()) ||
+                              e.email?.toLowerCase().includes(enquirySearch.toLowerCase()) ||
+                              e.phone?.includes(enquirySearch) ||
+                              e.subject?.toLowerCase().includes(enquirySearch.toLowerCase());
+                            const matchStatus =
+                              enquiryStatusFilter === 'ALL' ? true : e.status === enquiryStatusFilter;
+                            return matchSearch && matchStatus;
+                          })
+                          .map((enq) => (
+                            <tr key={enq.id} className="hover:bg-[#FFF0F3]/40 transition-colors">
+                              <td className="p-4">
+                                <span className="font-mono text-[#FF2A6D] font-black">#{enq.id}</span>
+                                <p className="text-[10px] text-[#684E67]">{new Date(enq.createdAt).toLocaleString('en-IN')}</p>
+                              </td>
+
+                              <td className="p-4">
+                                <p className="font-black text-[#2A0826]">{enq.fullName}</p>
+                                <p className="text-[11px] font-mono text-[#684E67]">{enq.email}</p>
+                                {enq.phone && <p className="text-[10px] font-mono text-[#FF2A6D]">{enq.phone}</p>}
+                              </td>
+
+                              <td className="p-4">
+                                <span className="bg-[#FFF0F3] text-[#FF2A6D] px-2.5 py-1 rounded-lg text-[10px] font-black border border-[#FFCCE1]">
+                                  {enq.subject || 'General Inquiry'}
+                                </span>
+                              </td>
+
+                              <td className="p-4 max-w-xs">
+                                <p className="text-xs text-[#2A0826] line-clamp-3 leading-relaxed font-normal bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+                                  {enq.message}
+                                </p>
+                              </td>
+
+                              <td className="p-4">
+                                {enq.status === 'RESOLVED' ? (
+                                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-300 px-3 py-1 rounded-full text-[10px] font-black uppercase flex items-center space-x-1 w-fit">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                    <span>RESOLVED</span>
+                                  </span>
+                                ) : (
+                                  <span className="bg-amber-50 text-amber-700 border border-amber-300 px-3 py-1 rounded-full text-[10px] font-black uppercase flex items-center space-x-1 w-fit animate-pulse">
+                                    <RefreshCw className="w-3 h-3 text-amber-600 animate-spin" />
+                                    <span>PENDING</span>
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="p-4 text-right">
+                                {enq.status === 'PENDING' ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleResolveEnquiry(enq.id)}
+                                    className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider shadow hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                                  >
+                                    MARK AS RESOLVED
+                                  </button>
+                                ) : (
+                                  <span className="text-[10px] text-gray-500 font-bold">Resolved</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-[#684E67] font-black">
+                            No contact enquiries or support messages recorded yet.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
