@@ -7,7 +7,7 @@ import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { Footer } from '../../components/layout/Footer.js';
 import { fetchPlans } from '../../redux/slices/planSlice.js';
 import { fetchUser } from '../../redux/slices/authSlice.js';
-import { Shield, Lock, CreditCard, ArrowRight, AlertCircle, User, Phone, Mail, ExternalLink, Sparkles } from 'lucide-react';
+import { Shield, Lock, CreditCard, ArrowRight, AlertCircle, User, Phone, Mail, ExternalLink, Sparkles, CheckCircle2 } from 'lucide-react';
 import { apiClient } from '../../redux/api/apiClient.js';
 
 function CheckoutContent() {
@@ -162,73 +162,76 @@ function CheckoutContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden flex flex-col">
       <PublicNavbar />
 
-      {/* BACKGROUND MESHES */}
-      <div className="absolute w-[700px] h-[700px] rounded-full bg-rose/15 blur-[150px] top-[-100px] left-[-200px] pointer-events-none" />
-      <div className="absolute w-[700px] h-[700px] rounded-full bg-gold/15 blur-[150px] bottom-[100px] right-[-200px] pointer-events-none" />
+      {/* BACKGROUND NEON GLOW BLURS */}
+      <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF5C8A]/12 blur-[170px] top-[-100px] left-[-250px] pointer-events-none animate-pulse" />
+      <div className="absolute w-[750px] h-[750px] rounded-full bg-[#FFCCE1]/25 blur-[160px] bottom-[50px] right-[-250px] pointer-events-none animate-pulse" />
 
-      <div className="flex-1 max-w-4xl mx-auto px-4 py-12 w-full relative z-10 space-y-8">
+      <div className="flex-1 max-w-5xl mx-auto px-4 py-12 sm:py-16 w-full relative z-10 space-y-10">
         
-        {/* PAGE HEADER */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center space-x-2 bg-white text-rose border border-rose/30 px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest shadow-sm">
-            <CreditCard className="w-4 h-4 text-rose" />
-            <span>Order Summary & PayU Checkout</span>
+        {/* PREMIUM 3D HEADER */}
+        <div className="text-center space-y-4 max-w-2xl mx-auto">
+          <div className="inline-flex items-center space-x-2 bg-white text-[#FF2A6D] border-2 border-[#FFCCE1] px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(255,92,138,0.12)]">
+            <CreditCard className="w-4 h-4 text-[#FF2A6D] animate-pulse" />
+            <span>Secure Checkout Portal</span>
           </div>
-          <h1 className="text-3xl font-black text-tichi-text">Complete Your Protection Plan</h1>
-          <p className="text-xs font-semibold text-tichi-muted">
-            Review your plan summary with itemized GST breakdown before PayU payment activation.
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#2A0826] tracking-tight">
+            Complete Your Protection
+          </h1>
+          <p className="text-xs sm:text-sm font-extrabold text-[#684E67] leading-relaxed">
+            Review your plan summary with itemized GST breakdown before secure PayU activation.
           </p>
         </div>
 
         {error && (
-          <div className="bg-rose/15 border-2 border-rose text-rose p-4 rounded-2xl text-xs font-bold flex items-center space-x-2 shadow-sm animate-fade-up">
-            <AlertCircle className="w-5 h-5 shrink-0" />
+          <div className="bg-rose/10 border-2 border-rose/30 text-[#FF2A6D] p-5 rounded-3xl text-xs font-black flex items-start space-x-3 shadow-md max-w-3xl mx-auto animate-fade-up">
+            <AlertCircle className="w-5 h-5 shrink-0 text-[#FF2A6D] mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start max-w-4xl mx-auto">
           
           {/* USER & GUARDIAN SUMMARY (2 COLS) */}
-          <div className="md:col-span-2 card-antique-pink p-6 space-y-5 border border-[#FFCCE1]">
-            <h3 className="text-sm font-black text-tichi-text uppercase tracking-wider border-b border-[#FFCCE1] pb-3">
-              Subscriber Details
-            </h3>
+          <div className="lg:col-span-2 bg-white/75 backdrop-blur-xl border-2 border-[#FFCCE1] rounded-3xl p-6 space-y-6 shadow-[0_15px_40px_rgba(255,92,138,0.06)] animate-fade-up">
+            <div className="flex items-center space-x-2.5 border-b border-[#FFCCE1] pb-4">
+              <div className="w-7 h-7 rounded-lg bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center">
+                <User className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                Subscriber Details
+              </h3>
+            </div>
 
-            <div className="space-y-3 text-xs font-semibold">
-              <div className="flex items-center space-x-3">
-                <User className="w-4 h-4 text-rose shrink-0" />
-                <div>
-                  <span className="text-tichi-muted block text-[10px] uppercase font-bold">Full Name</span>
-                  <span className="font-bold text-tichi-text">{subscriberInfo?.fullName || 'Sakhi Member'}</span>
-                </div>
+            <div className="space-y-4">
+              <div className="p-3.5 bg-[#FFF0F3]/50 rounded-2xl border border-[#FFCCE1]/50 space-y-1 hover:border-[#FF5C8A]/40 transition-colors">
+                <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider">Full Name</span>
+                <span className="font-black text-xs text-[#2A0826]">{subscriberInfo?.fullName || 'Sakhi Member'}</span>
               </div>
 
-              <div className="flex items-center space-x-3">
-                <Mail className="w-4 h-4 text-rose shrink-0" />
-                <div>
-                  <span className="text-tichi-muted block text-[10px] uppercase font-bold">Email Address</span>
-                  <span className="font-mono text-tichi-text">{subscriberInfo?.email || 'Registered Email'}</span>
-                </div>
+              <div className="p-3.5 bg-[#FFF0F3]/50 rounded-2xl border border-[#FFCCE1]/50 space-y-1 hover:border-[#FF5C8A]/40 transition-colors">
+                <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider">Email Address</span>
+                <span className="font-mono text-xs font-bold text-[#2A0826] break-all">{subscriberInfo?.email || 'Registered Email'}</span>
               </div>
 
-              <div className="flex items-center space-x-3">
-                <Phone className="w-4 h-4 text-rose shrink-0" />
-                <div>
-                  <span className="text-tichi-muted block text-[10px] uppercase font-bold">Mobile Number</span>
-                  <span className="font-mono text-tichi-text">{subscriberInfo?.phone || '+91 Mobile Number'}</span>
-                </div>
+              <div className="p-3.5 bg-[#FFF0F3]/50 rounded-2xl border border-[#FFCCE1]/50 space-y-1 hover:border-[#FF5C8A]/40 transition-colors">
+                <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider">Mobile Number</span>
+                <span className="font-mono text-xs font-bold text-[#2A0826]">{subscriberInfo?.phone || '+91 Mobile Number'}</span>
               </div>
 
               {subscriberInfo?.emergencyContactName && (
-                <div className="flex items-center space-x-3 border-t border-[#FFCCE1] pt-3">
-                  <Shield className="w-4 h-4 text-rose shrink-0" />
-                  <div>
-                    <span className="text-tichi-muted block text-[10px] uppercase font-bold">Guardian Contact</span>
-                    <span className="font-bold text-tichi-text">{subscriberInfo.emergencyContactName} ({subscriberInfo.emergencyContactPhone})</span>
+                <div className="p-3.5 bg-[#FFF0F3]/70 rounded-2xl border-2 border-[#FFCCE1] space-y-1.5">
+                  <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-[#FF2A6D]" />
+                    <span>Primary Guardian</span>
+                  </span>
+                  <div className="text-xs font-black text-[#2A0826]">
+                    {subscriberInfo.emergencyContactName}
+                    <span className="block font-mono text-[11px] text-[#684E67] font-bold mt-0.5">
+                      {subscriberInfo.emergencyContactPhone}
+                    </span>
                   </div>
                 </div>
               )}
@@ -236,63 +239,68 @@ function CheckoutContent() {
           </div>
 
           {/* ITEMIZED BILLING SUMMARY (3 COLS) */}
-          <div className="md:col-span-3 card-antique-pink p-8 border-2 border-rose shadow-coral-glow space-y-6">
+          <div className="lg:col-span-3 bg-gradient-to-br from-white via-[#FFF0F3] to-white border-2 border-[#FF2A6D] shadow-[0_20px_60px_rgba(255,42,109,0.14)] rounded-3xl p-6 sm:p-8 space-y-6 relative overflow-hidden animate-fade-up">
             
-            <div className="flex items-center space-x-3 border-b border-[#FFCCE1] pb-4">
-              <div className="w-12 h-12 rounded-xl bg-rose/15 text-rose border border-rose/30 flex items-center justify-center">
+            {/* GLOWING ACCENT TOP BAR */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
+
+            <div className="flex items-center space-x-3 border-b border-[#FFCCE1] pb-5">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] border border-[#FF5C8A] flex items-center justify-center shadow-md">
                 <Shield className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-tichi-text">{selectedPlan.name}</h3>
-                <span className="text-xs text-rose font-bold uppercase">{selectedPlan.durationDays || 365} Days Unlimited Protection</span>
+                <h3 className="text-base sm:text-lg font-black text-[#2A0826] tracking-tight">{selectedPlan.name}</h3>
+                <span className="inline-block text-[10px] bg-[#FF2A6D]/10 text-[#FF2A6D] font-black px-2.5 py-0.5 rounded-full border border-[#FF2A6D]/20 uppercase tracking-widest mt-0.5">
+                  {selectedPlan.durationDays || 365} Days Active Protection
+                </span>
               </div>
             </div>
 
-            {/* ITEMIZED PRICING BREAKDOWN */}
-            <div className="bg-blush-subtle p-5 rounded-2xl border border-[#FFCCE1] space-y-3 text-xs font-bold">
-              <div className="flex justify-between items-center text-tichi-muted">
-                <span>Base Plan Price (Without GST):</span>
-                <span className="font-mono text-tichi-text text-sm font-black">₹{basePrice.toFixed(2)}</span>
+            {/* ITEMIZED BILLING BLOCK */}
+            <div className="bg-white/90 p-5 rounded-2xl border border-[#FFCCE1] space-y-4 shadow-sm">
+              <div className="flex justify-between items-center text-xs font-extrabold text-[#684E67]">
+                <span>Base Plan Price (Net):</span>
+                <span className="font-mono text-sm font-black text-[#2A0826]">₹{basePrice.toFixed(2)}</span>
               </div>
 
-              <div className="flex justify-between items-center text-tichi-muted">
-                <span>Added GST ({gstRate}%):</span>
-                <span className="font-mono text-tichi-text text-sm font-black">₹{gstAmount.toFixed(2)}</span>
+              <div className="flex justify-between items-center text-xs font-extrabold text-[#684E67] border-b border-dashed border-[#FFCCE1] pb-4">
+                <span>GST Tax Added ({gstRate}%):</span>
+                <span className="font-mono text-sm font-black text-[#2A0826]">₹{gstAmount.toFixed(2)}</span>
               </div>
 
-              <div className="border-t border-[#FFCCE1] pt-3 flex justify-between items-center text-tichi-text">
-                <span className="font-black text-sm uppercase text-rose">Total Payable Amount:</span>
-                <span className="font-mono text-2xl font-black text-rose">₹{totalPrice.toFixed(2)}</span>
+              <div className="pt-2 flex justify-between items-center">
+                <span className="font-black text-xs uppercase text-[#FF2A6D] tracking-wider">Total Payable Amount:</span>
+                <span className="font-mono text-2xl font-black text-[#FF2A6D] drop-shadow-xs">₹{totalPrice.toFixed(2)}</span>
               </div>
             </div>
 
-            {/* PAYMENT ACTIONS */}
+            {/* ACTION FOOTER BUTTONS */}
             <div className="space-y-3 pt-2">
               <button
                 type="button"
                 onClick={handlePayUGatewayRedirect}
                 disabled={isProcessing}
-                className="w-full btn-baby-pink py-4 text-xs sm:text-sm uppercase tracking-wider shadow-coral-glow flex items-center justify-center space-x-2 font-black cursor-pointer"
+                className="w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white py-4 rounded-2xl text-xs sm:text-sm uppercase tracking-wider font-black shadow-[0_8px_25px_rgba(255,42,109,0.35)] hover:shadow-[0_12px_35px_rgba(255,42,109,0.50)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer border border-white/30"
               >
                 <span>
-                  {isProcessing ? 'REDIRECTING TO PAYU GATEWAY...' : `PROCEED TO PAYU PAYMENT GATEWAY (₹${totalPrice.toFixed(2)})`}
+                  {isProcessing ? 'REDIRECTING TO SECURE PAYU...' : `PROCEED TO PAYU CHECKOUT (₹${totalPrice.toFixed(2)})`}
                 </span>
-                <ExternalLink className="w-5 h-5" />
+                <ExternalLink className="w-4 h-4" />
               </button>
 
               <button
                 type="button"
                 onClick={handleTestSimulatedPayment}
                 disabled={isProcessing}
-                className="w-full bg-white hover:bg-rose/5 text-rose border-2 border-rose/40 py-3 text-xs font-black uppercase tracking-wider rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer"
+                className="w-full bg-white hover:bg-rose/5 text-[#FF2A6D] border-2 border-rose/30 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center justify-center space-x-2.5 cursor-pointer"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Simulate PayU Test Payment Success (Instant Activation)</span>
+                <Sparkles className="w-4 h-4 text-[#FF2A6D] animate-pulse" />
+                <span>Simulate PayU Test Success (Instant Activation)</span>
               </button>
 
-              <div className="flex items-center justify-center space-x-2 text-[11px] text-tichi-muted font-bold pt-1">
-                <Lock className="w-3.5 h-3.5 text-tichi-success" />
-                <span>256-Bit SSL Encrypted Official PayU Payment Gateway</span>
+              <div className="flex items-center justify-center space-x-2 text-[10px] text-[#684E67] font-black pt-1">
+                <Lock className="w-3.5 h-3.5 text-emerald-500" />
+                <span>256-Bit SSL Secured Official PayU Integration</span>
               </div>
             </div>
 
