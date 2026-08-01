@@ -80,8 +80,10 @@ export async function seedDatabase() {
   console.log(`✅ [Seed] Subscription Plan Created (ID: ${p.id}): ${p.name}`);
 
   // 3. Seed System Setting for GST
-  await prisma.systemSetting.create({
-    data: { key: 'GST_PERCENTAGE', value: '18.0' },
+  await prisma.systemSetting.upsert({
+    where: { key: 'GST_PERCENTAGE' },
+    update: { value: '18.0' },
+    create: { key: 'GST_PERCENTAGE', value: '18.0' },
   });
   console.log('✅ [Seed] System Setting Created (GST: 18.0%)');
 
