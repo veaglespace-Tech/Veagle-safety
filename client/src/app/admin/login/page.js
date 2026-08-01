@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAuthStore } from '../../../redux/useAuthStore.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../../redux/slices/authSlice.js';
 import { PublicNavbar } from '../../../components/layout/PublicNavbar.js';
 import { Footer } from '../../../components/layout/Footer.js';
 import { Logo3DFlip } from '../../../components/ui/Logo3DFlip.js';
@@ -14,12 +15,12 @@ import {
 import { AnimatedHeading } from '../../../components/common/AnimatedHeading.jsx';
 
 export default function SuperAdminLoginPage() {
+  const dispatch = useDispatch();
+  const { isLoading, error } = useSelector((state) => state?.auth || {});
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [localError, setLocalError] = useState(null);
-
-  const { login, isLoading, error } = useAuthStore();
   const router = useRouter();
 
   const handleAdminSubmit = async (e) => {
@@ -31,9 +32,15 @@ export default function SuperAdminLoginPage() {
       return;
     }
 
-    const success = await login(email, password);
-    if (success) {
-      router.push('/admin');
+    try {
+      const res = await dispatch(loginUser({ email: email.trim(), password })).unwrap();
+      if (res.user?.role === 'SUPER_ADMIN') {
+        router.push('/admin');
+      } else {
+        setLocalError('Access denied. SuperAdmin privileges required.');
+      }
+    } catch (err) {
+      setLocalError(typeof err === 'string' ? err : err?.error || 'Invalid credentials');
     }
   };
 

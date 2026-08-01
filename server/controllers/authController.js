@@ -248,6 +248,13 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       data: { isEmailVerified: true, emailOtp: null, emailOtpExpiresAt: null },
     });
 
+    // Send Welcome Email after successful verification
+    try {
+      await sendWelcomeEmail({ recipientEmail: updatedUser.email, userName: updatedUser.fullName });
+    } catch (welcomeErr) {
+      console.warn('[Welcome Email Notice] Failed to send welcome email:', welcomeErr.message);
+    }
+
     const token = jwt.sign(
       { id: updatedUser.id, userId: updatedUser.id, role: updatedUser.role, email: updatedUser.email },
       config.jwt.secret,

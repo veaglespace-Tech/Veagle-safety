@@ -57,7 +57,7 @@ export const AppLayout = ({ children, fullScreen = false }) => {
     }
 
     // SuperAdmin trying to access member workspace pages -> redirect to /admin
-    const memberOnlyPaths = ['/subscription', '/contacts', '/track-journey'];
+    const memberOnlyPaths = ['/dashboard', '/subscription', '/contacts', '/track-journey'];
     if (hasAuthToken && isSuperAdmin && memberOnlyPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
       router.push('/admin');
       return;
@@ -72,7 +72,7 @@ export const AppLayout = ({ children, fullScreen = false }) => {
       </Suspense>
 
       {/* Main content area — offset by sidebar on desktop */}
-      <div className="lg:ml-64 flex-1 flex flex-col">
+      <div className="lg:ml-72 flex-1 flex flex-col">
         {!fullScreen && <Header />}
 
         <main className={`flex-1 ${!fullScreen ? 'pb-28 lg:pb-8' : ''}`}>
@@ -80,7 +80,7 @@ export const AppLayout = ({ children, fullScreen = false }) => {
         </main>
 
         {!fullScreen && <Footer />}
-        {!fullScreen && <BottomNavigation />}
+        {!fullScreen && <Suspense fallback={null}><BottomNavigation /></Suspense>}
       </div>
 
       {/* Super Admin Quick Jump Floating Dock */}

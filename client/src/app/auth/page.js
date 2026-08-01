@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { Footer } from '../../components/layout/Footer.js';
 import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
+import { api } from '../../utils/api.js';
 import {
   registerUser,
   loginUser,
@@ -98,10 +99,19 @@ function UserAuthForm() {
   }, [showOtpModal]);
 
   useEffect(() => {
-    if (wasOtpModalOpened && !showOtpModal && registrationToken) {
-      router.push('/pricing');
+    if (wasOtpModalOpened && !showOtpModal) {
+      // Case 1: New user pending payment (registrationToken from verify)
+      if (registrationToken) {
+        router.push('/pricing');
+        return;
+      }
+      // Case 2: Existing DB user verified but subscription still INACTIVE
+      if (user && user.subscriptionStatus !== 'ACTIVE' && token) {
+        router.push('/pricing');
+        return;
+      }
     }
-  }, [wasOtpModalOpened, showOtpModal, registrationToken, router]);
+  }, [wasOtpModalOpened, showOtpModal, registrationToken, user, token, router]);
 
   useEffect(() => {
     if (token && user) {
@@ -210,6 +220,26 @@ function UserAuthForm() {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setValidationError('');
+    if (!email.trim()) {
+      setValidationError('Please enter your registered email address.');
+      return;
+    }
+    setIsSendingReset(true);
+    try {
+      const res = await api.post('/auth/forgot-password', { email: email.trim() });
+      dispatch(clearAuthMessages());
+      setValidationError('');
+      alert(res.data.message || 'Password reset link sent! Check your inbox.');
+    } catch (err) {
+      setValidationError(err.response?.data?.error || 'Failed to send reset link. Please try again.');
+    } finally {
+      setIsSendingReset(false);
+    }
+  };
+
   const handleOtpSubmit = (e) => {
     e.preventDefault();
     if (!otpCode || otpCode.length !== 6) {
@@ -233,40 +263,40 @@ function UserAuthForm() {
       <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF5C8A]/15 blur-[170px] top-[-120px] left-[-220px] pointer-events-none animate-pulse" />
       <div className="absolute w-[750px] h-[750px] rounded-full bg-[#FFCCE1]/30 blur-[160px] bottom-[40px] right-[-200px] pointer-events-none animate-pulse" />
 
-      <div className="flex-1 flex items-center justify-center px-4 py-8 sm:py-14 relative z-10">
-        <div className="w-full max-w-xl bg-white/95 backdrop-blur-2xl border-1.5 border-[#FFCCE1] rounded-3xl p-6 sm:p-10 space-y-6 shadow-[0_20px_60px_rgba(255,92,138,0.20)] hover:shadow-[0_24px_70px_rgba(255,42,109,0.28)] transition-all duration-500 relative overflow-hidden">
+      <div className="flex-1 flex items-center justify-center px-4 py-10 sm:py-16 relative z-10">
+        <div className="w-full max-w-2xl bg-white/95 backdrop-blur-2xl border border-[#FFCCE1]/70 rounded-[36px] p-8 sm:p-12 space-y-8 shadow-[0_20px_50px_rgba(255,92,138,0.12)] transition-all duration-500 relative overflow-hidden">
           
           {/* TOP DECORATIVE ACCENT STRIP */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] rounded-t-3xl" />
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
 
           {/* HEADER */}
-          <div className="flex flex-col items-center justify-center text-center space-y-3 pt-2">
+          <div className="flex flex-col items-center justify-center text-center space-y-4 pt-1">
             <div className="relative flex items-center justify-center">
-              <div className="absolute -inset-3 rounded-2xl bg-[#FF5C8A]/20 animate-pulse blur-lg" />
-              <div className="relative z-10 p-3 rounded-2xl bg-gradient-to-br from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FFCCE1] shadow-md flex items-center justify-center">
-                <Logo3DFlip size={52} />
+              <div className="absolute -inset-2 rounded-2xl bg-[#FF5C8A]/15 blur-md" />
+              <div className="relative z-10 p-3.5 rounded-2xl bg-gradient-to-br from-[#FFF0F3] via-white to-[#FFCCE1]/50 border border-[#FFCCE1]/80 shadow-sm flex items-center justify-center">
+                <Logo3DFlip size={54} />
               </div>
             </div>
 
-            <div className="inline-flex items-center space-x-1.5 bg-[#FFF0F3] border border-[#FFCCE1] px-4 py-1.5 rounded-full text-[10px] font-black text-[#FF2A6D] uppercase tracking-widest shadow-sm mt-1">
+            <div className="inline-flex items-center space-x-2 bg-[#FFF0F3] border border-[#FFCCE1]/80 px-4 py-1.5 rounded-full text-[11px] font-black text-[#FF2A6D] uppercase tracking-widest shadow-xs">
               {isForgotMode 
                 ? <ShieldCheck className="w-3.5 h-3.5 text-[#FF5C8A]" />
                 : isLogin
                   ? <Lock className="w-3.5 h-3.5 text-[#FF5C8A]" />
                   : <UserPlus className="w-3.5 h-3.5 text-[#FF5C8A]" />
               }
-              <span>24/7 Encrypted Sakhi Safety</span>
+              <span>24/7 Encrypted Sakhi Protection</span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-black text-[#2A0826] tracking-tight pt-1">
-              {isForgotMode ? 'Password Recovery' : 'Sakhi Suraksha SOS'}
+            <h1 className="text-2xl sm:text-3xl font-black text-[#2A0826] tracking-tight">
+              {isForgotMode ? 'Password Recovery' : isLogin ? 'Welcome Back to Sakhi' : 'Create Safety Account'}
             </h1>
-            <p className="text-xs font-bold text-[#684E67] max-w-md mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm font-semibold text-[#684E67] max-w-lg mx-auto leading-relaxed">
               {isForgotMode
                 ? 'Enter your registered email address and we will send you a 1-hour password reset link.'
                 : isLogin
-                ? 'Welcome back! Sign in to access your live protection dashboard & guardian emergency alerts.'
-                : 'Create your account & unlock instant 365-day women safety dispatch.'}
+                ? 'Sign in to access your live emergency protection dashboard & guardian safety network.'
+                : 'Create your account & unlock instant 365-day women emergency safety dispatch.'}
             </p>
           </div>
 

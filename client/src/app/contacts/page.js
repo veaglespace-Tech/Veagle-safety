@@ -6,12 +6,16 @@ import { TrustedContactCard } from '../../components/contacts/TrustedContactCard
 import { api } from '../../utils/api.js';
 import { UserPlus, Shield, X, CheckCircle } from 'lucide-react';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchContacts, addContact, deleteContact } from '../../redux/slices/contactSlice.js';
+
 export const dynamic = 'force-dynamic';
 
 const RELATIONSHIPS = ['Sister', 'Mother', 'Father', 'Brother', 'Friend', 'Spouse', 'Guardian', 'Colleague'];
 
 export default function UserTrustedContactsPage() {
-  const [contacts, setContacts] = useState([]);
+  const dispatch = useDispatch();
+  const { contacts = [] } = useSelector((state) => state?.contacts || {});
   const [showAddModal, setShowAddModal] = useState(false);
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState('Sister');
@@ -20,21 +24,16 @@ export default function UserTrustedContactsPage() {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  useEffect(() => { loadContacts(); }, []);
-
-  const loadContacts = async () => {
-    try {
-      const res = await api.get('/contacts');
-      setContacts(res.data.contacts);
-    } catch (err) {}
-  };
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   const handleAddContact = async (e) => {
     e.preventDefault();
     if (!name || !phone) return;
     setLoading(true);
     try {
-      await api.post('/contacts', { name, relationship, phone, email });
+      await dispatch(addContact({ name, relationship, phone, email })).unwrap();
       setSaved(true);
       setTimeout(() => {
         setSaved(false);
@@ -42,7 +41,6 @@ export default function UserTrustedContactsPage() {
         setPhone('');
         setEmail('');
         setShowAddModal(false);
-        loadContacts();
       }, 1200);
     } catch (err) {
       alert('We couldn\'t save this contact right now. Please try again.');
@@ -53,7 +51,9 @@ export default function UserTrustedContactsPage() {
 
   const handleDeleteContact = async (id) => {
     if (!confirm('Remove this trusted contact? They will no longer receive emergency alerts.')) return;
-    try { await api.delete(`/contacts/${id}`); loadContacts(); } catch (err) {}
+    try {
+      await dispatch(deleteContact(id)).unwrap();
+    } catch (err) {}
   };
 
   const MAX_CONTACTS = 5;

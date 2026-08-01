@@ -120,46 +120,6 @@ function CheckoutContent() {
     }
   };
 
-  // 2. Local Test Payment Simulation (Instant DB Creation & Activation)
-  const handleTestSimulatedPayment = async () => {
-    if (!token && !currentRegToken) {
-      router.push('/auth?mode=register');
-      return;
-    }
-
-    setIsProcessing(true);
-    setError(null);
-
-    try {
-      const res = await apiClient.post('/payment/payu-initiate', {
-        planId: selectedPlan.id,
-        amount: totalPrice,
-        registrationToken: currentRegToken,
-      });
-      const txnid = res.data?.paymentData?.txnid || `VEAGLE_${Date.now()}`;
-
-      const successRes = await apiClient.post('/payment/payu-success', {
-        txnid,
-        mihpayid: `PAYU_TEST_${Date.now()}`,
-        mode: 'UPI_TEST',
-        status: 'success',
-        registrationToken: currentRegToken,
-      });
-
-      if (successRes.data?.token) {
-        localStorage.setItem('tichi_token', successRes.data.token);
-        localStorage.removeItem('tichi_reg_token');
-        localStorage.removeItem('tichi_pending_token');
-        await dispatch(fetchUser());
-      }
-
-      router.push(`/payment/success?txnid=${txnid}&plan=${encodeURIComponent(selectedPlan.name)}&amount=${totalPrice}`);
-    } catch (err) {
-      console.error('Simulated PayU Error:', err);
-      setError(err.response?.data?.error || err.message || 'Simulated payment failed.');
-      setIsProcessing(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden flex flex-col">
@@ -288,15 +248,6 @@ function CheckoutContent() {
                 <ExternalLink className="w-4 h-4" />
               </button>
 
-              <button
-                type="button"
-                onClick={handleTestSimulatedPayment}
-                disabled={isProcessing}
-                className="w-full bg-white hover:bg-rose/5 text-[#FF2A6D] border-2 border-rose/30 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center justify-center space-x-2.5 cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4 text-[#FF2A6D] animate-pulse" />
-                <span>Simulate PayU Test Success (Instant Activation)</span>
-              </button>
 
               <div className="flex items-center justify-center space-x-2 text-[10px] text-[#684E67] font-black pt-1">
                 <Lock className="w-3.5 h-3.5 text-emerald-500" />

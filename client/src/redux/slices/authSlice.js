@@ -63,10 +63,10 @@ export const verifyEmailOtp = createAsyncThunk('auth/verifyEmailOtp', async ({ e
   }
 });
 
-export const resendOtpCode = createAsyncThunk('auth/resendOtpCode', async (email, { rejectWithValue }) => {
+export const resendOtpCode = createAsyncThunk('auth/resendOtpCode', async (payload, { rejectWithValue }) => {
   try {
-    const data = await authApi.resendOtp(email);
-    return data.message;
+    const data = await authApi.resendOtp(payload);
+    return data;
   } catch (err) {
     return rejectWithValue(err.response?.data?.error || 'Failed to resend OTP');
   }
@@ -128,11 +128,18 @@ const authSlice = createSlice({
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
+        if (typeof window !== 'undefined' && action.payload) {
+          localStorage.setItem('tichi_user', JSON.stringify(action.payload));
+        }
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.isLoading = false;
         state.token = null;
         state.user = null;
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('tichi_token');
+          localStorage.removeItem('tichi_user');
+        }
       })
 
       .addCase(loginUser.pending, (state) => {
@@ -144,6 +151,9 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.user = action.payload.user;
         state.error = null;
+        if (typeof window !== 'undefined' && action.payload.user) {
+          localStorage.setItem('tichi_user', JSON.stringify(action.payload.user));
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -162,6 +172,9 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.successMessage = action.payload.message;
         state.pendingToken = action.payload.pendingToken || state.pendingToken;
+        if (action.payload.user && typeof window !== 'undefined') {
+          localStorage.setItem('tichi_user', JSON.stringify(action.payload.user));
+        }
         if (action.payload.requiresVerification) {
           state.pendingVerificationEmail = action.payload.email;
           state.showOtpModal = true;
@@ -183,14 +196,30 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.showOtpModal = false;
         state.pendingVerificationEmail = null;
+        if (typeof window !== 'undefined' && action.payload.user) {
+          localStorage.setItem('tichi_user', JSON.stringify(action.payload.user));
+        }
       })
       .addCase(verifyEmailOtp.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
 
+      .addCase(resendOtpCode.fulfilled, (state, action) => {
+        state.successMessage = action.payload?.message || 'OTP resent successfully';
+        if (action.payload?.pendingToken) {
+          state.pendingToken = action.payload.pendingToken;
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('tichi_pending_token', action.payload.pendingToken);
+          }
+        }
+      })
+
       .addCase(updateProfileSettings.fulfilled, (state, action) => {
         state.user = action.payload;
+        if (typeof window !== 'undefined' && action.payload) {
+          localStorage.setItem('tichi_user', JSON.stringify(action.payload));
+        }
       });
   },
 });

@@ -2,11 +2,13 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ShieldAlert, VolumeX, Volume2, Radio, Sparkles } from 'lucide-react';
-import { useSOSStore } from '../../redux/useSOSStore.js';
-import { useLocationStore } from '../../redux/useLocationStore.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { startEmergencySos } from '../../redux/slices/sosSlice.js';
 import { useRouter } from 'next/navigation';
 
 export const SOSHeroButton = ({ onTriggerComplete }) => {
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [holding, setHolding] = useState(false);
   const [progress, setProgress] = useState(0);
   const [countdown, setCountdown] = useState(3);
@@ -14,9 +16,8 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
   const progressIntervalRef = useRef(null);
   const startTimeRef = useRef(0);
 
-  const { triggerSos, activeSession } = useSOSStore();
-  const { latitude, longitude } = useLocationStore();
-  const router = useRouter();
+  const { activeSession } = useSelector((state) => state?.sos || {});
+  const { latitude, longitude } = useSelector((state) => state?.location || {});
 
   const HOLD_DURATION = 3000;
 
@@ -65,10 +66,20 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate([300, 100, 300, 100, 400]);
     }
-    const success = await triggerSos(isSilent, latitude || 18.5204, longitude || 73.8567);
-    if (success) {
+    try {
+      await dispatch(
+        startEmergencySos({
+          isSilent,
+          latitude: latitude || 18.5204,
+          longitude: longitude || 73.8567,
+          emergencyMessage: isSilent ? 'Discreet Emergency SOS Triggered' : 'EMERGENCY SOS! I NEED HELP IMMEDIATELY!',
+        })
+      ).unwrap();
+
       if (onTriggerComplete) onTriggerComplete();
       router.push('/active-sos');
+    } catch (e) {
+      console.error('[SOS Trigger Error]:', e);
     }
   };
 
@@ -84,26 +95,25 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
   return (
     <div className="flex flex-col items-center justify-center my-6 relative select-none">
       
-      {/* 3D PORCELAIN EMBLEM CONTAINER (ZERO OVERLAPPING GAP) */}
+      {/* 3D EMBLEM CONTAINER */}
       <div className="relative w-80 h-80 flex items-center justify-center">
         
-        {/* SOFT RADAR AURA WAVES */}
+        {/* RADAR AURA WAVES */}
         <div
           className={`absolute inset-4 rounded-full transition-all duration-500 ${
             holding
               ? 'bg-[#FF2A6D]/30 scale-110 blur-xl animate-pulse'
               : activeSession
               ? 'bg-[#FF2A6D]/20 blur-xl animate-ping'
-              : 'bg-rose/15 blur-2xl'
+              : 'bg-[#FF5C8A]/15 blur-2xl'
           }`}
         />
 
-        {/* ELEGANT OUTER ANTIQUE GOLD ACCENT RING */}
-        <div className="absolute w-[290px] h-[290px] rounded-full border-2 border-gold/40 shadow-sm pointer-events-none" />
+        {/* ELEGANT OUTER GOLD ACCENT RING */}
+        <div className="absolute w-[290px] h-[290px] rounded-full border border-gold/40 shadow-xs pointer-events-none" />
 
-        {/* HIGH-PRECISION SVG TIMER RING (CLEANLY ORBITING AT RADIUS 120) */}
+        {/* HIGH-PRECISION SVG TIMER RING */}
         <svg className="w-72 h-72 transform -rotate-90 pointer-events-none z-10">
-          {/* TRACK BACKGROUND */}
           <circle
             cx="144"
             cy="144"
@@ -111,9 +121,8 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
             stroke="currentColor"
             strokeWidth="8"
             fill="transparent"
-            className="text-rose/20"
+            className="text-[#FFCCE1]/40"
           />
-          {/* PROGRESS NEON FILL */}
           <circle
             cx="144"
             cy="144"
@@ -135,7 +144,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
           </defs>
         </svg>
 
-        {/* MAIN 3D PORCELAIN CRYSTAL SOS BUTTON CORE */}
+        {/* MAIN 3D SOS BUTTON CORE */}
         <button
           onMouseDown={startHold}
           onMouseUp={endHold}
@@ -147,10 +156,9 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
               ? 'bg-gradient-to-b from-[#FF2A6D] via-[#FF5C8A] to-[#D90429] text-white border-white scale-105 shadow-coral-glow'
               : activeSession
               ? 'bg-gradient-to-b from-[#FF2A6D] to-[#D90429] text-white border-white animate-pulse shadow-coral-glow'
-              : 'bg-gradient-to-br from-[#FF2A6D] via-[#FF5C8A] to-[#FF80A0] text-white border-white hover:scale-105 shadow-[0_15px_35px_rgba(255,92,138,0.5)]'
+              : 'bg-gradient-to-br from-[#FF2A6D] via-[#FF5C8A] to-[#FF80A0] text-white border-white hover:scale-105 shadow-[0_15px_35px_rgba(255,92,138,0.4)]'
           }`}
         >
-          {/* INNER SHIELD ICON & TYPOGRAPHY */}
           <div className="relative z-10 flex flex-col items-center justify-center space-y-1 text-center">
             
             <ShieldAlert className={`w-9 h-9 text-white drop-shadow-md mb-0.5 ${
@@ -172,23 +180,23 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
 
       {/* FOOTER SILENT MODE SWITCH */}
       <div className="mt-4 flex flex-col items-center space-y-3 z-30">
-        <p className="text-xs font-bold text-tichi-muted text-center tracking-wide flex items-center space-x-1.5">
-          <Radio className="w-4 h-4 text-rose animate-pulse" />
+        <p className="text-xs font-bold text-[#684E67] text-center tracking-wide flex items-center space-x-1.5">
+          <Radio className="w-4 h-4 text-[#FF2A6D] animate-pulse" />
           <span>Press & hold for 3 seconds to broadcast live GPS location</span>
         </p>
 
         <button
           type="button"
           onClick={() => setIsSilent(!isSilent)}
-          className={`flex items-center space-x-2 text-xs font-black px-5 py-2.5 rounded-full transition-all border-2 shadow-sm cursor-pointer ${
+          className={`flex items-center space-x-2 text-xs font-black px-5 py-2.5 rounded-full transition-all border-2 shadow-xs cursor-pointer ${
             isSilent
               ? 'bg-[#FF2A6D] text-white border-white shadow-coral-glow'
-              : 'bg-white text-tichi-text border-[#FFCCE1] hover:border-rose'
+              : 'bg-white text-[#2A0826] border-[#FFCCE1] hover:border-[#FF2A6D]'
           }`}
         >
-          {isSilent ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-rose" />}
+          {isSilent ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-[#FF2A6D]" />}
           <span>Silent Emergency Mode: {isSilent ? 'ON (Discreet Alert)' : 'OFF (Loud Siren)'}</span>
-          <span className={`w-2 h-2 rounded-full ${isSilent ? 'bg-white animate-ping' : 'bg-tichi-success'}`} />
+          <span className={`w-2 h-2 rounded-full ${isSilent ? 'bg-white animate-ping' : 'bg-emerald-500'}`} />
         </button>
       </div>
 

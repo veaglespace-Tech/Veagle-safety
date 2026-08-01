@@ -4,9 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { SOSHeroButton } from '../../components/sos/SOSHeroButton.js';
 import { TrustedContactCard } from '../../components/contacts/TrustedContactCard.js';
-import { useAuthStore } from '../../redux/useAuthStore.js';
-import { useSOSStore } from '../../redux/useSOSStore.js';
-import { useLocationStore } from '../../redux/useLocationStore.js';
 import { api } from '../../utils/api.js';
 import Link from 'next/link';
 import { AnimatedHeading } from '../../components/common/AnimatedHeading.jsx';
@@ -35,29 +32,27 @@ import {
   SunMedium,
   Moon,
 } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchContacts } from '../../redux/slices/contactSlice.js';
+import { checkActiveSos } from '../../redux/slices/sosSlice.js';
+import { fetchUser } from '../../redux/slices/authSlice.js';
 
 export default function DashboardAppPage() {
+  const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
-  const { user } = useAuthStore();
-  const { activeSession, fetchActiveSos } = useSOSStore();
-  const { status, startTracking, accuracy } = useLocationStore();
-  const [contacts, setContacts] = useState([]);
+  const { user } = useSelector((state) => state?.auth || {});
+  const { activeSession } = useSelector((state) => state?.sos || {});
+  const { contacts = [] } = useSelector((state) => state?.contacts || {});
+  const { status = 'LIVE', accuracy = 10 } = useSelector((state) => state?.location || {});
   const [activeJourney, setActiveJourney] = useState(null);
 
   useEffect(() => {
     setMounted(true);
-    fetchContacts();
+    dispatch(fetchUser());
+    dispatch(fetchContacts());
+    dispatch(checkActiveSos());
     fetchActiveJourney();
-    fetchActiveSos();
-    startTracking();
-  }, []);
-
-  const fetchContacts = async () => {
-    try {
-      const res = await api.get('/contacts');
-      setContacts(res.data.contacts || []);
-    } catch (err) {}
-  };
+  }, [dispatch]);
 
   const fetchActiveJourney = async () => {
     try {
@@ -172,98 +167,98 @@ export default function DashboardAppPage() {
           )}
 
           {/* MAIN UNIFIED HERO SAFETY HUB */}
-          <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white p-6 sm:p-10 border-2 border-[#FFCCE1] hover:border-[#FF5C8A] rounded-3xl shadow-[0_16px_50px_rgba(255,92,138,0.18)] hover:shadow-[0_20px_60px_rgba(255,42,109,0.25)] transition-all duration-500 space-y-8 relative overflow-hidden">
+          <div className="bg-white/90 backdrop-blur-2xl p-8 sm:p-12 border border-[#FFCCE1]/70 rounded-[36px] shadow-[0_20px_50px_rgba(255,92,138,0.10)] space-y-10 relative overflow-hidden">
             
             {/* AMBIENT SHIMMER BADGE */}
-            <div className="absolute top-0 right-0 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-[10px] sm:text-[11px] font-black px-5 sm:px-6 py-2 rounded-bl-2xl uppercase tracking-widest shadow-md flex items-center space-x-1.5">
+            <div className="absolute top-0 right-0 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-[11px] font-black px-6 py-2.5 rounded-bl-3xl uppercase tracking-widest shadow-sm flex items-center space-x-2">
               <ShieldCheck className="w-4 h-4 animate-pulse" />
               <span>365-DAY PROTECTION ACTIVE</span>
             </div>
 
             {/* HEADER STATUS BAR */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#FFCCE1] pb-6 pt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[#FFCCE1]/60 pb-8 pt-2">
               <div>
-                <div className="flex items-center space-x-2.5">
+                <div className="flex items-center space-x-3">
                   <span className="text-xs font-black uppercase tracking-widest text-[#FF2A6D]">{greetingText}</span>
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] text-white shadow-[0_4px_12px_rgba(255,42,109,0.3)] border-2 border-white transform hover:scale-110 transition-transform">
-                    <GreetingIcon className="w-4 h-4 text-white drop-shadow-sm" />
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] text-white shadow-sm border-2 border-white transform hover:scale-105 transition-transform">
+                    <GreetingIcon className="w-4.5 h-4.5 text-white drop-shadow-xs" />
                   </span>
                 </div>
-                <h1 className="text-3xl sm:text-4xl font-black text-[#2A0826] mt-1 tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-black text-[#2A0826] mt-2 tracking-tight">
                   {firstName}'s Safety Command
                 </h1>
-                <p className="text-xs sm:text-sm text-[#684E67] font-bold mt-1">
+                <p className="text-xs sm:text-sm text-[#684E67] font-semibold mt-1">
                   24/7 Encrypted GPS Tracking & Emergency Guardian Network
                 </p>
               </div>
 
               {/* GPS METER PILL */}
-              <div className="bg-white/95 border-2 border-[#FFCCE1] p-3.5 rounded-2xl flex items-center space-x-3.5 shadow-sm hover:border-[#FF2A6D] transition-colors shrink-0">
+              <div className="bg-[#FFF0F3]/60 border border-[#FFCCE1]/80 p-4 rounded-2xl flex items-center space-x-4 shadow-xs shrink-0">
                 <div className="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
                 <div>
                   <div className="flex items-center space-x-2">
                     <span className="text-xs font-black text-[#2A0826]">{locInfo.label}</span>
-                    <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-emerald-200">
+                    <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2.5 py-0.5 rounded-full border border-emerald-200">
                       ±{accuracy || '10'}m
                     </span>
                   </div>
-                  <p className="text-[11px] text-[#684E67] font-bold mt-0.5">Real-Time Geolocation Sync</p>
+                  <p className="text-[11px] text-[#684E67] font-semibold mt-0.5">Real-Time Geolocation Sync</p>
                 </div>
               </div>
             </div>
 
             {/* EMERGENCY SOS HERO ACTION BUTTON */}
-            <div className="py-4 text-center space-y-4">
+            <div className="py-6 text-center space-y-5">
               <SOSHeroButton />
-              <p className="text-xs text-[#684E67] font-black tracking-wider uppercase">
+              <p className="text-xs text-[#684E67] font-black tracking-widest uppercase">
                 HOLD FOR 3 SECONDS OR DOUBLE-CLICK TO BROADCAST EMERGENCY ALERTS
               </p>
             </div>
 
             {/* 4-GRID QUICK ACTIONS */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-2">
               <Link
                 href="/track-journey"
-                className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2.5 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
+                className="bg-[#FFF0F3]/40 p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
               >
-                <div className="w-12 h-12 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
-                  <Navigation className="w-5 h-5" />
+                <div className="w-13 h-13 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs">
+                  <Navigation className="w-6 h-6" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Track Journey</p>
-                <p className="text-[10px] text-[#684E67] font-extrabold">Share Live Route</p>
+                <p className="text-[11px] text-[#684E67] font-semibold">Share Live Route</p>
               </Link>
 
               <Link
                 href="/track-journey"
-                className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2.5 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
+                className="bg-[#FFF0F3]/40 p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
               >
-                <div className="w-12 h-12 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
-                  <Clock className="w-5 h-5" />
+                <div className="w-13 h-13 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs">
+                  <Clock className="w-6 h-6" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Check On Me</p>
-                <p className="text-[10px] text-[#684E67] font-extrabold">Safety Alarm Timer</p>
+                <p className="text-[11px] text-[#684E67] font-semibold">Safety Alarm Timer</p>
               </Link>
 
               <Link
                 href="/contacts"
-                className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2.5 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
+                className="bg-[#FFF0F3]/40 p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
               >
-                <div className="w-12 h-12 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
-                  <Users className="w-5 h-5" />
+                <div className="w-13 h-13 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs">
+                  <Users className="w-6 h-6" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Guardians</p>
-                <p className="text-[10px] text-[#684E67] font-extrabold">{contacts.length} Trusted Listed</p>
+                <p className="text-[11px] text-[#684E67] font-semibold">{contacts.length} Trusted Listed</p>
               </Link>
 
               <Link
                 href="/help"
-                className="bg-white p-5 rounded-2xl border-2 border-[#FFCCE1] hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-2.5 group shadow-sm hover:shadow-[0_10px_25px_rgba(255,42,109,0.20)]"
+                className="bg-[#FFF0F3]/40 p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
               >
-                <div className="w-12 h-12 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300">
-                  <PhoneCall className="w-5 h-5" />
+                <div className="w-13 h-13 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs">
+                  <PhoneCall className="w-6 h-6" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Helplines</p>
-                <p className="text-[10px] text-[#684E67] font-extrabold">National 112 & 1091</p>
+                <p className="text-[11px] text-[#684E67] font-semibold">National 112 & 1091</p>
               </Link>
             </div>
 

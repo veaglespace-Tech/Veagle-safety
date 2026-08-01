@@ -33,6 +33,7 @@ const sosSlice = createSlice({
   initialState: {
     activeSession: null,
     isTriggering: false,
+    isAlarmPlaying: false,
     error: null,
   },
   reducers: {
@@ -40,6 +41,12 @@ const sosSlice = createSlice({
       state.activeSession = null;
       state.isTriggering = false;
       state.error = null;
+    },
+    toggleAlarm: (state) => {
+      state.isAlarmPlaying = !state.isAlarmPlaying;
+    },
+    setAlarmState: (state, action) => {
+      state.isAlarmPlaying = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -50,6 +57,7 @@ const sosSlice = createSlice({
       .addCase(startEmergencySos.fulfilled, (state, action) => {
         state.isTriggering = false;
         state.activeSession = action.payload;
+        state.isAlarmPlaying = true;
       })
       .addCase(startEmergencySos.rejected, (state, action) => {
         state.isTriggering = false;
@@ -58,6 +66,7 @@ const sosSlice = createSlice({
 
       .addCase(resolveEmergencySos.fulfilled, (state) => {
         state.activeSession = null;
+        state.isAlarmPlaying = false;
       })
 
       .addCase(checkActiveSos.fulfilled, (state, action) => {
@@ -66,5 +75,5 @@ const sosSlice = createSlice({
   },
 });
 
-export const { clearSosState } = sosSlice.actions;
+export const { clearSosState, toggleAlarm, setAlarmState } = sosSlice.actions;
 export default sosSlice.reducer;

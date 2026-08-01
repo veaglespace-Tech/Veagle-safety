@@ -55,16 +55,19 @@ function SuperAdminHQContent() {
   const [enquirySearch, setEnquirySearch] = useState('');
   const [enquiryStatusFilter, setEnquiryStatusFilter] = useState('ALL');
 
+  const searchTab = searchParams.get('tab');
+
   useEffect(() => {
-    const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl && ['overview', 'users', 'plans', 'payments', 'enquiries'].includes(tabFromUrl)) {
-      setActiveTab(tabFromUrl);
+    if (searchTab && ['overview', 'users', 'plans', 'payments', 'enquiries'].includes(searchTab)) {
+      setActiveTab(searchTab);
+    } else if (!searchTab) {
+      setActiveTab('overview');
     }
-  }, [searchParams]);
+  }, [searchTab]);
 
   const handleTabChange = (newTab) => {
     setActiveTab(newTab);
-    router.push(`/admin?tab=${newTab}`);
+    router.push(`/admin?tab=${newTab}`, { scroll: false });
   };
 
   // OVERVIEW DATA
@@ -380,24 +383,24 @@ function SuperAdminHQContent() {
         <div className="absolute w-[800px] h-[800px] rounded-full bg-gold/15 blur-[170px] top-[-100px] left-[-200px] pointer-events-none" />
         <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF2A6D]/15 blur-[170px] bottom-[100px] right-[-200px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10 animate-fade-up">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 relative z-10 animate-fade-up">
 
           {/* SUPERADMIN HQ HEADER BANNER */}
-          <div className="bg-gradient-to-r from-[#2A0826] via-[#3D0C38] to-[#2A0826] text-white p-6 sm:p-8 rounded-[36px] border-2 border-gold/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#FFD700] via-[#E6A100] to-[#FFD166] text-[#2A0826] flex items-center justify-center shadow-lg shrink-0 border-2 border-white">
+          <div className="bg-gradient-to-r from-[#2A0826] via-[#3D0C38] to-[#2A0826] text-white p-8 sm:p-10 rounded-[36px] border border-gold/40 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+            <div className="flex items-center space-x-5">
+              <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#FFD700] via-[#E6A100] to-[#FFD166] text-[#2A0826] flex items-center justify-center shadow-md shrink-0 border-2 border-white">
                 <Crown className="w-9 h-9 text-[#2A0826] animate-pulse" />
               </div>
               <div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   <h1 className="font-black text-2xl sm:text-3xl text-white tracking-tight">
                     SuperAdmin Command HQ
                   </h1>
-                  <span className="bg-gold text-[#2A0826] font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider shadow">
+                  <span className="bg-gold text-[#2A0826] font-black text-[10px] px-3.5 py-1 rounded-full uppercase tracking-widest shadow-xs">
                     SUPERUSER
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-gold/90 font-bold mt-1">
+                <p className="text-xs sm:text-sm text-gold/90 font-semibold mt-1">
                   Full control over Users, Subscription Plans, Global GST Settings, and Payment Receipts
                 </p>
               </div>
@@ -408,7 +411,7 @@ function SuperAdminHQContent() {
                 type="button"
                 onClick={loadAllAdminData}
                 disabled={isLoading}
-                className="bg-white/10 hover:bg-white/20 text-white font-black text-xs px-5 py-3 rounded-2xl border border-white/20 shadow flex items-center space-x-2 transition-all cursor-pointer"
+                className="bg-white/10 hover:bg-white/20 text-white font-black text-xs px-5 py-3.5 rounded-2xl border border-white/20 shadow-xs flex items-center space-x-2.5 transition-all cursor-pointer"
               >
                 <RefreshCw className={`w-4 h-4 text-gold ${isLoading ? 'animate-spin' : ''}`} />
                 <span>{isLoading ? 'SYNCING...' : 'REFRESH METRICS'}</span>
@@ -418,23 +421,23 @@ function SuperAdminHQContent() {
 
           {/* FEEDBACK TOAST NOTIFICATION */}
           {toast && (
-            <div className={`p-4 rounded-2xl text-xs font-black shadow-lg animate-shake ${
+            <div className={`p-4 rounded-2xl text-xs font-black shadow-md animate-shake ${
               toast.type === 'error'
-                ? 'bg-rose-50 text-[#FF2A6D] border-2 border-[#FF2A6D]'
-                : 'bg-emerald-50 text-emerald-800 border-2 border-emerald-400'
+                ? 'bg-rose-50 text-[#FF2A6D] border border-[#FF2A6D]/60'
+                : 'bg-emerald-50 text-emerald-800 border border-emerald-300'
             }`}>
               {toast.text}
             </div>
           )}
 
           {/* MASTER TAB NAVIGATION BAR */}
-          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md p-2 rounded-3xl border-2 border-[#FFCCE1] shadow-md overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-3 bg-white/95 backdrop-blur-2xl p-3 rounded-[32px] border border-[#FFCCE1]/70 shadow-sm overflow-x-auto scrollbar-none">
             {[
-              { id: 'overview', label: 'Emergency Command & Overview', icon: AlertOctagon, badge: overview?.metrics?.activeSosCount || 0 },
+              { id: 'overview', label: 'Emergency Command', icon: AlertOctagon, badge: overview?.metrics?.activeSosCount || 0 },
               { id: 'users', label: 'User Management', icon: Users, badge: users.length },
               { id: 'plans', label: 'Plans & Dynamic GST', icon: Sliders, badge: plans.length },
-              { id: 'payments', label: 'Payment Receipts & Revenue', icon: CreditCard, badge: payments.length },
-              { id: 'enquiries', label: 'Contact Enquiries & Support', icon: HelpCircle, badge: enquiries.filter(e => e.status === 'PENDING').length },
+              { id: 'payments', label: 'Payment Receipts', icon: CreditCard, badge: payments.length },
+              { id: 'enquiries', label: 'Contact Support', icon: HelpCircle, badge: (Array.isArray(enquiries) ? enquiries : []).filter(e => e.status === 'PENDING').length },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -442,10 +445,10 @@ function SuperAdminHQContent() {
                 <button
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
-                  className={`flex-1 min-w-[200px] px-5 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2.5 transition-all cursor-pointer ${
+                  className={`flex-1 min-w-[190px] px-5 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2.5 transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white shadow-md scale-[1.02]'
-                      : 'text-[#684E67] hover:bg-[#FFF0F3] hover:text-[#FF2A6D]'
+                      ? 'bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white shadow-md shadow-[#FF2A6D]/20 scale-[1.01]'
+                      : 'text-[#684E67] hover:bg-[#FFF0F3]/80 hover:text-[#FF2A6D]'
                   }`}
                 >
                   <Icon className={`w-4.5 h-4.5 ${isActive ? 'text-white' : 'text-[#FF2A6D]'}`} />

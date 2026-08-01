@@ -1,47 +1,14 @@
-import { create } from 'zustand';
+// Deprecated Zustand store replaced by Redux Toolkit locationSlice
+import { useSelector, useDispatch } from 'react-redux';
+import { updateCoordinates, setLocationStatus } from './slices/locationSlice.js';
 
-export const useLocationStore = create((set) => ({
-  latitude: null,
-  longitude: null,
-  accuracy: null,
-  status: 'OFFLINE',
-  watchId: null,
-
-  startTracking: () => {
-    if (typeof window === 'undefined' || !('geolocation' in navigator)) {
-      set({ status: 'DENIED' });
-      return;
-    }
-
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        set({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          accuracy: Math.round(pos.coords.accuracy),
-          status: 'LIVE',
-        });
-      },
-      (err) => {
-        console.warn('Geolocation warning:', err.message);
-        set({ status: 'DENIED' });
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 5000,
-      }
-    );
-
-    set({ watchId });
-  },
-
-  stopTracking: () => {
-    set((state) => {
-      if (typeof window !== 'undefined' && state.watchId !== null && 'geolocation' in navigator) {
-        navigator.geolocation.clearWatch(state.watchId);
-      }
-      return { watchId: null, status: 'OFFLINE' };
-    });
-  },
-}));
+export const useLocationStore = () => {
+  const dispatch = useDispatch();
+  const locationState = useSelector((state) => state?.location || {});
+  return {
+    ...locationState,
+    startTracking: () => {},
+    updateCoordinates: (coords) => dispatch(updateCoordinates(coords)),
+    setLocationStatus: (status) => dispatch(setLocationStatus(status)),
+  };
+};

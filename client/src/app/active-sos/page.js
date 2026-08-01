@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSOSStore } from '../../redux/useSOSStore.js';
-import { useLocationStore } from '../../redux/useLocationStore.js';
-import { useAuthStore } from '../../redux/useAuthStore.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { resolveEmergencySos, toggleAlarm } from '../../redux/slices/sosSlice.js';
 import { LiveLocationMap } from '../../components/location/DynamicLiveLocationMap.js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,9 +20,10 @@ import {
 } from 'lucide-react';
 
 export default function ActiveSOSLivePage() {
-  const { activeSession, resolveSos, isAlarmPlaying, toggleAlarm } = useSOSStore();
-  const { latitude, longitude, accuracy } = useLocationStore();
-  const { user } = useAuthStore();
+  const dispatch = useDispatch();
+  const { activeSession, isAlarmPlaying } = useSelector((state) => state?.sos || {});
+  const { latitude = 18.5204, longitude = 73.8567, accuracy = 10 } = useSelector((state) => state?.location || {});
+  const { user } = useSelector((state) => state?.auth || {});
   const [showConfirmSafeModal, setShowConfirmSafeModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -45,8 +45,14 @@ export default function ActiveSOSLivePage() {
   };
 
   const handleMarkSafe = async () => {
-    const success = await resolveSos();
-    if (success) { setShowConfirmSafeModal(false); router.push('/dashboard'); }
+    try {
+      await dispatch(resolveEmergencySos(activeSession?.id)).unwrap();
+      setShowConfirmSafeModal(false);
+      router.push('/dashboard');
+    } catch (e) {
+      setShowConfirmSafeModal(false);
+      router.push('/dashboard');
+    }
   };
 
   const copyTrackingLink = () => {

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
-import { useAuthStore } from '../../redux/useAuthStore.js';
-import { useLocationStore } from '../../redux/useLocationStore.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUser, updateProfileSettings } from '../../redux/slices/authSlice.js';
 import { startEmergencySiren, stopEmergencySiren } from '../../utils/sirenAudio.js';
 import { useRouter } from 'next/navigation';
 import { authApi } from '../../redux/api/authApi.js';
@@ -43,8 +43,9 @@ import {
 } from 'lucide-react';
 
 export default function UserProfileSettingsPage() {
-  const { user, updateUserAvatar, fetchUser } = useAuthStore();
-  const { status, accuracy } = useLocationStore();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state?.auth || {});
+  const { status = 'LIVE', accuracy = 10 } = useSelector((state) => state?.location || {});
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 

@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUser } from '../../redux/slices/authSlice.js';
 import { AppLayout } from '../../components/layout/AppLayout.js';
-import { useAuthStore } from '../../redux/useAuthStore.js';
 import Link from 'next/link';
 import {
   ShieldCheck,
@@ -19,13 +20,14 @@ import {
 } from 'lucide-react';
 
 export default function SubscriptionPage() {
-  const { user, fetchUser } = useAuthStore();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state?.auth || {});
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    fetchUser();
-  }, []);
+    dispatch(fetchUser());
+  }, [dispatch]);
 
   const isActive = mounted && user?.subscriptionStatus === 'ACTIVE';
   

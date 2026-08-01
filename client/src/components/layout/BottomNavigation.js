@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Home, MapPin, AlertTriangle, Users, ShieldCheck, Crown, Sliders, CreditCard } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { useSOSStore } from '../../redux/useSOSStore.js';
 
 export const BottomNavigation = () => {
   const pathname = usePathname();
-  const { activeSession } = useSOSStore();
+  const searchParams = useSearchParams();
+  const { activeSession } = useSelector((state) => state?.sos || {});
   const [mounted, setMounted] = useState(false);
   const [pressingSOS, setPressingSOS] = useState(false);
 
@@ -27,10 +27,10 @@ export const BottomNavigation = () => {
   ];
 
   const adminNavItems = [
-    { path: '/admin?tab=overview', label: 'HQ', icon: Crown },
-    { path: '/admin?tab=users', label: 'Users', icon: Users },
-    { path: '/admin?tab=plans', label: 'Plans', icon: Sliders },
-    { path: '/admin?tab=payments', label: 'Pay', icon: CreditCard },
+    { path: '/admin?tab=overview', tabKey: 'overview', label: 'HQ', icon: Crown },
+    { path: '/admin?tab=users', tabKey: 'users', label: 'Users', icon: Users },
+    { path: '/admin?tab=plans', tabKey: 'plans', label: 'Plans', icon: Sliders },
+    { path: '/admin?tab=payments', tabKey: 'payments', label: 'Pay', icon: CreditCard },
   ];
 
   const navItems = isSuperAdmin ? adminNavItems : memberNavItems;
@@ -75,7 +75,9 @@ export const BottomNavigation = () => {
 
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.path;
+            const isActive = item.tabKey
+              ? (pathname === '/admin' || pathname.startsWith('/admin')) && (searchParams?.get('tab') || 'overview') === item.tabKey
+              : pathname === item.path;
 
             /* ========================================================
                CENTER 3D FLOATING SOS BUTTON

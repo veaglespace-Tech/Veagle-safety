@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
-import { useLocationStore } from '../../redux/useLocationStore.js';
+import { useSelector } from 'react-redux';
 import { api } from '../../utils/api.js';
 import { Navigation, Clock, ShieldCheck, Info, MapPin, ArrowRight, Shield, CheckCircle2, Sliders } from 'lucide-react';
 
 export default function UserTrackJourneyPage() {
-  const { latitude, longitude } = useLocationStore();
+  const { latitude = 18.5204, longitude = 73.8567 } = useSelector((state) => state?.location || {});
   const [activeTab, setActiveTab] = useState('JOURNEY');
   const [destination, setDestination] = useState('');
   const [minutes, setMinutes] = useState('30');
