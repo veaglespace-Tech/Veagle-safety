@@ -5,7 +5,6 @@ import { config } from './config/index.js';
 import { prisma } from './config/prisma.js';
 import apiRouter from './routes/api.js';
 import { initSocketIO } from './socket.js';
-import { seedSuperAdminData } from './services/seed_superadmin.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -104,8 +103,6 @@ const startServer = async () => {
   console.log("prisma connecting...");
   await prisma.$connect();
   console.log("prisma connected");
-
-  await seedSuperAdminData();
 
   initSocketIO(server);
 

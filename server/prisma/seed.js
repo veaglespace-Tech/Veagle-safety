@@ -6,53 +6,34 @@ const prisma = new PrismaClient();
 export async function seedDatabase() {
   console.log('🌱 Starting Database Seeding...');
 
-  // 1. Clean up & Seed SINGLE Official SuperAdmin Account
-  const superAdminEmail = 'admin@veaglesafety.org';
-  const passwordHash = await bcrypt.hash('Veagle@123', 10);
-
-  // Demote any extra SUPER_ADMIN accounts in database
-  await prisma.user.updateMany({
-    where: {
-      role: 'SUPER_ADMIN',
-      email: { not: superAdminEmail },
-    },
-    data: {
-      role: 'USER',
-    },
+  // 1. Check if SuperAdmin exists. If not, seed default SuperAdmin account.
+  const existingSuperAdmin = await prisma.user.findFirst({
+    where: { role: 'SUPER_ADMIN' },
   });
 
-  // Remove previous legacy super admin account
-  await prisma.user.deleteMany({
-    where: {
-      email: 'abhijeetambhore4@gmail.com',
-    },
-  });
-
-  // Upsert single SuperAdmin Account
-  const superAdmin = await prisma.user.upsert({
-    where: { email: superAdminEmail },
-    update: {
-      fullName: 'Super Admin',
-      passwordHash,
-      role: 'SUPER_ADMIN',
-      isEmailVerified: true,
-    },
-    create: {
-      fullName: 'Super Admin',
-      email: superAdminEmail,
-      phone: '+91 90000 00000',
-      passwordHash,
-      role: 'SUPER_ADMIN',
-      isEmailVerified: true,
-      subscriptionStatus: 'ACTIVE',
-      onboardingStep: 7,
-    },
-  });
-  console.log(`✅ [Seed] Single SuperAdmin Account Ready: ${superAdmin.email} (Password: Veagle@123)`);
+  if (!existingSuperAdmin) {
+    const superAdminEmail = 'admin@veaglesafety.org';
+    const passwordHash = await bcrypt.hash('Veagle@123', 10);
+    const superAdmin = await prisma.user.create({
+      data: {
+        fullName: 'Super Admin',
+        email: superAdminEmail,
+        phone: '+91 90000 00000',
+        passwordHash,
+        role: 'SUPER_ADMIN',
+        isEmailVerified: true,
+        subscriptionStatus: 'ACTIVE',
+        onboardingStep: 7,
+      },
+    });
+    console.log(`✅ [Seed] Default SuperAdmin Account Created: ${superAdmin.email} (Password: Veagle@123)`);
+  } else {
+    console.log(`ℹ️ [Seed] Preserving existing SuperAdmin account in DB: ${existingSuperAdmin.email}`);
+  }
 
   // 2. Clean up old/extra plans — keep ONLY the single 365-Day Protection Plan
   const singlePlanData = {
-    id: 'plan_yearly_24',
+    id: 1,
     name: 'Sakhi Suraksha 365 Yearly Protection Plan',
     description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
     basePrice: 24.0,
@@ -62,22 +43,19 @@ export async function seedDatabase() {
     isActive: true,
   };
 
-  // Remove any legacy plans ('2', '3', etc.)
+  // Remove any legacy plans
   await prisma.plan.deleteMany({
     where: {
-      id: { notIn: ['plan_yearly_24', '1'] }
+      id: { not: 1 }
     }
   });
 
-  // Seed the single yearly plan for both 'plan_yearly_24' and '1' for backwards compatibility
-  for (const id of ['plan_yearly_24', '1']) {
-    const p = await prisma.plan.upsert({
-      where: { id },
-      update: { ...singlePlanData, id },
-      create: { ...singlePlanData, id },
-    });
-    console.log(`✅ [Seed] Plan ID '${p.id}' Ready: ${p.name} (Base: ₹${p.basePrice}, Total: ₹${p.totalPrice})`);
-  }
+  const p = await prisma.plan.upsert({
+    where: { id: 1 },
+    update: singlePlanData,
+    create: singlePlanData,
+  });
+  console.log(`✅ [Seed] Plan ID '${p.id}' Ready: ${p.name} (Base: ₹${p.basePrice}, Total: ₹${p.totalPrice})`);
 
   // 3. Seed System Setting for GST
   await prisma.systemSetting.upsert({

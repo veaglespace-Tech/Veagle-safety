@@ -8,7 +8,7 @@ generator client {
 }
 
 model User {
-  id                    String            @id @default(uuid())
+  id                    Int               @id @default(autoincrement())
   fullName              String
   email                 String            @unique
   phone                 String
@@ -29,7 +29,7 @@ model User {
   emailOtpExpiresAt     DateTime?
   subscriptionStatus    String            @default("INACTIVE") // INACTIVE, ACTIVE, EXPIRED
   subscriptionExpiresAt DateTime?
-  currentPlanId         String?
+  currentPlanId         Int?
   safetyStatus          String            @default("SAFE") // SAFE, SOS_ACTIVE, JOURNEY_ACTIVE
   quickSosMode          String            @default("STANDARD") // STANDARD, SILENT
   onboardingStep        Int               @default(1)
@@ -46,7 +46,7 @@ model User {
 }
 
 model Plan {
-  id               String           @id @default(uuid())
+  id               Int              @id @default(autoincrement())
   name             String
   description      String?
   basePrice        Float            @default(24.0)
@@ -61,10 +61,10 @@ model Plan {
 }
 
 model PaymentHistory {
-  id            String   @id @default(uuid())
-  userId        String
+  id            Int      @id @default(autoincrement())
+  userId        Int
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  planId        String?
+  planId        Int?
   plan          Plan?    @relation(fields: [planId], references: [id])
   txnid         String   @unique
   amount        Float
@@ -80,15 +80,15 @@ model PaymentHistory {
 }
 
 model SystemSetting {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   key       String   @unique
   value     String
   updatedAt DateTime @updatedAt
 }
 
 model TrustedContact {
-  id            String   @id @default(uuid())
-  userId        String
+  id            Int      @id @default(autoincrement())
+  userId        Int
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name          String
   relationship  String
@@ -100,8 +100,8 @@ model TrustedContact {
 }
 
 model SosSession {
-  id             String        @id @default(uuid())
-  userId         String
+  id             Int           @id @default(autoincrement())
+  userId         Int
   user           User          @relation(fields: [userId], references: [id])
   status         String        @default("ACTIVE") // ACTIVE, RESOLVED, CANCELLED
   isSilent       Boolean       @default(false)
@@ -114,8 +114,8 @@ model SosSession {
 }
 
 model SosLocation {
-  id           String     @id @default(uuid())
-  sosSessionId String
+  id           Int        @id @default(autoincrement())
+  sosSessionId Int
   sosSession   SosSession @relation(fields: [sosSessionId], references: [id], onDelete: Cascade)
   latitude     Float
   longitude    Float
@@ -127,8 +127,8 @@ model SosLocation {
 }
 
 model SosAlert {
-  id           String     @id @default(uuid())
-  sosSessionId String
+  id           Int        @id @default(autoincrement())
+  sosSessionId Int
   sosSession   SosSession @relation(fields: [sosSessionId], references: [id])
   channel      String     // EMAIL, SMS, WEBSOCKET
   recipient    String
@@ -137,8 +137,8 @@ model SosAlert {
 }
 
 model LiveShareSession {
-  id              String   @id @default(uuid())
-  userId          String
+  id              Int      @id @default(autoincrement())
+  userId          Int
   user            User     @relation(fields: [userId], references: [id])
   shareToken      String   @unique
   durationMinutes Int
@@ -148,8 +148,8 @@ model LiveShareSession {
 }
 
 model Journey {
-  id              String            @id @default(uuid())
-  userId          String
+  id              Int               @id @default(autoincrement())
+  userId          Int
   user            User              @relation(fields: [userId], references: [id])
   originName      String
   destinationName String
@@ -166,8 +166,8 @@ model Journey {
 }
 
 model JourneyLocation {
-  id         String   @id @default(uuid())
-  journeyId  String
+  id         Int      @id @default(autoincrement())
+  journeyId  Int
   journey    Journey  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
   latitude   Float
   longitude  Float
@@ -175,8 +175,8 @@ model JourneyLocation {
 }
 
 model SafetyCheckin {
-  id           String    @id @default(uuid())
-  userId       String
+  id           Int       @id @default(autoincrement())
+  userId       Int
   user         User      @relation(fields: [userId], references: [id])
   intervalMins Int
   triggerAt    DateTime
@@ -185,7 +185,7 @@ model SafetyCheckin {
 }
 
 model AdminUser {
-  id           String   @id @default(uuid())
+  id           Int      @id @default(autoincrement())
   email        String   @unique
   passwordHash String
   name         String
@@ -194,8 +194,8 @@ model AdminUser {
 }
 
 model AuditLog {
-  id        String   @id @default(uuid())
-  userId    String?
+  id        Int      @id @default(autoincrement())
+  userId    Int?
   user      User?    @relation(fields: [userId], references: [id])
   action    String
   details   String   @db.Text
@@ -206,7 +206,7 @@ model AuditLog {
 // Web Push Notification Subscription - Linked to user email
 // Contacts subscribe once → receive emergency alarms even with browser closed
 model PushSubscription {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   userEmail   String
   endpoint    String   @unique @db.VarChar(500)
   p256dh      String   @db.Text

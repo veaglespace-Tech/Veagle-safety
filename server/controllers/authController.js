@@ -81,7 +81,27 @@ export const register = asyncHandler(async (req, res) => {
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
-    return res.status(409).json({ error: 'An account with this email already exists' });
+    if (existingUser.isEmailVerified) {
+      return res.status(409).json({ error: 'An account with this email already exists' });
+    }
+    // Update existing unverified user with new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: { emailOtp: otp, emailOtpExpiresAt: otpExpires },
+    });
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: email, userName: fullName, otp });
+    } catch (emailErr) {
+      console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
+    }
+    return res.status(200).json({
+      message: `OTP code sent to ${email}. (OTP Code: ${otp})`,
+      requiresVerification: true,
+      email,
+      debugOtp: otp,
+    });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -90,25 +110,57 @@ export const register = asyncHandler(async (req, res) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-  // For USER role: Defer DB insertion until full flow (payment completion)
+  // Create User entry in Database immediately upon registration
+  const user = await prisma.user.create({
+    data: {
+      fullName,
+      email,
+      phone: phone || '+91 98765 43210',
+      passwordHash,
+      role: assignedRole,
+      profilePhoto: profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
+      bloodGroup: bloodGroup || 'O+',
+      address: address || 'Not Specified',
+      city: city || 'Pune',
+      state: state || 'Maharashtra',
+      country: country || 'India',
+      pincode: pincode || '411001',
+      emergencyContactName: emergencyContactName || null,
+      emergencyContactPhone: emergencyContactPhone || null,
+      medicalNotes: medicalNotes || null,
+      isEmailVerified: assignedRole === 'SUPER_ADMIN',
+      emailOtp: assignedRole === 'USER' ? otp : null,
+      emailOtpExpiresAt: assignedRole === 'USER' ? otpExpires : null,
+      subscriptionStatus: assignedRole === 'SUPER_ADMIN' ? 'ACTIVE' : 'INACTIVE',
+    },
+  });
+
+  if (emergencyContactName && emergencyContactPhone) {
+    try {
+      await prisma.trustedContact.create({
+        data: {
+          userId: user.id,
+          name: emergencyContactName,
+          relationship: 'Primary Guardian / Emergency Contact',
+          phone: emergencyContactPhone,
+          email: user.email,
+          isVerified: true,
+          priorityOrder: 1,
+        },
+      });
+    } catch (e) {
+      console.log('[Register Notice] Primary contact creation skipped:', e.message);
+    }
+  }
+
   if (assignedRole === 'USER') {
     const pendingRegistrationToken = jwt.sign(
       {
-        fullName,
-        email,
-        phone,
-        passwordHash,
+        userId: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
         role: 'USER',
-        profilePhoto: profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
-        bloodGroup,
-        address,
-        city,
-        state,
-        country: country || 'India',
-        pincode,
-        emergencyContactName,
-        emergencyContactPhone,
-        medicalNotes: medicalNotes || null,
         otp,
         otpExpiresAt: otpExpires.getTime(),
         type: 'PENDING_REGISTRATION',
@@ -133,27 +185,6 @@ export const register = asyncHandler(async (req, res) => {
   }
 
   // SuperAdmin gets immediate DB creation & JWT login
-  const user = await prisma.user.create({
-    data: {
-      fullName,
-      email,
-      phone: phone || '+91 98765 43210',
-      passwordHash,
-      role: assignedRole,
-      profilePhoto: profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
-      bloodGroup: bloodGroup || 'O+',
-      address: address || 'Not Specified',
-      city: city || 'Pune',
-      state: state || 'Maharashtra',
-      country: country || 'India',
-      pincode: pincode || '411001',
-      emergencyContactName: emergencyContactName || null,
-      emergencyContactPhone: emergencyContactPhone || null,
-      medicalNotes: medicalNotes || null,
-      isEmailVerified: true,
-    },
-  });
-
   const token = jwt.sign(
     { userId: user.id, role: user.role, email: user.email },
     config.jwt.secret,

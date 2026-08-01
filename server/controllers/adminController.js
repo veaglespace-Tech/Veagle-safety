@@ -104,8 +104,10 @@ export const updateUserRole = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: 'Invalid user ID or role parameter' });
   }
 
+  const targetUserId = typeof userId === 'number' ? userId : parseInt(userId, 10);
+
   const updated = await prisma.user.update({
-    where: { id: userId },
+    where: { id: targetUserId },
     data: { role },
   });
 
@@ -121,8 +123,10 @@ export const updateUserRole = asyncHandler(async (req, res) => {
 export const adminResolveSos = asyncHandler(async (req, res) => {
   const { sosSessionId, note } = req.body;
 
+  const targetSosId = typeof sosSessionId === 'number' ? sosSessionId : parseInt(sosSessionId, 10);
+
   const sos = await prisma.sosSession.update({
-    where: { id: sosSessionId },
+    where: { id: targetSosId },
     data: {
       status: 'RESOLVED',
       resolvedAt: new Date(),
@@ -148,12 +152,12 @@ export const getPlans = asyncHandler(async (req, res) => {
   if (plans.length === 0) {
     const defaultPlan = await prisma.plan.create({
       data: {
-        name: 'Veagle Safety Standard Monthly Plan',
-        description: 'Full access to SOS emergency broadcast, live GPS tracking, and safety check-ins.',
+        name: 'Sakhi Suraksha 365 Yearly Protection Plan',
+        description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
         basePrice: 24.0,
         gstPercentage: 18.0,
         totalPrice: 28.32,
-        durationDays: 30,
+        durationDays: 365,
         isActive: true,
       },
     });
@@ -179,8 +183,9 @@ export const createOrUpdatePlan = asyncHandler(async (req, res) => {
 
   let plan;
   if (id) {
+    const targetPlanId = typeof id === 'number' ? id : parseInt(id, 10);
     plan = await prisma.plan.update({
-      where: { id },
+      where: { id: targetPlanId },
       data: {
         name,
         description,

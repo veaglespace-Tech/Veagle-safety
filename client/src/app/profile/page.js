@@ -45,9 +45,13 @@ export default function UserProfileSettingsPage() {
   const [activeTab, setActiveTab] = useState('DIAGNOSTICS');
   const [showTestModal, setShowTestModal] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
+  const [isVibrationSupported, setIsVibrationSupported] = useState(false);
 
   useEffect(() => {
     fetchUser();
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      setIsVibrationSupported(true);
+    }
   }, []);
   
   // AVATAR NOTIFICATION STATE
@@ -160,15 +164,6 @@ export default function UserProfileSettingsPage() {
     : 'PS';
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
-  const [isVibrationSupported, setIsVibrationSupported] = useState(true);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      setIsVibrationSupported(true);
-    } else {
-      setIsVibrationSupported(false);
-    }
-  }, []);
 
   const diagnostics = [
     { icon: MapPin, label: 'GPS Location Access', status: status === 'LIVE', value: status === 'LIVE' ? `✓ Active (±${accuracy || '10'}m)` : '⚠ Permission Required' },

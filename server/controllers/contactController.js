@@ -48,7 +48,7 @@ export const deleteContact = async (req, res) => {
 
     await prisma.trustedContact.deleteMany({
       where: {
-        id,
+        id: typeof id === 'number' ? id : parseInt(id, 10),
         userId: req.user?.id,
       },
     });
