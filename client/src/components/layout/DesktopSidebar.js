@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   Shield,
   ShieldCheck,
@@ -34,6 +34,7 @@ export const DesktopSidebar = () => {
   const { activeSession } = useSOSStore();
   const { status } = useLocationStore();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
 
   const [mounted, setMounted] = React.useState(false);
@@ -43,9 +44,7 @@ export const DesktopSidebar = () => {
   }, []);
 
   const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
-  const currentAdminTab = mounted && typeof window !== 'undefined'
-    ? (new URLSearchParams(window.location.search).get('tab') || 'overview')
-    : 'overview';
+  const currentAdminTab = searchParams?.get('tab') || 'overview';
 
   const memberNavItems = [
     { path: '/dashboard', label: 'Home', icon: Home, desc: 'Safety Dashboard' },
