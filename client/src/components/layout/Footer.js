@@ -8,7 +8,7 @@ export const Footer = () => {
   return (
     <footer className="bg-white/95 backdrop-blur-xl border-t-1.5 border-[#FFCCE1] py-4 text-[#2A0826] shadow-sm relative z-20 w-full mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-3 text-xs font-extrabold text-[#684E67]">
-        
+
         {/* LEFT: LOGO & BRAND */}
         <div className="flex items-center space-x-2.5 shrink-0 justify-center lg:justify-start">
           <Logo3DFlip size={30} />
