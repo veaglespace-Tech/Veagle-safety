@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Home, MapPin, AlertTriangle, Users, ShieldCheck, Crown, Sliders, CreditCard } from 'lucide-react';
+import { User, Home, MapPin, AlertTriangle, Users, ShieldCheck, Crown, Sliders, CreditCard } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 export const BottomNavigation = () => {
