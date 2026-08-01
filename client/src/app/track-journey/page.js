@@ -94,13 +94,13 @@ export default function UserTrackJourneyPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden pb-16">
+      <div className="bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden">
         
         {/* BACKGROUND AMBIENT GLOW MESHES */}
         <div className="absolute w-[700px] h-[700px] rounded-full bg-rose/15 blur-[150px] top-[-100px] left-[-200px] pointer-events-none" />
         <div className="absolute w-[700px] h-[700px] rounded-full bg-gold/15 blur-[150px] bottom-[100px] right-[-200px] pointer-events-none" />
 
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 relative z-10 animate-fade-up">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4 space-y-6 relative z-10 animate-fade-up">
 
           {/* PAGE TITLE HEADER */}
           <div className="text-center space-y-2">

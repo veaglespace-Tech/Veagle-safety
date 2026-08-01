@@ -377,11 +377,11 @@ function SuperAdminHQContent() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden pb-16">
+      <div className="bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden">
         
-        {/* AMBIENT BACKGROUND GLOWS */}
-        <div className="absolute w-[800px] h-[800px] rounded-full bg-gold/15 blur-[170px] top-[-100px] left-[-200px] pointer-events-none" />
-        <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF2A6D]/15 blur-[170px] bottom-[100px] right-[-200px] pointer-events-none" />
+        {/* BACKGROUND AMBIENT GLOW MESHES */}
+        <div className="absolute w-[800px] h-[800px] rounded-full bg-rose/15 blur-[160px] top-[-100px] left-[-200px] pointer-events-none" />
+        <div className="absolute w-[800px] h-[800px] rounded-full bg-gold/15 blur-[160px] bottom-[100px] right-[-200px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 relative z-10 animate-fade-up">
 

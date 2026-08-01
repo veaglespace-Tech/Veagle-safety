@@ -75,7 +75,7 @@ export const AppLayout = ({ children, fullScreen = false }) => {
       <div className="lg:ml-72 flex-1 flex flex-col">
         {!fullScreen && <Header />}
 
-        <main className={`flex-1 ${!fullScreen ? 'pb-28 lg:pb-8' : ''}`}>
+        <main className={`flex-1 ${!fullScreen ? 'pb-16 lg:pb-4' : ''}`}>
           {children}
         </main>
 

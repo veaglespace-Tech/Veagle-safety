@@ -82,24 +82,26 @@ export const PublicNavbar = () => {
           </div>
         </Link>
 
-        {/* DESKTOP ANIMATED NAV CHIPS CAPSULE */}
-        <nav className="hidden md:flex items-center gap-1.5 nav-chip-capsule">
-          {navLinks.map(({ href, label }) => {
-            const active = isActive(href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-300 ${active
-                    ? 'nav-chip-active'
-                    : 'nav-chip-hover'
-                  }`}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
+        {/* DESKTOP ANIMATED NAV CHIPS CAPSULE (ONLY FOR GUESTS) */}
+        {!isLoggedIn && (
+          <nav className="hidden md:flex items-center gap-1.5 nav-chip-capsule">
+            {navLinks.map(({ href, label }) => {
+              const active = isActive(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-300 ${active
+                      ? 'nav-chip-active'
+                      : 'nav-chip-hover'
+                    }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
 
         {/* RIGHT SIDE ACTIONS & MOBILE MENU TOGGLE */}
         <div className="flex items-center gap-2 shrink-0">
@@ -141,23 +143,25 @@ export const PublicNavbar = () => {
             </div>
           )}
 
-          {/* MOBILE MENU TOGGLE BUTTON (SHRINK-0 ALWAYS INSIDE VIEWPORT) */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm shrink-0"
-            aria-label="Toggle menu"
-          >
-            <div className={`transition-transform duration-300 ${menuOpen ? 'rotate-90' : 'rotate-0'}`}>
-              {menuOpen ? <X size={18} /> : <Menu size={18} />}
-            </div>
-          </button>
+          {/* MOBILE MENU TOGGLE BUTTON (ONLY FOR PUBLIC GUESTS) */}
+          {!isLoggedIn && (
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm shrink-0"
+              aria-label="Toggle menu"
+            >
+              <div className={`transition-transform duration-300 ${menuOpen ? 'rotate-90' : 'rotate-0'}`}>
+                {menuOpen ? <X size={18} /> : <Menu size={18} />}
+              </div>
+            </button>
+          )}
         </div>
       </div>
 
       {/* MOBILE COLLAPSED MENU DROPDOWN */}
       {menuOpen && (
         <div className="md:hidden border-t-1.5 border-[#FFCCE1] bg-white/99 p-3.5 shadow-2xl animate-fade-up">
-          {navLinks.map(({ href, label, icon: Icon }) => (
+          {!isLoggedIn && navLinks.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} className={`flex items-center gap-3 p-3 rounded-xl text-xs font-black mb-1.5 transition-all duration-200 ${isActive(href)
                 ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30'
                 : 'bg-[#FFF0F3] text-[#2A0826] hover:bg-white hover:text-[#FF5C8A]'
