@@ -57,9 +57,12 @@ export default function ActiveSOSLivePage() {
     }
   };
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   if (!activeSession) return null;
 
-  const firstName = user?.fullName?.split(' ')[0] || 'User';
+  const firstName = mounted && (user?.fullName || user?.name) ? (user.fullName || user.name).split(' ')[0] : 'User';
 
   return (
     <div className="min-h-screen bg-tichi-emergency/5">

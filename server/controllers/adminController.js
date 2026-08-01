@@ -118,6 +118,194 @@ export const updateUserRole = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Update Full User Details by SuperAdmin (including Direct Email Change without OTP)
+ */
+export const updateUserDetailsAdmin = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const {
+    fullName,
+    email,
+    phone,
+    role,
+    bloodGroup,
+    address,
+    city,
+    state,
+    pincode,
+    emergencyContactName,
+    emergencyContactPhone,
+    medicalNotes,
+    password,
+  } = req.body;
+
+  const targetUserId = parseInt(id, 10);
+  const targetUser = await prisma.user.findUnique({ where: { id: targetUserId } });
+  if (!targetUser) {
+    return res.status(404).json({ error: 'User account not found' });
+  }
+
+  // Check email uniqueness if email is changed
+  if (email && email.toLowerCase().trim() !== targetUser.email.toLowerCase().trim()) {
+    const cleanEmail = email.toLowerCase().trim();
+    const existing = await prisma.user.findFirst({
+      where: { email: cleanEmail, id: { not: targetUserId } },
+    });
+    if (existing) {
+      return res.status(409).json({ error: 'An account with this email address already exists' });
+    }
+  }
+
+  let passwordHash = undefined;
+  if (password && password.length >= 6) {
+    passwordHash = await bcrypt.hash(password, 10);
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: targetUserId },
+    data: {
+      ...(fullName && { fullName: fullName.trim() }),
+      ...(email && { email: email.toLowerCase().trim(), isEmailVerified: true }),
+      ...(phone && { phone: phone.replace(/\D/g, '') }),
+      ...(role && { role }),
+      ...(passwordHash && { passwordHash }),
+      ...(bloodGroup !== undefined && { bloodGroup }),
+      ...(address !== undefined && { address }),
+      ...(city !== undefined && { city }),
+      ...(state !== undefined && { state }),
+      ...(pincode !== undefined && { pincode }),
+      ...(emergencyContactName !== undefined && { emergencyContactName }),
+      ...(emergencyContactPhone !== undefined && { emergencyContactPhone }),
+      ...(medicalNotes !== undefined && { medicalNotes }),
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      role: true,
+      bloodGroup: true,
+      address: true,
+      city: true,
+      state: true,
+      pincode: true,
+      emergencyContactName: true,
+      emergencyContactPhone: true,
+      medicalNotes: true,
+      subscriptionStatus: true,
+      subscriptionExpiresAt: true,
+      safetyStatus: true,
+    },
+  });
+
+  return res.json({
+    message: `User details updated successfully for ${updatedUser.fullName}`,
+    user: updatedUser,
+  });
+});
+
+/**
+ * Toggle User Account Block / Unblock Status by SuperAdmin
+ */
+export const toggleUserBlock = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const targetUserId = parseInt(id, 10);
+
+  const targetUser = await prisma.user.findUnique({ where: { id: targetUserId } });
+  if (!targetUser) {
+    return res.status(404).json({ error: 'User account not found' });
+  }
+
+  const isBlocked = targetUser.safetyStatus === 'BLOCKED';
+  const newSafetyStatus = isBlocked ? 'SAFE' : 'BLOCKED';
+
+  const updated = await prisma.user.update({
+    where: { id: targetUserId },
+    data: { safetyStatus: newSafetyStatus },
+    select: { id: true, fullName: true, safetyStatus: true },
+  });
+
+  return res.json({
+    message: `User ${updated.fullName} is now ${newSafetyStatus === 'BLOCKED' ? 'BLOCKED' : 'UNBLOCKED'}`,
+    user: updated,
+  });
+});
+
+/**
+ * Grant Free Custom Subscription Plan / Renewal by SuperAdmin
+ */
+export const grantUserFreeSubscription = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { durationDays, customStartDate, customExpiryDate, planName } = req.body;
+  const targetUserId = parseInt(id, 10);
+
+  const targetUser = await prisma.user.findUnique({ where: { id: targetUserId } });
+  if (!targetUser) {
+    return res.status(404).json({ error: 'User account not found' });
+  }
+
+  let startDate = customStartDate ? new Date(customStartDate) : new Date();
+  let expiryDate = customExpiryDate ? new Date(customExpiryDate) : new Date(startDate.getTime() + (durationDays || 365) * 24 * 60 * 60 * 1000);
+
+  const updatedUser = await prisma.user.update({
+    where: { id: targetUserId },
+    data: {
+      subscriptionStatus: 'ACTIVE',
+      subscriptionExpiresAt: expiryDate,
+    },
+    select: {
+      id: true,
+      fullName: true,
+      subscriptionStatus: true,
+      subscriptionExpiresAt: true,
+    },
+  });
+
+  // Record free grant in payment history for audit logging
+  try {
+    await prisma.paymentHistory.create({
+      data: {
+        userId: targetUserId,
+        txnid: `SUPERADMIN_GRANT_${Date.now()}_${targetUserId}`,
+        amount: 0.0,
+        baseAmount: 0.0,
+        gstAmount: 0.0,
+        gstPercentage: 0.0,
+        status: 'SUCCESS',
+        paymentMode: 'SUPERADMIN_FREE_GRANT',
+      },
+    });
+  } catch (e) {}
+
+  return res.json({
+    message: `Free Subscription (${planName || 'Custom Plan'}) granted to ${updatedUser.fullName} valid until ${expiryDate.toLocaleDateString('en-IN')}`,
+    user: updatedUser,
+  });
+});
+
+/**
+ * Toggle Subscription Plan Active Status
+ */
+export const togglePlanActive = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const targetPlanId = parseInt(id, 10);
+
+  const targetPlan = await prisma.plan.findUnique({ where: { id: targetPlanId } });
+  if (!targetPlan) {
+    return res.status(404).json({ error: 'Plan not found' });
+  }
+
+  const updated = await prisma.plan.update({
+    where: { id: targetPlanId },
+    data: { isActive: !targetPlan.isActive },
+  });
+
+  return res.json({
+    message: `Plan "${updated.name}" is now ${updated.isActive ? 'ENABLED' : 'DISABLED'}`,
+    plan: updated,
+  });
+});
+
+/**
  * Resolve Active SOS Session by SuperAdmin
  */
 export const adminResolveSos = asyncHandler(async (req, res) => {

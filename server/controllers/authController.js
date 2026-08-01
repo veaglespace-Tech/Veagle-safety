@@ -23,6 +23,7 @@ export const register = asyncHandler(async (req, res) => {
     country,
     pincode,
     emergencyContactName,
+    emergencyContactRelation,
     emergencyContactPhone,
     medicalNotes,
   } = req.body;
@@ -141,7 +142,7 @@ export const register = asyncHandler(async (req, res) => {
         data: {
           userId: user.id,
           name: emergencyContactName,
-          relationship: 'Primary Guardian / Emergency Contact',
+          relationship: emergencyContactRelation || 'Guardian',
           phone: emergencyContactPhone,
           email: user.email,
           isVerified: true,
@@ -493,9 +494,57 @@ export const getProfile = asyncHandler(async (req, res) => {
 /**
  * Update Profile Settings
  */
+/**
+ * Send OTP for New Email Change Verification
+ */
+export const sendEmailChangeOtp = asyncHandler(async (req, res) => {
+  const { newEmail } = req.body;
+  if (!newEmail) {
+    return res.status(400).json({ error: 'New email address is required' });
+  }
+
+  const cleanEmail = newEmail.toLowerCase().trim();
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      email: cleanEmail,
+      id: { not: req.user.id },
+    },
+  });
+
+  if (existingUser) {
+    return res.status(409).json({ error: 'An account with this email address already exists' });
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+  await prisma.user.update({
+    where: { id: req.user.id },
+    data: {
+      emailOtp: otp,
+      emailOtpExpiresAt: otpExpires,
+    },
+  });
+
+  try {
+    await sendEmailVerificationOtp({
+      recipientEmail: cleanEmail,
+      userName: req.user.fullName || 'Sakhi Member',
+      otp,
+    });
+  } catch (emailErr) {
+    console.warn('[Email Change OTP Notice]:', emailErr.message);
+  }
+
+  res.status(200).json({
+    message: `Verification 6-digit OTP code sent to ${cleanEmail}`,
+  });
+});
+
 export const updateSettings = asyncHandler(async (req, res) => {
   const {
     fullName,
+    email,
     phone,
     profilePhoto,
     bloodGroup,
@@ -507,13 +556,41 @@ export const updateSettings = asyncHandler(async (req, res) => {
     emergencyContactName,
     emergencyContactPhone,
     medicalNotes,
+    newPassword,
   } = req.body;
+
+  const currentUser = await prisma.user.findUnique({ where: { id: req.user.id } });
+  if (!currentUser) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  // Strict DB Uniqueness check for Email
+  if (email && email.toLowerCase().trim() !== currentUser.email.toLowerCase().trim()) {
+    const cleanEmail = email.toLowerCase().trim();
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        email: cleanEmail,
+        id: { not: req.user.id },
+      },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ error: 'An account with this email address already exists. Duplicate email is not allowed.' });
+    }
+  }
+
+  let passwordHash = undefined;
+  if (newPassword && newPassword.length >= 6) {
+    passwordHash = await bcrypt.hash(newPassword, 10);
+  }
 
   const updatedUser = await prisma.user.update({
     where: { id: req.user.id },
     data: {
       ...(fullName && { fullName }),
+      ...(email && { email: email.toLowerCase().trim() }),
       ...(phone && { phone }),
+      ...(passwordHash && { passwordHash }),
       ...(profilePhoto !== undefined && { profilePhoto }),
       ...(bloodGroup !== undefined && { bloodGroup }),
       ...(address !== undefined && { address }),
@@ -545,7 +622,80 @@ export const updateSettings = asyncHandler(async (req, res) => {
     },
   });
 
-  res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+  res.status(200).json({
+    message: 'Profile updated successfully',
+    user: updatedUser,
+  });
+});
+
+/**
+ * Verify New Email Change via OTP
+ */
+export const verifyNewEmail = asyncHandler(async (req, res) => {
+  const { pendingEmail, otpCode } = req.body;
+
+  if (!pendingEmail || !otpCode) {
+    return res.status(400).json({ error: 'New email and 6-digit OTP code are required' });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  if (user.emailOtp !== otpCode.trim()) {
+    return res.status(400).json({ error: 'Invalid OTP code. Please check your email and try again.' });
+  }
+
+  if (user.emailOtpExpiresAt && new Date() > new Date(user.emailOtpExpiresAt)) {
+    return res.status(400).json({ error: 'OTP code has expired. Please request a new email update.' });
+  }
+
+  const cleanEmail = pendingEmail.toLowerCase().trim();
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      email: cleanEmail,
+      id: { not: req.user.id },
+    },
+  });
+
+  if (existingUser) {
+    return res.status(409).json({ error: 'An account with this email address already exists. Duplicate email is not allowed.' });
+  }
+
+  // Update user's email to verified pending email
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      email: cleanEmail,
+      isEmailVerified: true,
+      emailOtp: null,
+      emailOtpExpiresAt: null,
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      role: true,
+      subscriptionStatus: true,
+      profilePhoto: true,
+      bloodGroup: true,
+      address: true,
+      city: true,
+      state: true,
+      country: true,
+      pincode: true,
+      emergencyContactName: true,
+      emergencyContactPhone: true,
+      medicalNotes: true,
+    },
+  });
+
+  res.status(200).json({
+    message: 'New email address verified and updated successfully!',
+    user: updatedUser,
+  });
 });
 
 /**

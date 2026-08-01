@@ -36,4 +36,14 @@ export const authApi = {
     const response = await apiClient.put('/auth/settings', settingsData);
     return response.data;
   },
+
+  sendEmailChangeOtp: async ({ newEmail }) => {
+    const response = await apiClient.post('/auth/send-email-change-otp', { newEmail });
+    return response.data;
+  },
+
+  verifyNewEmail: async ({ pendingEmail, otpCode }) => {
+    const response = await apiClient.post('/auth/verify-new-email', { pendingEmail, otpCode });
+    return response.data;
+  },
 };

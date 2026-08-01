@@ -1,1155 +1,1528 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useAuthStore } from '../../redux/useAuthStore.js';
+import React, { useState, useEffect, Suspense } from 'react';
+import { AppLayout } from '../../components/layout/AppLayout.js';
 import { api } from '../../utils/api.js';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Logo3DFlip } from '../../components/ui/Logo3DFlip.js';
-import { SuperAdminQuickJump } from '../../components/common/SuperAdminQuickJump.jsx';
-import { Footer } from '../../components/layout/Footer.js';
 import {
-  Crown,
-  AlertOctagon,
-  Users,
-  CheckCircle,
-  MapPin,
-  RefreshCw,
-  Search,
-  UserCheck,
-  ShieldAlert,
-  Radio,
-  LogOut,
-  PhoneCall,
-  Activity,
-  ShieldCheck,
-  Zap,
-  Sliders,
-  ArrowRight,
   Shield,
-  Layers,
-  UserPlus,
+  ShieldCheck,
+  Users,
+  CreditCard,
+  Sliders,
+  Search,
+  Filter,
+  CheckCircle2,
+  XCircle,
+  AlertOctagon,
+  Crown,
   Edit3,
-  X,
-  Menu,
   Lock,
-  Mail,
-  User,
-  Heart,
-  KeyRound,
+  Unlock,
   Plus,
+  RefreshCw,
+  Eye,
+  FileText,
+  DollarSign,
+  ChevronLeft,
+  ChevronRight,
+  Send,
+  Calendar,
+  Sparkles,
+  Zap,
+  MapPin,
+  PhoneCall,
+  Mail,
+  UserCheck,
+  UserX,
+  Printer,
+  X,
+  TrendingUp,
 } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function SuperAdminOperationsPortal() {
-  const [mounted, setMounted] = useState(false);
-  const { user, logout, fetchUser } = useAuthStore();
+function SuperAdminHQContent() {
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'users', 'plans', 'payments'
+  const [isLoading, setIsLoading] = useState(true);
+  const [toast, setToast] = useState(null);
 
-  const [metrics, setMetrics] = useState(null);
-  const [activeSos, setActiveSos] = useState([]);
-  const [recentSos, setRecentSos] = useState([]);
-  const [usersList, setUsersList] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('INCIDENTS');
-  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-  const [actionSuccess, setActionSuccess] = useState(null);
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && ['overview', 'users', 'plans', 'payments'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
-  // PAGINATION STATES (7 items per page)
-  const [sosPage, setSosPage] = useState(1);
-  const [usersPage, setUsersPage] = useState(1);
-  const LOGS_PER_PAGE = 7;
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    router.push(`/admin?tab=${newTab}`);
+  };
 
-  // CREATE USER MODAL STATE
-  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
-  const [newUserName, setNewUserName] = useState('');
-  const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserPhone, setNewUserPhone] = useState('');
-  const [newUserPass, setNewUserPass] = useState('');
-  const [newUserRole, setNewUserRole] = useState('USER');
-  const [newUserBlood, setNewUserBlood] = useState('O+');
-  const [createLoading, setCreateLoading] = useState(false);
-  const [createError, setCreateError] = useState(null);
+  // OVERVIEW DATA
+  const [overview, setOverview] = useState(null);
 
-  // EDIT ADMIN PROFILE MODAL STATE
-  const [showEditAdminModal, setShowEditAdminModal] = useState(false);
-  const [adminName, setAdminName] = useState('');
-  const [adminEmail, setAdminEmail] = useState('');
-  const [adminPhone, setAdminPhone] = useState('');
-  const [adminPass, setAdminPass] = useState('');
-  const [editAdminLoading, setEditAdminLoading] = useState(false);
-  const [editAdminError, setEditAdminError] = useState(null);
+  // USERS DATA & FILTERS
+  const [users, setUsers] = useState([]);
+  const [userSearch, setUserSearch] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('ALL');
+  const [userSubFilter, setUserSubFilter] = useState('ALL');
+  const [userStatusFilter, setUserStatusFilter] = useState('ALL');
+  const [userPage, setUserPage] = useState(1);
+  const usersPerPage = 8;
+
+  // MODAL STATES FOR USERS
+  const [editingUser, setEditingUser] = useState(null);
+  const [grantingUser, setGrantingUser] = useState(null);
+  const [freePlanDuration, setFreePlanDuration] = useState('365');
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customExpiryDate, setCustomExpiryDate] = useState('');
+
+  // USER EDIT FORM STATE
+  const [editFullName, setEditFullName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editRole, setEditRole] = useState('USER');
+  const [editBloodGroup, setEditBloodGroup] = useState('O+');
+  const [editAddress, setEditAddress] = useState('');
+  const [editCity, setEditCity] = useState('');
+  const [editState, setEditState] = useState('');
+  const [editPincode, setEditPincode] = useState('');
+  const [editEmergencyName, setEditEmergencyName] = useState('');
+  const [editEmergencyPhone, setEditEmergencyPhone] = useState('');
+  const [editMedicalNotes, setEditMedicalNotes] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [isSubmittingUserEdit, setIsSubmittingUserEdit] = useState(false);
+
+  // PLANS & GST DATA
+  const [plans, setPlans] = useState([]);
+  const [gstPercentage, setGstPercentage] = useState(18);
+  const [editingPlan, setEditingPlan] = useState(null);
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
+  const [planForm, setPlanForm] = useState({
+    id: null,
+    name: '',
+    description: '',
+    basePrice: '',
+    gstPercentage: 18,
+    durationDays: 365,
+    isActive: true,
+  });
+
+  // PAYMENTS DATA & FILTERS
+  const [payments, setPayments] = useState([]);
+  const [paymentSummary, setPaymentSummary] = useState(null);
+  const [paymentSearch, setPaymentSearch] = useState('');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState('ALL');
+  const [paymentPage, setPaymentPage] = useState(1);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const paymentsPerPage = 8;
 
   useEffect(() => {
     setMounted(true);
+    loadAllAdminData();
   }, []);
 
-  useEffect(() => {
-    setUsersPage(1);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    if (!mounted) return;
-    if (!user) {
-      router.push('/admin/login');
-      return;
-    }
-    if (user.role !== 'SUPER_ADMIN') {
-      router.push('/dashboard');
-      return;
-    }
-    loadAdminData();
-
-    // Populate initial edit admin fields
-    setAdminName(user.fullName || '');
-    setAdminEmail(user.email || '');
-    setAdminPhone(user.phone || '');
-  }, [user, mounted]);
-
-  const loadAdminData = async () => {
-    setLoading(true);
+  const loadAllAdminData = async () => {
+    setIsLoading(true);
     try {
-      const [overviewRes, usersRes] = await Promise.all([
-        api.get('/admin/overview'),
-        api.get('/admin/users'),
+      await Promise.all([
+        fetchOverview(),
+        fetchUsersData(),
+        fetchPlansData(),
+        fetchGstData(),
+        fetchPaymentsData(),
       ]);
-      setMetrics(overviewRes.data.metrics);
-      setActiveSos(overviewRes.data.activeSos || []);
-      setRecentSos(overviewRes.data.recentSos || []);
-      setUsersList(usersRes.data.users || []);
     } catch (err) {
-      console.error('Failed to fetch admin dashboard data');
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        router.push('/admin/login');
-      }
+      showToast('error', 'Failed to load SuperAdmin dashboard metrics');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleCreateUser = async (e) => {
+  const showToast = (type, text) => {
+    setToast({ type, text });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  // API FETCHERS
+  const fetchOverview = async () => {
+    const res = await api.get('/admin/overview');
+    setOverview(res.data);
+  };
+
+  const fetchUsersData = async () => {
+    const res = await api.get('/admin/users');
+    setUsers(res.data.users || []);
+  };
+
+  const fetchPlansData = async () => {
+    const res = await api.get('/admin/plans');
+    setPlans(res.data.plans || []);
+  };
+
+  const fetchGstData = async () => {
+    const res = await api.get('/admin/gst');
+    setGstPercentage(res.data.gstPercentage || 18);
+  };
+
+  const fetchPaymentsData = async () => {
+    const res = await api.get('/admin/payments');
+    setPayments(res.data.payments || []);
+    setPaymentSummary(res.data.summary || null);
+  };
+
+  // HANDLERS FOR USER MANAGEMENT
+  const openEditUserModal = (u) => {
+    setEditingUser(u);
+    setEditFullName(u.fullName || '');
+    setEditEmail(u.email || '');
+    setEditPhone(u.phone || '');
+    setEditRole(u.role || 'USER');
+    setEditBloodGroup(u.bloodGroup || 'O+');
+    setEditAddress(u.address || '');
+    setEditCity(u.city || '');
+    setEditState(u.state || '');
+    setEditPincode(u.pincode || '');
+    setEditEmergencyName(u.emergencyContactName || '');
+    setEditEmergencyPhone(u.emergencyContactPhone || '');
+    setEditMedicalNotes(u.medicalNotes || '');
+    setEditPassword('');
+  };
+
+  const handleSaveUserEdit = async (e) => {
     e.preventDefault();
-    setCreateError(null);
-    setCreateLoading(true);
+    if (!editingUser) return;
+    setIsSubmittingUserEdit(true);
 
     try {
-      const res = await api.post('/admin/users/create', {
-        fullName: newUserName,
-        email: newUserEmail,
-        phone: newUserPhone,
-        password: newUserPass,
-        role: newUserRole,
-        bloodGroup: newUserBlood,
-      });
+      const payload = {
+        fullName: editFullName.trim(),
+        email: editEmail.trim(),
+        phone: editPhone.replace(/\D/g, ''),
+        role: editRole,
+        bloodGroup: editBloodGroup,
+        address: editAddress.trim(),
+        city: editCity.trim(),
+        state: editState.trim(),
+        pincode: editPincode.trim(),
+        emergencyContactName: editEmergencyName.trim(),
+        emergencyContactPhone: editEmergencyPhone.replace(/\D/g, ''),
+        medicalNotes: editMedicalNotes.trim(),
+        ...(editPassword && { password: editPassword }),
+      };
 
-      setActionSuccess(res.data.message);
-      setTimeout(() => setActionSuccess(null), 4000);
-
-      // Reset form & close modal
-      setNewUserName('');
-      setNewUserEmail('');
-      setNewUserPhone('');
-      setNewUserPass('');
-      setShowCreateUserModal(false);
-
-      // Refresh list
-      loadAdminData();
+      const res = await api.put(`/admin/users/${editingUser.id}`, payload);
+      showToast('success', res.data.message || 'User details updated successfully!');
+      setEditingUser(null);
+      fetchUsersData();
     } catch (err) {
-      setCreateError(err.response?.data?.error || 'Failed to create new user.');
+      showToast('error', err.response?.data?.error || 'Failed to update user details');
     } finally {
-      setCreateLoading(false);
+      setIsSubmittingUserEdit(false);
     }
   };
 
-  const handleUpdateAdminProfile = async (e) => {
+  const handleToggleBlockUser = async (userObj) => {
+    const isCurrentlyBlocked = userObj.safetyStatus === 'BLOCKED';
+    const actionLabel = isCurrentlyBlocked ? 'UNBLOCK' : 'BLOCK';
+    if (!confirm(`Are you sure you want to ${actionLabel} user "${userObj.fullName}"?`)) return;
+
+    try {
+      const res = await api.post(`/admin/users/${userObj.id}/block`);
+      showToast('success', res.data.message);
+      fetchUsersData();
+    } catch (err) {
+      showToast('error', err.response?.data?.error || 'Failed to toggle user block status');
+    }
+  };
+
+  const handleGrantFreeSubscription = async () => {
+    if (!grantingUser) return;
+    try {
+      const payload = {
+        durationDays: parseInt(freePlanDuration, 10),
+        planName: freePlanDuration === '365' ? 'Free 1-Year Sakhi Protection' : `Free ${freePlanDuration}-Day Pass`,
+        ...(customStartDate && { customStartDate }),
+        ...(customExpiryDate && { customExpiryDate }),
+      };
+
+      const res = await api.post(`/admin/users/${grantingUser.id}/grant-subscription`, payload);
+      showToast('success', res.data.message);
+      setGrantingUser(null);
+      fetchUsersData();
+      fetchOverview();
+    } catch (err) {
+      showToast('error', err.response?.data?.error || 'Failed to grant free subscription');
+    }
+  };
+
+  // HANDLERS FOR GST MODULE & PLAN MANAGEMENT
+  const handleUpdateGlobalGst = async (e) => {
     e.preventDefault();
-    setEditAdminError(null);
-    setEditAdminLoading(true);
-
     try {
-      const res = await api.put('/admin/profile', {
-        fullName: adminName,
-        email: adminEmail,
-        phone: adminPhone,
-        password: adminPass || undefined,
-      });
-
-      setActionSuccess(res.data.message);
-      setTimeout(() => setActionSuccess(null), 4000);
-
-      fetchUser();
-      setShowEditAdminModal(false);
-      setAdminPass('');
+      const res = await api.put('/admin/gst', { gstPercentage: parseFloat(gstPercentage) });
+      showToast('success', res.data.message);
+      fetchGstData();
+      fetchPlansData();
     } catch (err) {
-      setEditAdminError(err.response?.data?.error || 'Failed to update admin profile.');
-    } finally {
-      setEditAdminLoading(false);
+      showToast('error', err.response?.data?.error || 'Failed to update global GST');
     }
   };
 
-  const handleRoleToggle = async (targetUserId, currentRole) => {
-    const newRole = currentRole === 'SUPER_ADMIN' ? 'USER' : 'SUPER_ADMIN';
-    if (!confirm(`Change role of user to ${newRole}?`)) return;
-
+  const handleTogglePlanActive = async (planId) => {
     try {
-      const res = await api.put('/admin/user/role', { userId: targetUserId, role: newRole });
-      setActionSuccess(res.data.message);
-      setTimeout(() => setActionSuccess(null), 3000);
-      loadAdminData();
+      const res = await api.post(`/admin/plans/${planId}/toggle`);
+      showToast('success', res.data.message);
+      fetchPlansData();
     } catch (err) {
-      alert(err.response?.data?.error || 'Failed to update user role');
+      showToast('error', err.response?.data?.error || 'Failed to toggle plan status');
     }
   };
 
-  const handleAdminResolveSos = async (sosSessionId) => {
-    if (!confirm('Force-resolve this active emergency SOS session?')) return;
+  const handleSavePlan = async (e) => {
+    e.preventDefault();
     try {
-      await api.post('/admin/sos/resolve', { sosSessionId, note: 'Resolved via Super Admin HQ Panel' });
-      setActionSuccess('Emergency session resolved successfully');
-      setTimeout(() => setActionSuccess(null), 3000);
-      loadAdminData();
+      const res = await api.post('/admin/plans', planForm);
+      showToast('success', res.data.message);
+      setIsPlanModalOpen(false);
+      fetchPlansData();
     } catch (err) {
-      alert('Failed to resolve SOS session');
+      showToast('error', err.response?.data?.error || 'Failed to save plan');
     }
   };
 
-  const filteredUsers = usersList.filter(
-    (u) =>
-      u.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.phone?.includes(searchQuery)
-  );
+  const handleResolveSos = async (sosId) => {
+    if (!confirm('Resolve emergency SOS broadcast on behalf of dispatch center?')) return;
+    try {
+      const res = await api.post('/admin/sos/resolve', { sosSessionId: sosId });
+      showToast('success', res.data.message);
+      fetchOverview();
+    } catch (err) {
+      showToast('error', err.response?.data?.error || 'Failed to resolve SOS');
+    }
+  };
 
-  const totalSosPages = Math.ceil((recentSos?.length || 0) / LOGS_PER_PAGE) || 1;
-  const paginatedSos = recentSos.slice((sosPage - 1) * LOGS_PER_PAGE, sosPage * LOGS_PER_PAGE);
+  // FILTER & PAGINATION COMPUTATIONS FOR USERS
+  const filteredUsers = users.filter((u) => {
+    const q = userSearch.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      (u.fullName || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.phone || '').includes(q) ||
+      (u.city || '').toLowerCase().includes(q);
 
-  const totalUsersPages = Math.ceil((filteredUsers?.length || 0) / LOGS_PER_PAGE) || 1;
-  const paginatedUsers = filteredUsers.slice((usersPage - 1) * LOGS_PER_PAGE, usersPage * LOGS_PER_PAGE);
+    const matchesRole = userRoleFilter === 'ALL' || u.role === userRoleFilter;
+    const matchesSub = userSubFilter === 'ALL' || u.subscriptionStatus === userSubFilter;
+    const matchesStatus =
+      userStatusFilter === 'ALL' ||
+      (userStatusFilter === 'BLOCKED' ? u.safetyStatus === 'BLOCKED' : u.safetyStatus !== 'BLOCKED');
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-[#FFF0F3] text-tichi-text flex items-center justify-center text-xs font-black animate-pulse">
-        👑 Loading Super Admin HQ Command Center...
-      </div>
-    );
-  }
+    return matchesSearch && matchesRole && matchesSub && matchesStatus;
+  });
+
+  const totalUserPages = Math.ceil(filteredUsers.length / usersPerPage) || 1;
+  const paginatedUsers = filteredUsers.slice((userPage - 1) * usersPerPage, userPage * usersPerPage);
+
+  // FILTER & PAGINATION COMPUTATIONS FOR PAYMENTS
+  const filteredPayments = payments.filter((p) => {
+    const q = paymentSearch.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      (p.txnid || '').toLowerCase().includes(q) ||
+      (p.user?.fullName || '').toLowerCase().includes(q) ||
+      (p.user?.email || '').toLowerCase().includes(q);
+
+    const matchesStatus = paymentStatusFilter === 'ALL' || p.status === paymentStatusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPaymentPages = Math.ceil(filteredPayments.length / paymentsPerPage) || 1;
+  const paginatedPayments = filteredPayments.slice((paymentPage - 1) * paymentsPerPage, paymentPage * paymentsPerPage);
+
+  if (!mounted) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden">
-      
-      {/* BACKGROUND AMBIENT GLOW MESHES */}
-      <div className="absolute w-[800px] h-[800px] rounded-full bg-rose/15 blur-[160px] top-[-100px] left-[-200px] pointer-events-none" />
-      <div className="absolute w-[800px] h-[800px] rounded-full bg-gold/15 blur-[160px] bottom-[100px] right-[-200px] pointer-events-none" />
+    <AppLayout>
+      <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden pb-16">
+        
+        {/* AMBIENT BACKGROUND GLOWS */}
+        <div className="absolute w-[800px] h-[800px] rounded-full bg-gold/15 blur-[170px] top-[-100px] left-[-200px] pointer-events-none" />
+        <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF2A6D]/15 blur-[170px] bottom-[100px] right-[-200px] pointer-events-none" />
 
-      {/* PORCELAIN BLUSH TOP HEADER */}
-      <header className="bg-white/95 border-b-2 border-[#FFCCE1] sticky top-0 z-40 backdrop-blur-md px-4 sm:px-6 py-3.5 shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          
-          {/* BRANDING */}
-          <div className="flex items-center space-x-3">
-            <Logo3DFlip size={40} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10 animate-fade-up">
 
-            <div>
-              <h1 className="font-black text-sm sm:text-lg tracking-tight text-tichi-text">Super Admin HQ</h1>
-              <p className="text-[11px] sm:text-xs text-tichi-muted font-bold line-clamp-1">Sakhi Suraksha Control Center</p>
+          {/* SUPERADMIN HQ HEADER BANNER */}
+          <div className="bg-gradient-to-r from-[#2A0826] via-[#3D0C38] to-[#2A0826] text-white p-6 sm:p-8 rounded-[36px] border-2 border-gold/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#FFD700] via-[#E6A100] to-[#FFD166] text-[#2A0826] flex items-center justify-center shadow-lg shrink-0 border-2 border-white">
+                <Crown className="w-9 h-9 text-[#2A0826] animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <h1 className="font-black text-2xl sm:text-3xl text-white tracking-tight">
+                    SuperAdmin Command HQ
+                  </h1>
+                  <span className="bg-gold text-[#2A0826] font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider shadow">
+                    SUPERUSER
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-gold/90 font-bold mt-1">
+                  Full control over Users, Subscription Plans, Global GST Settings, and Payment Receipts
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+              <button
+                type="button"
+                onClick={loadAllAdminData}
+                disabled={isLoading}
+                className="bg-white/10 hover:bg-white/20 text-white font-black text-xs px-5 py-3 rounded-2xl border border-white/20 shadow flex items-center space-x-2 transition-all cursor-pointer"
+              >
+                <RefreshCw className={`w-4 h-4 text-gold ${isLoading ? 'animate-spin' : ''}`} />
+                <span>{isLoading ? 'SYNCING...' : 'REFRESH METRICS'}</span>
+              </button>
             </div>
           </div>
 
-          {/* ACTION CONTROLS */}
-          <div className="flex items-center space-x-2">
-            
-            {/* DESKTOP QUICK ACTIONS */}
-            <div className="hidden lg:flex items-center space-x-2">
-              <button
-                type="button"
-                onClick={() => setShowCreateUserModal(true)}
-                className="btn-baby-pink px-3.5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-1.5 cursor-pointer shrink-0"
-                title="Super Admin Help: Add New User via Backend"
-              >
-                <UserPlus className="w-4 h-4" />
-                <span>+ Add User</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminName(user?.fullName || '');
-                  setAdminEmail(user?.email || '');
-                  setAdminPhone(user?.phone || '');
-                  setShowEditAdminModal(true);
-                }}
-                className="p-2.5 rounded-2xl bg-white border-2 border-rose text-rose hover:bg-rose hover:text-white transition-all flex items-center space-x-1.5 text-xs font-black shadow-sm cursor-pointer"
-                title="Edit Super Admin Profile"
-              >
-                <Edit3 className="w-4 h-4" />
-                <span>Edit Profile</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={loadAdminData}
-                className="p-2.5 rounded-2xl bg-white border-2 border-[#FFCCE1] text-tichi-text hover:border-rose transition-all flex items-center space-x-1.5 text-xs font-black shadow-sm cursor-pointer"
-                title="Refresh Real-time Data"
-              >
-                <RefreshCw className={`w-4 h-4 text-rose ${loading ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
-              </button>
+          {/* FEEDBACK TOAST NOTIFICATION */}
+          {toast && (
+            <div className={`p-4 rounded-2xl text-xs font-black shadow-lg animate-shake ${
+              toast.type === 'error'
+                ? 'bg-rose-50 text-[#FF2A6D] border-2 border-[#FF2A6D]'
+                : 'bg-emerald-50 text-emerald-800 border-2 border-emerald-400'
+            }`}>
+              {toast.text}
             </div>
+          )}
 
-            {/* MOBILE MENU TOGGLE BUTTON (VISIBLE ON MOBILE/TABLET < LG) */}
-            <button
-              type="button"
-              onClick={() => setAdminMenuOpen(!adminMenuOpen)}
-              className="lg:hidden p-2.5 rounded-2xl bg-[#FFF0F3] border-2 border-[#FFCCE1] text-rose hover:bg-rose hover:text-white transition-all shadow-sm cursor-pointer"
-              aria-label="Toggle Admin Navigation Menu"
-            >
-              {adminMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-
-            {/* LOGOUT BUTTON - ALWAYS OUTSIDE ON RIGHT FOR 1-TAP ACCESSIBILITY */}
-            <button
-              type="button"
-              onClick={() => {
-                logout();
-                router.push('/admin/login');
-              }}
-              className="p-2.5 rounded-2xl bg-white border-2 border-[#FF2A6D] text-[#FF2A6D] hover:bg-[#FF2A6D] hover:text-white transition-all shadow-sm cursor-pointer shrink-0"
-              title="Sign Out"
-            >
-              <LogOut className="w-4.5 h-4.5" />
-            </button>
+          {/* MASTER TAB NAVIGATION BAR */}
+          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md p-2 rounded-3xl border-2 border-[#FFCCE1] shadow-md overflow-x-auto scrollbar-none">
+            {[
+              { id: 'overview', label: 'Emergency Command & Overview', icon: AlertOctagon, badge: overview?.metrics?.activeSosCount || 0 },
+              { id: 'users', label: 'User Management', icon: Users, badge: users.length },
+              { id: 'plans', label: 'Plans & Dynamic GST', icon: Sliders, badge: plans.length },
+              { id: 'payments', label: 'Payment Receipts & Revenue', icon: CreditCard, badge: payments.length },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`flex-1 min-w-[200px] px-5 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2.5 transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white shadow-md scale-[1.02]'
+                      : 'text-[#684E67] hover:bg-[#FFF0F3] hover:text-[#FF2A6D]'
+                  }`}
+                >
+                  <Icon className={`w-4.5 h-4.5 ${isActive ? 'text-white' : 'text-[#FF2A6D]'}`} />
+                  <span>{tab.label}</span>
+                  {tab.badge !== undefined && (
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                      isActive ? 'bg-white text-[#FF2A6D]' : 'bg-[#FFF0F3] text-[#2A0826] border border-[#FFCCE1]'
+                    }`}>
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
-        </div>
+          {/* TAB 1: OVERVIEW & ACTIVE SOS INCIDENT COMMAND */}
+          {activeTab === 'overview' && (
+            <div className="space-y-8 animate-fade-up">
+              
+              {/* TOP KPI CARDS */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#684E67] uppercase">Active SOS Alerts</span>
+                    <div className="w-10 h-10 rounded-2xl bg-rose-50 text-[#FF2A6D] flex items-center justify-center border border-rose-200">
+                      <AlertOctagon className="w-5 h-5 animate-pulse" />
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-[#2A0826]">{overview?.metrics?.activeSosCount || 0}</p>
+                  <p className="text-[11px] font-bold text-[#684E67]">Emergency broadcasts live</p>
+                </div>
 
-        {/* MOBILE COLLAPSIBLE ADMIN NAVIGATION DROPDOWN */}
-        {adminMenuOpen && (
-          <div className="lg:hidden border-t-2 border-[#FFCCE1] bg-white/99 p-4 mt-3 rounded-2xl shadow-xl space-y-4 animate-fade-up">
-            
-            {/* ADMIN TABS IN MOBILE MENU */}
-            <div className="space-y-1.5">
-              <span className="text-[10px] font-black uppercase text-tichi-muted tracking-wider px-1">Navigation Tabs</span>
-              {[
-                { key: 'INCIDENTS', label: 'Active Incidents', icon: ShieldAlert, badge: activeSos.length },
-                { key: 'USERS', label: 'User Roles & Accounts', icon: UserCheck, badge: usersList.length },
-                { key: 'SYSTEM', label: 'Dispatch Settings', icon: Sliders },
-              ].map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.key;
-                return (
+                <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#684E67] uppercase">Total Members</span>
+                    <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200">
+                      <Users className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-[#2A0826]">{overview?.metrics?.totalUsers || users.length}</p>
+                  <p className="text-[11px] font-bold text-[#684E67]">Registered Sakhi accounts</p>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#684E67] uppercase">Active Paid Plans</span>
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-[#2A0826]">{overview?.metrics?.activeSubscriptions || 0}</p>
+                  <p className="text-[11px] font-bold text-[#684E67]">Active paid protection</p>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#684E67] uppercase">Total Revenue</span>
+                    <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
+                      <TrendingUp className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-[#2A0826]">₹{overview?.metrics?.totalRevenue?.toFixed(2) || '0.00'}</p>
+                  <p className="text-[11px] font-bold text-[#684E67]">Incl. {gstPercentage}% Global GST</p>
+                </div>
+              </div>
+
+              {/* LIVE ACTIVE EMERGENCY SOS BROADCASTS TABLE */}
+              <div className="bg-white border-2 border-[#FFCCE1] rounded-[32px] p-6 sm:p-8 shadow-md space-y-6">
+                <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-2xl bg-rose-50 text-[#FF2A6D] flex items-center justify-center border border-rose-200">
+                      <AlertOctagon className="w-5 h-5 text-[#FF2A6D] animate-bounce" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-lg text-[#2A0826]">Live Active SOS Emergency Broadcasts</h3>
+                      <p className="text-xs text-[#684E67] font-bold">Real-time incident dispatch stream with 1-click resolution</p>
+                    </div>
+                  </div>
+                </div>
+
+                {overview?.activeSos && overview.activeSos.length > 0 ? (
+                  <div className="space-y-4">
+                    {overview.activeSos.map((sos) => (
+                      <div key={sos.id} className="bg-gradient-to-r from-rose-50 via-white to-rose-50 p-5 rounded-2xl border-2 border-[#FF2A6D] flex flex-col sm:flex-row items-center justify-between gap-4 shadow">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-12 h-12 rounded-2xl bg-[#FF2A6D] text-white flex items-center justify-center font-black text-lg shadow shrink-0">
+                            SOS
+                          </div>
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <h4 className="font-black text-base text-[#2A0826]">{sos.user?.fullName}</h4>
+                              <span className="bg-[#FF2A6D] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase animate-pulse">
+                                BROADCASTING
+                              </span>
+                            </div>
+                            <p className="text-xs font-bold text-[#684E67] mt-0.5">
+                              Email: {sos.user?.email} • Phone: {sos.user?.phone}
+                            </p>
+                            <p className="text-[11px] font-extrabold text-[#FF2A6D] mt-0.5">
+                              Started: {new Date(sos.startedAt).toLocaleTimeString()} ({new Date(sos.startedAt).toLocaleDateString('en-IN')})
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleResolveSos(sos.id)}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-6 py-3 rounded-xl shadow transition-all cursor-pointer uppercase tracking-wider shrink-0"
+                        >
+                          RESOLVE SOS INCIDENT
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-10 bg-[#FFF0F3] rounded-2xl border-2 border-[#FFCCE1] space-y-2">
+                    <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
+                    <p className="font-black text-base text-[#2A0826]">All Clear! No Active SOS Incidents</p>
+                    <p className="text-xs text-[#684E67] font-bold">24/7 Monitoring active across all registered member accounts</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: USER MANAGEMENT PORTAL */}
+          {activeTab === 'users' && (
+            <div className="space-y-6 animate-fade-up">
+              
+              {/* SEARCH, FILTER & ACTION CONTROL BAR */}
+              <div className="bg-white border-2 border-[#FFCCE1] p-6 rounded-[32px] shadow-md space-y-4">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                  
+                  {/* LIVE SEARCH INPUT */}
+                  <div className="relative flex-1 w-full">
+                    <Search className="w-4 h-4 text-[#684E67] absolute left-4 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Search users by Name, Email, Mobile Phone, City..."
+                      value={userSearch}
+                      onChange={(e) => { setUserSearch(e.target.value); setUserPage(1); }}
+                      className="w-full pl-11 pr-4 py-3 bg-[#FFF0F3] border-2 border-[#FFCCE1] focus:border-[#FF2A6D] rounded-2xl text-xs font-bold text-[#2A0826] outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* FILTER SELECTS */}
+                  <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                    <select
+                      value={userRoleFilter}
+                      onChange={(e) => { setUserRoleFilter(e.target.value); setUserPage(1); }}
+                      className="px-3.5 py-3 bg-[#FFF0F3] border-2 border-[#FFCCE1] rounded-2xl text-xs font-black text-[#2A0826] outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Roles</option>
+                      <option value="USER">Member Users</option>
+                      <option value="SUPER_ADMIN">Super Admins</option>
+                    </select>
+
+                    <select
+                      value={userSubFilter}
+                      onChange={(e) => { setUserSubFilter(e.target.value); setUserPage(1); }}
+                      className="px-3.5 py-3 bg-[#FFF0F3] border-2 border-[#FFCCE1] rounded-2xl text-xs font-black text-[#2A0826] outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Subscriptions</option>
+                      <option value="ACTIVE">Active Plan</option>
+                      <option value="INACTIVE">No Plan / Expired</option>
+                    </select>
+
+                    <select
+                      value={userStatusFilter}
+                      onChange={(e) => { setUserStatusFilter(e.target.value); setUserPage(1); }}
+                      className="px-3.5 py-3 bg-[#FFF0F3] border-2 border-[#FFCCE1] rounded-2xl text-xs font-black text-[#2A0826] outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Statuses</option>
+                      <option value="SAFE">Active Safe</option>
+                      <option value="BLOCKED">Blocked Accounts</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-bold text-[#684E67] border-t border-[#FFCCE1] pt-3">
+                  <span>Showing <strong className="text-[#FF2A6D]">{filteredUsers.length}</strong> matching registered users</span>
+                  <span>Page {userPage} of {totalUserPages}</span>
+                </div>
+              </div>
+
+              {/* USERS TABLE LIST */}
+              <div className="bg-white border-2 border-[#FFCCE1] rounded-[32px] overflow-hidden shadow-md">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-[#FFF0F3] border-b-2 border-[#FFCCE1] text-[11px] font-black uppercase text-[#684E67] tracking-wider">
+                        <th className="p-4 pl-6">Member Profile</th>
+                        <th className="p-4">Contact Info</th>
+                        <th className="p-4">Role</th>
+                        <th className="p-4">Subscription</th>
+                        <th className="p-4">Status</th>
+                        <th className="p-4 pr-6 text-right">Admin Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#FFCCE1] text-xs font-bold">
+                      {paginatedUsers.length > 0 ? (
+                        paginatedUsers.map((u) => {
+                          const isBlocked = u.safetyStatus === 'BLOCKED';
+                          return (
+                            <tr key={u.id} className="hover:bg-[#FFF0F3]/50 transition-colors">
+                              <td className="p-4 pl-6">
+                                <div className="flex items-center space-x-3">
+                                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center font-black text-sm shadow shrink-0">
+                                    {(u.fullName || u.name || 'U').slice(0, 2).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <p className="font-black text-[#2A0826]">{u.fullName}</p>
+                                    <p className="text-[10px] text-[#684E67] font-extrabold">{u.city || 'Pune'}, {u.state || 'MH'}</p>
+                                  </div>
+                                </div>
+                              </td>
+
+                              <td className="p-4 space-y-0.5">
+                                <p className="font-bold text-[#2A0826] flex items-center space-x-1">
+                                  <Mail className="w-3 h-3 text-[#FF2A6D]" />
+                                  <span>{u.email}</span>
+                                </p>
+                                <p className="text-[11px] text-[#684E67] font-mono flex items-center space-x-1">
+                                  <PhoneCall className="w-3 h-3 text-[#FF2A6D]" />
+                                  <span>{u.phone}</span>
+                                </p>
+                              </td>
+
+                              <td className="p-4">
+                                {u.role === 'SUPER_ADMIN' ? (
+                                  <span className="bg-gold text-[#2A0826] font-black text-[10px] px-2.5 py-1 rounded-full uppercase flex items-center space-x-1 w-fit shadow-xs">
+                                    <Crown className="w-3 h-3" />
+                                    <span>SUPER ADMIN</span>
+                                  </span>
+                                ) : (
+                                  <span className="bg-gray-100 text-gray-700 font-bold text-[10px] px-2.5 py-1 rounded-full uppercase">
+                                    MEMBER USER
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="p-4">
+                                {u.subscriptionStatus === 'ACTIVE' ? (
+                                  <div>
+                                    <span className="bg-emerald-50 text-emerald-600 border border-emerald-300 font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase inline-block">
+                                      ✓ ACTIVE
+                                    </span>
+                                    {u.subscriptionExpiresAt && (
+                                      <p className="text-[10px] text-[#684E67] mt-0.5 font-extrabold">
+                                        Exp: {new Date(u.subscriptionExpiresAt).toLocaleDateString('en-IN')}
+                                      </p>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="bg-rose-50 text-[#FF2A6D] border border-[#FF2A6D] font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase inline-block">
+                                    INACTIVE
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="p-4">
+                                {isBlocked ? (
+                                  <span className="bg-rose-600 text-white font-black text-[10px] px-2.5 py-1 rounded-full uppercase flex items-center space-x-1 w-fit shadow-xs">
+                                    <UserX className="w-3 h-3" />
+                                    <span>BLOCKED</span>
+                                  </span>
+                                ) : (
+                                  <span className="bg-emerald-100 text-emerald-800 font-black text-[10px] px-2.5 py-1 rounded-full uppercase flex items-center space-x-1 w-fit">
+                                    <UserCheck className="w-3 h-3" />
+                                    <span>SAFE / ACTIVE</span>
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="p-4 pr-6 text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => openEditUserModal(u)}
+                                    title="Edit All Details (Direct Email Change without OTP)"
+                                    className="bg-[#FFF0F3] hover:bg-[#FF2A6D] text-[#FF2A6D] hover:text-white p-2 rounded-xl border border-[#FFCCE1] shadow-xs transition-all cursor-pointer"
+                                  >
+                                    <Edit3 className="w-4 h-4" />
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => setGrantingUser(u)}
+                                    title="Grant Free Subscription / Renewal"
+                                    className="bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white p-2 rounded-xl border border-emerald-300 shadow-xs transition-all cursor-pointer"
+                                  >
+                                    <Zap className="w-4 h-4" />
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleBlockUser(u)}
+                                    title={isBlocked ? 'Unblock User' : 'Block User'}
+                                    className={`p-2 rounded-xl border shadow-xs transition-all cursor-pointer ${
+                                      isBlocked
+                                        ? 'bg-amber-50 hover:bg-amber-500 text-amber-700 hover:text-white border-amber-300'
+                                        : 'bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border-rose-300'
+                                    }`}
+                                  >
+                                    {isBlocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-[#684E67] font-black">
+                            No matching user accounts found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* PAGINATION CONTROLS */}
+                <div className="p-4 bg-[#FFF0F3] border-t-2 border-[#FFCCE1] flex items-center justify-between">
                   <button
-                    key={tab.key}
+                    type="button"
+                    disabled={userPage === 1}
+                    onClick={() => setUserPage((p) => Math.max(1, p - 1))}
+                    className="px-4 py-2 bg-white border border-[#FFCCE1] rounded-xl text-xs font-black text-[#2A0826] disabled:opacity-50 flex items-center space-x-1 cursor-pointer"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Previous</span>
+                  </button>
+
+                  <span className="text-xs font-black text-[#684E67]">
+                    Page {userPage} of {totalUserPages}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={userPage >= totalUserPages}
+                    onClick={() => setUserPage((p) => Math.min(totalUserPages, p + 1))}
+                    className="px-4 py-2 bg-white border border-[#FFCCE1] rounded-xl text-xs font-black text-[#2A0826] disabled:opacity-50 flex items-center space-x-1 cursor-pointer"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: SUBSCRIPTION PLANS & DYNAMIC GLOBAL GST MODULE */}
+          {activeTab === 'plans' && (
+            <div className="space-y-8 animate-fade-up">
+              
+              {/* GLOBAL GST PERCENTAGE MODULE CARD */}
+              <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white border-2 border-[#FFCCE1] rounded-[32px] p-6 sm:p-8 shadow-md space-y-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b-2 border-[#FFCCE1] pb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] text-white flex items-center justify-center shadow shrink-0">
+                      <Sliders className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-lg text-[#2A0826]">Global Dynamic GST Rate Control</h3>
+                      <p className="text-xs text-[#684E67] font-bold">Modifying GST percentage instantly recalculates total pricing for all subscription plans</p>
+                    </div>
+                  </div>
+                </div>
+
+                <form onSubmit={handleUpdateGlobalGst} className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+                  <div className="flex items-center space-x-3 flex-1 w-full">
+                    <label className="text-xs font-black text-[#2A0826] shrink-0">Global GST Percentage (%):</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      required
+                      value={gstPercentage}
+                      onChange={(e) => setGstPercentage(e.target.value)}
+                      className="w-32 px-4 py-3 bg-white border-2 border-[#FF2A6D] rounded-2xl text-center text-base font-black text-[#2A0826] outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black text-xs px-8 py-3.5 rounded-2xl shadow hover:scale-105 transition-all uppercase tracking-wider cursor-pointer"
+                  >
+                    UPDATE GLOBAL GST RATE
+                  </button>
+                </form>
+              </div>
+
+              {/* DYNAMIC PLANS MANAGEMENT TABLE */}
+              <div className="bg-white border-2 border-[#FFCCE1] rounded-[32px] p-6 sm:p-8 shadow-md space-y-6">
+                <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
+                  <div>
+                    <h3 className="font-black text-lg text-[#2A0826]">Subscription Plans in Database</h3>
+                    <p className="text-xs text-[#684E67] font-bold">Dynamic subscription offerings for Sakhi Suraksha members</p>
+                  </div>
+
+                  <button
                     type="button"
                     onClick={() => {
-                      setActiveTab(tab.key);
-                      setAdminMenuOpen(false);
+                      setPlanForm({
+                        id: null,
+                        name: '',
+                        description: '',
+                        basePrice: '',
+                        gstPercentage: gstPercentage,
+                        durationDays: 365,
+                        isActive: true,
+                      });
+                      setIsPlanModalOpen(true);
                     }}
-                    className={`w-full p-3 rounded-xl font-black text-xs transition-all flex items-center justify-between uppercase tracking-wider cursor-pointer ${
-                      isActive
-                        ? 'bg-rose text-white shadow-md'
-                        : 'bg-[#FFF0F3] text-tichi-text hover:bg-rose/10 border border-[#FFCCE1]'
-                    }`}
+                    className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white font-black text-xs px-5 py-3 rounded-2xl shadow hover:scale-105 transition-all flex items-center space-x-1.5 cursor-pointer uppercase tracking-wider"
                   >
-                    <div className="flex items-center space-x-2.5">
-                      <Icon className="w-4 h-4" />
-                      <span>{tab.label}</span>
-                    </div>
-                    {tab.badge !== undefined && (
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${isActive ? 'bg-white text-rose' : 'bg-rose/20 text-rose'}`}>
-                        {tab.badge}
-                      </span>
-                    )}
+                    <Plus className="w-4 h-4" />
+                    <span>CREATE NEW PLAN</span>
                   </button>
-                );
-              })}
-            </div>
+                </div>
 
-            {/* QUICK ACTIONS IN MOBILE MENU */}
-            <div className="pt-2 border-t border-[#FFCCE1] space-y-2">
-              <span className="text-[10px] font-black uppercase text-tichi-muted tracking-wider px-1">Quick Admin Actions</span>
-              
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCreateUserModal(true);
-                    setAdminMenuOpen(false);
-                  }}
-                  className="btn-baby-pink py-3 px-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1 cursor-pointer"
-                >
-                  <UserPlus className="w-4 h-4 shrink-0" />
-                  <span className="truncate">+ Add User</span>
-                </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {plans.map((p) => {
+                    const base = parseFloat(p.basePrice || 0);
+                    const gst = parseFloat(p.gstPercentage || gstPercentage);
+                    const total = parseFloat((base + (base * gst) / 100).toFixed(2));
+                    return (
+                      <div key={p.id} className={`p-6 rounded-3xl border-2 space-y-4 transition-all relative ${
+                        p.isActive ? 'bg-white border-[#FF2A6D] shadow-md' : 'bg-gray-50 border-gray-300 opacity-70'
+                      }`}>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase ${
+                              p.isActive ? 'bg-emerald-50 text-emerald-600 border border-emerald-300' : 'bg-gray-200 text-gray-700'
+                            }`}>
+                              {p.isActive ? 'ENABLED' : 'DISABLED'}
+                            </span>
+                            <h4 className="font-black text-lg text-[#2A0826] mt-2">{p.name}</h4>
+                          </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAdminName(user?.fullName || '');
-                    setAdminEmail(user?.email || '');
-                    setAdminPhone(user?.phone || '');
-                    setShowEditAdminModal(true);
-                    setAdminMenuOpen(false);
-                  }}
-                  className="py-3 px-2 rounded-xl bg-white border-2 border-rose text-rose font-black text-xs flex items-center justify-center space-x-1 cursor-pointer shadow-sm"
-                >
-                  <Edit3 className="w-4 h-4 shrink-0" />
-                  <span className="truncate">Edit Profile</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    loadAdminData();
-                    setAdminMenuOpen(false);
-                  }}
-                  className="py-3 px-2 rounded-xl bg-white border-2 border-[#FFCCE1] text-tichi-text font-black text-xs flex items-center justify-center space-x-1 cursor-pointer shadow-sm"
-                >
-                  <RefreshCw className={`w-4 h-4 text-rose shrink-0 ${loading ? 'animate-spin' : ''}`} />
-                  <span className="truncate">Refresh</span>
-                </button>
-              </div>
-            </div>
-
-          </div>
-        )}
-
-      </header>
-
-      {/* MAIN CONTAINER */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10 animate-fade-up">
-
-        {/* ACTION SUCCESS BANNER */}
-        {actionSuccess && (
-          <div className="bg-tichi-success/15 border-2 border-tichi-success text-tichi-success font-black text-xs p-4 rounded-2xl flex items-center justify-between shadow-md animate-fade-up">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5 text-tichi-success shrink-0" />
-              <span>{actionSuccess}</span>
-            </div>
-            <button type="button" onClick={() => setActionSuccess(null)} className="text-tichi-success font-black hover:opacity-75">
-              ✕
-            </button>
-          </div>
-        )}
-
-        {/* SUPER ADMIN QUICK USER ASSISTANCE ACTION BANNER */}
-        <div className="card-antique-pink border-2 border-rose p-5 rounded-3xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-2xl bg-rose/15 text-rose flex items-center justify-center shrink-0 border border-rose/30">
-              <UserPlus className="w-6 h-6 text-rose" />
-            </div>
-            <div>
-              <h3 className="font-black text-base text-tichi-text">Super Admin Direct User Registration Help</h3>
-              <p className="text-xs text-tichi-muted font-bold mt-0.5">
-                Assist users who are unable to register by creating their accounts directly via backend.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowCreateUserModal(true)}
-            className="btn-baby-pink px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-2 shrink-0 cursor-pointer"
-          >
-            <UserPlus className="w-4.5 h-4.5" />
-            <span>+ ADD NEW USER VIA BACKEND</span>
-          </button>
-        </div>
-
-        {/* 4-GRID METRICS STATS CARDS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          
-          {/* CARD 1: ACTIVE SOS CALLS */}
-          <div className={`p-6 rounded-3xl border-2 transition-all shadow-md ${
-            metrics?.activeSosCount && metrics.activeSosCount > 0
-              ? 'bg-gradient-to-r from-[#FF2A6D] to-rose border-white text-white animate-pulse shadow-coral-glow'
-              : 'card-antique-pink border-rose text-tichi-text'
-          }`}>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-rose">Active SOS Emergencies</span>
-              <div className="w-10 h-10 rounded-2xl bg-rose/15 text-rose flex items-center justify-center">
-                <AlertOctagon className="w-5 h-5 text-rose" />
-              </div>
-            </div>
-            <p className="text-4xl font-black mt-2 tracking-tight">
-              {metrics?.activeSosCount || 0}
-            </p>
-            <p className="text-xs text-tichi-muted font-bold mt-1">
-              {metrics?.activeSosCount ? '🚨 Live emergency monitoring active' : 'No active emergency calls currently'}
-            </p>
-          </div>
-
-          {/* CARD 2: TOTAL USERS */}
-          <div className="card-antique-pink border-2 border-rose p-6 rounded-3xl shadow-md text-tichi-text">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-tichi-text">Total System Users</span>
-              <div className="w-10 h-10 rounded-2xl bg-rose/15 text-rose flex items-center justify-center">
-                <Users className="w-5 h-5 text-rose" />
-              </div>
-            </div>
-            <p className="text-4xl font-black mt-2 tracking-tight">{metrics?.totalUsers || 0}</p>
-            <p className="text-xs text-tichi-muted font-bold mt-1">
-              👑 {metrics?.superAdminsCount || 1} Super Admin(s) Active
-            </p>
-          </div>
-
-          {/* CARD 3: ACTIVE JOURNEYS */}
-          <div className="card-antique-pink border-2 border-rose p-6 rounded-3xl shadow-md text-tichi-text">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-tichi-text">Active Journeys</span>
-              <div className="w-10 h-10 rounded-2xl bg-rose/15 text-rose flex items-center justify-center">
-                <Radio className="w-5 h-5 text-rose animate-pulse" />
-              </div>
-            </div>
-            <p className="text-4xl font-black mt-2 tracking-tight">{metrics?.activeJourneysCount || 0}</p>
-            <p className="text-xs text-tichi-muted font-bold mt-1">Real-Time Protected Trips Monitored</p>
-          </div>
-
-          {/* CARD 4: DISPATCH SYSTEM */}
-          <div className="bg-white border-2 border-[#FFCCE1] p-6 rounded-3xl shadow-md text-tichi-text">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-tichi-text">Dispatch Engine</span>
-              <div className="w-10 h-10 rounded-2xl bg-tichi-success/15 text-tichi-success flex items-center justify-center">
-                <Activity className="w-5 h-5 text-tichi-success animate-pulse" />
-              </div>
-            </div>
-            <p className="text-base font-black text-tichi-success mt-3 tracking-wide">
-              {metrics?.systemStatus || '100% OPERATIONAL'}
-            </p>
-            <p className="text-xs text-tichi-muted font-bold mt-1">Socket.IO Real-time Engine Connected</p>
-          </div>
-
-        </div>
-
-        {/* PORCELAIN SEGMENTED NAVIGATION TABS (DESKTOP) */}
-        <div className="bg-white p-2 rounded-2xl border-2 border-[#FFCCE1] shadow-sm hidden md:flex items-center gap-2 w-full max-w-2xl mx-auto relative z-20">
-          {[
-            { key: 'INCIDENTS', label: 'Active Incidents', icon: ShieldAlert, badge: activeSos.length },
-            { key: 'USERS', label: 'User Roles & Accounts', icon: UserCheck, badge: usersList.length },
-            { key: 'SYSTEM', label: 'Dispatch Settings', icon: Sliders },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex-1 py-3 px-3.5 rounded-xl font-black text-xs transition-all flex items-center justify-center space-x-1.5 uppercase tracking-wider cursor-pointer relative z-20 shrink-0 ${
-                  isActive
-                    ? 'bg-rose text-white border-2 border-rose shadow-md'
-                    : 'bg-white text-tichi-text hover:text-rose hover:bg-rose/10 border-2 border-[#FFCCE1]'
-                }`}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                <span className="truncate">{tab.label}</span>
-                {tab.badge !== undefined && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 ${isActive ? 'bg-white text-rose' : 'bg-rose/15 text-rose'}`}>
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* PORCELAIN COMPACT NAVIGATION TABS (MOBILE & SMALL SCREENS) */}
-        <div className="md:hidden grid grid-cols-3 gap-1.5 p-1.5 rounded-2xl bg-white border-2 border-[#FFCCE1] shadow-sm w-full relative z-20">
-          {[
-            { key: 'INCIDENTS', label: 'Incidents', icon: ShieldAlert, badge: activeSos.length },
-            { key: 'USERS', label: 'Users', icon: UserCheck, badge: usersList.length },
-            { key: 'SYSTEM', label: 'Settings', icon: Sliders },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTab(tab.key)}
-                className={`py-2.5 px-2 rounded-xl font-black text-[11px] transition-all flex items-center justify-center space-x-1 uppercase tracking-wider cursor-pointer relative z-20 truncate ${
-                  isActive
-                    ? 'bg-rose text-white border-1.5 border-rose shadow-sm'
-                    : 'bg-[#FFF0F3] text-tichi-text hover:bg-rose/10 border border-[#FFCCE1]'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">{tab.label}</span>
-                {tab.badge !== undefined && (
-                  <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black shrink-0 ${isActive ? 'bg-white text-rose' : 'bg-rose/20 text-rose'}`}>
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* TAB 1: ACTIVE INCIDENTS STREAM */}
-        {activeTab === 'INCIDENTS' && (
-          <div className="space-y-6 animate-fade-up">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-black text-tichi-text flex items-center space-x-2 uppercase tracking-wider">
-                <ShieldAlert className="w-5 h-5 text-rose" />
-                <span>Real-Time Emergency Incident Command Stream</span>
-              </h2>
-            </div>
-
-            {activeSos.length === 0 ? (
-              <div className="card-antique-pink border-2 border-rose rounded-3xl p-10 text-center space-y-3 shadow-md">
-                <CheckCircle className="w-14 h-14 text-tichi-success mx-auto" />
-                <h3 className="font-black text-lg text-tichi-text">All Clear — No Active SOS Emergency Calls</h3>
-                <p className="text-xs text-tichi-muted font-bold max-w-md mx-auto leading-relaxed">
-                  The emergency dispatch system is actively scanning 24/7. When a user triggers an SOS, live GPS location streams will appear here instantly.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {activeSos.map((session) => (
-                  <div
-                    key={session.id}
-                    className="bg-white border-2 border-[#FF2A6D] rounded-3xl p-6 shadow-coral-glow flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-3">
-                        <span className="bg-[#FF2A6D] text-white font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider animate-pulse border border-white">
-                          🚨 CRITICAL SOS ACTIVE
-                        </span>
-                        <span className="text-xs text-tichi-muted font-bold font-mono" suppressHydrationWarning>
-                          Started: {mounted && session.startedAt ? new Date(session.startedAt).toLocaleTimeString() : ''}
-                        </span>
-                      </div>
-
-                      <div className="space-y-0.5">
-                        <h3 className="font-black text-xl text-tichi-text">{session.user?.fullName}</h3>
-                        <p className="text-xs text-tichi-muted font-bold">{session.user?.email} • {session.user?.phone}</p>
-                      </div>
-
-                      {session.locations && session.locations.length > 0 && (
-                        <div className="flex items-center space-x-2 text-xs font-mono text-rose bg-[#FFF0F3] px-3.5 py-2 rounded-xl border border-[#FFCCE1]">
-                          <MapPin className="w-4 h-4 text-rose shrink-0" />
-                          <span className="font-bold">Lat: {session.locations[0].latitude.toFixed(4)}, Lng: {session.locations[0].longitude.toFixed(4)} (±{session.locations[0].accuracy || 10}m)</span>
+                          <div className="text-right">
+                            <p className="font-black text-2xl text-[#FF2A6D]">₹{total}</p>
+                            <p className="text-[10px] font-bold text-[#684E67]">₹{base} + {gst}% GST</p>
+                          </div>
                         </div>
-                      )}
-                    </div>
 
-                    <div className="flex items-center space-x-3 shrink-0">
-                      <a
-                        href={`tel:${session.user?.phone}`}
-                        className="bg-white border-2 border-[#FFCCE1] text-tichi-text font-black text-xs px-5 py-3 rounded-2xl hover:border-rose transition-all flex items-center space-x-1.5 shadow-sm"
-                      >
-                        <PhoneCall className="w-4 h-4 text-rose" />
-                        <span>Call User</span>
-                      </a>
+                        <p className="text-xs text-[#684E67] font-bold leading-relaxed">{p.description}</p>
 
-                      <button
-                        type="button"
-                        onClick={() => handleAdminResolveSos(session.id)}
-                        className="bg-tichi-success text-white font-black text-xs px-5 py-3 rounded-2xl shadow hover:brightness-110 transition-all flex items-center space-x-1.5 cursor-pointer"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Resolve SOS</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                        <div className="flex items-center justify-between pt-2 border-t border-[#FFCCE1]">
+                          <span className="text-xs font-black text-[#2A0826]">Validity: {p.durationDays} Days</span>
+
+                          <div className="flex items-center space-x-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPlanForm({
+                                  id: p.id,
+                                  name: p.name,
+                                  description: p.description,
+                                  basePrice: p.basePrice,
+                                  gstPercentage: p.gstPercentage || gstPercentage,
+                                  durationDays: p.durationDays,
+                                  isActive: p.isActive,
+                                });
+                                setIsPlanModalOpen(true);
+                              }}
+                              className="bg-[#FFF0F3] text-[#FF2A6D] font-black text-xs px-3.5 py-2 rounded-xl border border-[#FFCCE1] hover:bg-[#FF2A6D] hover:text-white transition-all cursor-pointer"
+                            >
+                              EDIT PLAN
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleTogglePlanActive(p.id)}
+                              className={`font-black text-xs px-3.5 py-2 rounded-xl border transition-all cursor-pointer ${
+                                p.isActive
+                                  ? 'bg-rose-50 text-[#FF2A6D] border-[#FF2A6D]'
+                                  : 'bg-emerald-50 text-emerald-700 border-emerald-400'
+                              }`}
+                            >
+                              {p.isActive ? 'DISABLE' : 'ENABLE'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* RECENT INCIDENTS LOG HISTORY TABLE */}
-            <div className="bg-white border-2 border-[#FFCCE1] rounded-3xl p-6 shadow-sm space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#FFCCE1] pb-3">
-                <h3 className="font-black text-sm text-tichi-text uppercase tracking-wider">Recent Incident Log History</h3>
-                <span className="text-[11px] font-extrabold text-[#FF2A6D] bg-[#FFF0F3] px-3 py-1 rounded-full border border-[#FFCCE1] self-start sm:self-auto">
-                  7 Logs per Page (Total: {recentSos.length})
-                </span>
-              </div>
+          {/* TAB 4: PAYMENT TRANSACTIONS & RECEIPTS */}
+          {activeTab === 'payments' && (
+            <div className="space-y-8 animate-fade-up">
               
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-bold text-tichi-text">
-                  <thead>
-                    <tr className="border-b-2 border-[#FFCCE1] text-tichi-muted uppercase tracking-wider text-[11px]">
-                      <th className="pb-3 px-3">User</th>
-                      <th className="pb-3 px-3">Status</th>
-                      <th className="pb-3 px-3">Started At</th>
-                      <th className="pb-3 px-3">Share Token</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#FFCCE1]">
-                    {paginatedSos.map((item) => (
-                      <tr key={item.id} className="hover:bg-[#FFF0F3] transition-colors">
-                        <td className="py-3 px-3 font-black text-tichi-text">{item.user?.fullName}</td>
-                        <td className="py-3 px-3">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
-                            item.status === 'ACTIVE'
-                              ? 'bg-rose/15 text-rose border border-rose/30 animate-pulse'
-                              : 'bg-tichi-success/15 text-tichi-success border border-tichi-success/30'
-                          }`}>
-                            {item.status}
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 text-tichi-muted font-mono" suppressHydrationWarning>
-                          {mounted && item.startedAt ? new Date(item.startedAt).toLocaleString() : ''}
-                        </td>
-                        <td className="py-3 px-3 font-mono text-tichi-muted truncate max-w-[150px]">
-                          {item.shareToken}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              {/* REVENUE RECAP CARDS */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-1">
+                  <span className="text-xs font-black text-[#684E67] uppercase">Total Revenue Collected</span>
+                  <p className="text-3xl font-black text-emerald-600">₹{paymentSummary?.totalRevenue?.toFixed(2) || '0.00'}</p>
+                </div>
+                <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-1">
+                  <span className="text-xs font-black text-[#684E67] uppercase">Successful Transactions</span>
+                  <p className="text-3xl font-black text-[#2A0826]">{paymentSummary?.successCount || 0}</p>
+                </div>
+                <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-1">
+                  <span className="text-xs font-black text-[#684E67] uppercase">Total GST Collected</span>
+                  <p className="text-3xl font-black text-purple-600">₹{paymentSummary?.totalGstCollected?.toFixed(2) || '0.00'}</p>
+                </div>
               </div>
 
-              {/* PAGINATION CONTROLS FOR INCIDENT LOG HISTORY */}
-              {recentSos.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#FFCCE1] text-xs font-bold text-tichi-muted">
-                  <div>
-                    Showing <span className="font-black text-[#2A0826]">{(sosPage - 1) * LOGS_PER_PAGE + 1}</span> to{' '}
-                    <span className="font-black text-[#2A0826]">{Math.min(sosPage * LOGS_PER_PAGE, recentSos.length)}</span> of{' '}
-                    <span className="font-black text-[#2A0826]">{recentSos.length}</span> entries
+              {/* SEARCH & FILTERS */}
+              <div className="bg-white border-2 border-[#FFCCE1] p-6 rounded-[32px] shadow-md space-y-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="relative flex-1 w-full">
+                    <Search className="w-4 h-4 text-[#684E67] absolute left-4 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Search transactions by Txn ID, User Name, Email..."
+                      value={paymentSearch}
+                      onChange={(e) => { setPaymentSearch(e.target.value); setPaymentPage(1); }}
+                      className="w-full pl-11 pr-4 py-3 bg-[#FFF0F3] border-2 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
                   </div>
 
-                  <div className="flex items-center space-x-1.5">
-                    <button
-                      type="button"
-                      disabled={sosPage === 1}
-                      onClick={() => setSosPage((prev) => Math.max(prev - 1, 1))}
-                      className="px-3 py-1.5 rounded-xl border border-[#FFCCE1] bg-white text-[#2A0826] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FFF0F3] transition-colors font-black cursor-pointer shadow-xs"
-                    >
-                      Previous
-                    </button>
+                  <select
+                    value={paymentStatusFilter}
+                    onChange={(e) => { setPaymentStatusFilter(e.target.value); setPaymentPage(1); }}
+                    className="px-4 py-3 bg-[#FFF0F3] border-2 border-[#FFCCE1] rounded-2xl text-xs font-black text-[#2A0826] outline-none cursor-pointer"
+                  >
+                    <option value="ALL">All Payment Statuses</option>
+                    <option value="SUCCESS">Successful Only</option>
+                    <option value="PENDING">Pending Only</option>
+                    <option value="FAILED">Failed Only</option>
+                  </select>
+                </div>
+              </div>
 
-                    {Array.from({ length: totalSosPages }, (_, i) => i + 1).map((pageNum) => (
-                      <button
-                        key={pageNum}
-                        type="button"
-                        onClick={() => setSosPage(pageNum)}
-                        className={`w-8 h-8 rounded-xl font-black text-xs transition-colors cursor-pointer ${
-                          sosPage === pageNum
-                            ? 'bg-[#FF2A6D] text-white shadow-sm'
-                            : 'bg-white text-[#2A0826] border border-[#FFCCE1] hover:bg-[#FFF0F3]'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    ))}
+              {/* PAYMENTS TABLE LIST */}
+              <div className="bg-white border-2 border-[#FFCCE1] rounded-[32px] overflow-hidden shadow-md">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-[#FFF0F3] border-b-2 border-[#FFCCE1] text-[11px] font-black uppercase text-[#684E67] tracking-wider">
+                        <th className="p-4 pl-6">Txn ID & Date</th>
+                        <th className="p-4">Customer Details</th>
+                        <th className="p-4">Plan Name</th>
+                        <th className="p-4">Amount Paid</th>
+                        <th className="p-4">Status</th>
+                        <th className="p-4 pr-6 text-right">Receipt</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#FFCCE1] text-xs font-bold">
+                      {paginatedPayments.length > 0 ? (
+                        paginatedPayments.map((p) => (
+                          <tr key={p.id} className="hover:bg-[#FFF0F3]/50 transition-colors">
+                            <td className="p-4 pl-6">
+                              <p className="font-mono font-black text-[#2A0826]">{p.txnid || `TXN_${p.id}`}</p>
+                              <p className="text-[10px] text-[#684E67] font-extrabold">{new Date(p.createdAt).toLocaleString('en-IN')}</p>
+                            </td>
 
-                    <button
-                      type="button"
-                      disabled={sosPage === totalSosPages}
-                      onClick={() => setSosPage((prev) => Math.min(prev + 1, totalSosPages))}
-                      className="px-3 py-1.5 rounded-xl border border-[#FFCCE1] bg-white text-[#2A0826] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FFF0F3] transition-colors font-black cursor-pointer shadow-xs"
-                    >
-                      Next
-                    </button>
+                            <td className="p-4">
+                              <p className="font-black text-[#2A0826]">{p.user?.fullName || 'N/A'}</p>
+                              <p className="text-[10px] text-[#684E67] font-mono">{p.user?.email || 'N/A'}</p>
+                            </td>
+
+                            <td className="p-4 text-[#684E67]">
+                              {p.plan?.name || 'Sakhi Protection Plan'}
+                            </td>
+
+                            <td className="p-4">
+                              <p className="font-black text-[#FF2A6D] text-sm">₹{p.amount}</p>
+                              <p className="text-[10px] text-[#684E67]">Base ₹{p.baseAmount} + GST ₹{p.gstAmount}</p>
+                            </td>
+
+                            <td className="p-4">
+                              {p.status === 'SUCCESS' ? (
+                                <span className="bg-emerald-50 text-emerald-600 border border-emerald-300 font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase">
+                                  ✓ SUCCESS
+                                </span>
+                              ) : p.status === 'FAILED' ? (
+                                <span className="bg-rose-50 text-rose-600 border border-rose-300 font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase">
+                                  FAILED
+                                </span>
+                              ) : (
+                                <span className="bg-amber-50 text-amber-700 border border-amber-300 font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase">
+                                  PENDING
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="p-4 pr-6 text-right">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedReceipt(p)}
+                                className="bg-[#FFF0F3] hover:bg-[#FF2A6D] text-[#FF2A6D] hover:text-white px-3 py-1.5 rounded-xl border border-[#FFCCE1] font-black text-xs transition-all cursor-pointer flex items-center space-x-1 ml-auto"
+                              >
+                                <FileText className="w-3.5 h-3.5" />
+                                <span>VIEW RECEIPT</span>
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-[#684E67] font-black">
+                            No payment transactions recorded yet.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* PAGINATION CONTROLS */}
+                <div className="p-4 bg-[#FFF0F3] border-t-2 border-[#FFCCE1] flex items-center justify-between">
+                  <button
+                    type="button"
+                    disabled={paymentPage === 1}
+                    onClick={() => setPaymentPage((p) => Math.max(1, p - 1))}
+                    className="px-4 py-2 bg-white border border-[#FFCCE1] rounded-xl text-xs font-black text-[#2A0826] disabled:opacity-50 cursor-pointer"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-xs font-black text-[#684E67]">
+                    Page {paymentPage} of {totalPaymentPages}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={paymentPage >= totalPaymentPages}
+                    onClick={() => setPaymentPage((p) => Math.min(totalPaymentPages, p + 1))}
+                    className="px-4 py-2 bg-white border border-[#FFCCE1] rounded-xl text-xs font-black text-[#2A0826] disabled:opacity-50 cursor-pointer"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
+
+        {/* MODAL 1: EDIT USER DETAILS (DIRECT EMAIL CHANGE WITHOUT OTP) */}
+        {editingUser && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-[36px] max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border-2 border-[#FF2A6D] relative animate-scale-up">
+              
+              <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center">
+                    <Edit3 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-lg text-[#2A0826]">SuperAdmin Edit User Details</h3>
+                    <p className="text-xs text-[#684E67] font-bold">Direct Email Change without OTP Verification</p>
                   </div>
                 </div>
-              )}
-            </div>
 
+                <button
+                  type="button"
+                  onClick={() => setEditingUser(null)}
+                  className="p-2 text-[#684E67] hover:text-[#FF2A6D] cursor-pointer"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveUserEdit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editFullName}
+                      onChange={(e) => setEditFullName(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">
+                      Email Address (Direct Update) *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      className="w-full px-4 py-3 bg-emerald-50 border-2 border-emerald-400 rounded-xl text-xs font-black text-emerald-900 outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">Mobile Phone *</label>
+                    <input
+                      type="tel"
+                      required
+                      maxLength={10}
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value.replace(/\D/g, ''))}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-mono font-bold text-[#2A0826] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">Account Role *</label>
+                    <select
+                      value={editRole}
+                      onChange={(e) => setEditRole(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none cursor-pointer"
+                    >
+                      <option value="USER">MEMBER USER</option>
+                      <option value="SUPER_ADMIN">SUPER ADMIN</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">Blood Group</label>
+                    <select
+                      value={editBloodGroup}
+                      onChange={(e) => setEditBloodGroup(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none cursor-pointer"
+                    >
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">New Password (Optional)</label>
+                    <input
+                      type="password"
+                      placeholder="Leave blank to keep current"
+                      value={editPassword}
+                      onChange={(e) => setEditPassword(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-black text-[#684E67] mb-1">Residential Address</label>
+                    <input
+                      type="text"
+                      value={editAddress}
+                      onChange={(e) => setEditAddress(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">City</label>
+                    <input
+                      type="text"
+                      value={editCity}
+                      onChange={(e) => setEditCity(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">State</label>
+                    <input
+                      type="text"
+                      value={editState}
+                      onChange={(e) => setEditState(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">Primary Guardian Name</label>
+                    <input
+                      type="text"
+                      value={editEmergencyName}
+                      onChange={(e) => setEditEmergencyName(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">Guardian Phone</label>
+                    <input
+                      type="tel"
+                      maxLength={10}
+                      value={editEmergencyPhone}
+                      onChange={(e) => setEditEmergencyPhone(e.target.value.replace(/\D/g, ''))}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-mono font-bold text-[#2A0826] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-[#FFCCE1]">
+                  <button
+                    type="button"
+                    onClick={() => setEditingUser(null)}
+                    className="px-5 py-3 rounded-full text-xs font-black text-gray-600 bg-gray-100 hover:bg-gray-200 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmittingUserEdit}
+                    className="px-8 py-3 rounded-full text-xs font-black text-white bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] uppercase tracking-wider shadow cursor-pointer disabled:opacity-50"
+                  >
+                    {isSubmittingUserEdit ? 'SAVING...' : 'SAVE USER DETAILS'}
+                  </button>
+                </div>
+              </form>
+
+            </div>
           </div>
         )}
 
-        {/* TAB 2: USER & SUPER ADMIN ROLE MANAGEMENT WITH CREATE USER BUTTON */}
-        {activeTab === 'USERS' && (
-          <div className="space-y-6 animate-fade-up">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-base font-black text-tichi-text flex items-center space-x-2 uppercase tracking-wider">
-                  <UserCheck className="w-5 h-5 text-rose" />
-                  <span>User Accounts & Role Privilege Management</span>
-                </h2>
-                <p className="text-xs text-tichi-muted font-bold mt-0.5">
-                  Create new user accounts directly or manage role permissions.
-                </p>
-              </div>
+        {/* MODAL 2: GRANT FREE CUSTOM SUBSCRIPTION / RENEWAL */}
+        {grantingUser && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-[36px] max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl border-2 border-emerald-500 relative animate-scale-up">
+              
+              <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base text-[#2A0826]">Grant Free Subscription</h3>
+                    <p className="text-xs text-[#684E67] font-bold">For user: {grantingUser.fullName}</p>
+                  </div>
+                </div>
 
-              <div className="flex items-center space-x-3">
-                {/* CREATE NEW USER BUTTON */}
                 <button
                   type="button"
-                  onClick={() => setShowCreateUserModal(true)}
-                  className="btn-baby-pink px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-coral-glow flex items-center space-x-1.5 cursor-pointer shrink-0"
+                  onClick={() => setGrantingUser(null)}
+                  className="p-2 text-[#684E67] hover:text-[#FF2A6D] cursor-pointer"
                 >
-                  <UserPlus className="w-4 h-4" />
-                  <span>+ Create User</span>
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-black text-[#684E67] mb-1.5">Select Free Subscription Duration</label>
+                  <select
+                    value={freePlanDuration}
+                    onChange={(e) => setFreePlanDuration(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border-2 border-emerald-500 rounded-xl text-xs font-black text-[#2A0826] outline-none cursor-pointer"
+                  >
+                    <option value="365">1 Year Full Protection (365 Days)</option>
+                    <option value="90">3 Months Pass (90 Days)</option>
+                    <option value="30">1 Month Trial Pass (30 Days)</option>
+                    <option value="CUSTOM">Custom Date Range</option>
+                  </select>
+                </div>
+
+                {freePlanDuration === 'CUSTOM' && (
+                  <div className="grid grid-cols-2 gap-3 bg-emerald-50 p-4 rounded-2xl border border-emerald-300">
+                    <div>
+                      <label className="block text-[11px] font-black text-emerald-900 mb-1">Start Date</label>
+                      <input
+                        type="date"
+                        value={customStartDate}
+                        onChange={(e) => setCustomStartDate(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-emerald-400 rounded-xl text-xs font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-black text-emerald-900 mb-1">Expiry Date</label>
+                      <input
+                        type="date"
+                        value={customExpiryDate}
+                        onChange={(e) => setCustomExpiryDate(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-emerald-400 rounded-xl text-xs font-bold"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setGrantingUser(null)}
+                  className="px-5 py-3 rounded-full text-xs font-black text-gray-600 bg-gray-100 hover:bg-gray-200 cursor-pointer"
+                >
+                  Cancel
                 </button>
 
-                <div className="relative w-full sm:w-64">
-                  <Search className="w-4 h-4 text-rose absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <button
+                  type="button"
+                  onClick={handleGrantFreeSubscription}
+                  className="px-8 py-3 rounded-full text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 uppercase tracking-wider shadow cursor-pointer"
+                >
+                  GRANT FREE PLAN NOW
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* MODAL 3: CREATE / EDIT PLAN FORM */}
+        {isPlanModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-[36px] max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl border-2 border-[#FF2A6D] relative animate-scale-up">
+              
+              <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
+                <h3 className="font-black text-lg text-[#2A0826]">
+                  {planForm.id ? 'Edit Subscription Plan' : 'Create New Subscription Plan'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setIsPlanModalOpen(false)}
+                  className="p-2 text-[#684E67] hover:text-[#FF2A6D] cursor-pointer"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSavePlan} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-black text-[#684E67] mb-1">Plan Title / Name *</label>
                   <input
                     type="text"
-                    placeholder="Search name, email..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-2xl bg-white border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text placeholder-tichi-muted focus:border-rose focus:ring-4 focus:ring-rose/15 focus:outline-none shadow-sm"
+                    required
+                    placeholder="e.g. Sakhi Suraksha 365 Plan"
+                    value={planForm.name}
+                    onChange={(e) => setPlanForm({ ...planForm, name: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none"
                   />
                 </div>
-              </div>
-            </div>
 
-            <div className="bg-white border-2 border-[#FFCCE1] rounded-3xl overflow-hidden shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-bold text-tichi-text">
-                  <thead className="bg-[#FFF0F3] border-b-2 border-[#FFCCE1] text-tichi-muted uppercase font-black text-[11px]">
-                    <tr>
-                      <th className="p-4">User Details</th>
-                      <th className="p-4">Role</th>
-                      <th className="p-4">Safety Status</th>
-                      <th className="p-4">Guardians</th>
-                      <th className="p-4">Joined Date</th>
-                      <th className="p-4 text-right">Role Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#FFCCE1]">
-                    {paginatedUsers.map((u) => (
-                      <tr key={u.id} className="hover:bg-[#FFF0F3] transition-colors">
-                        <td className="p-4">
-                          <p className="font-black text-tichi-text text-sm">{u.fullName}</p>
-                          <p className="text-[11px] text-tichi-muted font-bold">{u.email} • {u.phone}</p>
-                        </td>
+                <div>
+                  <label className="block text-xs font-black text-[#684E67] mb-1">Plan Description *</label>
+                  <textarea
+                    rows={3}
+                    required
+                    placeholder="Describe plan features & coverage..."
+                    value={planForm.description}
+                    onChange={(e) => setPlanForm({ ...planForm, description: e.target.value })}
+                    className="w-full p-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none resize-none"
+                  />
+                </div>
 
-                        <td className="p-4">
-                          {u.role === 'SUPER_ADMIN' ? (
-                            <span className="inline-flex items-center space-x-1 bg-gold text-tichi-text font-black text-[10px] px-3 py-1 rounded-full shadow-sm border border-gold/40">
-                              <Crown className="w-3.5 h-3.5" />
-                              <span>SUPER ADMIN</span>
-                            </span>
-                          ) : (
-                            <span className="bg-white text-tichi-muted border border-[#FFCCE1] text-[10px] font-black px-3 py-1 rounded-full">
-                              USER
-                            </span>
-                          )}
-                        </td>
-
-                        <td className="p-4">
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-black ${
-                            u.safetyStatus === 'SAFE'
-                              ? 'bg-tichi-success/15 text-tichi-success border border-tichi-success/30'
-                              : 'bg-rose/15 text-rose border border-rose/30 animate-pulse'
-                          }`}>
-                            ● {u.safetyStatus}
-                          </span>
-                        </td>
-
-                        <td className="p-4 font-black text-tichi-text">
-                          {u._count?.trustedContacts || 0} Contacts
-                        </td>
-
-                        <td className="p-4 text-tichi-muted font-mono" suppressHydrationWarning>
-                          {mounted && u.createdAt ? new Date(u.createdAt).toLocaleDateString() : ''}
-                        </td>
-
-                        <td className="p-4 text-right">
-                          <button
-                            type="button"
-                            onClick={() => handleRoleToggle(u.id, u.role)}
-                            className={`px-4 py-2 rounded-xl text-xs font-black transition-all border-2 cursor-pointer ${
-                              u.role === 'SUPER_ADMIN'
-                                ? 'bg-white text-tichi-muted border-[#FFCCE1] hover:border-rose hover:text-rose'
-                                : 'bg-gold text-tichi-text border-gold shadow-sm hover:brightness-110'
-                            }`}
-                          >
-                            {u.role === 'SUPER_ADMIN' ? 'Demote to User' : '👑 Make Super Admin'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* PAGINATION CONTROLS FOR USER ACCOUNTS */}
-              {filteredUsers.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#FFF0F3]/60 border-t border-[#FFCCE1] text-xs font-bold text-tichi-muted">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    Showing <span className="font-black text-[#2A0826]">{(usersPage - 1) * LOGS_PER_PAGE + 1}</span> to{' '}
-                    <span className="font-black text-[#2A0826]">{Math.min(usersPage * LOGS_PER_PAGE, filteredUsers.length)}</span> of{' '}
-                    <span className="font-black text-[#2A0826]">{filteredUsers.length}</span> user accounts
+                    <label className="block text-xs font-black text-[#684E67] mb-1">Base Price (INR ₹) *</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      required
+                      placeholder="e.g. 24.00"
+                      value={planForm.basePrice}
+                      onChange={(e) => setPlanForm({ ...planForm, basePrice: e.target.value })}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
                   </div>
 
-                  <div className="flex items-center space-x-1.5">
-                    <button
-                      type="button"
-                      disabled={usersPage === 1}
-                      onClick={() => setUsersPage((prev) => Math.max(prev - 1, 1))}
-                      className="px-3 py-1.5 rounded-xl border border-[#FFCCE1] bg-white text-[#2A0826] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FFF0F3] transition-colors font-black cursor-pointer shadow-xs"
-                    >
-                      Previous
-                    </button>
-
-                    {Array.from({ length: totalUsersPages }, (_, i) => i + 1).map((pageNum) => (
-                      <button
-                        key={pageNum}
-                        type="button"
-                        onClick={() => setUsersPage(pageNum)}
-                        className={`w-8 h-8 rounded-xl font-black text-xs transition-colors cursor-pointer ${
-                          usersPage === pageNum
-                            ? 'bg-[#FF2A6D] text-white shadow-sm'
-                            : 'bg-white text-[#2A0826] border border-[#FFCCE1] hover:bg-[#FFF0F3]'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    ))}
-
-                    <button
-                      type="button"
-                      disabled={usersPage === totalUsersPages}
-                      onClick={() => setUsersPage((prev) => Math.min(prev + 1, totalUsersPages))}
-                      className="px-3 py-1.5 rounded-xl border border-[#FFCCE1] bg-white text-[#2A0826] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FFF0F3] transition-colors font-black cursor-pointer shadow-xs"
-                    >
-                      Next
-                    </button>
+                  <div>
+                    <label className="block text-xs font-black text-[#684E67] mb-1">Duration (Days) *</label>
+                    <input
+                      type="number"
+                      required
+                      placeholder="e.g. 365"
+                      value={planForm.durationDays}
+                      onChange={(e) => setPlanForm({ ...planForm, durationDays: parseInt(e.target.value, 10) })}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold text-[#2A0826] outline-none"
+                    />
                   </div>
                 </div>
-              )}
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-[#FFCCE1]">
+                  <button
+                    type="button"
+                    onClick={() => setIsPlanModalOpen(false)}
+                    className="px-5 py-3 rounded-full text-xs font-black text-gray-600 bg-gray-100 hover:bg-gray-200 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="px-8 py-3 rounded-full text-xs font-black text-white bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] uppercase tracking-wider shadow cursor-pointer"
+                  >
+                    SAVE PLAN
+                  </button>
+                </div>
+              </form>
+
             </div>
           </div>
         )}
 
-        {/* TAB 3: DISPATCH DIAGNOSTICS & SETTINGS */}
-        {activeTab === 'SYSTEM' && (
-          <div className="space-y-6 animate-fade-up">
-            <h2 className="text-base font-black text-tichi-text flex items-center space-x-2 uppercase tracking-wider">
-              <Activity className="w-5 h-5 text-rose" />
-              <span>System & Emergency Dispatch Diagnostics</span>
-            </h2>
+        {/* MODAL 4: PRINTABLE PAYMENT RECEIPT VIEWER */}
+        {selectedReceipt && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-[36px] max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border-2 border-[#FF2A6D] relative animate-scale-up">
+              
+              <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base text-[#2A0826]">Official Payment Receipt</h3>
+                    <p className="text-xs text-[#684E67] font-mono">TXN: {selectedReceipt.txnid}</p>
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="card-antique-pink border-2 border-rose p-6 rounded-3xl space-y-4 shadow-md">
-                <h3 className="font-black text-sm text-tichi-text uppercase tracking-wider">Real-Time Socket Engine</h3>
-                <div className="space-y-2.5 text-xs font-bold text-tichi-text">
-                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
-                    <span className="text-tichi-muted">Protocol:</span>
-                    <span className="font-mono text-tichi-success font-black">WebSocket (Socket.IO v4)</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedReceipt(null)}
+                  className="p-2 text-[#684E67] hover:text-[#FF2A6D] cursor-pointer"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="bg-[#FFF0F3] p-5 rounded-2xl border border-[#FFCCE1] space-y-4">
+                <div className="flex justify-between items-center border-b border-[#FFCCE1] pb-3">
+                  <div>
+                    <h4 className="font-black text-sm text-[#2A0826]">Sakhi Suraksha SOS Protection</h4>
+                    <p className="text-[11px] text-[#684E67] font-bold">Encrypted 24/7 Safety Command Network</p>
                   </div>
-                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
-                    <span className="text-tichi-muted">GPS Broadcast Room:</span>
-                    <span className="font-mono text-rose font-black">track:shareToken</span>
+                  <span className="bg-emerald-50 text-emerald-600 border border-emerald-300 font-black text-xs px-3 py-1 rounded-full uppercase">
+                    PAID SUCCESS
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 text-xs font-bold">
+                  <div>
+                    <span className="text-[#684E67] text-[10px] uppercase font-black">Customer Name</span>
+                    <p className="text-[#2A0826] font-black">{selectedReceipt.user?.fullName}</p>
                   </div>
-                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
-                    <span className="text-tichi-muted">Admin Command Channel:</span>
-                    <span className="font-mono text-rose font-black">admin-ops</span>
+                  <div>
+                    <span className="text-[#684E67] text-[10px] uppercase font-black">Customer Email</span>
+                    <p className="text-[#2A0826] font-black font-mono">{selectedReceipt.user?.email}</p>
+                  </div>
+                  <div>
+                    <span className="text-[#684E67] text-[10px] uppercase font-black">Payment Date</span>
+                    <p className="text-[#2A0826]">{new Date(selectedReceipt.createdAt).toLocaleString('en-IN')}</p>
+                  </div>
+                  <div>
+                    <span className="text-[#684E67] text-[10px] uppercase font-black">Payment Mode</span>
+                    <p className="text-[#2A0826]">{selectedReceipt.paymentMode || 'PAYU_ONLINE'}</p>
+                  </div>
+                </div>
+
+                <div className="border-t border-[#FFCCE1] pt-3 space-y-1 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-[#684E67]">Plan Base Price:</span>
+                    <span className="font-black">₹{selectedReceipt.baseAmount?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#684E67]">GST ({selectedReceipt.gstPercentage || gstPercentage}%):</span>
+                    <span className="font-black">₹{selectedReceipt.gstAmount?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-base font-black text-[#FF2A6D] pt-2 border-t border-[#FFCCE1]">
+                    <span>Total Amount Paid:</span>
+                    <span>₹{selectedReceipt.amount?.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="card-antique-pink border-2 border-rose p-6 rounded-3xl space-y-4 shadow-md">
-                <h3 className="font-black text-sm text-tichi-text uppercase tracking-wider">Emergency Helplines Verified</h3>
-                <div className="space-y-2.5 text-xs font-bold text-tichi-text">
-                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
-                    <span className="text-tichi-muted">National Emergency Hotline:</span>
-                    <span className="font-mono text-rose font-black">112</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
-                    <span className="text-tichi-muted">National Women Helpline:</span>
-                    <span className="font-mono text-rose font-black">1091</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-[#FFCCE1]">
-                    <span className="text-tichi-muted">Police Control Center:</span>
-                    <span className="font-mono text-tichi-text font-black">100</span>
-                  </div>
-                </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-6 py-3 rounded-full text-xs font-black text-white bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] flex items-center space-x-1.5 shadow cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>PRINT RECEIPT</span>
+                </button>
               </div>
+
             </div>
           </div>
         )}
 
-        {/* CENTERED SUPER ADMIN QUICK JUMP BUTTON BELOW CARDS */}
-        <SuperAdminQuickJump />
-      </main>
+      </div>
+    </AppLayout>
+  );
+}
 
-      {/* ---------------------------------------------------- */}
-      {/* 1. SUPER ADMIN CREATE USER MODAL */}
-      {/* ---------------------------------------------------- */}
-      {showCreateUserModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
-            <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <UserPlus className="w-5 h-5" />
-                <h3 className="font-black text-base">Super Admin User Onboarding</h3>
-              </div>
-              <button type="button" onClick={() => setShowCreateUserModal(false)} className="text-white/80 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateUser} className="p-6 space-y-4">
-              {createError && (
-                <div className="bg-rose/10 border border-rose text-rose text-xs font-black p-3 rounded-xl text-center">
-                  {createError}
-                </div>
-              )}
-
-              <div className="space-y-1">
-                <label className="text-xs font-black uppercase text-tichi-text">User Full Name</label>
-                <input
-                  type="text"
-                  placeholder="Pooja Sharma"
-                  value={newUserName}
-                  onChange={(e) => setNewUserName(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-black uppercase text-tichi-text">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="pooja@example.com"
-                  value={newUserEmail}
-                  onChange={(e) => setNewUserEmail(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-black uppercase text-tichi-text">Phone Number</label>
-                <input
-                  type="text"
-                  placeholder="+91 98765 43210"
-                  value={newUserPhone}
-                  onChange={(e) => setNewUserPhone(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-black uppercase text-tichi-text">Role</label>
-                  <select
-                    value={newUserRole}
-                    onChange={(e) => setNewUserRole(e.target.value)}
-                    className="w-full px-3 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                  >
-                    <option value="USER">USER</option>
-                    <option value="SUPER_ADMIN">SUPER_ADMIN</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-black uppercase text-tichi-text">Blood Group</label>
-                  <select
-                    value={newUserBlood}
-                    onChange={(e) => setNewUserBlood(e.target.value)}
-                    className="w-full px-3 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                  >
-                    <option value="O+">O+</option>
-                    <option value="A+">A+</option>
-                    <option value="B+">B+</option>
-                    <option value="AB+">AB+</option>
-                    <option value="O-">O-</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-black uppercase text-tichi-text">Initial Password</label>
-                <input
-                  type="password"
-                  placeholder="••••••••••••"
-                  value={newUserPass}
-                  onChange={(e) => setNewUserPass(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={createLoading}
-                className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow cursor-pointer disabled:opacity-60"
-              >
-                {createLoading ? 'CREATING ACCOUNT...' : '⚡ CREATE USER VIA BACKEND'}
-              </button>
-            </form>
+export default function SuperAdminHQPage() {
+  return (
+    <Suspense
+      fallback={
+        <AppLayout>
+          <div className="min-h-screen bg-[#FFF0F3] p-8 text-center font-black text-xs text-[#2A0826]">
+            Loading SuperAdmin HQ Command Portal...
           </div>
-        </div>
-      )}
-
-      {/* ---------------------------------------------------- */}
-      {/* 2. EDIT SUPER ADMIN PROFILE MODAL */}
-      {/* ---------------------------------------------------- */}
-      {showEditAdminModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border-4 border-rose overflow-hidden animate-scale-in">
-            <div className="bg-gradient-to-r from-rose to-[#FF2A6D] p-5 text-white flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Edit3 className="w-5 h-5" />
-                <h3 className="font-black text-base">Edit Super Admin Profile</h3>
-              </div>
-              <button type="button" onClick={() => setShowEditAdminModal(false)} className="text-white/80 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleUpdateAdminProfile} className="p-6 space-y-4">
-              {editAdminError && (
-                <div className="bg-rose/10 border border-rose text-rose text-xs font-black p-3 rounded-xl text-center">
-                  {editAdminError}
-                </div>
-              )}
-
-              <div className="space-y-1">
-                <label className="text-xs font-black uppercase text-tichi-text">Super Admin Full Name</label>
-                <input
-                  type="text"
-                  value={adminName}
-                  onChange={(e) => setAdminName(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-black uppercase text-tichi-text">Admin Email Address</label>
-                <input
-                  type="email"
-                  value={adminEmail}
-                  onChange={(e) => setAdminEmail(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-black uppercase text-tichi-text">Phone Number</label>
-                <input
-                  type="text"
-                  value={adminPhone}
-                  onChange={(e) => setAdminPhone(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-black uppercase text-tichi-text">New Secret Access Key (Optional)</label>
-                <input
-                  type="password"
-                  placeholder="Leave blank to keep current password"
-                  value={adminPass}
-                  onChange={(e) => setAdminPass(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-[#FFCCE1] text-xs font-bold text-tichi-text focus:outline-none focus:border-rose bg-white"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={editAdminLoading}
-                className="w-full btn-baby-pink py-3.5 rounded-2xl text-xs uppercase tracking-wider font-black shadow-coral-glow cursor-pointer disabled:opacity-60"
-              >
-                {editAdminLoading ? 'SAVING CHANGES...' : 'SAVE SUPER ADMIN PROFILE'}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* FOOTER */}
-      <Footer />
-    </div>
+        </AppLayout>
+      }
+    >
+      <SuperAdminHQContent />
+    </Suspense>
   );
 }

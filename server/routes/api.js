@@ -19,6 +19,8 @@ router.post('/auth/login', authController.login);
 router.post('/auth/logout', authController.logout);
 router.get('/auth/me', authenticateToken, authController.getProfile);
 router.put('/auth/settings', authenticateToken, authController.updateSettings);
+router.post('/auth/send-email-change-otp', authenticateToken, authController.sendEmailChangeOtp);
+router.post('/auth/verify-new-email', authenticateToken, authController.verifyNewEmail);
 
 // Public Plans & Pricing
 router.get('/plans', adminController.getPlans);
@@ -59,9 +61,13 @@ router.get('/admin/users', authenticateToken, requireSuperAdmin, adminController
 router.post('/admin/users/create', authenticateToken, requireSuperAdmin, adminController.createUserByAdmin);
 router.put('/admin/profile', authenticateToken, requireSuperAdmin, adminController.updateSuperAdminProfile);
 router.put('/admin/user/role', authenticateToken, requireSuperAdmin, adminController.updateUserRole);
+router.put('/admin/users/:id', authenticateToken, requireSuperAdmin, adminController.updateUserDetailsAdmin);
+router.post('/admin/users/:id/block', authenticateToken, requireSuperAdmin, adminController.toggleUserBlock);
+router.post('/admin/users/:id/grant-subscription', authenticateToken, requireSuperAdmin, adminController.grantUserFreeSubscription);
 router.post('/admin/sos/resolve', authenticateToken, requireSuperAdmin, adminController.adminResolveSos);
 router.get('/admin/plans', authenticateToken, requireSuperAdmin, adminController.getPlans);
 router.post('/admin/plans', authenticateToken, requireSuperAdmin, adminController.createOrUpdatePlan);
+router.post('/admin/plans/:id/toggle', authenticateToken, requireSuperAdmin, adminController.togglePlanActive);
 router.get('/admin/gst', authenticateToken, requireSuperAdmin, adminController.getGstSettings);
 router.put('/admin/gst', authenticateToken, requireSuperAdmin, adminController.updateGstSettings);
 router.get('/admin/payments', authenticateToken, requireSuperAdmin, adminController.getPaymentHistory);

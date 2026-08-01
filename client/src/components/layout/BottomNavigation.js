@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MapPin, AlertTriangle, Users, User } from 'lucide-react';
+import { Home, MapPin, AlertTriangle, Users, ShieldCheck, Crown, Sliders, CreditCard } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useSOSStore } from '../../redux/useSOSStore.js';
 
@@ -16,13 +16,24 @@ export const BottomNavigation = () => {
   const { token, user } = useSelector((state) => state?.auth || {});
   const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
 
-  const navItems = [
+  const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
+
+  const memberNavItems = [
     { path: isLoggedIn ? '/dashboard' : '/', label: 'Home', icon: Home },
     { path: '/track-journey', label: 'Track', icon: MapPin },
     { path: '/active-sos', label: 'SOS', icon: AlertTriangle, isCenter: true },
     { path: '/contacts', label: 'Contacts', icon: Users },
-    { path: '/profile', label: 'Profile', icon: User },
+    { path: '/subscription', label: 'Plan', icon: ShieldCheck },
   ];
+
+  const adminNavItems = [
+    { path: '/admin?tab=overview', label: 'HQ', icon: Crown },
+    { path: '/admin?tab=users', label: 'Users', icon: Users },
+    { path: '/admin?tab=plans', label: 'Plans', icon: Sliders },
+    { path: '/admin?tab=payments', label: 'Pay', icon: CreditCard },
+  ];
+
+  const navItems = isSuperAdmin ? adminNavItems : memberNavItems;
 
   useEffect(() => { 
     setMounted(true); 

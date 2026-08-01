@@ -4,34 +4,65 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 export async function seedDatabase() {
-  console.log('🌱 Starting Database Seeding...');
+  console.log('🌱 Starting Database Reset & Clean Seeding...');
 
-  // 1. Check if SuperAdmin exists. If not, seed default SuperAdmin account.
-  const existingSuperAdmin = await prisma.user.findFirst({
-    where: { role: 'SUPER_ADMIN' },
-  });
+  try {
+    // Disable Foreign Key checks for MySQL reset
+    await prisma.$executeRawUnsafe(`SET FOREIGN_KEY_CHECKS = 0;`);
 
-  if (!existingSuperAdmin) {
-    const superAdminEmail = 'admin@veaglesafety.org';
-    const passwordHash = await bcrypt.hash('Veagle@123', 10);
-    const superAdmin = await prisma.user.create({
-      data: {
-        fullName: 'Super Admin',
-        email: superAdminEmail,
-        phone: '+91 90000 00000',
-        passwordHash,
-        role: 'SUPER_ADMIN',
-        isEmailVerified: true,
-        subscriptionStatus: 'ACTIVE',
-        onboardingStep: 7,
-      },
-    });
-    console.log(`✅ [Seed] Default SuperAdmin Account Created: ${superAdmin.email} (Password: Veagle@123)`);
-  } else {
-    console.log(`ℹ️ [Seed] Preserving existing SuperAdmin account in DB: ${existingSuperAdmin.email}`);
+    // Truncate all tables & reset AUTO_INCREMENT to 1
+    const tables = [
+      'SosAlert',
+      'SosLocation',
+      'SosSession',
+      'Checkin',
+      'Journey',
+      'TrustedContact',
+      'PaymentHistory',
+      'PushSubscription',
+      'User',
+      'Plan',
+      'SystemSetting',
+    ];
+
+    for (const table of tables) {
+      try {
+        await prisma.$executeRawUnsafe(`TRUNCATE TABLE \`${table}\`;`);
+        await prisma.$executeRawUnsafe(`ALTER TABLE \`${table}\` AUTO_INCREMENT = 1;`);
+      } catch (e) {
+        try {
+          await prisma.$executeRawUnsafe(`DELETE FROM \`${table}\`;`);
+          await prisma.$executeRawUnsafe(`ALTER TABLE \`${table}\` AUTO_INCREMENT = 1;`);
+        } catch (e2) {}
+      }
+    }
+
+    await prisma.$executeRawUnsafe(`SET FOREIGN_KEY_CHECKS = 1;`);
+    console.log('✨ All DB tables cleared & AUTO_INCREMENT counter reset to start from 1!');
+  } catch (err) {
+    console.warn('⚠️ Table reset notice:', err.message);
   }
 
-  // 2. Clean up old/extra plans — keep ONLY the single 365-Day Protection Plan
+  // 1. Seed SuperAdmin Account with ID = 1
+  const superAdminEmail = 'abhijeetambhore4@gmail.com';
+  const passwordHash = await bcrypt.hash('Veagle@123', 10);
+
+  const superAdmin = await prisma.user.create({
+    data: {
+      id: 1,
+      fullName: 'Super Admin',
+      email: superAdminEmail,
+      phone: '7756099153',
+      passwordHash,
+      role: 'SUPER_ADMIN',
+      isEmailVerified: true,
+      subscriptionStatus: 'ACTIVE',
+      onboardingStep: 7,
+    },
+  });
+  console.log(`✅ [Seed] SuperAdmin Account Created (ID: ${superAdmin.id}): ${superAdmin.email} (Password: Veagle@123)`);
+
+  // 2. Seed Default 365-Day Plan with ID = 1
   const singlePlanData = {
     id: 1,
     name: 'Sakhi Suraksha 365 Yearly Protection Plan',
@@ -43,29 +74,18 @@ export async function seedDatabase() {
     isActive: true,
   };
 
-  // Remove any legacy plans
-  await prisma.plan.deleteMany({
-    where: {
-      id: { not: 1 }
-    }
+  const p = await prisma.plan.create({
+    data: singlePlanData,
   });
-
-  const p = await prisma.plan.upsert({
-    where: { id: 1 },
-    update: singlePlanData,
-    create: singlePlanData,
-  });
-  console.log(`✅ [Seed] Plan ID '${p.id}' Ready: ${p.name} (Base: ₹${p.basePrice}, Total: ₹${p.totalPrice})`);
+  console.log(`✅ [Seed] Subscription Plan Created (ID: ${p.id}): ${p.name}`);
 
   // 3. Seed System Setting for GST
-  await prisma.systemSetting.upsert({
-    where: { key: 'GST_PERCENTAGE' },
-    update: { value: '18.0' },
-    create: { key: 'GST_PERCENTAGE', value: '18.0' },
+  await prisma.systemSetting.create({
+    data: { key: 'GST_PERCENTAGE', value: '18.0' },
   });
-  console.log('✅ [Seed] System Settings Ready (GST: 18.0%)');
+  console.log('✅ [Seed] System Setting Created (GST: 18.0%)');
 
-  console.log('🎉 Database Seeding Completed Successfully!');
+  console.log('🎉 Database Reset & Seeding Completed Successfully! Next inserted record will start from ID = 2.');
 }
 
 if (process.argv[1] && process.argv[1].includes('seed.js')) {

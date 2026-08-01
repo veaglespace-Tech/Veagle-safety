@@ -62,6 +62,7 @@ function UserAuthForm() {
   const [state, setState] = useState('');
   const [pincode, setPincode] = useState('');
   const [emergencyContactName, setEmergencyContactName] = useState('');
+  const [emergencyContactRelation, setEmergencyContactRelation] = useState('Parent');
   const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
@@ -197,6 +198,7 @@ function UserAuthForm() {
           country: 'India',
           pincode: pincode.trim(),
           emergencyContactName: emergencyContactName.trim(),
+          emergencyContactRelation,
           emergencyContactPhone: emergencyContactPhone.replace(/\D/g, ''),
           password,
         })
@@ -463,8 +465,8 @@ function UserAuthForm() {
                   </div>
                 </div>
 
-                {/* EMERGENCY GUARDIAN CONTACT */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* EMERGENCY GUARDIAN CONTACT & RELATIONSHIP */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-[#684E67] font-extrabold mb-1">Guardian Name *</label>
                     <div className="relative">
@@ -475,13 +477,30 @@ function UserAuthForm() {
                         placeholder="e.g. Rajesh Sharma"
                         value={emergencyContactName}
                         onChange={(e) => setEmergencyContactName(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                        className="w-full pl-10 pr-3 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[#684E67] font-extrabold mb-1">Guardian Mobile Number *</label>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Relationship *</label>
+                    <select
+                      value={emergencyContactRelation}
+                      onChange={(e) => setEmergencyContactRelation(e.target.value)}
+                      className="w-full px-3 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs cursor-pointer"
+                    >
+                      <option value="Parent">Parent</option>
+                      <option value="Spouse">Spouse</option>
+                      <option value="Sibling">Sibling</option>
+                      <option value="Friend">Friend</option>
+                      <option value="Guardian">Guardian</option>
+                      <option value="Relative">Relative</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Mobile Number *</label>
                     <div className="relative">
                       <Phone className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
@@ -491,7 +510,7 @@ function UserAuthForm() {
                         placeholder="10-digit number"
                         value={emergencyContactPhone}
                         onChange={(e) => setEmergencyContactPhone(e.target.value.replace(/\D/g, ''))}
-                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                        className="w-full pl-10 pr-3 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-mono font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs"
                       />
                     </div>
                   </div>

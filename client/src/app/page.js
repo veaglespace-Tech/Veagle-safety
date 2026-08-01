@@ -21,7 +21,8 @@ export default function LandingPage() {
   }, []);
 
   const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
+  const displayName = mounted && (user?.fullName || user?.name) ? (user.fullName || user.name) : 'Sakhi Member';
 
   return (
     <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden">
@@ -37,7 +38,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 flex-wrap text-xs font-black">
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-white animate-pulse" />
-              <span>Welcome Back, <strong className="text-[#FFE600] font-black">{user?.fullName || 'Sakhi Member'}</strong>! Active Protection Enabled.</span>
+              <span>Welcome Back, <strong className="text-[#FFE600] font-black">{displayName}</strong>! Active Protection Enabled.</span>
             </div>
             <Link
               href={isSuperAdmin ? '/admin' : '/dashboard'}

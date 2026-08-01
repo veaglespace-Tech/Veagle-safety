@@ -81,8 +81,12 @@ export default function DashboardAppPage() {
   };
 
   const GreetingIcon = getGreetingIcon();
-  const firstName = user?.fullName?.split(' ')[0] || 'Sakhi Member';
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const firstName = mounted && (user?.fullName || user?.name)
+    ? (user.fullName || user.name).split(' ')[0]
+    : 'Sakhi Member';
+
+  const greetingText = mounted ? getGreeting() : 'Good Day';
+  const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
 
   const locationStatusInfo = {
     LIVE: { label: 'GPS Live Active', color: 'text-tichi-success', dot: 'bg-tichi-success', icon: MapPin },
@@ -180,7 +184,7 @@ export default function DashboardAppPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#FFCCE1] pb-6 pt-2">
               <div>
                 <div className="flex items-center space-x-2.5">
-                  <span className="text-xs font-black uppercase tracking-widest text-[#FF2A6D]">{getGreeting()}</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-[#FF2A6D]">{greetingText}</span>
                   <span className="inline-flex items-center justify-center w-7 h-7 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] text-white shadow-[0_4px_12px_rgba(255,42,109,0.3)] border-2 border-white transform hover:scale-110 transition-transform">
                     <GreetingIcon className="w-4 h-4 text-white drop-shadow-sm" />
                   </span>

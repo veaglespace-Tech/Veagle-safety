@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   ShieldAlert, Radio, Users, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
-  LogOut, Menu, X, Crown, Home, Zap
+  LogOut, Menu, X, Crown, Home, Zap, Sparkles, Sliders
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -54,7 +54,19 @@ export const Header = () => {
     navLinks.splice(1, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
   }
 
-  const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
+  const isLoggedIn = mounted && (
+    Boolean(token) ||
+    Boolean(user?.email) ||
+    (typeof window !== 'undefined' && (
+      Boolean(localStorage.getItem('tichi_token')) ||
+      Boolean(localStorage.getItem('token')) ||
+      Boolean(localStorage.getItem('tichi_user'))
+    ))
+  );
+
+  const displayName = mounted && (user?.fullName || user?.name)
+    ? (user.fullName || user.name)
+    : 'Kaveri';
 
   return (
     <header style={{
@@ -94,43 +106,43 @@ export const Header = () => {
           </div>
         </Link>
 
-        {/* DESKTOP ANIMATED NAV CHIPS CAPSULE */}
-        <nav className="hidden md:flex items-center gap-1 sm:gap-1.5 nav-chip-capsule overflow-x-auto scrollbar-none py-1 max-w-[60vw] lg:max-w-none shrink">
-          {navLinks.map(({ href, label }) => {
-            const active = isActive(href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-300 ${
-                  active
-                    ? 'nav-chip-active'
-                    : 'nav-chip-hover'
-                }`}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
+        {/* CENTER HEADER: LOGGED IN USER WELCOME CHIP OR PUBLIC NAV LINKS */}
+        {isLoggedIn ? (
+          <div className="hidden md:flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#FFF0F3] via-white to-[#FFF0F3] border-2 border-[#FFCCE1] shadow-xs">
+            <Sparkles size={16} className="text-[#FF2A6D] animate-pulse shrink-0" />
+            <span className="font-black text-xs sm:text-sm text-[#2A0826] tracking-tight truncate">
+              {displayName}'s Safety Command
+            </span>
+          </div>
+        ) : (
+          <nav className="hidden md:flex items-center gap-1 sm:gap-1.5 nav-chip-capsule overflow-x-auto scrollbar-none py-1 max-w-[60vw] lg:max-w-none shrink">
+            {navLinks.map(({ href, label }) => {
+              const active = isActive(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-300 ${
+                    active
+                      ? 'nav-chip-active'
+                      : 'nav-chip-hover'
+                  }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
 
         {/* RIGHT SIDE ACTIONS & MOBILE MENU TOGGLE */}
         <div className="flex items-center gap-2 shrink-0">
           {isLoggedIn ? (
             <div className="flex items-center gap-2">
-              {/* ALWAYS-VISIBLE 3D SOS EMERGENCY CTA BUTTON */}
-              <Link
-                href="/active-sos"
-                className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black px-4 py-2 rounded-full cursor-pointer shadow-[0_4px_16px_rgba(255,42,109,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/40 uppercase tracking-wider"
-              >
-                <ShieldAlert size={15} className="animate-pulse text-white" />
-                <span className="tracking-wide">Emergency SOS</span>
-              </Link>
-
               <button
                 type="button"
                 onClick={handleLogout}
-                className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-extrabold px-4 py-2 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md active:scale-95"
+                className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-extrabold px-4 py-2 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md active:scale-95"
                 title="Sign Out"
               >
                 <span className="tracking-wide">Sign Out</span>
