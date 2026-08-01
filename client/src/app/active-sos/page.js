@@ -89,7 +89,7 @@ export default function ActiveSOSLivePage() {
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto px-4 py-4 space-y-4 pb-12 lg:max-w-2xl">
+      <div className="max-w-xl mx-auto px-4 py-4 space-y-4 pb-4 lg:max-w-2xl">
         <div className="rounded-2xl overflow-hidden shadow-plum-lg border-2 border-tichi-emergency/30 h-64">
           <LiveLocationMap
             lat={latitude || 28.6139}

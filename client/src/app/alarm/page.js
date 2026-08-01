@@ -64,7 +64,7 @@ export default function EmergencyAlarmPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-xl mx-auto px-4 pt-5 pb-6 space-y-5 lg:max-w-2xl">
+      <div className="max-w-xl mx-auto px-4 pt-5 pb-4 space-y-5 lg:max-w-2xl">
         <div className="animate-fade-up">
           <h1 className="text-xl font-extrabold text-tichi-text tracking-tight">Emergency Siren</h1>
           <p className="text-xs text-tichi-muted mt-0.5">Maximum volume loud alarm to deter threats and attract attention</p>

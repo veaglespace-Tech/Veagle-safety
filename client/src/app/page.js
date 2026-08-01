@@ -53,7 +53,7 @@ export default function LandingPage() {
       )}
 
       {/* HERO SECTION WITH DIRECT AUTO-SCROLLING HERO BANNER */}
-      <section className="relative z-10 pt-6 sm:pt-10 pb-16 px-4 sm:px-6 lg:px-8 text-center space-y-8">
+      <section className="relative z-10 pt-6 sm:pt-10 pb-6 px-4 sm:px-6 lg:px-8 text-center space-y-8">
 
         {/* DIRECT 4K AUTO-SCROLL HERO BANNER */}
         <HeroBannerCarousel />

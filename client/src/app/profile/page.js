@@ -315,13 +315,13 @@ export default function UserProfileSettingsPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden pb-16">
+      <div className="bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden">
         
         {/* BACKGROUND AMBIENT GLOW MESHES */}
         <div className="absolute w-[700px] h-[700px] rounded-full bg-rose/15 blur-[150px] top-[-100px] left-[-200px] pointer-events-none" />
         <div className="absolute w-[700px] h-[700px] rounded-full bg-gold/15 blur-[150px] bottom-[100px] right-[-200px] pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-8 animate-fade-up">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4 relative z-10 space-y-6 animate-fade-up">
 
           {/* PAGE TITLE BANNER WITH UPDATE / EDIT PROFILE TOGGLE BUTTON */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white/90 backdrop-blur-md p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-md">

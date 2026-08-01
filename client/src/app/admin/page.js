@@ -374,13 +374,13 @@ function SuperAdminHQContent() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden pb-16">
+      <div className="bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden">
         
-        {/* AMBIENT BACKGROUND GLOWS */}
-        <div className="absolute w-[800px] h-[800px] rounded-full bg-gold/15 blur-[170px] top-[-100px] left-[-200px] pointer-events-none" />
-        <div className="absolute w-[800px] h-[800px] rounded-full bg-[#FF2A6D]/15 blur-[170px] bottom-[100px] right-[-200px] pointer-events-none" />
+        {/* BACKGROUND AMBIENT GLOW MESHES */}
+        <div className="absolute w-[800px] h-[800px] rounded-full bg-rose/15 blur-[160px] top-[-100px] left-[-200px] pointer-events-none" />
+        <div className="absolute w-[800px] h-[800px] rounded-full bg-gold/15 blur-[160px] bottom-[100px] right-[-200px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10 animate-fade-up">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4 space-y-6 relative z-10 animate-fade-up">
 
           {/* SUPERADMIN HQ HEADER BANNER */}
           <div className="bg-gradient-to-r from-[#2A0826] via-[#3D0C38] to-[#2A0826] text-white p-6 sm:p-8 rounded-[36px] border-2 border-gold/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
