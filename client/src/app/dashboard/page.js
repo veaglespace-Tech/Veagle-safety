@@ -167,24 +167,24 @@ export default function DashboardAppPage() {
           )}
 
           {/* MAIN UNIFIED HERO SAFETY HUB */}
-          <div className="bg-white/90 backdrop-blur-2xl p-8 sm:p-12 border border-[#FFCCE1]/70 rounded-[36px] shadow-[0_20px_50px_rgba(255,92,138,0.10)] space-y-10 relative overflow-hidden">
+          <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white p-5 sm:p-8 border-2 border-[#FFCCE1] hover:border-[#FF5C8A] rounded-3xl shadow-[0_16px_50px_rgba(255,92,138,0.18)] hover:shadow-[0_20px_60px_rgba(255,42,109,0.25)] transition-all duration-500 space-y-4 relative overflow-hidden">
             
             {/* AMBIENT SHIMMER BADGE */}
-            <div className="absolute top-0 right-0 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-[11px] font-black px-6 py-2.5 rounded-bl-3xl uppercase tracking-widest shadow-sm flex items-center space-x-2">
+            <div className="absolute top-0 right-0 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-[10px] sm:text-[11px] font-black px-5 sm:px-6 py-2 rounded-bl-2xl uppercase tracking-widest shadow-md flex items-center space-x-1.5">
               <ShieldCheck className="w-4 h-4 animate-pulse" />
               <span>365-DAY PROTECTION ACTIVE</span>
             </div>
 
             {/* HEADER STATUS BAR */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[#FFCCE1]/60 pb-8 pt-2">
-              <div>
-                <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#FFCCE1] pb-4 pt-1 min-w-0">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center space-x-2.5">
                   <span className="text-xs font-black uppercase tracking-widest text-[#FF2A6D]">{greetingText}</span>
-                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] text-white shadow-sm border-2 border-white transform hover:scale-105 transition-transform">
-                    <GreetingIcon className="w-4.5 h-4.5 text-white drop-shadow-xs" />
+                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] text-white shadow-sm border-2 border-white transform hover:scale-105 transition-transform">
+                    <GreetingIcon className="w-4 h-4 text-white drop-shadow-xs" />
                   </span>
                 </div>
-                <h1 className="text-3xl sm:text-4xl font-black text-[#2A0826] mt-2 tracking-tight">
+                <h1 className="text-xl sm:text-3xl lg:text-4xl font-black text-[#2A0826] mt-1.5 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
                   {firstName}'s Safety Command
                 </h1>
                 <p className="text-xs sm:text-sm text-[#684E67] font-semibold mt-1">
@@ -193,7 +193,7 @@ export default function DashboardAppPage() {
               </div>
 
               {/* GPS METER PILL */}
-              <div className="bg-[#FFF0F3]/60 border border-[#FFCCE1]/80 p-4 rounded-2xl flex items-center space-x-4 shadow-xs shrink-0">
+              <div className="bg-[#FFF0F3]/60 border border-[#FFCCE1]/80 p-3.5 rounded-2xl flex items-center space-x-3.5 shadow-xs shrink-0">
                 <div className="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
                 <div>
                   <div className="flex items-center space-x-2">
@@ -208,7 +208,7 @@ export default function DashboardAppPage() {
             </div>
 
             {/* EMERGENCY SOS HERO ACTION BUTTON */}
-            <div className="py-6 text-center space-y-5">
+            <div className="pt-2 pb-3 text-center space-y-3">
               <SOSHeroButton />
               <p className="text-xs text-[#684E67] font-black tracking-widest uppercase">
                 HOLD FOR 3 SECONDS OR DOUBLE-CLICK TO BROADCAST EMERGENCY ALERTS
