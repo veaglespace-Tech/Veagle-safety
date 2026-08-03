@@ -79,8 +79,18 @@ export const getAllUsers = asyncHandler(async (req, res) => {
       isEmailVerified: true,
       subscriptionStatus: true,
       subscriptionExpiresAt: true,
-      safetyStatus: true,
-      createdAt: true,
+      emergencyContactName: true,
+      emergencyContactPhone: true,
+      trustedContacts: {
+        select: {
+          id: true,
+          name: true,
+          relationship: true,
+          phone: true,
+          email: true,
+        },
+        orderBy: { priorityOrder: 'asc' },
+      },
       _count: {
         select: {
           trustedContacts: true,
@@ -733,6 +743,16 @@ export const addContactAdmin = asyncHandler(async (req, res) => {
       priorityOrder: count + 1,
     },
   });
+
+  if (!targetUser.emergencyContactName || count === 0) {
+    await prisma.user.update({
+      where: { id: targetUserId },
+      data: {
+        emergencyContactName: name.trim(),
+        emergencyContactPhone: phone.replace(/\D/g, ''),
+      },
+    });
+  }
 
   res.status(201).json({ message: 'Trusted contact added successfully', contact });
 });

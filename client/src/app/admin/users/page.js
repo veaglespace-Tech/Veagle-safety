@@ -292,7 +292,14 @@ export default function AdminUsersPage() {
 
                           <td className="py-4 px-6 text-right text-xs text-[#684E67] font-bold">
                             {u.emergencyContactName ? (
-                              <p>{u.emergencyContactName} ({u.emergencyContactPhone || 'N/A'})</p>
+                              <p className="font-black text-[#2A0826]">{u.emergencyContactName} <span className="text-gray-500 font-bold">({u.emergencyContactPhone || 'N/A'})</span></p>
+                            ) : u.trustedContacts && u.trustedContacts.length > 0 ? (
+                              <div>
+                                <p className="font-black text-[#2A0826]">{u.trustedContacts[0].name} <span className="text-gray-500 font-bold">({u.trustedContacts[0].phone || 'N/A'})</span></p>
+                                <span className="text-[9px] font-black text-[#FF2A6D] bg-[#FFF0F3] px-2 py-0.5 rounded-full border border-[#FFCCE1] inline-block mt-0.5">
+                                  {u.trustedContacts.length} Guardian{u.trustedContacts.length > 1 ? 's' : ''} Listed
+                                </span>
+                              </div>
                             ) : (
                               <span className="text-gray-400 italic">Not Specified</span>
                             )}

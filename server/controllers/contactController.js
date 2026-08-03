@@ -36,6 +36,17 @@ export const addContact = async (req, res) => {
       },
     });
 
+    const currentUser = await prisma.user.findUnique({ where: { id: req.user?.id } });
+    if (currentUser && (!currentUser.emergencyContactName || count === 0)) {
+      await prisma.user.update({
+        where: { id: req.user?.id },
+        data: {
+          emergencyContactName: name.trim(),
+          emergencyContactPhone: phone.replace(/\D/g, ''),
+        },
+      });
+    }
+
     return res.status(201).json({ message: 'Trusted contact added', contact });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to add contact' });
