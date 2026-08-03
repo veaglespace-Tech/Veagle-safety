@@ -61,11 +61,11 @@ export const DesktopSidebar = () => {
   ];
 
   const adminNavItems = [
-    { path: '/admin?tab=overview', tabKey: 'overview', label: 'Emergency Command', icon: AlertOctagon, desc: 'Active SOS & Incident HQ' },
-    { path: '/admin?tab=users', tabKey: 'users', label: 'User Management', icon: Users, desc: 'All Users & Free Grants' },
-    { path: '/admin?tab=plans', tabKey: 'plans', label: 'Plans & Dynamic GST', icon: Sliders, desc: 'DB Plans & Global GST' },
-    { path: '/admin?tab=payments', tabKey: 'payments', label: 'Payment Receipts', icon: CreditCard, desc: 'Txn History & Revenue' },
-    { path: '/admin?tab=enquiries', tabKey: 'enquiries', label: 'Contact Support', icon: HelpCircle, desc: 'Support & Inquiries' },
+    { path: '/admin', label: 'Emergency Command', icon: AlertOctagon, desc: 'Active SOS & Incident HQ' },
+    { path: '/admin/users', label: 'User Management', icon: Users, desc: 'All Users & Free Grants' },
+    { path: '/admin/plans', label: 'Plans & Dynamic GST', icon: Sliders, desc: 'DB Plans & Global GST' },
+    { path: '/admin/payments', label: 'Payment Receipts', icon: CreditCard, desc: 'Txn History & Revenue' },
+    { path: '/admin/enquiries', label: 'Contact Support', icon: HelpCircle, desc: 'Support & Inquiries' },
     { path: '/contacts', label: 'My Guardians', icon: Users, desc: 'Personal Safety Contacts' },
     { path: '/track-journey', label: 'Track My Journey', icon: MapPin, desc: 'Live Route Sharing' },
   ];
@@ -116,9 +116,7 @@ export const DesktopSidebar = () => {
 
             {adminNavItems.map((item) => {
               const Icon = item.icon;
-              const isActive = item.tabKey
-                ? (pathname === '/admin' || pathname.startsWith('/admin')) && currentAdminTab === item.tabKey
-                : pathname === item.path;
+              const isActive = pathname === item.path;
 
               return (
                 <Link
@@ -199,8 +197,12 @@ export const DesktopSidebar = () => {
         {/* LOGGED IN USER CARD WITH SIGN OUT */}
         <div className="bg-[#FFF0F3]/80 border border-[#FFCCE1] p-3 rounded-2xl flex items-center justify-between shadow-xs">
           <Link href="/settings" className="flex items-center space-x-3 min-w-0 group cursor-pointer flex-1">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
-              {initials}
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs overflow-hidden">
+              {currentUser?.profilePhoto ? (
+                <img src={currentUser.profilePhoto} alt={displayName} className="w-full h-full object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="font-black text-xs text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors truncate">

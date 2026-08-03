@@ -19,6 +19,15 @@ export const addContact = createAsyncThunk('contacts/addContact', async (contact
   }
 });
 
+export const updateContact = createAsyncThunk('contacts/updateContact', async ({ id, ...contactData }, { rejectWithValue }) => {
+  try {
+    const response = await api.put(`/contacts/${id}`, contactData);
+    return response.data.contact;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.error || 'Failed to update contact');
+  }
+});
+
 export const deleteContact = createAsyncThunk('contacts/deleteContact', async (contactId, { rejectWithValue }) => {
   try {
     await api.delete(`/contacts/${contactId}`);
@@ -52,6 +61,12 @@ export const contactSlice = createSlice({
       })
       .addCase(addContact.fulfilled, (state, action) => {
         state.contacts.unshift(action.payload);
+      })
+      .addCase(updateContact.fulfilled, (state, action) => {
+        const index = state.contacts.findIndex((c) => c.id === action.payload.id);
+        if (index !== -1) {
+          state.contacts[index] = action.payload;
+        }
       })
       .addCase(deleteContact.fulfilled, (state, action) => {
         state.contacts = state.contacts.filter((c) => c.id !== action.payload);

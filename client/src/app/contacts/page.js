@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { TrustedContactCard } from '../../components/contacts/TrustedContactCard.js';
-import { api } from '../../utils/api.js';
-import { UserPlus, Shield, X, CheckCircle } from 'lucide-react';
+import { UserPlus, Shield, X, CheckCircle, Edit3 } from 'lucide-react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchContacts, addContact, deleteContact } from '../../redux/slices/contactSlice.js';
+import { fetchContacts, addContact, updateContact, deleteContact } from '../../redux/slices/contactSlice.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +15,11 @@ const RELATIONSHIPS = ['Sister', 'Mother', 'Father', 'Brother', 'Friend', 'Spous
 export default function UserTrustedContactsPage() {
   const dispatch = useDispatch();
   const { contacts = [] } = useSelector((state) => state?.contacts || {});
+  
+  // MODAL & FORM STATES
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingContact, setEditingContact] = useState(null);
+
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState('Sister');
   const [phone, setPhone] = useState('');
@@ -28,22 +31,45 @@ export default function UserTrustedContactsPage() {
     dispatch(fetchContacts());
   }, [dispatch]);
 
-  const handleAddContact = async (e) => {
+  const openAddModal = () => {
+    setEditingContact(null);
+    setName('');
+    setRelationship('Sister');
+    setPhone('');
+    setEmail('');
+    setShowAddModal(true);
+  };
+
+  const openEditModal = (contact) => {
+    setEditingContact(contact);
+    setName(contact.name || '');
+    setRelationship(contact.relationship || 'Sister');
+    setPhone(contact.phone || '');
+    setEmail(contact.email || '');
+    setShowAddModal(true);
+  };
+
+  const handleSaveContact = async (e) => {
     e.preventDefault();
     if (!name || !phone) return;
     setLoading(true);
     try {
-      await dispatch(addContact({ name, relationship, phone, email })).unwrap();
+      if (editingContact) {
+        await dispatch(updateContact({ id: editingContact.id, name, relationship, phone, email })).unwrap();
+      } else {
+        await dispatch(addContact({ name, relationship, phone, email })).unwrap();
+      }
       setSaved(true);
       setTimeout(() => {
         setSaved(false);
         setName('');
         setPhone('');
         setEmail('');
+        setEditingContact(null);
         setShowAddModal(false);
-      }, 1200);
+      }, 1000);
     } catch (err) {
-      alert('We couldn\'t save this contact right now. Please try again.');
+      alert(err || 'We couldn\'t save this contact right now. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -74,7 +100,7 @@ export default function UserTrustedContactsPage() {
           {contacts.length < MAX_CONTACTS && (
             <button
               type="button"
-              onClick={() => setShowAddModal(true)}
+              onClick={openAddModal}
               className="flex items-center space-x-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-4 py-2.5 rounded-full text-xs shadow-[0_6px_20px_rgba(255,42,109,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
             >
               <UserPlus className="w-4 h-4" />
@@ -97,7 +123,7 @@ export default function UserTrustedContactsPage() {
               </div>
               <button
                 type="button"
-                onClick={() => setShowAddModal(true)}
+                onClick={openAddModal}
                 className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-7 py-3.5 rounded-full text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(255,42,109,0.38)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 + Add First Contact
@@ -106,13 +132,18 @@ export default function UserTrustedContactsPage() {
           ) : (
             <>
               {contacts.map((contact) => (
-                <TrustedContactCard key={contact.id} contact={contact} onDelete={handleDeleteContact} />
+                <TrustedContactCard
+                  key={contact.id}
+                  contact={contact}
+                  onEdit={openEditModal}
+                  onDelete={handleDeleteContact}
+                />
               ))}
 
               {contacts.length < MAX_CONTACTS && (
                 <button
                   type="button"
-                  onClick={() => setShowAddModal(true)}
+                  onClick={openAddModal}
                   className="w-full border-2 border-dashed border-[#FFCCE1] hover:border-[#FF2A6D] text-[#684E67] hover:text-[#FF2A6D] bg-white hover:bg-[#FFF0F3] py-4 rounded-2xl text-xs font-black transition-all flex items-center justify-center space-x-2 shadow-xs cursor-pointer"
                 >
                   <UserPlus className="w-4 h-4 text-[#FF2A6D]" />
@@ -132,13 +163,18 @@ export default function UserTrustedContactsPage() {
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200] bg-black/75 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
           <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white rounded-3xl w-full max-w-md border-2 border-[#FFCCE1] shadow-[0_25px_70px_rgba(0,0,0,0.3)] space-y-4 animate-slide-in-bottom overflow-hidden">
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#FFCCE1]">
-              <h3 className="font-black text-lg text-[#2A0826]">Add Trusted Contact</h3>
+              <h3 className="font-black text-lg text-[#2A0826]">
+                {editingContact ? 'Edit Trusted Contact' : 'Add Trusted Contact'}
+              </h3>
               <button
                 type="button"
-                onClick={() => setShowAddModal(false)}
+                onClick={() => {
+                  setShowAddModal(false);
+                  setEditingContact(null);
+                }}
                 className="w-8 h-8 flex items-center justify-center rounded-xl text-[#684E67] hover:bg-[#FFF0F3] hover:text-[#FF2A6D] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -148,11 +184,13 @@ export default function UserTrustedContactsPage() {
             {saved ? (
               <div className="px-6 pb-6 text-center py-8 space-y-3">
                 <CheckCircle className="w-14 h-14 text-emerald-500 mx-auto animate-bounce" />
-                <p className="font-black text-base text-[#2A0826]">Contact Saved!</p>
+                <p className="font-black text-base text-[#2A0826]">
+                  {editingContact ? 'Contact Details Updated!' : 'Contact Saved!'}
+                </p>
                 <p className="text-xs text-[#684E67] font-bold">They'll receive emergency alerts when SOS is activated.</p>
               </div>
             ) : (
-              <form onSubmit={handleAddContact} className="px-6 pb-6 space-y-4">
+              <form onSubmit={handleSaveContact} className="px-6 pb-6 space-y-4">
                 <div className="grid grid-cols-2 gap-3.5">
                   <div className="col-span-2">
                     <label className="block text-xs font-black uppercase tracking-wider text-[#2A0826] mb-1.5">Full Name *</label>
@@ -208,7 +246,7 @@ export default function UserTrustedContactsPage() {
                   disabled={loading || !name || !phone}
                   className="w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black py-4 rounded-full text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(255,42,109,0.38)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-60 cursor-pointer"
                 >
-                  {loading ? 'SAVING...' : 'SAVE TRUSTED CONTACT'}
+                  {loading ? 'SAVING...' : (editingContact ? 'UPDATE TRUSTED CONTACT' : 'SAVE TRUSTED CONTACT')}
                 </button>
               </form>
             )}

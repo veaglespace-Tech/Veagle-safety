@@ -91,52 +91,21 @@ export default function UserProfileSettingsPage() {
 
   useEffect(() => {
     setMounted(true);
-    fetchUser();
+    dispatch(fetchUser());
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
       setIsVibrationSupported(true);
     }
-  }, []);
+  }, [dispatch]);
 
-  // Sync state from authStore user object
-  const resetFormValues = () => {
-    if (user) {
-      setFullName(user.fullName || user.name || '');
-      setEmail(user.email || '');
-      setPhone(user.phone || '');
-      setBloodGroup(user.bloodGroup || 'O+');
-      setAddress(user.address || '');
-      setCity(user.city || '');
-      setState(user.state || '');
-      setPincode(user.pincode || '');
-      setEmergencyContactName(user.emergencyContactName || '');
-      setEmergencyContactPhone(user.emergencyContactPhone || '');
-      setMedicalNotes(user.medicalNotes || '');
-      setNewPassword('');
-      setConfirmPassword('');
-      setShowInlineOtpInput(false);
-      setInlineOtpCode('');
-      setIsInlineEmailVerified(false);
-      setInlineEmailNotice(null);
-    }
-  };
-
-  useEffect(() => {
-    resetFormValues();
-  }, [user]);
-
-  const isEmailChanged = mounted && user?.email
-    ? email.trim().toLowerCase() !== user.email.trim().toLowerCase()
-    : false;
-
-  const handleToggleEdit = () => {
-    if (isEditing) {
-      resetFormValues();
-      setIsEditing(false);
-      setToastMessage(null);
-    } else {
-      setIsEditing(true);
-      setToastMessage({ type: 'info', text: '✏️ Edit Mode Unlocked! Update your fields below.' });
-      setTimeout(() => setToastMessage(null), 3500);
+  const updateUserAvatar = async (base64Photo) => {
+    try {
+      await authApi.updateSettings({ profilePhoto: base64Photo });
+      dispatch(fetchUser());
+      setAvatarToast({ type: 'success', text: '✅ Profile photo updated successfully!' });
+      setTimeout(() => setAvatarToast(null), 3000);
+    } catch (err) {
+      setAvatarToast({ type: 'error', text: err.response?.data?.error || 'Failed to update profile photo.' });
+      setTimeout(() => setAvatarToast(null), 3000);
     }
   };
 
@@ -154,16 +123,28 @@ export default function UserProfileSettingsPage() {
     reader.onloadend = () => {
       const base64Image = reader.result;
       updateUserAvatar(base64Image);
-      setAvatarToast({ type: 'success', text: '✅ Profile photo updated successfully!' });
-      setTimeout(() => setAvatarToast(null), 3000);
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = () => {
-    updateUserAvatar(null);
-    setAvatarToast({ type: 'success', text: 'Profile photo reset to initials.' });
-    setTimeout(() => setAvatarToast(null), 3000);
+    updateUserAvatar('');
+  };
+
+  const isEmailChanged = mounted && user?.email
+    ? email.trim().toLowerCase() !== user.email.trim().toLowerCase()
+    : false;
+
+  const handleToggleEdit = () => {
+    if (isEditing) {
+      resetFormValues();
+      setIsEditing(false);
+      setToastMessage(null);
+    } else {
+      setIsEditing(true);
+      setToastMessage({ type: 'info', text: '✏️ Edit Mode Unlocked! Update your fields below.' });
+      setTimeout(() => setToastMessage(null), 3500);
+    }
   };
 
   // INLINE EMAIL OTP VERIFICATION HANDLERS
@@ -296,12 +277,39 @@ export default function UserProfileSettingsPage() {
     }, 2500);
   };
 
+  // Sync form inputs from Redux user state
+  const resetFormValues = () => {
+    if (user) {
+      setFullName(user.fullName || user.name || '');
+      setEmail(user.email || '');
+      setPhone(user.phone || '');
+      setBloodGroup(user.bloodGroup || 'O+');
+      setAddress(user.address || '');
+      setCity(user.city || '');
+      setState(user.state || '');
+      setPincode(user.pincode || '');
+      setEmergencyContactName(user.emergencyContactName || '');
+      setEmergencyContactPhone(user.emergencyContactPhone || '');
+      setMedicalNotes(user.medicalNotes || '');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowInlineOtpInput(false);
+      setInlineOtpCode('');
+      setIsInlineEmailVerified(false);
+      setInlineEmailNotice(null);
+    }
+  };
+
+  useEffect(() => {
+    resetFormValues();
+  }, [user]);
+
   const initials = mounted && (user?.fullName || user?.name)
     ? (user.fullName || user.name).split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'PS';
 
   const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
-  const displayAvatar = mounted ? user?.avatar : null;
+  const displayAvatar = mounted ? (user?.profilePhoto || user?.avatar) : null;
   const displayName = mounted && (user?.fullName || user?.name) ? (user.fullName || user.name) : 'Sakhi Member';
   const displayEmail = mounted && user?.email ? user.email : 'sakhi@suraksha.org';
   const displayPhone = mounted && user?.phone ? user.phone : '+91 98765 43210';

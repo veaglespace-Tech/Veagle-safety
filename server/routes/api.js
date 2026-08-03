@@ -42,6 +42,7 @@ router.get('/payment/history', authenticateToken, paymentController.getUserPayme
 // Contacts
 router.get('/contacts', authenticateToken, contactController.getContacts);
 router.post('/contacts', authenticateToken, contactController.addContact);
+router.put('/contacts/:id', authenticateToken, contactController.updateContact);
 router.delete('/contacts/:id', authenticateToken, contactController.deleteContact);
 
 // SOS
@@ -64,12 +65,16 @@ router.get('/checkin/active', authenticateToken, checkinController.getActiveChec
 // Super Admin Operations Command Portal
 router.get('/admin/overview', authenticateToken, requireSuperAdmin, adminController.getAdminOverview);
 router.get('/admin/users', authenticateToken, requireSuperAdmin, adminController.getAllUsers);
+router.get('/admin/users/:id', authenticateToken, requireSuperAdmin, adminController.getUserByIdAdmin);
 router.post('/admin/users/create', authenticateToken, requireSuperAdmin, adminController.createUserByAdmin);
 router.put('/admin/profile', authenticateToken, requireSuperAdmin, adminController.updateSuperAdminProfile);
 router.put('/admin/user/role', authenticateToken, requireSuperAdmin, adminController.updateUserRole);
 router.put('/admin/users/:id', authenticateToken, requireSuperAdmin, adminController.updateUserDetailsAdmin);
 router.post('/admin/users/:id/block', authenticateToken, requireSuperAdmin, adminController.toggleUserBlock);
 router.post('/admin/users/:id/grant-subscription', authenticateToken, requireSuperAdmin, adminController.grantUserFreeSubscription);
+router.post('/admin/users/:userId/contacts', authenticateToken, requireSuperAdmin, adminController.addContactAdmin);
+router.put('/admin/contacts/:contactId', authenticateToken, requireSuperAdmin, adminController.updateContactAdmin);
+router.delete('/admin/contacts/:contactId', authenticateToken, requireSuperAdmin, adminController.deleteContactAdmin);
 router.post('/admin/sos/resolve', authenticateToken, requireSuperAdmin, adminController.adminResolveSos);
 router.get('/admin/plans', authenticateToken, requireSuperAdmin, adminController.getPlans);
 router.post('/admin/plans', authenticateToken, requireSuperAdmin, adminController.createOrUpdatePlan);

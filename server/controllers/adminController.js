@@ -127,6 +127,7 @@ export const updateUserDetailsAdmin = asyncHandler(async (req, res) => {
     email,
     phone,
     role,
+    profilePhoto,
     bloodGroup,
     address,
     city,
@@ -168,6 +169,7 @@ export const updateUserDetailsAdmin = asyncHandler(async (req, res) => {
       ...(phone && { phone: phone.replace(/\D/g, '') }),
       ...(role && { role }),
       ...(passwordHash && { passwordHash }),
+      ...(profilePhoto !== undefined && { profilePhoto }),
       ...(bloodGroup !== undefined && { bloodGroup }),
       ...(address !== undefined && { address }),
       ...(city !== undefined && { city }),
@@ -183,6 +185,7 @@ export const updateUserDetailsAdmin = asyncHandler(async (req, res) => {
       email: true,
       phone: true,
       role: true,
+      profilePhoto: true,
       bloodGroup: true,
       address: true,
       city: true,
@@ -231,11 +234,42 @@ export const toggleUserBlock = asyncHandler(async (req, res) => {
 });
 
 /**
- * Grant Free Custom Subscription Plan / Renewal by SuperAdmin
+ * Get User Details by ID for Admin User Detail Page
+ */
+export const getUserByIdAdmin = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const targetUserId = parseInt(id, 10);
+
+  const user = await prisma.user.findUnique({
+    where: { id: targetUserId },
+    include: {
+      trustedContacts: { orderBy: { priorityOrder: 'asc' } },
+      paymentHistories: {
+        include: { plan: true },
+        orderBy: { createdAt: 'desc' },
+      },
+      sosSessions: {
+        orderBy: { startedAt: 'desc' },
+        take: 5,
+      },
+    },
+  });
+
+  if (!user) {
+    return res.status(404).json({ error: 'User account not found' });
+  }
+
+  const allPlans = await prisma.plan.findMany({ orderBy: { basePrice: 'asc' } });
+
+  return res.json({ user, allPlans });
+});
+
+/**
+ * Grant Free Custom Subscription Plan / Renewal by SuperAdmin (Zero Cost)
  */
 export const grantUserFreeSubscription = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { durationDays, customStartDate, customExpiryDate, planName } = req.body;
+  const { planId, durationDays, customStartDate, customExpiryDate, planName } = req.body;
   const targetUserId = parseInt(id, 10);
 
   const targetUser = await prisma.user.findUnique({ where: { id: targetUserId } });
@@ -243,14 +277,23 @@ export const grantUserFreeSubscription = asyncHandler(async (req, res) => {
     return res.status(404).json({ error: 'User account not found' });
   }
 
+  let chosenPlan = null;
+  if (planId) {
+    chosenPlan = await prisma.plan.findUnique({ where: { id: parseInt(planId, 10) } });
+  }
+
+  const daysToGrant = chosenPlan ? chosenPlan.durationDays : (parseInt(durationDays, 10) || 365);
+  const nameToUse = chosenPlan ? chosenPlan.name : (planName || 'Custom Free Admin Plan');
+
   let startDate = customStartDate ? new Date(customStartDate) : new Date();
-  let expiryDate = customExpiryDate ? new Date(customExpiryDate) : new Date(startDate.getTime() + (durationDays || 365) * 24 * 60 * 60 * 1000);
+  let expiryDate = customExpiryDate ? new Date(customExpiryDate) : new Date(startDate.getTime() + daysToGrant * 24 * 60 * 60 * 1000);
 
   const updatedUser = await prisma.user.update({
     where: { id: targetUserId },
     data: {
       subscriptionStatus: 'ACTIVE',
       subscriptionExpiresAt: expiryDate,
+      ...(chosenPlan && { currentPlanId: chosenPlan.id }),
     },
     select: {
       id: true,
@@ -260,24 +303,25 @@ export const grantUserFreeSubscription = asyncHandler(async (req, res) => {
     },
   });
 
-  // Record free grant in payment history for audit logging
+  // Record free grant in payment history for audit logging with 0 amount
   try {
     await prisma.paymentHistory.create({
       data: {
         userId: targetUserId,
-        txnid: `SUPERADMIN_GRANT_${Date.now()}_${targetUserId}`,
+        planId: chosenPlan ? chosenPlan.id : null,
+        txnid: `ADMIN_FREE_GRANT_${Date.now()}_${targetUserId}`,
         amount: 0.0,
         baseAmount: 0.0,
         gstAmount: 0.0,
         gstPercentage: 0.0,
         status: 'SUCCESS',
-        paymentMode: 'SUPERADMIN_FREE_GRANT',
+        paymentMode: 'ADMIN_FREE_GRANT',
       },
     });
   } catch (e) {}
 
   return res.json({
-    message: `Free Subscription (${planName || 'Custom Plan'}) granted to ${updatedUser.fullName} valid until ${expiryDate.toLocaleDateString('en-IN')}`,
+    message: `Plan "${nameToUse}" assigned/renewed for ${updatedUser.fullName} (Free Admin Grant - ₹0) valid until ${expiryDate.toLocaleDateString('en-IN')}`,
     user: updatedUser,
   });
 });
@@ -334,10 +378,18 @@ export const adminResolveSos = asyncHandler(async (req, res) => {
  * Manage Subscription Plans (Get All Plans)
  */
 export const getPlans = asyncHandler(async (req, res) => {
-  let plans = await prisma.plan.findMany({ orderBy: { createdAt: 'desc' } });
+  let plans = await prisma.plan.findMany({ orderBy: { basePrice: 'asc' } });
 
   // If no plans exist, create default 24 INR + GST plan
   if (plans.length === 0) {
+    const defaultFeatures = [
+      'Instant 3-Second Hold Emergency SOS',
+      '5 Guardian Emergency Alerts (SMS & Push)',
+      'Encrypted Real-Time Live GPS Map Sharing',
+      'High-Decibel Siren Alarm & Siren Control',
+      'Direct 112 & 1091 Helpline Access',
+      '24/7 Active Safety Command Support'
+    ];
     const defaultPlan = await prisma.plan.create({
       data: {
         name: 'Sakhi Suraksha 365 Yearly Protection Plan',
@@ -346,28 +398,52 @@ export const getPlans = asyncHandler(async (req, res) => {
         gstPercentage: 18.0,
         totalPrice: 28.32,
         durationDays: 365,
+        features: JSON.stringify(defaultFeatures),
         isActive: true,
       },
     });
     plans = [defaultPlan];
   }
 
-  return res.json({ plans });
+  const formattedPlans = plans.map((p) => {
+    let parsedFeatures = [];
+    if (p.features) {
+      try {
+        parsedFeatures = typeof p.features === 'string' ? JSON.parse(p.features) : p.features;
+      } catch (e) {
+        parsedFeatures = p.features.split('\n').map((f) => f.trim()).filter(Boolean);
+      }
+    }
+    return {
+      ...p,
+      features: Array.isArray(parsedFeatures) ? parsedFeatures : []
+    };
+  });
+
+  return res.json({ plans: formattedPlans });
 });
 
 /**
  * Create or Update Subscription Plan
  */
 export const createOrUpdatePlan = asyncHandler(async (req, res) => {
-  const { id, name, description, basePrice, gstPercentage, durationDays, isActive } = req.body;
+  const { id, name, description, basePrice, gstPercentage, durationDays, features, isActive } = req.body;
 
   if (!name || basePrice === undefined) {
     return res.status(400).json({ error: 'Plan name and basePrice are required' });
   }
 
-  const gst = gstPercentage !== undefined ? parseFloat(gstPercentage) : 18.0;
-  const base = parseFloat(basePrice);
-  const total = parseFloat((base + (base * gst) / 100).toFixed(2));
+  const base = parseFloat(basePrice) || 0;
+  const gst = base === 0 ? 0 : (gstPercentage !== undefined ? parseFloat(gstPercentage) : 18.0);
+  const total = base === 0 ? 0 : parseFloat((base + (base * gst) / 100).toFixed(2));
+  const duration = parseInt(durationDays, 10) || 30;
+
+  let featuresString = null;
+  if (Array.isArray(features)) {
+    featuresString = JSON.stringify(features.map((f) => (typeof f === 'string' ? f.trim() : f)).filter(Boolean));
+  } else if (typeof features === 'string') {
+    featuresString = features;
+  }
 
   let plan;
   if (id) {
@@ -380,7 +456,8 @@ export const createOrUpdatePlan = asyncHandler(async (req, res) => {
         basePrice: base,
         gstPercentage: gst,
         totalPrice: total,
-        durationDays: durationDays || 30,
+        durationDays: duration,
+        features: featuresString,
         isActive: isActive !== undefined ? isActive : true,
       },
     });
@@ -392,13 +469,26 @@ export const createOrUpdatePlan = asyncHandler(async (req, res) => {
         basePrice: base,
         gstPercentage: gst,
         totalPrice: total,
-        durationDays: durationDays || 30,
+        durationDays: duration,
+        features: featuresString,
         isActive: isActive !== undefined ? isActive : true,
       },
     });
   }
 
-  return res.json({ message: 'Subscription plan saved successfully', plan });
+  let parsedFeatures = [];
+  if (plan.features) {
+    try {
+      parsedFeatures = JSON.parse(plan.features);
+    } catch (e) {
+      parsedFeatures = [];
+    }
+  }
+
+  return res.json({
+    message: 'Subscription plan saved successfully',
+    plan: { ...plan, features: parsedFeatures }
+  });
 });
 
 /**
@@ -609,4 +699,83 @@ export const resolveContactEnquiry = asyncHandler(async (req, res) => {
     message: `Contact Enquiry #${updated.id} marked as RESOLVED`,
     enquiry: updated,
   });
+});
+
+/**
+ * Add Trusted Contact for a User by SuperAdmin
+ */
+export const addContactAdmin = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { name, relationship, phone, email } = req.body;
+
+  if (!name || !relationship || !phone) {
+    return res.status(400).json({ error: 'Name, relationship, and phone are required' });
+  }
+
+  const targetUserId = parseInt(userId, 10);
+  const targetUser = await prisma.user.findUnique({ where: { id: targetUserId } });
+  if (!targetUser) {
+    return res.status(404).json({ error: 'User account not found' });
+  }
+
+  const count = await prisma.trustedContact.count({ where: { userId: targetUserId } });
+  if (count >= 5) {
+    return res.status(400).json({ error: 'Maximum limit of 5 trusted contacts reached for this user' });
+  }
+
+  const contact = await prisma.trustedContact.create({
+    data: {
+      userId: targetUserId,
+      name: name.trim(),
+      relationship,
+      phone: phone.replace(/\D/g, ''),
+      email: email ? email.trim() : '',
+      priorityOrder: count + 1,
+    },
+  });
+
+  res.status(201).json({ message: 'Trusted contact added successfully', contact });
+});
+
+/**
+ * Update Trusted Contact by SuperAdmin
+ */
+export const updateContactAdmin = asyncHandler(async (req, res) => {
+  const { contactId } = req.params;
+  const { name, relationship, phone, email } = req.body;
+
+  const targetContactId = parseInt(contactId, 10);
+  const existing = await prisma.trustedContact.findUnique({ where: { id: targetContactId } });
+  if (!existing) {
+    return res.status(404).json({ error: 'Trusted contact not found' });
+  }
+
+  const updated = await prisma.trustedContact.update({
+    where: { id: targetContactId },
+    data: {
+      ...(name && { name: name.trim() }),
+      ...(relationship && { relationship }),
+      ...(phone && { phone: phone.replace(/\D/g, '') }),
+      ...(email !== undefined && { email: email ? email.trim() : '' }),
+    },
+  });
+
+  res.status(200).json({ message: 'Trusted contact updated successfully', contact: updated });
+});
+
+/**
+ * Delete Trusted Contact by SuperAdmin
+ */
+export const deleteContactAdmin = asyncHandler(async (req, res) => {
+  const { contactId } = req.params;
+
+  const targetContactId = parseInt(contactId, 10);
+  const existing = await prisma.trustedContact.findUnique({ where: { id: targetContactId } });
+  if (!existing) {
+    return res.status(404).json({ error: 'Trusted contact not found' });
+  }
+
+  await prisma.trustedContact.delete({ where: { id: targetContactId } });
+
+  res.status(200).json({ message: 'Trusted contact removed successfully' });
 });

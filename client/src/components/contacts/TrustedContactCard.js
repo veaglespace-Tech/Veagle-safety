@@ -1,12 +1,12 @@
 import React from 'react';
-import { Phone, CheckCircle, Trash2, Mail } from 'lucide-react';
+import { Phone, CheckCircle, Trash2, Mail, Edit3 } from 'lucide-react';
 
-export const TrustedContactCard = ({ contact, onDelete }) => {
+export const TrustedContactCard = ({ contact, onEdit, onDelete }) => {
   return (
     <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white border-2 border-[#FFCCE1] hover:border-[#FF5C8A] rounded-2xl p-4 flex items-center justify-between shadow-[0_6px_20px_rgba(255,92,138,0.12)] hover:shadow-[0_10px_28px_rgba(255,42,109,0.22)] transition-all duration-300">
       <div className="flex items-center space-x-3.5">
         <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center font-black text-base border-2 border-white shadow-md">
-          {contact.name.charAt(0)}
+          {contact.name ? contact.name.charAt(0).toUpperCase() : 'C'}
         </div>
         
         <div>
@@ -35,11 +35,22 @@ export const TrustedContactCard = ({ contact, onDelete }) => {
           <Phone className="w-4 h-4" />
         </a>
 
+        {onEdit && (
+          <button
+            type="button"
+            onClick={() => onEdit(contact)}
+            className="p-2.5 rounded-xl text-[#684E67] hover:text-[#FF2A6D] hover:bg-[#FFF0F3] transition-colors cursor-pointer"
+            title="Edit Contact"
+          >
+            <Edit3 className="w-4 h-4" />
+          </button>
+        )}
+
         {onDelete && (
           <button
             type="button"
             onClick={() => onDelete(contact.id)}
-            className="p-2.5 rounded-xl text-[#684E67] hover:text-[#FF2A6D] hover:bg-[#FFF0F3] transition-colors cursor-pointer"
+            className="p-2.5 rounded-xl text-[#684E67] hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
             title="Remove Contact"
           >
             <Trash2 className="w-4 h-4" />

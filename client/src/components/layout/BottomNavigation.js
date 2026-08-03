@@ -27,10 +27,10 @@ export const BottomNavigation = () => {
   ];
 
   const adminNavItems = [
-    { path: '/admin?tab=overview', tabKey: 'overview', label: 'SOS HQ', icon: AlertOctagon },
-    { path: '/admin?tab=users', tabKey: 'users', label: 'Users', icon: Users },
-    { path: '/admin?tab=plans', tabKey: 'plans', label: 'Plans', icon: Sliders },
-    { path: '/admin?tab=payments', tabKey: 'payments', label: 'Pay', icon: CreditCard },
+    { path: '/admin', label: 'SOS HQ', icon: AlertOctagon },
+    { path: '/admin/users', label: 'Users', icon: Users },
+    { path: '/admin/plans', label: 'Plans', icon: Sliders },
+    { path: '/admin/payments', label: 'Pay', icon: CreditCard },
   ];
 
   const navItems = isSuperAdmin ? adminNavItems : memberNavItems;
@@ -50,7 +50,7 @@ export const BottomNavigation = () => {
           bottom: '10px',
           left: '50%',
           transform: 'translateX(-50%)',
-          zIndex: 100,
+          zIndex: 40,
           width: 'min(360px, 88vw)',
           maxWidth: '360px',
           fontFamily: 'Manrope, sans-serif',
@@ -75,8 +75,8 @@ export const BottomNavigation = () => {
 
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = item.tabKey
-              ? (pathname === '/admin' || pathname.startsWith('/admin')) && (searchParams?.get('tab') || 'overview') === item.tabKey
+            const isActive = isSuperAdmin
+              ? (item.path === '/admin' ? pathname === '/admin' : pathname.startsWith(item.path))
               : pathname === item.path;
 
             /* ========================================================

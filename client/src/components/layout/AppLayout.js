@@ -68,14 +68,14 @@ export const AppLayout = ({ children, fullScreen = false }) => {
   }, [mounted, pathname, token, user, router]);
 
   return (
-    <div className="min-h-screen bg-blush flex flex-col relative">
+    <div className="min-h-screen bg-blush flex flex-col relative overflow-x-hidden">
       {/* Desktop sidebar (hidden on mobile) */}
       <Suspense fallback={null}>
         <DesktopSidebar />
       </Suspense>
 
       {/* Main content area — offset by sidebar on desktop */}
-      <div className="lg:ml-72 flex-1 flex flex-col">
+      <div className="lg:ml-72 flex-1 flex flex-col min-w-0">
         {!fullScreen && <Header />}
 
         <main className={`flex-1 ${!fullScreen ? 'pb-16 lg:pb-4' : ''}`}>

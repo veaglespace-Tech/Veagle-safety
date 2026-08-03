@@ -6,11 +6,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   ShieldAlert, Radio, Users, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
-  LogOut, Menu, X, Crown, Home, Zap, Sparkles, Sliders
+  LogOut, Menu, X, Crown, Home, Zap
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
-import { MagneticButton } from '../ui/MagneticButton.js';
 import { Logo3DFlip } from '../ui/Logo3DFlip.js';
 
 export const Header = () => {
@@ -43,8 +42,7 @@ export const Header = () => {
     }
   };
 
-  const isActive = (path) => pathname === path;
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const isActive = (path) => pathname === path || (path !== '/' && pathname.startsWith(path));
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
@@ -53,10 +51,6 @@ export const Header = () => {
     { href: '/gallery', label: 'Gallery', icon: ImageIcon },
     { href: '/contact', label: 'Contact', icon: PhoneCall },
   ];
-
-  if (mounted && token && isSuperAdmin) {
-    navLinks.splice(1, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
-  }
 
   const isLoggedIn = mounted && (
     Boolean(token) ||
@@ -68,9 +62,7 @@ export const Header = () => {
     ))
   );
 
-  const displayName = mounted && (user?.fullName || user?.name)
-    ? (user.fullName || user.name)
-    : 'Kaveri';
+  const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
 
   return (
     <header style={{
@@ -84,7 +76,7 @@ export const Header = () => {
     }}>
       <div className="max-w-7xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2 w-full">
 
-        {/* BRAND LOGO WITH RESPONSIVE FLEX SHRINK */}
+        {/* BRAND LOGO */}
         <Link 
           href="/" 
           className="group flex items-center gap-2 no-underline shrink min-w-0 overflow-hidden"
@@ -110,7 +102,7 @@ export const Header = () => {
           </div>
         </Link>
 
-        {/* CENTER HEADER: NAVIGATION LINKS (ONLY FOR PUBLIC/GUEST USERS) */}
+        {/* CENTER HEADER NAVIGATION LINKS */}
         {!isLoggedIn && (
           <nav className="hidden md:flex items-center gap-1 sm:gap-1.5 nav-chip-capsule overflow-x-auto scrollbar-none py-1 max-w-[60vw] lg:max-w-none shrink">
             {navLinks.map(({ href, label }) => {
@@ -148,7 +140,6 @@ export const Header = () => {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              {/* ALWAYS-VISIBLE 3D CTA PROTECT BUTTON */}
               <Link
                 href="/auth?mode=register"
                 className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black px-4 py-2 rounded-full cursor-pointer shadow-[0_4px_16px_rgba(255,42,109,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/40 uppercase tracking-wider"

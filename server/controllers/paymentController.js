@@ -49,15 +49,128 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
     plan = await prisma.plan.findFirst({ where: { isActive: true } });
   }
 
+  const baseAmount = plan ? plan.basePrice : 24.0;
   let gstPercentage = plan ? plan.gstPercentage : 18.0;
-  const gstSetting = await prisma.systemSetting.findUnique({ where: { key: 'GST_PERCENTAGE' } });
-  if (gstSetting) {
-    gstPercentage = parseFloat(gstSetting.value) || 18.0;
+
+  if (baseAmount === 0) {
+    gstPercentage = 0;
+  } else {
+    const gstSetting = await prisma.systemSetting.findUnique({ where: { key: 'GST_PERCENTAGE' } });
+    if (gstSetting) {
+      gstPercentage = parseFloat(gstSetting.value) || 18.0;
+    }
   }
 
-  const baseAmount = plan ? plan.basePrice : 24.0;
-  const gstAmount = parseFloat(((baseAmount * gstPercentage) / 100).toFixed(2));
-  const totalAmount = parseFloat((baseAmount + gstAmount).toFixed(2));
+  const gstAmount = baseAmount === 0 ? 0 : parseFloat(((baseAmount * gstPercentage) / 100).toFixed(2));
+  const totalAmount = baseAmount === 0 ? 0 : parseFloat((baseAmount + gstAmount).toFixed(2));
+
+  // IF PLAN IS 100% FREE (0 INR): Activate subscription directly without PayU!
+  if (baseAmount === 0 || totalAmount === 0) {
+    const durationDays = plan?.durationDays || 7;
+    const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
+    const freeTxnId = `FREE_${Date.now()}_${Math.floor(100 + Math.random() * 900)}`;
+
+    let activeUser = null;
+
+    if (req.user?.id) {
+      activeUser = await prisma.user.update({
+        where: { id: req.user.id },
+        data: {
+          subscriptionStatus: 'ACTIVE',
+          subscriptionExpiresAt: expiresAt,
+        },
+      });
+    } else if (decodedRegistration && decodedRegistration.email) {
+      activeUser = await prisma.user.findUnique({ where: { email: decodedRegistration.email } });
+      if (!activeUser) {
+        activeUser = await prisma.user.create({
+          data: {
+            fullName: decodedRegistration.fullName,
+            email: decodedRegistration.email,
+            phone: decodedRegistration.phone,
+            passwordHash: decodedRegistration.passwordHash,
+            role: decodedRegistration.role || 'USER',
+            profilePhoto: decodedRegistration.profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
+            bloodGroup: decodedRegistration.bloodGroup || 'O+',
+            address: decodedRegistration.address || 'Not Specified',
+            city: decodedRegistration.city || 'Pune',
+            state: decodedRegistration.state || 'Maharashtra',
+            country: decodedRegistration.country || 'India',
+            pincode: decodedRegistration.pincode || '411001',
+            emergencyContactName: decodedRegistration.emergencyContactName || null,
+            emergencyContactPhone: decodedRegistration.emergencyContactPhone || null,
+            isEmailVerified: true,
+            subscriptionStatus: 'ACTIVE',
+            subscriptionExpiresAt: expiresAt,
+          },
+        });
+
+        if (decodedRegistration.emergencyContactName && decodedRegistration.emergencyContactPhone) {
+          try {
+            await prisma.trustedContact.create({
+              data: {
+                userId: activeUser.id,
+                name: decodedRegistration.emergencyContactName,
+                relationship: 'Primary Guardian / Emergency Contact',
+                phone: decodedRegistration.emergencyContactPhone,
+                email: decodedRegistration.email,
+                isVerified: true,
+                priorityOrder: 1,
+              },
+            });
+          } catch (e) {
+            console.log('[Register Notice] Primary contact creation skipped:', e.message);
+          }
+        }
+      } else {
+        activeUser = await prisma.user.update({
+          where: { id: activeUser.id },
+          data: {
+            subscriptionStatus: 'ACTIVE',
+            subscriptionExpiresAt: expiresAt,
+          },
+        });
+      }
+    }
+
+    if (activeUser) {
+      await prisma.paymentHistory.create({
+        data: {
+          userId: activeUser.id,
+          planId: plan ? plan.id : null,
+          txnid: freeTxnId,
+          amount: 0,
+          baseAmount: 0,
+          gstAmount: 0,
+          gstPercentage: 0,
+          status: 'SUCCESS',
+          paymentMode: 'FREE_TRIAL',
+        },
+      });
+
+      const sessionToken = jwt.sign(
+        { id: activeUser.id, userId: activeUser.id, role: activeUser.role, email: activeUser.email },
+        config.jwt.secret,
+        { expiresIn: config.jwt.expiresIn }
+      );
+
+      return res.json({
+        success: true,
+        isFree: true,
+        message: 'Free Trial Plan activated successfully!',
+        token: sessionToken,
+        user: {
+          id: activeUser.id,
+          fullName: activeUser.fullName,
+          email: activeUser.email,
+          phone: activeUser.phone,
+          role: activeUser.role,
+          subscriptionStatus: activeUser.subscriptionStatus,
+        },
+        txnid: freeTxnId,
+      });
+    }
+  }
 
   const txnid = `VEAGLE_${Date.now()}_${Math.floor(100 + Math.random() * 900)}`;
   const productinfo = plan ? plan.name : 'Sakhi Suraksha 365 Yearly Protection Plan';

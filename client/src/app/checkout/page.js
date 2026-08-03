@@ -38,10 +38,11 @@ function CheckoutContent() {
     durationDays: 365,
   };
 
-  const basePrice = Number(selectedPlan.basePrice || 24.0);
-  const gstRate = Number(selectedPlan.gstPercentage || 18.0);
-  const gstAmount = Number(((basePrice * gstRate) / 100).toFixed(2));
-  const totalPrice = Number((basePrice + gstAmount).toFixed(2));
+  const basePrice = Number(selectedPlan.basePrice || 0);
+  const isFreePlan = basePrice === 0;
+  const gstRate = isFreePlan ? 0 : Number(selectedPlan.gstPercentage || 18.0);
+  const gstAmount = isFreePlan ? 0 : Number(((basePrice * gstRate) / 100).toFixed(2));
+  const totalPrice = isFreePlan ? 0 : Number((basePrice + gstAmount).toFixed(2));
 
   const currentRegToken = registrationToken || (typeof window !== 'undefined' ? localStorage.getItem('tichi_reg_token') : null);
 
@@ -78,6 +79,15 @@ function CheckoutContent() {
         amount: totalPrice,
         registrationToken: currentRegToken,
       });
+
+      if (res.data?.isFree) {
+        if (res.data.token) {
+          localStorage.setItem('tichi_auth_token', res.data.token);
+        }
+        router.push(`/payment/success?status=success&txnid=${res.data.txnid}&free=true`);
+        return;
+      }
+
       const payData = res.data?.paymentData;
 
       if (!payData || !payData.actionUrl || !payData.hash) {
@@ -220,17 +230,23 @@ function CheckoutContent() {
             <div className="bg-white/90 p-5 rounded-2xl border border-[#FFCCE1] space-y-4 shadow-sm">
               <div className="flex justify-between items-center text-xs font-extrabold text-[#684E67]">
                 <span>Base Plan Price (Net):</span>
-                <span className="font-mono text-sm font-black text-[#2A0826]">₹{basePrice.toFixed(2)}</span>
+                <span className="font-mono text-sm font-black text-[#2A0826]">
+                  {isFreePlan ? '₹0.00 (100% FREE)' : `₹${basePrice.toFixed(2)}`}
+                </span>
               </div>
 
               <div className="flex justify-between items-center text-xs font-extrabold text-[#684E67] border-b border-dashed border-[#FFCCE1] pb-4">
                 <span>GST Tax Added ({gstRate}%):</span>
-                <span className="font-mono text-sm font-black text-[#2A0826]">₹{gstAmount.toFixed(2)}</span>
+                <span className="font-mono text-sm font-black text-[#2A0826]">
+                  {isFreePlan ? '₹0.00 (No GST)' : `₹${gstAmount.toFixed(2)}`}
+                </span>
               </div>
 
               <div className="pt-2 flex justify-between items-center">
                 <span className="font-black text-xs uppercase text-[#FF2A6D] tracking-wider">Total Payable Amount:</span>
-                <span className="font-mono text-2xl font-black text-[#FF2A6D] drop-shadow-xs">₹{totalPrice.toFixed(2)}</span>
+                <span className="font-mono text-2xl font-black text-[#FF2A6D] drop-shadow-xs">
+                  {isFreePlan ? '₹0.00 (FREE TRIAL)' : `₹${totalPrice.toFixed(2)}`}
+                </span>
               </div>
             </div>
 
@@ -243,7 +259,11 @@ function CheckoutContent() {
                 className="w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white py-4 rounded-2xl text-xs sm:text-sm uppercase tracking-wider font-black shadow-[0_8px_25px_rgba(255,42,109,0.35)] hover:shadow-[0_12px_35px_rgba(255,42,109,0.50)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer border border-white/30"
               >
                 <span>
-                  {isProcessing ? 'REDIRECTING TO SECURE PAYU...' : `PROCEED TO PAYU CHECKOUT (₹${totalPrice.toFixed(2)})`}
+                  {isProcessing
+                    ? isFreePlan ? 'ACTIVATING FREE TRIAL...' : 'REDIRECTING TO SECURE PAYU...'
+                    : isFreePlan
+                      ? 'ACTIVATE 100% FREE TRIAL NOW'
+                      : `PROCEED TO PAYU CHECKOUT (₹${totalPrice.toFixed(2)})`}
                 </span>
                 <ExternalLink className="w-4 h-4" />
               </button>

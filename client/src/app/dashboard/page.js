@@ -187,8 +187,8 @@ export default function DashboardAppPage() {
                 <h1 className="text-xl sm:text-3xl lg:text-4xl font-black text-[#2A0826] mt-1.5 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
                   {firstName}'s Safety Command
                 </h1>
-                <p className="text-xs sm:text-sm text-[#684E67] font-semibold mt-1">
-                  24/7 Encrypted GPS Tracking & Emergency Guardian Network
+                <p className="text-xs sm:text-sm text-[#684E67] font-bold mt-0.5">
+                  24/7 Live Protection & Emergency Guardian Network
                 </p>
               </div>
 

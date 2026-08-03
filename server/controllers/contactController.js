@@ -28,10 +28,10 @@ export const addContact = async (req, res) => {
     const contact = await prisma.trustedContact.create({
       data: {
         userId: req.user?.id,
-        name,
+        name: name.trim(),
         relationship,
-        phone,
-        email: email || '',
+        phone: phone.replace(/\D/g, ''),
+        email: email ? email.trim() : '',
         priorityOrder: count + 1,
       },
     });
@@ -56,5 +56,35 @@ export const deleteContact = async (req, res) => {
     return res.json({ message: 'Contact removed successfully' });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to remove contact' });
+  }
+};
+
+export const updateContact = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, relationship, phone, email } = req.body;
+
+    const contactId = typeof id === 'number' ? id : parseInt(id, 10);
+    const existing = await prisma.trustedContact.findFirst({
+      where: { id: contactId, userId: req.user?.id },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ error: 'Trusted contact not found' });
+    }
+
+    const updated = await prisma.trustedContact.update({
+      where: { id: contactId },
+      data: {
+        ...(name && { name: name.trim() }),
+        ...(relationship && { relationship }),
+        ...(phone && { phone: phone.replace(/\D/g, '') }),
+        ...(email !== undefined && { email: email ? email.trim() : '' }),
+      },
+    });
+
+    return res.json({ message: 'Trusted contact updated successfully', contact: updated });
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to update contact' });
   }
 };
