@@ -7,6 +7,8 @@ import { Header } from './Header.js';
 import { BottomNavigation } from './BottomNavigation.js';
 import { DesktopSidebar } from './DesktopSidebar.js';
 
+import { GeoLocationTracker } from '../common/GeoLocationTracker.js';
+
 export const AppLayout = ({ children, fullScreen = false }) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -69,6 +71,7 @@ export const AppLayout = ({ children, fullScreen = false }) => {
 
   return (
     <div className="min-h-screen bg-blush flex flex-col relative overflow-x-hidden">
+      <GeoLocationTracker />
       {/* Desktop sidebar (hidden on mobile) */}
       <Suspense fallback={null}>
         <DesktopSidebar />

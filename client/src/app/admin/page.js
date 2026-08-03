@@ -52,11 +52,14 @@ export default function SuperAdminOverviewPage() {
 
   if (!mounted) return null;
 
+  const activeSosList = overview?.activeSos || [];
+  const recentSosList = overview?.recentSos || [];
+
   const metrics = {
     activeSosCount: overview?.metrics?.activeSosCount || 0,
-    totalUsers: overview?.metrics?.totalUsersCount || 0,
-    activePlansCount: overview?.metrics?.activeSubscriptionsCount || 0,
-    paymentsCount: overview?.metrics?.totalPaymentsCount || 0,
+    totalUsers: overview?.metrics?.totalUsers || 0,
+    activePlansCount: overview?.metrics?.activeSubscriptions || 0,
+    paymentsCount: overview?.metrics?.totalSuccessfulTransactions || 0,
   };
 
   return (
@@ -83,7 +86,7 @@ export default function SuperAdminOverviewPage() {
                   <AlertOctagon className="w-5 h-5 animate-pulse" />
                 </div>
               </div>
-              <p className="text-3xl font-black text-[#2A0826]">{overview?.metrics?.activeSosCount || 0}</p>
+              <p className="text-3xl font-black text-[#2A0826]">{metrics.activeSosCount}</p>
               <p className="text-[11px] font-bold text-rose-500">Emergency broadcasts live</p>
             </div>
 
@@ -94,7 +97,7 @@ export default function SuperAdminOverviewPage() {
                   <Users className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-3xl font-black text-[#2A0826]">{overview?.metrics?.totalUsersCount || 0}</p>
+              <p className="text-3xl font-black text-[#2A0826]">{metrics.totalUsers}</p>
               <p className="text-[11px] font-bold text-[#684E67]">Registered Sakhi accounts</p>
             </div>
 
@@ -105,7 +108,7 @@ export default function SuperAdminOverviewPage() {
                   <ShieldCheck className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-3xl font-black text-[#2A0826]">{overview?.metrics?.activeSubscriptionsCount || 0}</p>
+              <p className="text-3xl font-black text-[#2A0826]">{metrics.activePlansCount}</p>
               <p className="text-[11px] font-bold text-emerald-600">Active paid protection</p>
             </div>
 
@@ -129,54 +132,59 @@ export default function SuperAdminOverviewPage() {
                 <h3 className="font-black text-lg text-[#2A0826]">Live Active SOS Emergency Broadcasts</h3>
               </div>
               <span className="text-xs font-black bg-rose-100 text-[#FF2A6D] px-3 py-1 rounded-full uppercase border border-rose-300">
-                {overview?.activeSosSessions?.length || 0} LIVE INCIDENTS
+                {activeSosList.length} LIVE INCIDENTS
               </span>
             </div>
 
-            {overview?.activeSosSessions && overview.activeSosSessions.length > 0 ? (
+            {activeSosList.length > 0 ? (
               <div className="space-y-4">
-                {overview.activeSosSessions.map((sos) => (
-                  <div key={sos.id} className="p-5 rounded-3xl bg-rose-50/60 border-2 border-rose-300 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-1.5">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs font-black text-rose-600 bg-white px-2.5 py-0.5 rounded-full border border-rose-300 uppercase">
-                          SOS #{sos.id}
-                        </span>
-                        <h4 className="font-black text-base text-[#2A0826]">{sos.user?.fullName || 'Anonymous Sakhi'}</h4>
+                {activeSosList.map((sos) => {
+                  const latestLoc = sos.locations?.[0];
+                  return (
+                    <div key={sos.id} className="p-5 rounded-3xl bg-rose-50/60 border-2 border-rose-300 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs font-black text-rose-600 bg-white px-2.5 py-0.5 rounded-full border border-rose-300 uppercase">
+                            SOS #{sos.id}
+                          </span>
+                          <h4 className="font-black text-base text-[#2A0826]">{sos.user?.fullName || 'Anonymous Sakhi'}</h4>
+                        </div>
+                        <p className="text-xs font-bold text-[#684E67] flex items-center space-x-2">
+                          <PhoneCall className="w-3.5 h-3.5 text-[#FF2A6D]" />
+                          <span>{sos.user?.phone || 'N/A'}</span>
+                          <span>•</span>
+                          <Mail className="w-3.5 h-3.5 text-[#FF2A6D]" />
+                          <span>{sos.user?.email || 'N/A'}</span>
+                        </p>
+                        <p className="text-xs font-bold text-rose-700 flex items-center space-x-1 pt-1">
+                          <MapPin className="w-3.5 h-3.5 text-rose-600" />
+                          <span>
+                            GPS: {latestLoc?.latitude || sos.latitude || 'N/A'}, {latestLoc?.longitude || sos.longitude || 'N/A'}
+                          </span>
+                        </p>
                       </div>
-                      <p className="text-xs font-bold text-[#684E67] flex items-center space-x-2">
-                        <PhoneCall className="w-3.5 h-3.5 text-[#FF2A6D]" />
-                        <span>{sos.user?.phone || 'N/A'}</span>
-                        <span>•</span>
-                        <Mail className="w-3.5 h-3.5 text-[#FF2A6D]" />
-                        <span>{sos.user?.email || 'N/A'}</span>
-                      </p>
-                      <p className="text-xs font-bold text-rose-700 flex items-center space-x-1 pt-1">
-                        <MapPin className="w-3.5 h-3.5 text-rose-600" />
-                        <span>GPS: {sos.latitude}, {sos.longitude} ({sos.city || 'Pune'})</span>
-                      </p>
-                    </div>
 
-                    <div className="flex items-center space-x-3">
-                      <button
-                        type="button"
-                        onClick={() => router.push(`/active-sos`)}
-                        className="px-4 py-2.5 bg-white text-[#FF2A6D] border border-rose-300 font-black text-xs rounded-xl shadow-sm hover:bg-rose-100 transition-all flex items-center space-x-1 cursor-pointer"
-                      >
-                        <Eye className="w-4 h-4" />
-                        <span>TRACK LIVE</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleResolveSos(sos.id)}
-                        className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-xs rounded-xl shadow-sm hover:scale-105 transition-all flex items-center space-x-1 cursor-pointer"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>RESOLVE SOS</span>
-                      </button>
+                      <div className="flex items-center space-x-3">
+                        <button
+                          type="button"
+                          onClick={() => router.push('/active-sos')}
+                          className="px-4 py-2.5 bg-white text-[#FF2A6D] border border-rose-300 font-black text-xs rounded-xl shadow-sm hover:bg-rose-100 transition-all flex items-center space-x-1 cursor-pointer"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span>TRACK LIVE</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleResolveSos(sos.id)}
+                          className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-xs rounded-xl shadow-sm hover:scale-105 transition-all flex items-center space-x-1 cursor-pointer"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>RESOLVE SOS</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="p-8 text-center bg-[#FFF0F3]/40 rounded-3xl border border-dashed border-[#FFCCE1] space-y-2">
@@ -187,19 +195,27 @@ export default function SuperAdminOverviewPage() {
             )}
           </div>
 
-          {/* RECENT ACTIVITY & AUDIT LOGS */}
+          {/* RECENT ACTIVITY & DISPATCH LOGS */}
           <div className="bg-white p-6 sm:p-8 rounded-[36px] border-2 border-[#FFCCE1] shadow-md space-y-4">
             <h3 className="font-black text-lg text-[#2A0826] border-b border-[#FFCCE1] pb-3">Recent System Activity & Dispatch Logs</h3>
-            {overview?.recentAuditLogs && overview.recentAuditLogs.length > 0 ? (
+            {recentSosList.length > 0 ? (
               <div className="space-y-3">
-                {overview.recentAuditLogs.map((log) => (
-                  <div key={log.id} className="p-4 rounded-2xl bg-[#FFF0F3]/60 border border-[#FFCCE1] flex items-center justify-between text-xs">
+                {recentSosList.map((sos) => (
+                  <div key={sos.id} className="p-4 rounded-2xl bg-[#FFF0F3]/60 border border-[#FFCCE1] flex items-center justify-between text-xs">
                     <div>
-                      <span className="font-black text-[#2A0826]">{log.action}</span>
-                      <p className="text-[11px] text-[#684E67] font-bold mt-0.5">{log.details || 'System event recorded'}</p>
+                      <span className="font-black text-[#2A0826]">
+                        Emergency SOS #{sos.id} ({sos.status}) — {sos.user?.fullName || 'Member'}
+                      </span>
+                      <p className="text-[11px] text-[#684E67] font-bold mt-0.5">
+                        Triggered on {new Date(sos.startedAt).toLocaleString('en-IN')}
+                      </p>
                     </div>
-                    <span className="text-[10px] font-extrabold text-gray-500 bg-white px-2.5 py-1 rounded-full border border-gray-200">
-                      {new Date(log.createdAt).toLocaleString()}
+                    <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase border ${
+                      sos.status === 'ACTIVE'
+                        ? 'bg-rose-100 text-rose-700 border-rose-300'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    }`}>
+                      {sos.status}
                     </span>
                   </div>
                 ))}
