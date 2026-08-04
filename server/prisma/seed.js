@@ -62,22 +62,51 @@ export async function seedDatabase() {
   });
   console.log(`✅ [Seed] SuperAdmin Account Created (ID: ${superAdmin.id}): ${superAdmin.email} (Password: Veagle@123)`);
 
-  // 2. Seed Default 365-Day Plan with ID = 1
-  const singlePlanData = {
-    id: 1,
-    name: 'Sakhi Suraksha 365 Yearly Protection Plan',
-    description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
-    basePrice: 24.0,
-    gstPercentage: 18.0,
-    totalPrice: 28.32,
-    durationDays: 365,
-    isActive: true,
-  };
+  // 2. Seed Subscription Plans (Free Plan + 365 Yearly Protection Plan)
+  const plans = [
+    {
+      id: 1,
+      name: 'Sakhi Free Starter Safety Plan',
+      description: 'Free Lifetime Access to 24/7 Emergency SOS Siren, Live GPS Map Stream, and 2 Guardian Contacts',
+      basePrice: 0.0,
+      gstPercentage: 0.0,
+      totalPrice: 0.0,
+      durationDays: 36500,
+      features: JSON.stringify([
+        'Instant 3-Second SOS Emergency Trigger',
+        '2 Trusted Guardian Emergency Contacts',
+        'Real-Time Live GPS Map Stream Link',
+        'High-Decibel Emergency Siren Alarm',
+        'Direct 112 National Police Helpline',
+      ]),
+      isActive: true,
+    },
+    {
+      id: 2,
+      name: 'Sakhi Suraksha 365 Yearly Protection Plan',
+      description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
+      basePrice: 24.0,
+      gstPercentage: 18.0,
+      totalPrice: 28.32,
+      durationDays: 365,
+      features: JSON.stringify([
+        'Instant 3-Second Hold Emergency SOS',
+        '5 Guardian Emergency Alerts (Email & WhatsApp)',
+        'Encrypted Real-Time Live GPS Map Sharing',
+        'High-Decibel Siren Alarm & Guardian Unmute',
+        'Direct 112 & 1091 Helpline Access',
+        '24/7 Active Safety Command Center Support',
+      ]),
+      isActive: true,
+    },
+  ];
 
-  const p = await prisma.plan.create({
-    data: singlePlanData,
-  });
-  console.log(`✅ [Seed] Subscription Plan Created (ID: ${p.id}): ${p.name}`);
+  for (const planData of plans) {
+    const p = await prisma.plan.create({
+      data: planData,
+    });
+    console.log(`✅ [Seed] Subscription Plan Created (ID: ${p.id}): ${p.name} (Price: ₹${p.totalPrice})`);
+  }
 
   // 3. Seed System Setting for GST
   await prisma.systemSetting.upsert({
@@ -87,7 +116,7 @@ export async function seedDatabase() {
   });
   console.log('✅ [Seed] System Setting Created (GST: 18.0%)');
 
-  console.log('🎉 Database Reset & Seeding Completed Successfully! Next inserted record will start from ID = 2.');
+  console.log('🎉 Database Reset & Seeding Completed Successfully! Next inserted record will start from ID = 3.');
 }
 
 if (process.argv[1] && process.argv[1].includes('seed.js')) {
