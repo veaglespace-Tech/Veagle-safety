@@ -5,8 +5,10 @@ import { AppLayout } from '../../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../../components/admin/AdminHeaderNav.js';
 import { api } from '../../../utils/api.js';
 import {
-  CreditCard, Search, Eye, Printer, X, ChevronLeft, ChevronRight
+  CreditCard, Search, Download, FileText, CheckCircle2,
+  Clock, XCircle, ChevronLeft, ChevronRight, Eye, Printer, X
 } from 'lucide-react';
+import { CustomSelect } from '../../../components/ui/CustomSelect.js';
 
 export default function AdminPaymentsPage() {
   const [mounted, setMounted] = useState(false);
@@ -106,8 +108,8 @@ export default function AdminPaymentsPage() {
           </div>
 
           {/* SEARCH & FILTERS BAR */}
-          <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="relative w-full md:w-96">
+          <div className="bg-white p-5 sm:p-6 rounded-[28px] sm:rounded-3xl border-2 border-[#FFCCE1] shadow-md flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div className="relative w-full sm:w-80 md:w-96">
               <Search className="w-4 h-4 text-[#684E67] absolute left-4 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
@@ -118,16 +120,19 @@ export default function AdminPaymentsPage() {
               />
             </div>
 
-            <select
-              value={paymentStatusFilter}
-              onChange={(e) => { setPaymentStatusFilter(e.target.value); setPaymentPage(1); }}
-              className="px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-black text-[#2A0826] outline-none cursor-pointer w-full md:w-auto"
-            >
-              <option value="ALL">All Payment Statuses</option>
-              <option value="SUCCESS">SUCCESS</option>
-              <option value="PENDING">PENDING</option>
-              <option value="FAILED">FAILED</option>
-            </select>
+            <div className="w-full sm:w-64 shrink-0">
+              <CustomSelect
+                options={[
+                  { value: 'ALL', label: 'All Payment Statuses' },
+                  { value: 'SUCCESS', label: 'SUCCESS' },
+                  { value: 'PENDING', label: 'PENDING' },
+                  { value: 'FAILED', label: 'FAILED' },
+                ]}
+                value={paymentStatusFilter}
+                onChange={(e) => { setPaymentStatusFilter(e.target.value); setPaymentPage(1); }}
+                alignRight={true}
+              />
+            </div>
           </div>
 
           {/* PAYMENTS TABLE LIST */}

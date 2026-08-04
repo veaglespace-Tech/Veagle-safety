@@ -153,10 +153,10 @@ export default function AdminPlansPage() {
 
           {/* SUBSCRIPTION PLANS LIST & MANAGEMENT */}
           <div className="bg-white p-6 sm:p-8 rounded-[36px] border-2 border-[#FFCCE1] shadow-md space-y-6">
-            <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
-              <div>
-                <h3 className="font-black text-lg text-[#2A0826]">Subscription Plans in Database</h3>
-                <p className="text-xs text-[#684E67] font-bold">Dynamic subscription offerings for Sakhi Suraksha members</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#FFCCE1] pb-4">
+              <div className="min-w-0">
+                <h3 className="font-black text-base sm:text-lg text-[#2A0826] tracking-tight">Subscription Plans in Database</h3>
+                <p className="text-xs text-[#684E67] font-bold mt-0.5">Dynamic subscription offerings for Sakhi Suraksha members</p>
               </div>
 
               <button
@@ -181,9 +181,9 @@ export default function AdminPlansPage() {
                   });
                   setIsPlanModalOpen(true);
                 }}
-                className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white font-black text-xs px-5 py-3 rounded-2xl shadow hover:scale-105 transition-all flex items-center space-x-1.5 cursor-pointer uppercase tracking-wider"
+                className="bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white font-black text-xs px-5 py-3 rounded-2xl shadow hover:scale-105 transition-all flex items-center justify-center space-x-1.5 cursor-pointer uppercase tracking-wider shrink-0 whitespace-nowrap active:scale-95 self-start sm:self-auto"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 shrink-0" />
                 <span>CREATE NEW PLAN</span>
               </button>
             </div>
@@ -236,10 +236,12 @@ export default function AdminPlansPage() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between pt-2 border-t border-[#FFCCE1]">
-                      <span className="text-xs font-black text-[#2A0826]">Validity: {p.durationDays} Days</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#FFCCE1]">
+                      <span className="text-xs font-black text-[#2A0826] whitespace-nowrap shrink-0">
+                        Validity: {p.durationDays} Days
+                      </span>
 
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 shrink-0">
                         <button
                           type="button"
                           onClick={() => {
@@ -274,7 +276,7 @@ export default function AdminPlansPage() {
                             });
                             setIsPlanModalOpen(true);
                           }}
-                          className="bg-[#FFF0F3] text-[#FF2A6D] font-black text-xs px-3.5 py-2 rounded-xl border border-[#FFCCE1] hover:bg-[#FF2A6D] hover:text-white transition-all cursor-pointer"
+                          className="bg-[#FFF0F3] text-[#FF2A6D] font-black text-xs px-3.5 py-2 rounded-xl border border-[#FFCCE1] hover:bg-[#FF2A6D] hover:text-white transition-all cursor-pointer whitespace-nowrap shrink-0 active:scale-95"
                         >
                           EDIT PLAN
                         </button>
@@ -282,7 +284,7 @@ export default function AdminPlansPage() {
                         <button
                           type="button"
                           onClick={() => handleTogglePlanActive(p.id)}
-                          className={`font-black text-xs px-3.5 py-2 rounded-xl border transition-all cursor-pointer ${
+                          className={`font-black text-xs px-3.5 py-2 rounded-xl border transition-all cursor-pointer whitespace-nowrap shrink-0 active:scale-95 ${
                             p.isActive
                               ? 'bg-rose-50 text-[#FF2A6D] border-rose-300 hover:bg-[#FF2A6D] hover:text-white'
                               : 'bg-emerald-50 text-emerald-600 border-emerald-300 hover:bg-emerald-600 hover:text-white'

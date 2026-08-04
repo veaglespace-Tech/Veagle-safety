@@ -52,7 +52,7 @@ export const AppLayout = ({ children, fullScreen = false }) => {
         if (storedUser?.role === 'SUPER_ADMIN') {
           isSuperAdmin = true;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // Non-admin trying to access /admin -> redirect to /dashboard
@@ -81,7 +81,7 @@ export const AppLayout = ({ children, fullScreen = false }) => {
       <div className="lg:ml-72 flex-1 flex flex-col min-w-0">
         {!fullScreen && <Header />}
 
-        <main className={`flex-1 ${!fullScreen ? 'pb-16 lg:pb-4' : ''}`}>
+        <main className={`flex-1 ${!fullScreen ? 'pb-24 lg:pb-6' : ''}`}>
           {children}
         </main>
 

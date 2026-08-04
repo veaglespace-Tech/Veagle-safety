@@ -41,6 +41,7 @@ import {
   AlertTriangle,
   Send,
 } from 'lucide-react';
+import { CustomSelect } from '../../components/ui/CustomSelect.js';
 
 export default function UserProfileSettingsPage() {
   const dispatch = useDispatch();
@@ -97,34 +98,77 @@ export default function UserProfileSettingsPage() {
     }
   }, [dispatch]);
 
+  // HELPER FOR FAST CANVAS IMAGE COMPRESSION
+  const compressImageBase64 = (file, maxWidth = 500, maxHeight = 500, quality = 0.82) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Failed to read image file'));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Failed to load image element'));
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedBase64);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const updateUserAvatar = async (base64Photo) => {
     try {
-      await authApi.updateSettings({ profilePhoto: base64Photo });
-      dispatch(fetchUser());
+      setAvatarToast({ type: 'info', text: '⏳ Updating profile photo...' });
+      await dispatch(updateProfileSettings({ profilePhoto: base64Photo })).unwrap();
       setAvatarToast({ type: 'success', text: '✅ Profile photo updated successfully!' });
       setTimeout(() => setAvatarToast(null), 3000);
     } catch (err) {
-      setAvatarToast({ type: 'error', text: err.response?.data?.error || 'Failed to update profile photo.' });
+      setAvatarToast({
+        type: 'error',
+        text: typeof err === 'string' ? err : (err.message || 'Failed to update profile photo.'),
+      });
       setTimeout(() => setAvatarToast(null), 3000);
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      setAvatarToast({ type: 'error', text: 'Image file size must be less than 5MB.' });
+    if (!file.type.startsWith('image/')) {
+      setAvatarToast({ type: 'error', text: 'Please select a valid image file.' });
       setTimeout(() => setAvatarToast(null), 3000);
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64Image = reader.result;
-      updateUserAvatar(base64Image);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressedBase64 = await compressImageBase64(file);
+      await updateUserAvatar(compressedBase64);
+    } catch (err) {
+      setAvatarToast({ type: 'error', text: 'Failed to process selected image.' });
+      setTimeout(() => setAvatarToast(null), 3000);
+    }
   };
 
   const handleRemoveImage = () => {
@@ -242,8 +286,7 @@ export default function UserProfileSettingsPage() {
         ...(newPassword && { newPassword }),
       };
 
-      await authApi.updateSettings(payload);
-      await fetchUser();
+      await dispatch(updateProfileSettings(payload)).unwrap();
 
       setToastMessage({ type: 'success', text: '✅ All profile details updated & saved to database!' });
       setIsEditing(false);
@@ -635,25 +678,21 @@ export default function UserProfileSettingsPage() {
 
                 <div>
                   <label className="block text-xs font-black text-[#684E67] mb-1">Blood Group *</label>
-                  <select
-                    disabled={!isEditing}
+                  <CustomSelect
+                    options={[
+                      { value: 'A+', label: 'A+' },
+                      { value: 'A-', label: 'A-' },
+                      { value: 'B+', label: 'B+' },
+                      { value: 'B-', label: 'B-' },
+                      { value: 'O+', label: 'O+' },
+                      { value: 'O-', label: 'O-' },
+                      { value: 'AB+', label: 'AB+' },
+                      { value: 'AB-', label: 'AB-' },
+                    ]}
                     value={bloodGroup}
                     onChange={(e) => setBloodGroup(e.target.value)}
-                    className={`w-full px-4 py-3 border-1.5 rounded-xl text-xs text-[#2A0826] font-bold outline-none transition-all ${
-                      isEditing
-                        ? 'bg-[#FFF0F3] border-[#FF2A6D] focus:bg-white cursor-pointer'
-                        : 'bg-gray-50 border-gray-200 cursor-not-allowed text-gray-700'
-                    }`}
-                  >
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                  </select>
+                    alignRight={true}
+                  />
                 </div>
               </div>
             </div>

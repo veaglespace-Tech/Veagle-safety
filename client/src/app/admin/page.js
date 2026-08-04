@@ -160,12 +160,14 @@ export default function SuperAdminOverviewPage() {
 
           {/* LIVE EMERGENCY SOS BROADCAST STREAM */}
           <div className="bg-white p-6 sm:p-8 rounded-[36px] border-2 border-[#FFCCE1] shadow-md space-y-6">
-            <div className="flex items-center justify-between border-b border-[#FFCCE1] pb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 rounded-full bg-rose-500 animate-ping" />
-                <h3 className="font-black text-lg text-[#2A0826]">Live Active SOS Emergency Broadcasts</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#FFCCE1] pb-4">
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className="w-3 h-3 rounded-full bg-rose-500 animate-ping shrink-0" />
+                <h3 className="font-black text-base sm:text-lg text-[#2A0826] tracking-tight">
+                  Live Active SOS Emergency Broadcasts
+                </h3>
               </div>
-              <span className="text-xs font-black bg-rose-100 text-[#FF2A6D] px-3 py-1 rounded-full uppercase border border-rose-300">
+              <span className="text-[11px] sm:text-xs font-black bg-rose-100 text-[#FF2A6D] px-3 py-1.5 rounded-full uppercase border border-rose-300 whitespace-nowrap shrink-0 self-start sm:self-auto">
                 {activeSosList.length} LIVE INCIDENTS
               </span>
             </div>

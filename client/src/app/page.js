@@ -88,23 +88,23 @@ export default function LandingPage() {
         </div>
 
         {/* HERO CTA BUTTONS WITH PURE 3D POP-UP EFFECT (NO MAGNETIC MOTION) */}
-        <div className="flex flex-wrap justify-center gap-6 pt-3">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-3 px-4 w-full">
           {isLoggedIn ? (
             <>
               <Link
                 href={isSuperAdmin ? '/admin' : '/dashboard'}
-                className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
+                className="btn-3d-rose-pop w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-3 whitespace-nowrap"
               >
-                {isSuperAdmin ? <Crown size={18} /> : <LayoutDashboard size={18} />}
+                {isSuperAdmin ? <Crown size={18} className="shrink-0" /> : <LayoutDashboard size={18} className="shrink-0" />}
                 <span>{isSuperAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}</span>
-                <ArrowRight size={16} />
+                <ArrowRight size={16} className="shrink-0" />
               </Link>
 
               <Link
                 href="/profile"
-                className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
+                className="btn-3d-white-pop w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-2 whitespace-nowrap"
               >
-                <Shield size={16} className="text-[#FF5C8A]" />
+                <Shield size={16} className="text-[#FF5C8A] shrink-0" />
                 <span>MY PROFILE</span>
               </Link>
             </>
@@ -112,7 +112,7 @@ export default function LandingPage() {
             <>
               <Link
                 href="/auth?mode=register"
-                className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
+                className="btn-3d-rose-pop w-full sm:w-auto px-6 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-3 whitespace-nowrap"
               >
                 <span>PROTECT YOURSELF NOW</span>
                 <ArrowRight size={16} className="shrink-0" />
@@ -120,9 +120,9 @@ export default function LandingPage() {
 
               <Link
                 href="/about"
-                className="btn-3d-white-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 whitespace-nowrap"
+                className="btn-3d-white-pop w-full sm:w-auto px-6 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-2 whitespace-nowrap"
               >
-                <Shield size={16} className="text-[#FF5C8A]" />
+                <Shield size={16} className="text-[#FF5C8A] shrink-0" />
                 <span>HOW IT WORKS</span>
               </Link>
             </>
@@ -163,6 +163,7 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
+
 
       </section>
 

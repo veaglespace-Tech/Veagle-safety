@@ -13,6 +13,11 @@ const BANNERS = [
     src: '/images/banner-2.jpg',
     alt: 'Sakhi Suraksha SOS App Banner 2',
   },
+  {
+    id: 3,
+    src: '/images/cards-banner.jpeg',
+    alt: 'Sakhi Suraksha SOS App Banner 3',
+  },
 ];
 
 export const HeroBannerCarousel = () => {
@@ -44,21 +49,6 @@ export const HeroBannerCarousel = () => {
           />
         ))}
 
-        {/* MINIMAL DOT INDICATORS */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full border border-[#FFCCE1]">
-          {BANNERS.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentIndex(idx)}
-              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                idx === currentIndex
-                  ? 'w-6 bg-[#FF2A6D]'
-                  : 'w-2 bg-[#FFCCE1]'
-              }`}
-              aria-label={`Slide ${idx + 1}`}
-            />
-          ))}
-        </div>
       </div>
     </div>
   );

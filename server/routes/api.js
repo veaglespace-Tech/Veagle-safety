@@ -66,6 +66,7 @@ router.get('/checkin/active', authenticateToken, checkinController.getActiveChec
 router.get('/admin/overview', authenticateToken, requireSuperAdmin, adminController.getAdminOverview);
 router.get('/admin/users', authenticateToken, requireSuperAdmin, adminController.getAllUsers);
 router.get('/admin/users/:id', authenticateToken, requireSuperAdmin, adminController.getUserByIdAdmin);
+router.post('/admin/users', authenticateToken, requireSuperAdmin, adminController.createUserByAdmin);
 router.post('/admin/users/create', authenticateToken, requireSuperAdmin, adminController.createUserByAdmin);
 router.put('/admin/profile', authenticateToken, requireSuperAdmin, adminController.updateSuperAdminProfile);
 router.put('/admin/user/role', authenticateToken, requireSuperAdmin, adminController.updateUserRole);

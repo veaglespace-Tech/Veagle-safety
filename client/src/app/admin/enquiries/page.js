@@ -4,7 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../../components/admin/AdminHeaderNav.js';
 import { api } from '../../../utils/api.js';
-import { HelpCircle, Search, Mail, PhoneCall, CheckCircle2, MessageSquare } from 'lucide-react';
+import {
+  HelpCircle, Search, Mail, PhoneCall, CheckCircle2,
+  Clock, ShieldAlert, MessageSquare
+} from 'lucide-react';
+import { CustomSelect } from '../../../components/ui/CustomSelect.js';
 
 export default function AdminEnquiriesPage() {
   const [mounted, setMounted] = useState(false);
@@ -115,15 +119,18 @@ export default function AdminEnquiriesPage() {
               />
             </div>
 
-            <select
-              value={enquiryStatusFilter}
-              onChange={(e) => setEnquiryStatusFilter(e.target.value)}
-              className="px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-black text-[#2A0826] outline-none cursor-pointer w-full md:w-auto"
-            >
-              <option value="ALL">All Support Statuses</option>
-              <option value="PENDING">PENDING</option>
-              <option value="RESOLVED">RESOLVED</option>
-            </select>
+            <div className="w-full sm:w-64 shrink-0">
+              <CustomSelect
+                options={[
+                  { value: 'ALL', label: 'All Support Statuses' },
+                  { value: 'PENDING', label: 'PENDING' },
+                  { value: 'RESOLVED', label: 'RESOLVED' },
+                ]}
+                value={enquiryStatusFilter}
+                onChange={(e) => setEnquiryStatusFilter(e.target.value)}
+                alignRight={true}
+              />
+            </div>
           </div>
 
           {/* ENQUIRIES LIST CARDS */}

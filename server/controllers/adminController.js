@@ -858,3 +858,86 @@ export const updateContactAdmin = asyncHandler(async (req, res) => {
   res.status(200).json({ message: 'Trusted contact updated successfully', contact: updated });
 });
 
+/**
+ * Create a New User / SuperAdmin Account Directly via Admin Panel
+ */
+export const createUserByAdmin = asyncHandler(async (req, res) => {
+  const {
+    fullName,
+    email,
+    phone,
+    password,
+    role = 'USER',
+    city = 'Pune',
+    state = 'Maharashtra',
+    country = 'India',
+    bloodGroup = 'O+',
+    emergencyContactName,
+    emergencyContactPhone,
+    grantFreePlan = false,
+    planDurationDays = 365,
+  } = req.body;
+
+  if (!fullName || !email || !password) {
+    return res.status(400).json({ error: 'Full name, email, and password are required' });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // Check existing user
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { email: normalizedEmail },
+        ...(phone ? [{ phone: phone.trim() }] : []),
+      ],
+    },
+  });
+
+  if (existingUser) {
+    if (existingUser.email === normalizedEmail) {
+      return res.status(400).json({ error: 'An account with this email address already exists' });
+    }
+    if (phone && existingUser.phone === phone.trim()) {
+      return res.status(400).json({ error: 'An account with this phone number already exists' });
+    }
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const expiryDate = grantFreePlan
+    ? new Date(Date.now() + parseInt(planDurationDays || 365) * 24 * 60 * 60 * 1000)
+    : null;
+
+  const newUser = await prisma.user.create({
+    data: {
+      fullName: fullName.trim(),
+      email: normalizedEmail,
+      phone: phone ? phone.trim() : null,
+      password: hashedPassword,
+      role: role === 'SUPER_ADMIN' ? 'SUPER_ADMIN' : 'USER',
+      city: city || 'Pune',
+      state: state || 'Maharashtra',
+      country: country || 'India',
+      bloodGroup: bloodGroup || 'O+',
+      isEmailVerified: true,
+      subscriptionStatus: grantFreePlan ? 'ACTIVE' : 'INACTIVE',
+      subscriptionExpiresAt: expiryDate,
+      emergencyContactName: emergencyContactName ? emergencyContactName.trim() : null,
+      emergencyContactPhone: emergencyContactPhone ? emergencyContactPhone.trim() : null,
+    },
+  });
+
+  return res.status(201).json({
+    message: `Account created successfully for ${newUser.fullName} (${newUser.role})`,
+    user: {
+      id: newUser.id,
+      fullName: newUser.fullName,
+      email: newUser.email,
+      phone: newUser.phone,
+      role: newUser.role,
+      subscriptionStatus: newUser.subscriptionStatus,
+    },
+  });
+});
+
