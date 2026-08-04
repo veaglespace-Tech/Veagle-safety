@@ -514,19 +514,19 @@ export default function UserProfileSettingsPage() {
 
             {/* FORM SECTION 1: PERSONAL INFORMATION & INLINE EMAIL VERIFICATION */}
             <div className={`bg-white border-2 rounded-[32px] p-6 sm:p-8 shadow-md space-y-6 transition-all ${isEditing ? 'border-[#FF2A6D] ring-4 ring-[#FF2A6D]/10' : 'border-[#FFCCE1]'}`}>
-              <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#FFCCE1] pb-4">
+                <div className="flex items-center space-x-3.5 min-w-0">
+                  <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1] shrink-0">
                     <UserIcon className="w-5 h-5 text-[#FF2A6D]" />
                   </div>
-                  <div>
-                    <h3 className="font-black text-lg text-[#2A0826]">1. Personal Member Details</h3>
-                    <p className="text-xs text-[#684E67] font-bold">Update your full legal name, email address, phone number, and blood group</p>
+                  <div className="min-w-0">
+                    <h3 className="font-black text-base sm:text-lg text-[#2A0826] tracking-tight">1. Personal Member Details</h3>
+                    <p className="text-xs text-[#684E67] font-bold leading-snug">Update your full legal name, email address, phone number, and blood group</p>
                   </div>
                 </div>
 
                 {!isEditing && (
-                  <span className="text-[10px] font-black bg-gray-100 text-gray-600 px-3 py-1 rounded-full border border-gray-300">
+                  <span className="text-[10px] font-black bg-gray-100 text-gray-600 px-3 py-1.5 rounded-xl border border-gray-300 shrink-0 whitespace-nowrap self-start sm:self-auto">
                     🔒 LOCKED (CLICK UPDATE PROFILE)
                   </span>
                 )}
