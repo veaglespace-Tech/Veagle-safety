@@ -98,6 +98,8 @@ const listen = (port) =>
     instance.once("error", reject);
   });
 
+import { startSosPeriodicWorker } from './services/sosPeriodicWorker.js';
+
 // Start Server Routine
 const startServer = async () => {
   console.log("prisma connecting...");
@@ -105,6 +107,7 @@ const startServer = async () => {
   console.log("prisma connected");
 
   initSocketIO(server);
+  startSosPeriodicWorker();
 
   await listen(PORT);
   console.log(`server running on port ${PORT}`);

@@ -1,5 +1,7 @@
 import { prisma } from '../config/prisma.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { sendSosSafeAlert } from '../services/mailer.js';
+import { getIO } from '../socket.js';
 import bcrypt from 'bcryptjs';
 
 /**
@@ -364,24 +366,97 @@ export const togglePlanActive = asyncHandler(async (req, res) => {
  */
 export const adminResolveSos = asyncHandler(async (req, res) => {
   const { sosSessionId, note } = req.body;
+  const targetId = parseInt(sosSessionId, 10);
 
-  const targetSosId = typeof sosSessionId === 'number' ? sosSessionId : parseInt(sosSessionId, 10);
-
-  const sos = await prisma.sosSession.update({
-    where: { id: targetSosId },
+  const session = await prisma.sosSession.update({
+    where: { id: targetId },
     data: {
       status: 'RESOLVED',
       resolvedAt: new Date(),
-      resolutionNote: note || 'Resolved by Super Admin Command Center',
+      resolutionNote: note || 'Resolved by SuperAdmin Command HQ',
+    },
+    include: {
+      user: {
+        select: {
+          fullName: true,
+          email: true,
+          phone: true,
+          emergencyContactName: true,
+          emergencyContactPhone: true,
+          trustedContacts: true,
+        },
+      },
+      locations: {
+        orderBy: { recordedAt: 'desc' },
+        take: 1,
+      },
     },
   });
 
-  await prisma.user.update({
-    where: { id: sos.userId },
-    data: { safetyStatus: 'SAFE' },
-  });
+  if (session.userId) {
+    await prisma.user.update({
+      where: { id: session.userId },
+      data: { safetyStatus: 'SAFE' },
+    }).catch(() => {});
+  }
 
-  return res.json({ message: 'Emergency session resolved by Super Admin', sos });
+  const latestLocation = session.locations?.[0];
+  const latitude = latestLocation?.latitude || session.latitude || 18.5204;
+  const longitude = latestLocation?.longitude || session.longitude || 73.8567;
+  const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+  const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
+
+  // Dispatch Safe Confirmation Emails to Admin & Guardians
+  const recipientEmails = new Set();
+  if (adminEmail) recipientEmails.add(adminEmail);
+  if (session.user?.trustedContacts && Array.isArray(session.user.trustedContacts)) {
+    session.user.trustedContacts.forEach((c) => {
+      if (c.email) recipientEmails.add(c.email);
+    });
+  }
+
+  for (const email of recipientEmails) {
+    sendSosSafeAlert({
+      recipientEmail: email,
+      userName: session.user?.fullName || 'Sakhi Member',
+      userPhone: session.user?.phone || 'N/A',
+      googleMapsUrl,
+      latitude,
+      longitude,
+      resolvedAt: session.resolvedAt,
+    });
+  }
+
+  // Broadcast Alarm Stop Event via Socket.io
+  const io = getIO();
+  if (io) {
+    io.emit('SOS_ALARM_STOP', {
+      sosId: targetId,
+      victimName: session.user?.fullName || 'Sakhi Member',
+    });
+  }
+
+  return res.status(200).json({
+    message: `Emergency SOS Incident #${targetId} resolved successfully by Command HQ`,
+    session,
+  });
+});
+
+/**
+ * Delete Trusted Contact by Admin
+ */
+export const deleteContactAdmin = asyncHandler(async (req, res) => {
+  const { contactId } = req.params;
+
+  const targetContactId = parseInt(contactId, 10);
+  const existing = await prisma.trustedContact.findUnique({ where: { id: targetContactId } });
+  if (!existing) {
+    return res.status(404).json({ error: 'Trusted contact not found' });
+  }
+
+  await prisma.trustedContact.delete({ where: { id: targetContactId } });
+
+  res.status(200).json({ message: 'Trusted contact removed successfully' });
 });
 
 /**
@@ -790,12 +865,73 @@ export const deleteContactAdmin = asyncHandler(async (req, res) => {
   const { contactId } = req.params;
 
   const targetContactId = parseInt(contactId, 10);
-  const existing = await prisma.trustedContact.findUnique({ where: { id: targetContactId } });
-  if (!existing) {
-    return res.status(404).json({ error: 'Trusted contact not found' });
+      status: 'RESOLVED',
+      resolvedAt: new Date(),
+      resolutionNote: note || 'Resolved by SuperAdmin Command HQ',
+    },
+    include: {
+      user: {
+        select: {
+          fullName: true,
+          email: true,
+          phone: true,
+          emergencyContactName: true,
+          emergencyContactPhone: true,
+          trustedContacts: true,
+        },
+      },
+      locations: {
+        orderBy: { recordedAt: 'desc' },
+        take: 1,
+      },
+    },
+  });
+
+  if (session.userId) {
+    await prisma.user.update({
+      where: { id: session.userId },
+      data: { safetyStatus: 'SAFE' },
+    }).catch(() => {});
   }
 
-  await prisma.trustedContact.delete({ where: { id: targetContactId } });
+  const latestLocation = session.locations?.[0];
+  const latitude = latestLocation?.latitude || session.latitude || 18.5204;
+  const longitude = latestLocation?.longitude || session.longitude || 73.8567;
+  const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+  const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
 
-  res.status(200).json({ message: 'Trusted contact removed successfully' });
+  // Dispatch Safe Confirmation Emails to Admin & Guardians
+  const recipientEmails = new Set();
+  if (adminEmail) recipientEmails.add(adminEmail);
+  if (session.user?.trustedContacts && Array.isArray(session.user.trustedContacts)) {
+    session.user.trustedContacts.forEach((c) => {
+      if (c.email) recipientEmails.add(c.email);
+    });
+  }
+
+  for (const email of recipientEmails) {
+    sendSosSafeAlert({
+      recipientEmail: email,
+      userName: session.user?.fullName || 'Sakhi Member',
+      userPhone: session.user?.phone || 'N/A',
+      googleMapsUrl,
+      latitude,
+      longitude,
+      resolvedAt: session.resolvedAt,
+    });
+  }
+
+  // Broadcast Alarm Stop Event via Socket.io
+  const io = getIO();
+  if (io) {
+    io.emit('SOS_ALARM_STOP', {
+      sosId: targetId,
+      victimName: session.user?.fullName || 'Sakhi Member',
+    });
+  }
+
+  res.status(200).json({
+    message: `Emergency SOS Incident #${targetId} resolved successfully by Command HQ`,
+    session,
+  });
 });

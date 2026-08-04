@@ -1,14 +1,26 @@
 import { prisma } from '../config/prisma.js';
 import { config } from '../config/index.js';
-import { sendSosEmergencyAlert } from '../services/mailer.js';
+import { sendSosEmergencyAlert, sendSosSafeAlert } from '../services/mailer.js';
 import { getIO } from '../socket.js';
 import { sendEmergencyPushToEmails } from './pushController.js';
-
 
 export const startSos = async (req, res) => {
   try {
     const { isSilent, initialLat, initialLng } = req.body;
     const userId = req.user?.id;
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        profilePhoto: true,
+        emergencyContactName: true,
+        emergencyContactPhone: true,
+      },
+    });
 
     let session = await prisma.sosSession.findFirst({
       where: { userId, status: 'ACTIVE' },
@@ -22,6 +34,9 @@ export const startSos = async (req, res) => {
         },
       });
     }
+
+    const latitude = initialLat || 18.5204;
+    const longitude = initialLng || 73.8567;
 
     if (initialLat && initialLng) {
       await prisma.sosLocation.create({
@@ -45,66 +60,96 @@ export const startSos = async (req, res) => {
 
     const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
     const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
+    const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
 
-    // Send emails to trusted contacts
-    for (const contact of contacts) {
-      if (contact.email) {
-        sendSosEmergencyAlert({
-          recipientEmail: contact.email,
-          recipientName: contact.name,
-          userName: req.user?.fullName || 'User',
-          trackingUrl,
-          latitude: initialLat || 18.5204,
-          longitude: initialLng || 73.8567,
-        });
+    // 1. Collect Recipient Emails (Admin + Parent Emergency Email + Guardian Contacts)
+    const recipientEmails = new Set();
+    if (adminEmail) recipientEmails.add(adminEmail);
 
-        await prisma.sosAlert.create({
-          data: {
-            sosSessionId: session.id,
-            channel: 'EMAIL',
-            recipient: contact.email,
-            status: 'SENT',
-          },
-        });
-      }
+    contacts.forEach((c) => {
+      if (c.email) recipientEmails.add(c.email);
+    });
+
+    // 2. Dispatch High-Priority Emergency Emails
+    for (const email of recipientEmails) {
+      sendSosEmergencyAlert({
+        recipientEmail: email,
+        recipientName: 'Safety Guardian',
+        userName: currentUser?.fullName || 'Sakhi User',
+        userPhone: currentUser?.phone || 'N/A',
+        userEmail: currentUser?.email || 'N/A',
+        userPhoto: currentUser?.profilePhoto || null,
+        trackingUrl,
+        googleMapsUrl,
+        latitude,
+        longitude,
+        sosId: session.id,
+      });
+
+      await prisma.sosAlert.create({
+        data: {
+          sosSessionId: session.id,
+          channel: 'EMAIL',
+          recipient: email,
+          status: 'SENT',
+        },
+      }).catch(() => {});
     }
 
-    // Broadcast Real-Time Emergency Siren Alarm to All Devices & Connected Contacts
+    // 3. Format Direct WhatsApp Emergency Alert Links for Guardians
+    const whatsappAlerts = contacts.map((contact) => {
+      const cleanPhone = (contact.phone || '').replace(/\D/g, '');
+      const messageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${currentUser?.fullName || 'Sakhi Member'}\nPhone: ${currentUser?.phone || ''}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Map:\n${trackingUrl}\n\n🌐 Google Maps:\n${googleMapsUrl}`;
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(messageText)}`;
+
+      return {
+        contactName: contact.name,
+        phone: contact.phone,
+        whatsappUrl,
+      };
+    });
+
+    // 4. Broadcast Real-Time Emergency Siren Alarm to Connected Sockets
     const io = getIO();
     if (io) {
       io.emit('SOS_ALARM_BROADCAST', {
         sosId: session.id,
-        victimName: req.user?.fullName || 'Sakhi Suraksha User',
-        victimPhone: req.user?.phone || '',
+        victimName: currentUser?.fullName || 'Sakhi Suraksha User',
+        victimPhone: currentUser?.phone || '',
+        victimPhoto: currentUser?.profilePhoto || null,
         shareToken: session.shareToken,
         trackingUrl,
-        latitude: initialLat || 18.5204,
-        longitude: initialLng || 73.8567,
+        googleMapsUrl,
+        latitude,
+        longitude,
         isSilent: session.isSilent,
         contacts: contacts.map((c) => ({ name: c.name, phone: c.phone, email: c.email })),
+        whatsappAlerts,
         timestamp: new Date().toISOString(),
       });
     }
 
-    // Send Web Push Notifications to all trusted contacts' devices (even if browser is closed)
-    const contactEmails = contacts.map((c) => c.email).filter(Boolean);
+    // 5. Send Web Push Notifications to all trusted contacts' devices
+    const contactEmailsList = Array.from(recipientEmails);
     await sendEmergencyPushToEmails({
-      emails: contactEmails,
-      victimName: req.user?.fullName || 'Sakhi Suraksha User',
+      emails: contactEmailsList,
+      victimName: currentUser?.fullName || 'Sakhi Suraksha User',
       trackingUrl,
-      latitude: initialLat || 18.5204,
-      longitude: initialLng || 73.8567,
+      latitude,
+      longitude,
     });
 
-
     return res.json({
-      message: 'SOS Activated! Emergency alerts & Siren Alarm broadcasted.',
+      message: 'SOS Activated! Emergency Emails, WhatsApp Alerts & Siren Broadcasted.',
       sosSession: {
         id: session.id,
         shareToken: session.shareToken,
         startedAt: session.startedAt,
         isSilent: session.isSilent,
         trackingUrl,
+        googleMapsUrl,
+        whatsappAlerts,
       },
     });
   } catch (error) {
@@ -126,6 +171,18 @@ export const updateSosLocation = async (req, res) => {
       },
     });
 
+    // Emit live location update to connected sockets
+    const io = getIO();
+    if (io) {
+      io.emit('SOS_LOCATION_UPDATE', {
+        sosSessionId,
+        latitude,
+        longitude,
+        accuracy: accuracy || 10,
+        recordedAt: location.recordedAt,
+      });
+    }
+
     return res.json({ message: 'Location updated', location });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to record location update' });
@@ -144,21 +201,100 @@ export const resolveSos = async (req, res) => {
         resolvedAt: new Date(),
         resolutionNote: resolutionNote || 'Resolved by user',
       },
+      include: {
+        user: {
+          select: {
+            fullName: true,
+            email: true,
+            phone: true,
+            emergencyContactName: true,
+            emergencyContactPhone: true,
+            trustedContacts: true,
+          },
+        },
+        locations: {
+          orderBy: { recordedAt: 'desc' },
+          take: 1,
+        },
+      },
     });
 
-    await prisma.user.update({
-      where: { id: userId },
-      data: { safetyStatus: 'SAFE' },
-    });
-
-    // Broadcast Alarm Stop Event
-    const io = getIO();
-    if (io) {
-      io.emit('SOS_ALARM_STOP', { sosId: sosSessionId });
+    const targetUserId = userId || session.userId;
+    if (targetUserId) {
+      await prisma.user.update({
+        where: { id: targetUserId },
+        data: { safetyStatus: 'SAFE' },
+      });
     }
 
-    return res.json({ message: 'SOS session resolved safely.', session });
+    const latestLocation = session.locations?.[0];
+    const latitude = latestLocation?.latitude || session.latitude || 18.5204;
+    const longitude = latestLocation?.longitude || session.longitude || 73.8567;
+    const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
+
+    // 1. Collect Recipient Emails for Safe Confirmation
+    const recipientEmails = new Set();
+    if (adminEmail) recipientEmails.add(adminEmail);
+
+    if (session.user?.trustedContacts && Array.isArray(session.user.trustedContacts)) {
+      session.user.trustedContacts.forEach((c) => {
+        if (c.email) recipientEmails.add(c.email);
+      });
+    }
+
+    // 2. Dispatch "I AM SAFE NOW" Confirmation Emails
+    for (const email of recipientEmails) {
+      sendSosSafeAlert({
+        recipientEmail: email,
+        userName: session.user?.fullName || 'Sakhi Member',
+        userPhone: session.user?.phone || 'N/A',
+        googleMapsUrl,
+        latitude,
+        longitude,
+        resolvedAt: session.resolvedAt,
+      });
+
+      await prisma.sosAlert.create({
+        data: {
+          sosSessionId: session.id,
+          channel: 'EMAIL_SAFE_CONFIRMATION',
+          recipient: email,
+          status: 'SENT',
+        },
+      }).catch(() => {});
+    }
+
+    // 3. Format WhatsApp Safe Confirmation Message Links
+    const whatsappSafeAlerts = (session.user?.trustedContacts || []).map((contact) => {
+      const cleanPhone = (contact.phone || '').replace(/\D/g, '');
+      const safeMessage = `✅ SAKHI MEMBER IS SAFE NOW!\n\nVictim: ${session.user?.fullName || 'Sakhi Member'}\nStatus: RESOLVED & SAFE\nTime: ${new Date(session.resolvedAt).toLocaleString('en-IN')}\n\n📍 Final Location:\nLat: ${latitude}, Lng: ${longitude}\n🌐 Google Maps:\n${googleMapsUrl}`;
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(safeMessage)}`;
+
+      return {
+        contactName: contact.name,
+        phone: contact.phone,
+        whatsappUrl,
+      };
+    });
+
+    // 4. Broadcast Alarm Stop Event
+    const io = getIO();
+    if (io) {
+      io.emit('SOS_ALARM_STOP', {
+        sosId: sosSessionId,
+        victimName: session.user?.fullName || 'Sakhi Member',
+        whatsappSafeAlerts,
+      });
+    }
+
+    return res.json({
+      message: 'SOS session resolved safely. Safe emails & WhatsApp alerts dispatched.',
+      session,
+      whatsappSafeAlerts,
+    });
   } catch (error) {
+    console.error('Resolve SOS Error:', error);
     return res.status(500).json({ error: 'Failed to resolve SOS session' });
   }
 };

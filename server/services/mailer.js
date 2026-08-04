@@ -16,7 +16,6 @@ const transporter = nodemailer.createTransport({
 
 /**
  * Send Email Verification OTP
- * Supports both object parameter { recipientEmail, userName, otp } or positional args (recipientEmail, userName, otp)
  */
 export const sendEmailVerificationOtp = async (arg1, arg2, arg3) => {
   let recipientEmail, userName, otp;
@@ -47,11 +46,11 @@ export const sendEmailVerificationOtp = async (arg1, arg2, arg3) => {
           
           <div style="background-color: #ffffff; border-radius: 12px; padding: 24px; border: 1px solid #FFCCE1;">
             <p style="font-size: 16px; color: #2A0826; margin-top: 0;">Hi <strong>${userName || 'Sakhi Member'}</strong>,</p>
-            <p style="font-size: 14px; color: #555555; leading-height: 1.6;">
+            <p style="font-size: 14px; color: #555555; line-height: 1.6;">
               Thank you for registering on Sakhi Suraksha SOS. Please use the following 6-digit OTP code to verify your email address and activate your safety account:
             </p>
             
-            <div style="background: linear-gradient(135deg, #FF5C8A, #FF2A6D); border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0; shadow: 0 4px 12px rgba(255,92,138,0.3);">
+            <div style="background: linear-gradient(135deg, #FF5C8A, #FF2A6D); border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
               <span style="font-size: 36px; font-weight: 900; letter-spacing: 8px; color: #ffffff;">${otp}</span>
             </div>
             
@@ -59,15 +58,11 @@ export const sendEmailVerificationOtp = async (arg1, arg2, arg3) => {
               ⏰ This OTP is valid for 10 minutes. If you did not request this registration, please ignore this email.
             </p>
           </div>
-
-          <div style="text-align: center; margin-top: 24px; font-size: 12px; color: #888888;">
-            &copy; ${new Date().getFullYear()} Sakhi Suraksha SOS Platform. All rights reserved.
-          </div>
         </div>
       `,
     });
 
-    console.log(`[Email Service] Verification OTP sent successfully to ${recipientEmail} (ID: ${info.messageId})`);
+    console.log(`[Email Service] Verification OTP sent successfully to ${recipientEmail}`);
     return true;
   } catch (err) {
     console.error(`[Email Service Error] Failed to send OTP to ${recipientEmail}:`, err.message);
@@ -75,54 +70,234 @@ export const sendEmailVerificationOtp = async (arg1, arg2, arg3) => {
   }
 };
 
+/**
+ * 🚨 Send High-Priority Emergency SOS Broadcast Email
+ */
 export const sendSosEmergencyAlert = async ({
   recipientEmail,
   recipientName,
   userName,
+  userPhone,
+  userEmail,
+  userPhoto,
   trackingUrl,
+  googleMapsUrl,
   latitude,
   longitude,
+  sosId,
 }) => {
   try {
-    const mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
+    const isHttpUrl = userPhoto && typeof userPhoto === 'string' && (userPhoto.startsWith('http://') || userPhoto.startsWith('https://'));
+    const initials = (userName || 'Sakhi').split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase();
+
+    const avatarHtml = isHttpUrl ? `
+      <td style="width: 60px; vertical-align: middle; padding-right: 14px;">
+        <img src="${userPhoto}" alt="${userName}" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 3px solid #FF2A6D;" />
+      </td>
+    ` : `
+      <td style="width: 60px; vertical-align: middle; padding-right: 14px;">
+        <div style="width: 50px; height: 50px; border-radius: 50%; background: #FF2A6D; color: #ffffff; font-size: 20px; font-weight: 900; line-height: 50px; text-align: center; border: 2px solid #FFCCE1;">
+          ${initials}
+        </div>
+      </td>
+    `;
 
     const info = await transporter.sendMail({
-      from: `"Sakhi Suraksha SOS Emergency" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
+      from: `"🚨 Sakhi Suraksha Emergency Command" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
       to: recipientEmail,
-      subject: `🚨 EMERGENCY SOS ALERT: ${userName} Needs Help Immediately!`,
+      subject: `🚨 CRITICAL EMERGENCY SOS ALERT: ${userName} Needs Help Immediately!`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #FF2A6D; border-radius: 12px; padding: 24px; background-color: #FFF0F3;">
-          <h1 style="color: #FF2A6D; text-align: center;">🚨 EMERGENCY SOS ACTIVATED</h1>
-          <p style="font-size: 16px; color: #2A0826;">Hi <strong>${recipientName}</strong>,</p>
-          <p style="font-size: 16px; color: #2A0826;">
-            <strong>${userName}</strong> has activated an Emergency SOS trigger on Sakhi Suraksha SOS and marked you as a trusted contact.
-          </p>
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 3px solid #FF2A6D; border-radius: 18px; padding: 24px; background-color: #FFF0F3;">
           
-          <div style="background: #ffffff; padding: 16px; border-radius: 8px; border-left: 4px solid #FF2A6D; margin: 20px 0;">
-            <p style="margin: 0; font-size: 14px; font-weight: bold;">Live GPS Tracking Link:</p>
-            <p style="margin: 8px 0 0 0;">
-              <a href="${trackingUrl}" style="background-color: #FF2A6D; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-                VIEW LIVE LOCATION MAP
-              </a>
-            </p>
+          <div style="text-align: center; margin-bottom: 18px;">
+            <div style="display: inline-block; background-color: #FF2A6D; color: #ffffff; padding: 5px 14px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">
+              CRITICAL EMERGENCY GUARDIAN BROADCAST
+            </div>
+            <h1 style="color: #FF2A6D; font-size: 24px; font-weight: 900; margin: 10px 0 2px 0;">🚨 EMERGENCY SOS ACTIVATED</h1>
+            <p style="color: #684E67; font-size: 12px; font-weight: 700; margin: 0;">Sakhi Safety Incident #${sosId || 'LIVE'}</p>
           </div>
 
-          <p style="font-size: 14px; color: #555555;">
-            Direct Google Maps Coordinates: <a href="${mapUrl}">${latitude}, ${longitude}</a>
-          </p>
+          <div style="background-color: #ffffff; border-radius: 14px; padding: 18px; border: 1.5px solid #FFCCE1; margin-bottom: 18px;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                ${avatarHtml}
+                <td style="vertical-align: middle;">
+                  <h3 style="margin: 0 0 3px 0; color: #2A0826; font-size: 17px; font-weight: 900;">${userName}</h3>
+                  <p style="margin: 0; color: #FF2A6D; font-weight: 800; font-size: 13px;">📞 Phone: ${userPhone || 'N/A'}</p>
+                  <p style="margin: 3px 0 0 0; color: #684E67; font-weight: 600; font-size: 12px;">✉️ Email: ${userEmail || recipientEmail}</p>
+                </td>
+              </tr>
+            </table>
+          </div>
 
-          <hr style="border: 0; border-top: 1px solid #FFCCE1; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #888888; text-align: center;">
-            This is an automated high-priority safety alert broadcast by Sakhi Suraksha SOS.
+          <div style="background: linear-gradient(135deg, #FF2A6D, #E01A4F); border-radius: 14px; padding: 20px; text-align: center; color: #ffffff; margin-bottom: 18px;">
+            <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 900; text-transform: uppercase;">📍 LIVE GPS LOCATION COORDINATES</p>
+            <p style="font-size: 16px; font-weight: 900; font-family: monospace; background: rgba(0,0,0,0.25); display: inline-block; padding: 6px 14px; border-radius: 6px; margin: 4px 0 14px 0;">
+              Lat: ${latitude} | Lng: ${longitude}
+            </p>
+            
+            <div>
+              <a href="${trackingUrl}" target="_blank" style="background-color: #ffffff; color: #FF2A6D; padding: 12px 24px; text-decoration: none; border-radius: 999px; font-weight: 900; font-size: 12px; display: inline-block; text-transform: uppercase;">
+                👉 OPEN INTERACTIVE LIVE MAP TRACKER
+              </a>
+            </div>
+          </div>
+
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 14px; border: 1px solid #FFCCE1; text-align: center;">
+            <a href="${mapUrl}" target="_blank" style="color: #FF2A6D; font-weight: 900; font-size: 12px; text-decoration: underline;">
+              🌐 Open Coordinates on Google Maps (${latitude}, ${longitude})
+            </a>
+          </div>
+
+          <p style="font-size: 10px; color: #888888; text-align: center; margin: 14px 0 0 0;">
+            High-priority safety broadcast generated by Sakhi Suraksha SOS Command Center.
           </p>
         </div>
       `,
     });
 
-    console.log(`[Email Service] Emergency alert sent to ${recipientEmail} (ID: ${info.messageId})`);
+    console.log(`[Email Service] Rich Emergency alert sent to ${recipientEmail} (ID: ${info.messageId})`);
     return true;
   } catch (err) {
-    console.error(`[Email Service Error] Failed to send to ${recipientEmail}:`, err.message);
+    console.error(`[Email Service Error] Failed to send emergency alert to ${recipientEmail}:`, err.message);
+    return false;
+  }
+};
+
+/**
+ * ✅ Send "I AM SAFE NOW" Confirmation Email
+ */
+export const sendSosSafeAlert = async ({
+  recipientEmail,
+  userName,
+  userPhone,
+  googleMapsUrl,
+  latitude,
+  longitude,
+  resolvedAt,
+}) => {
+  try {
+    const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+    const info = await transporter.sendMail({
+      from: `"✅ Sakhi Suraksha Safety Status" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: `✅ SAFE NOW CONFIRMATION: ${userName} is Safe!`,
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 3px solid #10B981; border-radius: 18px; padding: 24px; background-color: #ECFDF5;">
+          
+          <div style="text-align: center; margin-bottom: 18px;">
+            <div style="display: inline-block; background-color: #10B981; color: #ffffff; padding: 5px 14px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">
+              EMERGENCY RESOLVED — STATUS SAFE
+            </div>
+            <h1 style="color: #065F46; font-size: 24px; font-weight: 900; margin: 10px 0 2px 0;">✅ I AM SAFE NOW!</h1>
+            <p style="color: #047857; font-size: 12px; font-weight: 700; margin: 0;">${userName} has marked themselves safe</p>
+          </div>
+
+          <div style="background-color: #ffffff; border-radius: 14px; padding: 18px; border: 1.5px solid #A7F3D0; margin-bottom: 18px;">
+            <p style="font-size: 14px; color: #065F46; margin: 0 0 10px 0; font-weight: 700;">
+              Great news! <strong>${userName}</strong> (${userPhone || ''}) has safely resolved their emergency SOS session.
+            </p>
+            <p style="font-size: 12px; color: #047857; margin: 0;">
+              🕒 Time of Safety Resolution: <strong>${new Date(resolvedAt || Date.now()).toLocaleString('en-IN')}</strong>
+            </p>
+          </div>
+
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 14px; border: 1px solid #A7F3D0; text-align: center;">
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #065F46; font-weight: 700;">
+              📍 Final Resolved Location Coordinates: <strong>${latitude}, ${longitude}</strong>
+            </p>
+            <a href="${mapUrl}" target="_blank" style="color: #10B981; font-weight: 900; font-size: 12px; text-decoration: underline;">
+              View Location on Google Maps
+            </a>
+          </div>
+
+          <p style="font-size: 10px; color: #047857; text-align: center; margin: 14px 0 0 0;">
+            Sakhi Suraksha 24/7 Safety Command System.
+          </p>
+        </div>
+      `,
+    });
+
+    console.log(`[Email Service] Safe confirmation sent to ${recipientEmail} (ID: ${info.messageId})`);
+    return true;
+  } catch (err) {
+    console.error(`[Email Service Error] Failed to send safe email to ${recipientEmail}:`, err.message);
+    return false;
+  }
+};
+
+/**
+ * 📍 Send 5-Minute Periodic GPS Location Alert Email
+ */
+export const sendSos5MinLocationUpdate = async ({
+  recipientEmail,
+  victimName,
+  victimPhone,
+  trackingUrl,
+  googleMapsUrl,
+  latitude,
+  longitude,
+  sosId,
+  startedAt,
+}) => {
+  try {
+    const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+    const info = await transporter.sendMail({
+      from: `"📍 Sakhi Suraksha Live GPS Update" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: `📍 [5-MIN PERIODIC GPS UPDATE] Live Coordinates for ${victimName}`,
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 3px solid #3B82F6; border-radius: 18px; padding: 22px; background-color: #EFF6FF;">
+          
+          <div style="text-align: center; margin-bottom: 14px;">
+            <div style="display: inline-block; background-color: #3B82F6; color: #ffffff; padding: 4px 12px; border-radius: 999px; font-size: 9px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">
+              RECURRING 5-MINUTE LOCATION DISPATCH
+            </div>
+            <h2 style="color: #1E40AF; font-size: 20px; font-weight: 900; margin: 8px 0 2px 0;">📍 5-MIN LIVE GPS UPDATE</h2>
+            <p style="color: #1D4ED8; font-size: 11px; font-weight: 700; margin: 0;">Emergency Incident #${sosId} is STILL ACTIVE</p>
+          </div>
+
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 14px; border: 1px solid #BFDBFE; margin-bottom: 14px;">
+            <p style="margin: 0; font-size: 13px; color: #1E3A8A; font-weight: 800;">
+              Sakhi Member: <strong>${victimName}</strong> (${victimPhone})
+            </p>
+            <p style="margin: 3px 0 0 0; font-size: 11px; color: #3B82F6;">
+              Emergency Triggered: <strong>${new Date(startedAt || Date.now()).toLocaleString('en-IN')}</strong>
+            </p>
+          </div>
+
+          <div style="background: linear-gradient(135deg, #2563EB, #1D4ED8); border-radius: 14px; padding: 18px; text-align: center; color: #ffffff; margin-bottom: 14px;">
+            <p style="margin: 0 0 4px 0; font-size: 11px; font-weight: 800; text-transform: uppercase;">CURRENT LIVE GPS COORDINATES</p>
+            <p style="font-size: 16px; font-weight: 900; font-family: monospace; background: rgba(0,0,0,0.25); display: inline-block; padding: 5px 12px; border-radius: 6px; margin: 4px 0 12px 0;">
+              Lat: ${latitude} | Lng: ${longitude}
+            </p>
+            <div>
+              <a href="${trackingUrl}" target="_blank" style="background-color: #ffffff; color: #2563EB; padding: 10px 20px; text-decoration: none; border-radius: 999px; font-weight: 900; font-size: 11px; display: inline-block; text-transform: uppercase;">
+                VIEW LIVE INTERACTIVE MAP
+              </a>
+            </div>
+          </div>
+
+          <div style="text-align: center; background-color: #ffffff; border-radius: 10px; padding: 10px; border: 1px solid #BFDBFE;">
+            <a href="${mapUrl}" target="_blank" style="color: #2563EB; font-weight: 900; font-size: 11px; text-decoration: underline;">
+              🌐 Open Location on Google Maps (${latitude}, ${longitude})
+            </a>
+          </div>
+
+          <p style="font-size: 10px; color: #1E40AF; text-align: center; margin: 10px 0 0 0;">
+            Automatic 5-minute safety tracker. Updates will continue until the user resolves the SOS.
+          </p>
+        </div>
+      `,
+    });
+
+    console.log(`[Email Service] 5-minute location update sent to ${recipientEmail} (ID: ${info.messageId})`);
+    return true;
+  } catch (err) {
+    console.error(`[Email Service Error] 5-min update failed for ${recipientEmail}:`, err.message);
     return false;
   }
 };
@@ -131,49 +306,29 @@ export const sendSosEmergencyAlert = async ({
  * Send Welcome Email on User Registration
  */
 export const sendWelcomeEmail = async ({ recipientEmail, userName }) => {
-  console.log(`🌸 [WELCOME EMAIL] Sending welcome email to ${recipientEmail}`);
-
   try {
     const info = await transporter.sendMail({
       from: `"Sakhi Suraksha SOS" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: `🌸 Welcome to Sakhi Suraksha SOS - 24/7 Personal Protection Active`,
       html: `
-        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 32px; background-color: #FFF0F3;">
-          <div style="text-align: center; margin-bottom: 24px;">
-            <h1 style="color: #2A0826; font-size: 26px; font-weight: 900; margin: 0;">Sakhi Suraksha SOS</h1>
-            <p style="color: #FF5C8A; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;">Welcome to Your Personal Safety Command</p>
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 28px; background-color: #FFF0F3;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #2A0826; font-size: 24px; font-weight: 900; margin: 0;">Sakhi Suraksha SOS</h1>
+            <p style="color: #FF5C8A; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;">Welcome to Your Personal Safety Command</p>
           </div>
           
-          <div style="background-color: #ffffff; border-radius: 12px; padding: 24px; border: 1px solid #FFCCE1;">
-            <p style="font-size: 16px; color: #2A0826; margin-top: 0;">Dear <strong>${userName || 'Sakhi Member'}</strong>,</p>
-            <p style="font-size: 14px; color: #555555; line-height: 1.6;">
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 20px; border: 1px solid #FFCCE1;">
+            <p style="font-size: 15px; color: #2A0826; margin-top: 0;">Dear <strong>${userName || 'Sakhi Member'}</strong>,</p>
+            <p style="font-size: 13px; color: #555555; line-height: 1.6;">
               Welcome to <strong>Sakhi Suraksha SOS</strong>! Your account has been registered successfully. You now have access to 24/7 encrypted GPS emergency broadcasts, instant siren alerts, and your trusted guardian network.
             </p>
-
-            <div style="background-color: #FFF0F3; border-radius: 12px; padding: 16px; margin: 20px 0; border: 1.5px solid #FF5C8A;">
-              <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #FF2A6D;">🛡️ Next Steps to Ensure 100% Protection:</h3>
-              <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #2A0826;">
-                <li>Add up to 5 Trusted Emergency Guardians in your profile.</li>
-                <li>Test your SOS Drill and Emergency Siren Audio.</li>
-                <li>Activate your Sakhi Suraksha 365 Protection Plan.</li>
-              </ul>
-            </div>
-
-            <div style="text-align: center; margin-top: 24px;">
-              <a href="${config.clientUrl || 'http://localhost:3000'}/dashboard" style="background: linear-gradient(135deg, #FF5C8A, #FF2A6D); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 999px; font-weight: 900; font-size: 13px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
-                GO TO SAFETY DASHBOARD
-              </a>
-            </div>
           </div>
         </div>
       `,
     });
-
-    console.log(`[Email Service] Welcome email sent to ${recipientEmail} (ID: ${info.messageId})`);
     return true;
   } catch (err) {
-    console.error(`[Email Service Notice] Welcome email failed for ${recipientEmail}:`, err.message);
     return false;
   }
 };
@@ -182,49 +337,28 @@ export const sendWelcomeEmail = async ({ recipientEmail, userName }) => {
  * Send Password Reset Link Email
  */
 export const sendPasswordResetEmail = async ({ recipientEmail, userName, resetLink }) => {
-  console.log(`🔐 [RESET PASSWORD EMAIL] Sending reset link to ${recipientEmail}`);
-
   try {
     const info = await transporter.sendMail({
       from: `"Sakhi Suraksha SOS" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: `🔐 Reset Your Sakhi Suraksha Password`,
       html: `
-        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 32px; background-color: #FFF0F3;">
-          <div style="text-align: center; margin-bottom: 24px;">
-            <h1 style="color: #2A0826; font-size: 26px; font-weight: 900; margin: 0;">Sakhi Suraksha SOS</h1>
-            <p style="color: #FF5C8A; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;">Password Reset Request</p>
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 28px; background-color: #FFF0F3;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #2A0826; font-size: 24px; font-weight: 900; margin: 0;">Sakhi Suraksha SOS</h1>
           </div>
-          
-          <div style="background-color: #ffffff; border-radius: 12px; padding: 24px; border: 1px solid #FFCCE1;">
-            <p style="font-size: 16px; color: #2A0826; margin-top: 0;">Hi <strong>${userName || 'Sakhi Member'}</strong>,</p>
-            <p style="font-size: 14px; color: #555555; line-height: 1.6;">
-              We received a request to reset your password for your Sakhi Suraksha account. Click the button below to set a new password:
-            </p>
-            
-            <div style="text-align: center; margin: 24px 0;">
-              <a href="${resetLink}" style="background: linear-gradient(135deg, #FF5C8A, #FF2A6D); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 999px; font-weight: 900; font-size: 13px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
-                RESET PASSWORD NOW
-              </a>
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 20px; border: 1px solid #FFCCE1;">
+            <p style="font-size: 15px; color: #2A0826;">Hi <strong>${userName || 'Sakhi Member'}</strong>,</p>
+            <p style="font-size: 13px; color: #555555;">Click below to reset your password:</p>
+            <div style="text-align: center; margin-top: 16px;">
+              <a href="${resetLink}" style="background-color: #FF2A6D; color: white; padding: 12px 24px; text-decoration: none; border-radius: 999px; font-weight: bold; display: inline-block;">RESET PASSWORD</a>
             </div>
-
-            <p style="font-size: 12px; color: #684E67;">
-              Or copy & paste this link in your browser:<br />
-              <a href="${resetLink}" style="color: #FF2A6D; word-break: break-all;">${resetLink}</a>
-            </p>
-            
-            <p style="font-size: 12px; color: #888888; margin-bottom: 0;">
-              ⏰ This link is valid for 1 hour. If you did not request a password reset, please ignore this email.
-            </p>
           </div>
         </div>
       `,
     });
-
-    console.log(`[Email Service] Reset password email sent to ${recipientEmail} (ID: ${info.messageId})`);
     return true;
   } catch (err) {
-    console.error(`[Email Service Notice] Reset password email failed for ${recipientEmail}:`, err.message);
     return false;
   }
 };

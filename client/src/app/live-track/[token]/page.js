@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { api, SERVER_URL } from '../../../utils/api.js';
 import { LiveLocationMap } from '../../../components/location/DynamicLiveLocationMap.js';
-import { ShieldAlert, MapPin, PhoneCall, Clock, CheckCircle, Volume2, VolumeX, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, MapPin, PhoneCall, Clock, CheckCircle, Volume2, VolumeX, AlertTriangle, User } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { startEmergencySiren, stopEmergencySiren } from '../../../utils/sirenAudio.js';
 
@@ -74,7 +74,7 @@ export default function LivePublicTrackingPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FFF0F3] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-rose border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-[#FF2A6D] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -83,9 +83,9 @@ export default function LivePublicTrackingPage() {
     return (
       <div className="min-h-screen bg-[#FFF0F3] p-4 flex items-center justify-center text-center">
         <div className="bg-white border-2 border-[#FFCCE1] rounded-3xl p-8 max-w-sm space-y-4 shadow-xl">
-          <CheckCircle className="w-16 h-16 text-tichi-success mx-auto" />
-          <h2 className="font-black text-xl text-tichi-text">Tracking Link Resolved</h2>
-          <p className="text-xs text-tichi-muted font-bold leading-relaxed">
+          <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto" />
+          <h2 className="font-black text-xl text-[#2A0826]">Tracking Link Resolved</h2>
+          <p className="text-xs text-[#684E67] font-bold leading-relaxed">
             {error || 'This emergency live tracking session is no longer active or the user has confirmed safety.'}
           </p>
         </div>
@@ -94,19 +94,38 @@ export default function LivePublicTrackingPage() {
   }
 
   const isEmergency = session.status === 'ACTIVE';
+  const victimName = session.user?.fullName || 'Sakhi Member';
+  const victimPhoto = session.user?.profilePhoto;
+  const userInitials = victimName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase();
+
+  const lat = location?.latitude || session?.latitude || 18.5204;
+  const lng = location?.longitude || session?.longitude || 73.8567;
 
   return (
-    <div className="min-h-screen bg-[#FFF0F3] text-tichi-text font-sans p-4 max-w-2xl mx-auto space-y-4 pb-12">
+    <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans p-4 max-w-2xl mx-auto space-y-4 pb-12">
       
       {/* HEADER BANNER */}
-      <div className={`p-5 rounded-3xl text-white flex items-center justify-between shadow-xl ${isEmergency ? 'bg-gradient-to-r from-[#FF2A6D] via-rose to-[#FF2A6D] animate-pulse border-2 border-white' : 'bg-tichi-text'}`}>
+      <div className={`p-5 rounded-3xl text-white flex items-center justify-between shadow-xl ${isEmergency ? 'bg-gradient-to-r from-[#FF2A6D] via-rose-500 to-[#FF2A6D] animate-pulse border-2 border-white' : 'bg-[#2A0826]'}`}>
         <div className="flex items-center space-x-3">
-          <ShieldAlert className="w-8 h-8 shrink-0 animate-bounce" />
+          {/* PROFILE PHOTO OR INITIALS AVATAR */}
+          {victimPhoto ? (
+            <img
+              src={victimPhoto}
+              alt={victimName}
+              className="w-12 h-12 rounded-full object-cover border-2 border-white shrink-0 shadow-md"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-white/20 text-white flex items-center justify-center font-black text-base border-2 border-white shrink-0 shadow-md">
+              {userInitials}
+            </div>
+          )}
+
           <div>
-            <h1 className="font-black text-lg">{session.user?.fullName || 'Sakhi Member'} — Emergency GPS Stream</h1>
+            <h1 className="font-black text-lg">{victimName} — Live GPS Stream</h1>
             <p className="text-xs text-white/90 font-bold">24/7 Live Encrypted Guardian Location Map</p>
           </div>
         </div>
+
         <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
           ● {session.status}
         </span>
@@ -114,14 +133,14 @@ export default function LivePublicTrackingPage() {
 
       {/* SIREN TRIGGER / UNMUTE BUTTON FOR GUARDIAN */}
       {isEmergency && (
-        <div className="bg-white border-2 border-[#FF2A6D] rounded-2xl p-4 shadow-coral-glow flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="bg-white border-2 border-[#FF2A6D] rounded-2xl p-4 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-3 text-left">
             <div className="w-10 h-10 rounded-xl bg-[#FF2A6D]/15 text-[#FF2A6D] flex items-center justify-center shrink-0">
               <AlertTriangle className="w-6 h-6 animate-pulse" />
             </div>
             <div>
               <p className="text-xs font-black text-[#FF2A6D]">GUARDIAN EMERGENCY ALARM</p>
-              <p className="text-[11px] font-bold text-tichi-muted">Tap button to play high-decibel siren on your device</p>
+              <p className="text-[11px] font-bold text-[#684E67]">Tap button to play high-decibel siren on your device</p>
             </div>
           </div>
 
@@ -130,8 +149,8 @@ export default function LivePublicTrackingPage() {
             onClick={handleToggleSiren}
             className={`w-full sm:w-auto px-5 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center space-x-2 border-2 ${
               isSirenPlaying
-                ? 'bg-tichi-success text-white border-tichi-success shadow-lg animate-pulse'
-                : 'bg-[#FF2A6D] text-white border-[#FF2A6D] shadow-coral-glow hover:brightness-110'
+                ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg animate-pulse'
+                : 'bg-[#FF2A6D] text-white border-[#FF2A6D] shadow-md hover:brightness-110'
             }`}
           >
             {isSirenPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 animate-bounce" />}
@@ -141,39 +160,33 @@ export default function LivePublicTrackingPage() {
       )}
 
       {/* GPS LIVE MAP */}
-      <div className="h-80 sm:h-96 rounded-3xl overflow-hidden shadow-xl border-2 border-[#FFCCE1]">
-        {location ? (
-          <LiveLocationMap
-            lat={location.latitude}
-            lng={location.longitude}
-            accuracy={location.accuracy || 15}
-            userName={`${session.user?.fullName || 'User'} (EMERGENCY)`}
-            isEmergency={isEmergency}
-          />
-        ) : (
-          <div className="h-full bg-white flex items-center justify-center text-xs text-tichi-muted font-black">
-            Connecting to live GPS satellite stream...
-          </div>
-        )}
+      <div className="h-80 sm:h-96 rounded-3xl overflow-hidden shadow-xl border-2 border-[#FFCCE1] relative">
+        <LiveLocationMap
+          lat={lat}
+          lng={lng}
+          accuracy={location?.accuracy || 15}
+          userName={`${victimName} (EMERGENCY)`}
+          isEmergency={isEmergency}
+        />
       </div>
 
       {/* VICTIM DETAILS & DIRECT PHONE CALL */}
       <div className="bg-white border-2 border-[#FFCCE1] rounded-3xl p-5 space-y-3 shadow-md">
         <div className="flex items-center justify-between text-xs border-b border-[#FFCCE1] pb-3 font-bold">
-          <span className="text-tichi-muted">Emergency User Phone:</span>
+          <span className="text-[#684E67]">Emergency User Phone:</span>
           {session.user?.phone ? (
-            <a href={`tel:${session.user?.phone}`} className="font-black text-rose hover:underline text-sm font-mono flex items-center space-x-1">
+            <a href={`tel:${session.user?.phone}`} className="font-black text-[#FF2A6D] hover:underline text-sm font-mono flex items-center space-x-1">
               <PhoneCall className="w-4 h-4" />
               <span>{session.user?.phone}</span>
             </a>
           ) : (
-            <span className="font-mono text-tichi-text">Available in SOS Dispatch</span>
+            <span className="font-mono text-[#2A0826]">Available in SOS Dispatch</span>
           )}
         </div>
 
         <div className="flex items-center justify-between text-xs font-bold">
-          <span className="text-tichi-muted">Last GPS Timestamp:</span>
-          <span className="font-mono text-tichi-text">
+          <span className="text-[#684E67]">Last GPS Timestamp:</span>
+          <span className="font-mono text-[#2A0826]">
             {location?.recordedAt ? new Date(location.recordedAt).toLocaleTimeString() : 'Just now'}
           </span>
         </div>
@@ -182,7 +195,7 @@ export default function LivePublicTrackingPage() {
       {/* DIRECT EMERGENCY HELPLINE CALL */}
       <a
         href="tel:112"
-        className="w-full btn-baby-pink py-4 rounded-2xl text-center shadow-coral-glow flex items-center justify-center space-x-2 text-xs uppercase tracking-wider font-black"
+        className="w-full bg-[#FF2A6D] text-white py-4 rounded-2xl text-center shadow-md flex items-center justify-center space-x-2 text-xs uppercase tracking-wider font-black hover:bg-[#E01A4F] transition-all"
       >
         <PhoneCall className="w-5 h-5" />
         <span>CALL 112 NATIONAL EMERGENCY POLICE DISPATCH</span>

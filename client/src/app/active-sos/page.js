@@ -30,7 +30,14 @@ export default function ActiveSOSLivePage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!activeSession) { router.push('/dashboard'); return; }
+    if (!activeSession) {
+      if (user?.role === 'SUPER_ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
+      return;
+    }
     const startTime = new Date(activeSession.startedAt).getTime();
     const interval = setInterval(() => {
       setElapsed(Math.floor((Date.now() - startTime) / 1000));

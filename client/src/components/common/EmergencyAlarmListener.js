@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { ShieldAlert, Volume2, VolumeX, MapPin, ExternalLink, PhoneCall, X, Bell } from 'lucide-react';
 import { startEmergencySiren, stopEmergencySiren } from '../../utils/sirenAudio.js';
 
@@ -73,7 +74,10 @@ export const EmergencyAlarmListener = () => {
     setAlarmData(null);
   };
 
-  if (!alarmData) return null;
+  const { user } = useSelector((state) => state?.auth || {});
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+
+  if (!alarmData || isSuperAdmin) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
@@ -152,6 +156,18 @@ export const EmergencyAlarmListener = () => {
           >
             <MapPin className="w-4 h-4" />
             <span>OPEN LIVE GPS MAP & SIREN CONTROLS</span>
+            <ExternalLink className="w-4 h-4" />
+          </a>
+        )}
+
+        {alarmData.victimPhone && (
+          <a
+            href={`https://api.whatsapp.com/send?phone=${alarmData.victimPhone.replace(/\D/g, '')}&text=${encodeURIComponent(`🚨 SAKHI EMERGENCY ALERT!\n\nVictim: ${alarmData.victimName}\nPhone: ${alarmData.victimPhone}\n\n📍 GPS Coordinates:\nLat: ${alarmData.latitude}, Lng: ${alarmData.longitude}\n\n👉 Live Map:\n${alarmData.trackingUrl || ''}\n\n🌐 Google Maps:\n${alarmData.googleMapsUrl || `https://www.google.com/maps?q=${alarmData.latitude},${alarmData.longitude}`}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-md flex items-center justify-center space-x-2 transition-all"
+          >
+            <span>💬 DISPATCH WHATSAPP EMERGENCY ALERT</span>
             <ExternalLink className="w-4 h-4" />
           </a>
         )}
