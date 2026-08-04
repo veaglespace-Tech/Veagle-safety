@@ -19,6 +19,22 @@ body {
   overflow-x: hidden;
 }
 
+/* SLEEK DROPDOWN SCROLLBAR */
+.custom-select-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-select-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 6px 0;
+}
+.custom-select-scrollbar::-webkit-scrollbar-thumb {
+  background: #FF5C8A;
+  border-radius: 10px;
+}
+.custom-select-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #FF2A6D;
+}
+
 /* ULTRA-MODERN GRADIENT TYPOGRAPHY SYSTEM */
 .heading-gradient-hero {
   background: linear-gradient(135deg, #2A0826 0%, #FF2A6D 45%, #FF5C8A 90%);

@@ -8,6 +8,8 @@ import { UserPlus, Shield, X, CheckCircle, Edit3 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchContacts, addContact, updateContact, deleteContact } from '../../redux/slices/contactSlice.js';
 
+import { CustomSelect } from '../../components/ui/CustomSelect.js';
+
 export const dynamic = 'force-dynamic';
 
 const RELATIONSHIPS = ['Sister', 'Mother', 'Father', 'Brother', 'Friend', 'Spouse', 'Guardian', 'Colleague'];
@@ -206,13 +208,12 @@ export default function UserTrustedContactsPage() {
 
                   <div>
                     <label className="block text-xs font-black uppercase tracking-wider text-[#2A0826] mb-1.5">Relationship</label>
-                    <select
+                    <CustomSelect
+                      options={RELATIONSHIPS.map((r) => ({ value: r, label: r }))}
                       value={relationship}
                       onChange={(e) => setRelationship(e.target.value)}
-                      className="w-full px-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF2A6D]/15 focus:outline-none bg-white text-[#2A0826] shadow-xs cursor-pointer"
-                    >
-                      {RELATIONSHIPS.map((r) => <option key={r} value={r}>{r}</option>)}
-                    </select>
+                      alignRight={true}
+                    />
                   </div>
 
                   <div>

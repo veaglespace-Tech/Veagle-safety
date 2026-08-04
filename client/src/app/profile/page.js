@@ -827,24 +827,28 @@ export default function UserProfileSettingsPage() {
 
                 <div>
                   <label className="block text-xs font-black text-[#684E67] mb-1">Relationship *</label>
-                  <select
-                    disabled={!isEditing}
-                    value={emergencyContactRelation}
-                    onChange={(e) => setEmergencyContactRelation(e.target.value)}
-                    className={`w-full px-3 py-3 border-1.5 rounded-xl text-xs text-[#2A0826] font-bold outline-none transition-all ${
-                      isEditing
-                        ? 'bg-[#FFF0F3] border-[#FF2A6D] focus:bg-white cursor-pointer'
-                        : 'bg-gray-50 border-gray-200 cursor-not-allowed text-gray-700'
-                    }`}
-                  >
-                    <option value="Parent">Parent</option>
-                    <option value="Spouse">Spouse</option>
-                    <option value="Sibling">Sibling</option>
-                    <option value="Friend">Friend</option>
-                    <option value="Guardian">Guardian</option>
-                    <option value="Relative">Relative</option>
-                    <option value="Other">Other</option>
-                  </select>
+                  {isEditing ? (
+                    <CustomSelect
+                      options={[
+                        { value: 'Parent', label: 'Parent' },
+                        { value: 'Spouse', label: 'Spouse' },
+                        { value: 'Sibling', label: 'Sibling' },
+                        { value: 'Friend', label: 'Friend' },
+                        { value: 'Guardian', label: 'Guardian' },
+                        { value: 'Relative', label: 'Relative' },
+                        { value: 'Other', label: 'Other' },
+                      ]}
+                      value={emergencyContactRelation}
+                      onChange={(e) => setEmergencyContactRelation(e.target.value)}
+                      alignRight={true}
+                    />
+                  ) : (
+                    <input
+                      disabled
+                      value={emergencyContactRelation}
+                      className="w-full px-3 py-3 border-1.5 rounded-xl text-xs text-gray-700 font-bold bg-gray-50 border-gray-200 cursor-not-allowed outline-none"
+                    />
+                  )}
                 </div>
 
                 <div>
@@ -959,17 +963,17 @@ export default function UserProfileSettingsPage() {
 
             {/* MASTER STICKY SUBMIT ACTION BAR (VISIBLE IN EDIT MODE) */}
             {isEditing && (
-              <div className="sticky bottom-4 z-40 bg-white/95 backdrop-blur-md p-4 rounded-3xl border-2 border-[#FF2A6D] shadow-2xl flex items-center justify-between gap-4 animate-slide-up">
-                <div>
-                  <p className="font-black text-xs text-[#2A0826]">Edit Mode Unlocked</p>
-                  <p className="text-[10px] font-bold text-[#684E67]">Click Save Changes to commit all details to database</p>
+              <div className="sticky bottom-4 z-40 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-3xl border-2 border-[#FF2A6D] shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 animate-slide-up">
+                <div className="min-w-0">
+                  <p className="font-black text-xs sm:text-sm text-[#2A0826] whitespace-nowrap">Edit Mode Unlocked</p>
+                  <p className="text-[11px] font-bold text-[#684E67] truncate">Click Save Changes to commit all details to database</p>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex items-center justify-end space-x-2.5 shrink-0">
                   <button
                     type="button"
                     onClick={handleToggleEdit}
-                    className="bg-gray-100 text-gray-700 hover:bg-gray-200 font-black px-5 py-3 rounded-full text-xs transition-all cursor-pointer"
+                    className="px-4.5 py-2.5 bg-gray-100 text-gray-700 hover:bg-gray-200 font-black text-xs rounded-2xl transition-all cursor-pointer shrink-0 whitespace-nowrap"
                   >
                     Cancel
                   </button>
@@ -977,10 +981,10 @@ export default function UserProfileSettingsPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-8 py-3 rounded-full text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(255,42,109,0.4)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                    className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-6 py-2.5 rounded-2xl text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap border border-white/20"
                   >
-                    <Save className="w-4 h-4" />
-                    <span>{isSubmitting ? 'SAVING CHANGES...' : 'SAVE ALL CHANGES'}</span>
+                    <Save className="w-4 h-4 shrink-0" />
+                    <span>{isSubmitting ? 'SAVING...' : 'SAVE ALL CHANGES'}</span>
                   </button>
                 </div>
               </div>
