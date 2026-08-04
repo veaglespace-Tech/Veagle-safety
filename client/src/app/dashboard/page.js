@@ -213,16 +213,14 @@ export default function DashboardAppPage() {
               <p className="text-xs text-[#684E67] font-black tracking-widest uppercase">
                 HOLD FOR 3 SECONDS OR DOUBLE-CLICK TO BROADCAST EMERGENCY ALERTS
               </p>
-            </div>
-
-            {/* 4-GRID QUICK ACTIONS */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-2">
+            </div>            {/* 4-GRID QUICK ACTIONS */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 pt-2">
               <Link
                 href="/track-journey"
-                className="bg-[#FFF0F3]/40 p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
+                className="bg-[#FFF0F3]/40 p-5 sm:p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
               >
-                <div className="w-13 h-13 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs">
-                  <Navigation className="w-6 h-6" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs shrink-0">
+                  <Navigation className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Track Journey</p>
                 <p className="text-[11px] text-[#684E67] font-semibold">Share Live Route</p>
@@ -230,10 +228,10 @@ export default function DashboardAppPage() {
 
               <Link
                 href="/track-journey"
-                className="bg-[#FFF0F3]/40 p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
+                className="bg-[#FFF0F3]/40 p-5 sm:p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
               >
-                <div className="w-13 h-13 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs">
-                  <Clock className="w-6 h-6" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs shrink-0">
+                  <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Check On Me</p>
                 <p className="text-[11px] text-[#684E67] font-semibold">Safety Alarm Timer</p>
@@ -241,10 +239,10 @@ export default function DashboardAppPage() {
 
               <Link
                 href="/contacts"
-                className="bg-[#FFF0F3]/40 p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
+                className="bg-[#FFF0F3]/40 p-5 sm:p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
               >
-                <div className="w-13 h-13 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs">
-                  <Users className="w-6 h-6" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs shrink-0">
+                  <Users className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Guardians</p>
                 <p className="text-[11px] text-[#684E67] font-semibold">{contacts.length} Trusted Listed</p>
@@ -252,10 +250,10 @@ export default function DashboardAppPage() {
 
               <Link
                 href="/help"
-                className="bg-[#FFF0F3]/40 p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
+                className="bg-[#FFF0F3]/40 p-5 sm:p-6 rounded-3xl border border-[#FFCCE1]/70 hover:border-[#FF2A6D] hover:-translate-y-1 transition-all duration-300 text-center space-y-3 group shadow-xs hover:shadow-md hover:shadow-[#FF2A6D]/10"
               >
-                <div className="w-13 h-13 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs">
-                  <PhoneCall className="w-6 h-6" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white text-[#FF2A6D] border border-[#FFCCE1]/80 flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-[#FF2A6D] group-hover:text-white transition-all duration-300 shadow-xs shrink-0">
+                  <PhoneCall className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <p className="text-xs font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors">Helplines</p>
                 <p className="text-[11px] text-[#684E67] font-semibold">National 112 & 1091</p>

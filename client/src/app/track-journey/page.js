@@ -267,8 +267,10 @@ export default function UserTrackJourneyPage() {
                 </form>
               )}
 
-              <div className="flex items-start space-x-3 bg-white p-4.5 rounded-2xl border-2 border-[#FFCCE1] shadow-xs">
-                <Info className="w-5 h-5 text-[#FF2A6D] shrink-0 mt-0.5" />
+              <div className="flex items-center space-x-3.5 bg-white p-4 sm:p-5 rounded-3xl border-2 border-[#FFCCE1] shadow-xs">
+                <div className="w-9 h-9 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center shrink-0">
+                  <Info className="w-5 h-5 text-[#FF2A6D]" />
+                </div>
                 <p className="text-xs text-[#684E67] font-bold leading-relaxed">
                   Journey tracking continuously updates your location every 30 seconds. Your trusted contacts can view live progress via the shared tracking link.
                 </p>

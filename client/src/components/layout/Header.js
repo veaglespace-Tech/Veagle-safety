@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   ShieldAlert, Radio, Users, PhoneCall,
   Info, Image as ImageIcon, UserCheck,
-  LogOut, Menu, X, Crown, Home, Zap
+  LogOut, Menu, X, Crown, Command, Home, Zap
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -87,11 +87,6 @@ export const Header = () => {
               <span className="font-black text-sm sm:text-base text-[#2A0826] tracking-tight truncate">
                 Sakhi Suraksha SOS
               </span>
-              {isSuperAdmin && (
-                <span className="bg-[#E6A100] text-white font-black text-[9px] px-1 py-0.5 rounded uppercase tracking-wider shrink-0">
-                  ADMIN
-                </span>
-              )}
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className={`w-1.5 h-1.5 rounded-full ${status === 'LIVE' ? 'bg-[#059669]' : 'bg-[#F59E0B]'} animate-pulse shrink-0`} />
@@ -125,35 +120,35 @@ export const Header = () => {
         )}
 
         {/* RIGHT SIDE ACTIONS & MOBILE MENU TOGGLE */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {isLoggedIn ? (
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={handleLogout}
-                className="group flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-xs font-extrabold px-4 py-2 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md active:scale-95"
+                className="group flex items-center gap-1.5 bg-gradient-to-r from-[#FFF0F3] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#FF2A6D] text-[11px] sm:text-xs font-extrabold px-3 sm:px-4 py-1.5 sm:py-2 rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-[#FF2A6D] hover:to-[#E01A4F] hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md active:scale-95 shrink-0"
                 title="Sign Out"
               >
                 <span className="tracking-wide">Sign Out</span>
-                <LogOut size={14} className="group-hover:translate-x-0.5 transition-transform duration-300" />
+                <LogOut size={13} className="group-hover:translate-x-0.5 transition-transform duration-300 shrink-0" />
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <Link
                 href="/auth?mode=register"
-                className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black px-4 py-2 rounded-full cursor-pointer shadow-[0_4px_16px_rgba(255,42,109,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/40 uppercase tracking-wider"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-[10.5px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-full cursor-pointer shadow-[0_4px_16px_rgba(255,42,109,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/40 uppercase tracking-wider shrink-0"
               >
-                <Zap size={15} className="animate-pulse text-white" />
+                <Zap size={13} className="animate-pulse text-white shrink-0" />
                 <span className="tracking-wide">Protect Now</span>
               </Link>
 
               <Link 
                 href="/auth?mode=login" 
-                className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-4 py-2 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md active:scale-95"
+                className="group hidden md:flex items-center gap-2 bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border-1.5 border-[#FF5C8A] text-[#2A0826] text-xs font-extrabold px-4 py-2 rounded-full hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md active:scale-95 shrink-0"
               >
                 <span className="tracking-wide">Sign In</span>
-                <UserCheck size={14} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300" />
+                <UserCheck size={14} className="text-[#FF2A6D] group-hover:text-white group-hover:scale-110 group-hover:translate-x-0.5 transition-all duration-300 shrink-0" />
               </Link>
             </div>
           )}

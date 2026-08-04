@@ -550,90 +550,125 @@ export const sendEmailChangeOtp = asyncHandler(async (req, res) => {
 });
 
 export const updateSettings = asyncHandler(async (req, res) => {
-  const {
-    fullName,
-    email,
-    phone,
-    profilePhoto,
-    bloodGroup,
-    address,
-    city,
-    state,
-    country,
-    pincode,
-    emergencyContactName,
-    emergencyContactPhone,
-    medicalNotes,
-    newPassword,
-  } = req.body;
+  try {
+    const {
+      fullName,
+      email,
+      phone,
+      profilePhoto,
+      bloodGroup,
+      address,
+      city,
+      state,
+      country,
+      pincode,
+      emergencyContactName,
+      emergencyContactPhone,
+      medicalNotes,
+      newPassword,
+    } = req.body;
 
-  const currentUser = await prisma.user.findUnique({ where: { id: req.user.id } });
-  if (!currentUser) {
-    return res.status(404).json({ error: 'User not found' });
-  }
+    const targetUserId = parseInt(req.user?.id || req.user?.userId, 10);
+    if (!targetUserId || isNaN(targetUserId)) {
+      return res.status(401).json({ error: 'Invalid user session token' });
+    }
 
-  // Strict DB Uniqueness check for Email
-  if (email && email.toLowerCase().trim() !== currentUser.email.toLowerCase().trim()) {
-    const cleanEmail = email.toLowerCase().trim();
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        email: cleanEmail,
-        id: { not: req.user.id },
+    const currentUser = await prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!currentUser) {
+      return res.status(404).json({ error: 'User account not found' });
+    }
+
+    const updateData = {};
+
+    if (typeof fullName === 'string' && fullName.trim()) {
+      updateData.fullName = fullName.trim();
+    }
+
+    if (typeof email === 'string' && email.trim() && email.toLowerCase().trim() !== currentUser.email.toLowerCase().trim()) {
+      const cleanEmail = email.toLowerCase().trim();
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          email: cleanEmail,
+          id: { not: targetUserId },
+        },
+      });
+
+      if (existingUser) {
+        return res.status(409).json({ error: 'An account with this email address already exists. Duplicate email is not allowed.' });
+      }
+      updateData.email = cleanEmail;
+    }
+
+    if (typeof phone === 'string' && phone.trim()) {
+      updateData.phone = phone.trim();
+    }
+
+    if (newPassword && typeof newPassword === 'string' && newPassword.length >= 6) {
+      updateData.passwordHash = await bcrypt.hash(newPassword, 10);
+    }
+
+    if (profilePhoto !== undefined) {
+      updateData.profilePhoto = profilePhoto;
+    }
+    if (bloodGroup !== undefined) {
+      updateData.bloodGroup = typeof bloodGroup === 'string' ? bloodGroup.trim() : bloodGroup;
+    }
+    if (address !== undefined) {
+      updateData.address = typeof address === 'string' ? address.trim() : address;
+    }
+    if (city !== undefined) {
+      updateData.city = typeof city === 'string' ? city.trim() : city;
+    }
+    if (state !== undefined) {
+      updateData.state = typeof state === 'string' ? state.trim() : state;
+    }
+    if (country !== undefined) {
+      updateData.country = typeof country === 'string' ? country.trim() : country;
+    }
+    if (pincode !== undefined) {
+      updateData.pincode = typeof pincode === 'string' ? pincode.trim() : pincode;
+    }
+    if (emergencyContactName !== undefined) {
+      updateData.emergencyContactName = typeof emergencyContactName === 'string' ? emergencyContactName.trim() : emergencyContactName;
+    }
+    if (emergencyContactPhone !== undefined) {
+      updateData.emergencyContactPhone = typeof emergencyContactPhone === 'string' ? emergencyContactPhone.trim() : emergencyContactPhone;
+    }
+    if (medicalNotes !== undefined) {
+      updateData.medicalNotes = typeof medicalNotes === 'string' ? medicalNotes.trim() : medicalNotes;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: targetUserId },
+      data: updateData,
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        role: true,
+        subscriptionStatus: true,
+        profilePhoto: true,
+        bloodGroup: true,
+        address: true,
+        city: true,
+        state: true,
+        country: true,
+        pincode: true,
+        emergencyContactName: true,
+        emergencyContactPhone: true,
+        medicalNotes: true,
       },
     });
 
-    if (existingUser) {
-      return res.status(409).json({ error: 'An account with this email address already exists. Duplicate email is not allowed.' });
-    }
+    return res.status(200).json({
+      message: 'Profile updated successfully',
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error('Error in updateSettings:', err);
+    return res.status(500).json({ error: err.message || 'Failed to update profile settings' });
   }
-
-  let passwordHash = undefined;
-  if (newPassword && newPassword.length >= 6) {
-    passwordHash = await bcrypt.hash(newPassword, 10);
-  }
-
-  const updatedUser = await prisma.user.update({
-    where: { id: req.user.id },
-    data: {
-      ...(fullName && { fullName }),
-      ...(email && { email: email.toLowerCase().trim() }),
-      ...(phone && { phone }),
-      ...(passwordHash && { passwordHash }),
-      ...(profilePhoto !== undefined && { profilePhoto }),
-      ...(bloodGroup !== undefined && { bloodGroup }),
-      ...(address !== undefined && { address }),
-      ...(city !== undefined && { city }),
-      ...(state !== undefined && { state }),
-      ...(country !== undefined && { country }),
-      ...(pincode !== undefined && { pincode }),
-      ...(emergencyContactName !== undefined && { emergencyContactName }),
-      ...(emergencyContactPhone !== undefined && { emergencyContactPhone }),
-      ...(medicalNotes !== undefined && { medicalNotes }),
-    },
-    select: {
-      id: true,
-      fullName: true,
-      email: true,
-      phone: true,
-      role: true,
-      subscriptionStatus: true,
-      profilePhoto: true,
-      bloodGroup: true,
-      address: true,
-      city: true,
-      state: true,
-      country: true,
-      pincode: true,
-      emergencyContactName: true,
-      emergencyContactPhone: true,
-      medicalNotes: true,
-    },
-  });
-
-  res.status(200).json({
-    message: 'Profile updated successfully',
-    user: updatedUser,
-  });
 });
 
 /**

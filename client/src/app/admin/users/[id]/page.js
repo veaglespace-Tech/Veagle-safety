@@ -106,18 +106,57 @@ export default function AdminUserDetailPage() {
     setIsEditModalOpen(true);
   };
 
-  const handlePhotoFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        showToast('error', 'Image file size should be less than 5MB');
-        return;
-      }
+  const compressImageBase64 = (file, maxWidth = 500, maxHeight = 500, quality = 0.82) => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setEditForm((prev) => ({ ...prev, profilePhoto: reader.result }));
+      reader.onerror = () => reject(new Error('Failed to read image file'));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Failed to load image element'));
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedBase64);
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  const handlePhotoFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        showToast('error', 'Please select a valid image file');
+        return;
+      }
+      try {
+        const compressedBase64 = await compressImageBase64(file);
+        setEditForm((prev) => ({ ...prev, profilePhoto: compressedBase64 }));
+      } catch (err) {
+        showToast('error', 'Failed to process selected image file');
+      }
     }
   };
 
