@@ -71,24 +71,71 @@ export const sendEmailVerificationOtp = async (arg1, arg2, arg3) => {
 };
 
 /**
- * 🚨 Send High-Priority Emergency SOS Broadcast Email
-
-/**
- * Helper to ensure a valid, publicly accessible profile photo image URL for email clients (Gmail, Outlook, etc.)
+ * 🚨 Send High-Priority Emergency SOS Broadcas/**
+ * Helper to resolve profile photo for email rendering:
+ * - Converts base64 Data URIs into raw binary Buffers with inline CID attachments for 100% Gmail rendering of actual face photos
+ * - Public HTTP/HTTPS URLs are passed as direct image src
+ * - Missing photos fall back to high-res PNG avatar
  */
-const getPublicAvatarUrl = (userPhoto, userName) => {
-  if (userPhoto && typeof userPhoto === 'string') {
+const resolveAvatarImage = (userPhoto, userName) => {
+  if (userPhoto && typeof userPhoto === 'string' && userPhoto.trim()) {
     const trimmed = userPhoto.trim();
+    
+    // Check for base64 Data URI (e.g. data:image/jpeg;base64,...)
+    if (trimmed.startsWith('data:image/')) {
+      const matches = trimmed.match(/^data:(image\/[a-zA-Z0-9\+\-\.]+);base64,(.+)$/s);
+      if (matches) {
+        const mimeType = matches[1];
+        const base64Data = matches[2].replace(/[\r\n\s]/g, '');
+        const ext = mimeType.split('/')[1] || 'jpg';
+        return {
+          src: 'cid:userprofilephoto',
+          attachments: [
+            {
+              filename: `profile.${ext}`,
+              content: Buffer.from(base64Data, 'base64'),
+              contentType: mimeType,
+              cid: 'userprofilephoto',
+            },
+          ],
+        };
+      }
+    }
+
+    // Check for raw base64 string
+    if (trimmed.length > 500 && !trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+      const cleanBase64 = trimmed.replace(/[\r\n\s]/g, '');
+      return {
+        src: 'cid:userprofilephoto',
+        attachments: [
+          {
+            filename: 'profile.jpg',
+            content: Buffer.from(cleanBase64, 'base64'),
+            contentType: 'image/jpeg',
+            cid: 'userprofilephoto',
+          },
+        ],
+      };
+    }
+
+    // Check for public HTTP/HTTPS URL
     if (
-      (trimmed.startsWith('https://') || trimmed.startsWith('http://') || trimmed.startsWith('data:image/')) &&
+      (trimmed.startsWith('https://') || trimmed.startsWith('http://')) &&
       !trimmed.includes('localhost') &&
       !trimmed.includes('127.0.0.1')
     ) {
-      return trimmed;
+      return {
+        src: trimmed,
+        attachments: [],
+      };
     }
   }
+
   const cleanName = encodeURIComponent(userName || 'Sakhi Member');
-  return `https://ui-avatars.com/api/?name=${cleanName}&background=FF2A6D&color=ffffff&size=128&bold=true&format=png`;
+  return {
+    src: `https://ui-avatars.com/api/?name=${cleanName}&background=FF2A6D&color=ffffff&size=128&bold=true&format=png`,
+    attachments: [],
+  };
 };
 
 /**
@@ -109,12 +156,13 @@ export const sendSosEmergencyAlert = async ({
 }) => {
   try {
     const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
-    const avatarUrl = getPublicAvatarUrl(userPhoto, userName);
+    const avatar = resolveAvatarImage(userPhoto, userName);
 
     const info = await transporter.sendMail({
       from: `"🚨 Sakhi Suraksha Emergency Command" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: `🚨 CRITICAL EMERGENCY SOS ALERT: ${userName} Needs Help Immediately!`,
+      attachments: avatar.attachments,
       html: `
         <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 3px solid #FF2A6D; border-radius: 18px; padding: 24px; background-color: #FFF0F3;">
           
@@ -130,7 +178,7 @@ export const sendSosEmergencyAlert = async ({
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="width: 66px; vertical-align: middle; padding-right: 14px;">
-                  <img src="${avatarUrl}" alt="${userName}" width="56" height="56" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 3px solid #FF2A6D; display: block;" />
+                  <img src="${avatar.src}" alt="${userName}" width="56" height="56" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 3px solid #FF2A6D; display: block;" />
                 </td>
                 <td style="vertical-align: middle;">
                   <h3 style="margin: 0 0 3px 0; color: #2A0826; font-size: 17px; font-weight: 900;">${userName}</h3>
@@ -190,12 +238,13 @@ export const sendSosSafeAlert = async ({
 }) => {
   try {
     const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
-    const avatarUrl = getPublicAvatarUrl(userPhoto, userName);
+    const avatar = resolveAvatarImage(userPhoto, userName);
 
     const info = await transporter.sendMail({
       from: `"✅ Sakhi Suraksha Safety Status" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: `✅ SAFE NOW CONFIRMATION: ${userName} is Safe!`,
+      attachments: avatar.attachments,
       html: `
         <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 3px solid #10B981; border-radius: 18px; padding: 24px; background-color: #ECFDF5;">
           
@@ -211,7 +260,7 @@ export const sendSosSafeAlert = async ({
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="width: 60px; vertical-align: middle; padding-right: 14px;">
-                  <img src="${avatarUrl}" alt="${userName}" width="50" height="50" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2.5px solid #10B981; display: block;" />
+                  <img src="${avatar.src}" alt="${userName}" width="50" height="50" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2.5px solid #10B981; display: block;" />
                 </td>
                 <td style="vertical-align: middle;">
                   <p style="font-size: 14px; color: #065F46; margin: 0 0 4px 0; font-weight: 700;">
@@ -266,12 +315,13 @@ export const sendSos5MinLocationUpdate = async ({
 }) => {
   try {
     const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
-    const avatarUrl = getPublicAvatarUrl(victimPhoto, victimName);
+    const avatar = resolveAvatarImage(victimPhoto, victimName);
 
     const info = await transporter.sendMail({
       from: `"📍 Sakhi Suraksha Live GPS Update" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: `📍 [5-MIN PERIODIC GPS UPDATE] Live Coordinates for ${victimName}`,
+      attachments: avatar.attachments,
       html: `
         <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 3px solid #3B82F6; border-radius: 18px; padding: 22px; background-color: #EFF6FF;">
           
@@ -287,7 +337,7 @@ export const sendSos5MinLocationUpdate = async ({
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="width: 56px; vertical-align: middle; padding-right: 12px;">
-                  <img src="${avatarUrl}" alt="${victimName}" width="48" height="48" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #2563EB; display: block;" />
+                  <img src="${avatar.src}" alt="${victimName}" width="48" height="48" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #2563EB; display: block;" />
                 </td>
                 <td style="vertical-align: middle;">
                   <p style="margin: 0; font-size: 13px; color: #1E3A8A; font-weight: 800;">
