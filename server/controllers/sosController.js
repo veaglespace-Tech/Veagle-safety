@@ -64,8 +64,9 @@ export const startSos = async (req, res) => {
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
     const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
 
-    // 1. Collect Recipient Emails (Admin + Parent Emergency Email + Guardian Contacts)
+    // 1. Collect Recipient Emails (User + Admin + Parent Emergency Email + Guardian Contacts)
     const recipientEmails = new Set();
+    if (currentUser?.email) recipientEmails.add(currentUser.email);
     if (adminEmail) recipientEmails.add(adminEmail);
     if (currentUser?.parentEmail) recipientEmails.add(currentUser.parentEmail);
 
@@ -256,6 +257,7 @@ export const resolveSos = async (req, res) => {
             fullName: true,
             email: true,
             phone: true,
+            profilePhoto: true,
             emergencyContactName: true,
             emergencyContactPhone: true,
             parentEmail: true,
@@ -283,8 +285,9 @@ export const resolveSos = async (req, res) => {
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
     const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
 
-    // 1. Collect Recipient Emails for Safe Confirmation
+    // 1. Collect Recipient Emails for Safe Confirmation (User + Admin + Parent + Guardians)
     const recipientEmails = new Set();
+    if (session.user?.email) recipientEmails.add(session.user.email);
     if (adminEmail) recipientEmails.add(adminEmail);
     if (session.user?.parentEmail) recipientEmails.add(session.user.parentEmail);
 
@@ -300,6 +303,7 @@ export const resolveSos = async (req, res) => {
         recipientEmail: email,
         userName: session.user?.fullName || 'Sakhi Member',
         userPhone: session.user?.phone || 'N/A',
+        userPhoto: session.user?.profilePhoto || null,
         googleMapsUrl,
         latitude,
         longitude,

@@ -58,8 +58,9 @@ export const startSosPeriodicWorker = () => {
         const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
         const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-        // Collect all target recipient emails (Admin + Guardians)
+        // Collect all target recipient emails (Victim + Admin + Guardians)
         const recipientEmails = new Set();
+        if (victim?.email) recipientEmails.add(victim.email);
         if (adminEmail) recipientEmails.add(adminEmail);
         if (victim?.emergencyContactEmail) recipientEmails.add(victim.emergencyContactEmail);
 
