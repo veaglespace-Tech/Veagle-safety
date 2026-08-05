@@ -267,14 +267,7 @@ export const resolveSos = async (req, res) => {
       },
       include: {
         user: {
-          select: {
-            fullName: true,
-            email: true,
-            phone: true,
-            profilePhoto: true,
-            emergencyContactName: true,
-            emergencyContactPhone: true,
-            parentEmail: true,
+          include: {
             trustedContacts: true,
           },
         },
