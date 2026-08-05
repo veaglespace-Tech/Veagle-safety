@@ -121,7 +121,6 @@ export const EmergencyAlarmListener = () => {
     setAlarmData(null);
   };
 
-  const { user } = useSelector((state) => state?.auth || {});
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   if (!alarmData || isSuperAdmin) return null;
