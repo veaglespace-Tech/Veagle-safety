@@ -73,25 +73,52 @@ export const sendEmailVerificationOtp = async (arg1, arg2, arg3) => {
 /**
  * 🚨 Send High-Priority Emergency SOS Broadcas/**
  * Helper to resolve profile photo for email rendering:
- * - Base64 images are attached as inline CID attachments so Gmail renders actual user face photos
+ * - Converts base64 Data URIs into raw binary Buffers with inline CID attachments for 100% Gmail rendering of actual face photos
  * - Public HTTP/HTTPS URLs are passed as direct image src
  * - Missing photos fall back to high-res PNG avatar
  */
 const resolveAvatarImage = (userPhoto, userName) => {
   if (userPhoto && typeof userPhoto === 'string' && userPhoto.trim()) {
     const trimmed = userPhoto.trim();
-    if (trimmed.startsWith('data:image/') || trimmed.length > 500) {
+    
+    // Check for base64 Data URI (e.g. data:image/jpeg;base64,...)
+    if (trimmed.startsWith('data:image/')) {
+      const matches = trimmed.match(/^data:(image\/[a-zA-Z0-9\+\-\.]+);base64,(.+)$/s);
+      if (matches) {
+        const mimeType = matches[1];
+        const base64Data = matches[2].replace(/[\r\n\s]/g, '');
+        const ext = mimeType.split('/')[1] || 'jpg';
+        return {
+          src: 'cid:userprofilephoto',
+          attachments: [
+            {
+              filename: `profile.${ext}`,
+              content: Buffer.from(base64Data, 'base64'),
+              contentType: mimeType,
+              cid: 'userprofilephoto',
+            },
+          ],
+        };
+      }
+    }
+
+    // Check for raw base64 string
+    if (trimmed.length > 500 && !trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+      const cleanBase64 = trimmed.replace(/[\r\n\s]/g, '');
       return {
         src: 'cid:userprofilephoto',
         attachments: [
           {
             filename: 'profile.jpg',
-            path: trimmed,
+            content: Buffer.from(cleanBase64, 'base64'),
+            contentType: 'image/jpeg',
             cid: 'userprofilephoto',
           },
         ],
       };
     }
+
+    // Check for public HTTP/HTTPS URL
     if (
       (trimmed.startsWith('https://') || trimmed.startsWith('http://')) &&
       !trimmed.includes('localhost') &&
@@ -103,6 +130,7 @@ const resolveAvatarImage = (userPhoto, userName) => {
       };
     }
   }
+
   const cleanName = encodeURIComponent(userName || 'Sakhi Member');
   return {
     src: `https://ui-avatars.com/api/?name=${cleanName}&background=FF2A6D&color=ffffff&size=128&bold=true&format=png`,
