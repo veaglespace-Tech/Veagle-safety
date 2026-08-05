@@ -11,6 +11,7 @@ import { PublicNavbar } from '../components/layout/PublicNavbar.js';
 import { Footer } from '../components/layout/Footer.js';
 import { Logo3DFlip } from '../components/ui/Logo3DFlip.js';
 import { HeroBannerCarousel } from '../components/ui/HeroBannerCarousel.js';
+import { Feature3DCard } from '../components/ui/Feature3DCard.js';
 
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
@@ -129,39 +130,49 @@ export default function LandingPage() {
           )}
         </div>
 
-        {/* 3 FEATURE CARDS */}
+        {/* 3 FEATURE CARDS IN 3D FLIP ARCHITECTURE */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto pt-8 text-left">
-          {[
-            {
-              icon: Zap, color: '#FF5C8A',
-              title: '3-Second Emergency SOS',
-              desc: 'Trigger loud siren & instant SMS/WhatsApp alerts with exact GPS coordinates to trusted emergency contacts.'
-            },
-            {
-              icon: MapPin, color: '#FF2A6D',
-              title: 'Encrypted GPS Journey Tracking',
-              desc: 'Share live movement updates securely during travel so guardians know you are safe in real time.'
-            },
-            {
-              icon: Users, color: '#FF5C8A',
-              title: 'Trusted Guardian Circle',
-              desc: 'Build your personal network of family & emergency guardians for automated response alerts.'
-            },
-          ].map((item, idx) => (
-            <div key={idx} className="group bg-white/95 backdrop-blur-xl p-8 rounded-3xl space-y-4 border-1.5 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_10px_30px_rgba(255,92,138,0.10)] hover:shadow-[0_16px_40px_rgba(255,92,138,0.22)] transition-all duration-300 h-full flex flex-col justify-between hover:-translate-y-1.5 cursor-pointer">
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] border-1.5 border-[#FF5C8A] flex items-center justify-center mb-4 shadow-sm shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                  <item.icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-black mb-2 text-[#2A0826] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#FF2A6D] group-hover:to-[#FF5C8A] transition-all duration-300">
-                  {item.title}
-                </h3>
-                <p className="text-xs text-[#684E67] font-bold leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          ))}
+          <Feature3DCard
+            icon={Zap}
+            title="3-Second Emergency SOS"
+            desc="Trigger loud siren & instant SMS/WhatsApp alerts with exact GPS coordinates to trusted emergency contacts."
+            backTitle="⚡ Emergency SOS Features"
+            badgeText="ZERO DELAY DISPATCH"
+            gradient="bg-gradient-to-tr from-[#FF2A6D] via-[#E01A4F] to-[#2A0826]"
+            points={[
+              '📢 High-Decibel Guardian Siren Broadcast',
+              '📍 Precise GPS Coordinates & Maps Link',
+              '💬 One-Tap Emergency WhatsApp Alerts',
+            ]}
+          />
+
+          <Feature3DCard
+            icon={MapPin}
+            title="Encrypted GPS Journey Tracking"
+            desc="Share live movement updates securely during travel so guardians know you are safe in real time."
+            backTitle="📍 Live Tracking Specs"
+            badgeText="REAL-TIME TELEMETRY"
+            gradient="bg-gradient-to-tr from-[#2A0826] via-[#910A42] to-[#FF2A6D]"
+            points={[
+              '🛡️ AES-256 Encrypted Location Stream',
+              '⏱️ 5-Minute Periodic Email Updates',
+              '🗺️ Interactive Live Map Share Token',
+            ]}
+          />
+
+          <Feature3DCard
+            icon={Users}
+            title="Trusted Guardian Circle"
+            desc="Build your personal network of family & emergency guardians for automated response alerts."
+            backTitle="👥 Guardian Circle Specs"
+            badgeText="AUTOMATED RESPONSE"
+            gradient="bg-gradient-to-tr from-[#E01A4F] via-[#FF2A6D] to-[#2A0826]"
+            points={[
+              '👨‍👩‍👧 Family & Parent Email Registration',
+              '🔔 Multi-Device Guardian Audio Siren',
+              '📱 Direct Emergency Phone Calling',
+            ]}
+          />
         </div>
 
 
