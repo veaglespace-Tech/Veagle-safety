@@ -699,15 +699,13 @@ export default function UserProfileSettingsPage() {
 
             {/* FORM SECTION 2: RESIDENTIAL ADDRESS & LOCATION */}
             <div className={`bg-white border-2 rounded-[32px] p-6 sm:p-8 shadow-md space-y-6 transition-all ${isEditing ? 'border-[#FF2A6D] ring-4 ring-[#FF2A6D]/10' : 'border-[#FFCCE1]'}`}>
-              <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1]">
-                    <MapPin className="w-5 h-5 text-[#FF2A6D]" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-lg text-[#2A0826]">2. Residential Location & Address</h3>
-                    <p className="text-xs text-[#684E67] font-bold">Address details used for emergency dispatch & guardian response</p>
-                  </div>
+              <div className="flex items-start sm:items-center space-x-3.5 border-b-2 border-[#FFCCE1] pb-4 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1] shrink-0 mt-0.5 sm:mt-0">
+                  <MapPin className="w-5 h-5 text-[#FF2A6D]" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-black text-base sm:text-lg text-[#2A0826] tracking-tight">2. Residential Location & Address</h3>
+                  <p className="text-xs text-[#684E67] font-bold leading-relaxed">Address details used for emergency dispatch & guardian response</p>
                 </div>
               </div>
 
@@ -794,13 +792,13 @@ export default function UserProfileSettingsPage() {
 
             {/* FORM SECTION 3: EMERGENCY GUARDIAN CONTACT DETAILS */}
             <div className={`bg-white border-2 rounded-[32px] p-6 sm:p-8 shadow-md space-y-6 transition-all ${isEditing ? 'border-[#FF2A6D] ring-4 ring-[#FF2A6D]/10' : 'border-[#FFCCE1]'}`}>
-              <div className="flex items-center space-x-3 border-b-2 border-[#FFCCE1] pb-4">
-                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1]">
+              <div className="flex items-start sm:items-center space-x-3.5 border-b-2 border-[#FFCCE1] pb-4 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1] shrink-0 mt-0.5 sm:mt-0">
                   <Users className="w-5 h-5 text-[#FF2A6D]" />
                 </div>
-                <div>
-                  <h3 className="font-black text-lg text-[#2A0826]">3. Primary Emergency Guardian Contact</h3>
-                  <p className="text-xs text-[#684E67] font-bold">First guardian notified automatically during an emergency SOS broadcast</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-black text-base sm:text-lg text-[#2A0826] tracking-tight">3. Primary Emergency Guardian Contact</h3>
+                  <p className="text-xs text-[#684E67] font-bold leading-relaxed">First guardian notified automatically during an emergency SOS broadcast</p>
                 </div>
               </div>
 
@@ -876,13 +874,13 @@ export default function UserProfileSettingsPage() {
 
             {/* FORM SECTION 4: SECURITY & PASSWORD UPDATE */}
             <div className={`bg-white border-2 rounded-[32px] p-6 sm:p-8 shadow-md space-y-6 transition-all ${isEditing ? 'border-[#FF2A6D] ring-4 ring-[#FF2A6D]/10' : 'border-[#FFCCE1]'}`}>
-              <div className="flex items-center space-x-3 border-b-2 border-[#FFCCE1] pb-4">
-                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1]">
+              <div className="flex items-start sm:items-center space-x-3.5 border-b-2 border-[#FFCCE1] pb-4 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1] shrink-0 mt-0.5 sm:mt-0">
                   <Lock className="w-5 h-5 text-[#FF2A6D]" />
                 </div>
-                <div>
-                  <h3 className="font-black text-lg text-[#2A0826]">4. Account Password & Security</h3>
-                  <p className="text-xs text-[#684E67] font-bold">Leave blank if you do not wish to change your account password</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-black text-base sm:text-lg text-[#2A0826] tracking-tight">4. Account Password & Security</h3>
+                  <p className="text-xs text-[#684E67] font-bold leading-relaxed">Leave blank if you do not wish to change your account password</p>
                 </div>
               </div>
 
@@ -935,13 +933,13 @@ export default function UserProfileSettingsPage() {
 
             {/* FORM SECTION 5: MEDICAL / HEALTH NOTES FOR RESPONDERS */}
             <div className={`bg-white border-2 rounded-[32px] p-6 sm:p-8 shadow-md space-y-6 transition-all ${isEditing ? 'border-[#FF2A6D] ring-4 ring-[#FF2A6D]/10' : 'border-[#FFCCE1]'}`}>
-              <div className="flex items-center space-x-3 border-b-2 border-[#FFCCE1] pb-4">
-                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1]">
+              <div className="flex items-start sm:items-center space-x-3.5 border-b-2 border-[#FFCCE1] pb-4 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1] shrink-0 mt-0.5 sm:mt-0">
                   <FileText className="w-5 h-5 text-[#FF2A6D]" />
                 </div>
-                <div>
-                  <h3 className="font-black text-lg text-[#2A0826]">5. Emergency Medical Notes & Instructions</h3>
-                  <p className="text-xs text-[#684E67] font-bold">Allergies, medical conditions, or specific emergency instructions for guardians</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-black text-base sm:text-lg text-[#2A0826] tracking-tight">5. Emergency Medical Notes & Instructions</h3>
+                  <p className="text-xs text-[#684E67] font-bold leading-relaxed">Allergies, medical conditions, or specific emergency instructions for guardians</p>
                 </div>
               </div>
 
@@ -994,17 +992,17 @@ export default function UserProfileSettingsPage() {
 
           {/* SECTION 6: 24/7 SYSTEM HEALTH DIAGNOSTICS & SOS DRILL RUNNER */}
           <div className="bg-white border-2 border-[#FFCCE1] rounded-[32px] p-6 sm:p-8 shadow-md space-y-6">
-            <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#FFCCE1] pb-4">
+              <div className="flex items-start sm:items-center space-x-3.5 min-w-0 flex-1">
+                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] flex items-center justify-center border border-[#FFCCE1] shrink-0 mt-0.5 sm:mt-0">
                   <Shield className="w-5 h-5 text-[#FF2A6D]" />
                 </div>
-                <div>
-                  <h3 className="font-black text-lg text-[#2A0826]">24/7 System Health Metrics & SOS Drill Runner</h3>
-                  <p className="text-xs text-[#684E67] font-bold">Verify device sensors, GPS stream, and siren audio capability</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-black text-base sm:text-lg text-[#2A0826] tracking-tight">24/7 System Health Metrics & SOS Drill Runner</h3>
+                  <p className="text-xs text-[#684E67] font-bold leading-relaxed">Verify device sensors, GPS stream, and siren audio capability</p>
                 </div>
               </div>
-              <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-300 hidden sm:inline-block">
+              <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-300 shrink-0 whitespace-nowrap self-start sm:self-auto">
                 100% Operational
               </span>
             </div>
