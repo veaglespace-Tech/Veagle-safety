@@ -97,7 +97,6 @@ export const Feature3DCard = ({
               <Sparkles size={11} className="text-[#FFE600]" />
               <span>Sakhi 365 Security</span>
             </span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full border border-white/30 text-white">Tap to Flip 🔄</span>
           </div>
         </div>
       </div>
