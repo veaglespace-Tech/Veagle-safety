@@ -14,20 +14,37 @@ export const Feature3DCard = ({
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const handleCardClick = (e) => {
+    e.stopPropagation();
+    setIsFlipped((prev) => !prev);
+  };
+
   return (
     <div
       className="perspective-1000 w-full h-[270px] cursor-pointer group select-none"
-      onMouseEnter={() => setIsFlipped(true)}
-      onMouseLeave={() => setIsFlipped(false)}
-      onClick={() => setIsFlipped((prev) => !prev)}
+      onClick={handleCardClick}
+      onMouseEnter={() => {
+        if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+          setIsFlipped(true);
+        }
+      }}
+      onMouseLeave={() => {
+        if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+          setIsFlipped(false);
+        }
+      }}
     >
       <div
         className={`relative w-full h-full duration-700 transform-style-3d transition-transform ease-out ${
           isFlipped ? 'rotate-y-180' : ''
         }`}
       >
-        {/* FRONT FACE OF 3D CARD (CLEAN & SLEEK) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden bg-white/95 backdrop-blur-2xl p-8 rounded-3xl border-1.5 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_10px_30px_rgba(255,92,138,0.10)] hover:shadow-[0_20px_50px_rgba(255,92,138,0.25)] flex flex-col justify-between transition-all duration-300">
+        {/* FRONT FACE OF 3D CARD */}
+        <div
+          className={`absolute inset-0 w-full h-full backface-hidden bg-white/95 backdrop-blur-2xl p-8 rounded-3xl border-1.5 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_10px_30px_rgba(255,92,138,0.10)] hover:shadow-[0_20px_50px_rgba(255,92,138,0.25)] flex flex-col justify-between transition-all duration-300 ${
+            isFlipped ? 'pointer-events-none opacity-0 sm:opacity-100' : 'pointer-events-auto opacity-100'
+          }`}
+        >
           <div>
             <div className="w-11 h-11 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mb-5 shrink-0 group-hover:scale-110 group-hover:bg-[#FFCCE1]/60 transition-all duration-300">
               <Icon className="w-5 h-5 stroke-[2.2]" />
@@ -45,7 +62,9 @@ export const Feature3DCard = ({
 
         {/* BACK FACE OF 3D CARD */}
         <div
-          className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 p-7 rounded-3xl border-2 border-white/30 text-white flex flex-col justify-between shadow-[0_20px_60px_rgba(255,42,109,0.35)] relative overflow-hidden ${gradient}`}
+          className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 p-7 rounded-3xl border-2 border-white/30 text-white flex flex-col justify-between shadow-[0_20px_60px_rgba(255,42,109,0.35)] relative overflow-hidden ${gradient} ${
+            isFlipped ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0 sm:opacity-100'
+          }`}
         >
           {/* AMBIENT BACKGROUND GLOW INSIDE BACK FACE */}
           <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-white/10 blur-2xl pointer-events-none" />
