@@ -29,8 +29,8 @@ function CheckoutContent() {
     }
   }, [dispatch, token, user]);
 
-  const selectedPlan = plans.find((p) => p.id === planIdParam) || plans[0] || {
-    id: 'plan_yearly_24',
+  const selectedPlan = plans.find((p) => String(p.id) === String(planIdParam)) || plans[0] || {
+    id: 2,
     name: 'Sakhi Suraksha 365 Yearly Protection Plan',
     basePrice: 24.0,
     gstPercentage: 18.0,
