@@ -114,10 +114,10 @@ export const startSos = async (req, res) => {
       };
     });
 
-    // 4. Broadcast Real-Time Emergency Siren Alarm to Connected Sockets
+    // 4. Broadcast Real-Time Emergency Siren Alarm to Connected Sockets (Targeted Guardian & Admin Rooms)
     const io = getIO();
     if (io) {
-      io.emit('SOS_ALARM_BROADCAST', {
+      const sosAlarmPayload = {
         sosId: session.id,
         victimName: currentUser?.fullName || 'Sakhi Suraksha User',
         victimPhone: currentUser?.phone || '',
@@ -132,7 +132,50 @@ export const startSos = async (req, res) => {
         whatsappAlerts,
         whatsappShareUrl,
         timestamp: new Date().toISOString(),
+      };
+
+      // Collect all guardian & recipient rooms (email rooms, phone rooms, admin room)
+      const targetRooms = new Set();
+      targetRooms.add('admin-ops');
+
+      if (currentUser?.parentEmail) {
+        targetRooms.add(`user:${currentUser.parentEmail.trim().toLowerCase()}`);
+      }
+      if (currentUser?.emergencyContactPhone) {
+        const cleanEmergencyPhone = currentUser.emergencyContactPhone.replace(/\D/g, '');
+        if (cleanEmergencyPhone) {
+          targetRooms.add(`user:${cleanEmergencyPhone}`);
+        }
+      }
+      if (currentUser?.email) {
+        targetRooms.add(`user:${currentUser.email.trim().toLowerCase()}`);
+      }
+      if (currentUser?.phone) {
+        const cleanVictimPhone = currentUser.phone.replace(/\D/g, '');
+        if (cleanVictimPhone) {
+          targetRooms.add(`user:${cleanVictimPhone}`);
+        }
+      }
+
+      contacts.forEach((c) => {
+        if (c.email && typeof c.email === 'string') {
+          targetRooms.add(`user:${c.email.trim().toLowerCase()}`);
+        }
+        if (c.phone && typeof c.phone === 'string') {
+          const cleanPhone = c.phone.replace(/\D/g, '');
+          if (cleanPhone) {
+            targetRooms.add(`user:${cleanPhone}`);
+          }
+        }
       });
+
+      // Target rooms specifically
+      targetRooms.forEach((roomName) => {
+        io.to(roomName).emit('SOS_ALARM_BROADCAST', sosAlarmPayload);
+      });
+
+      // Safety Fallback: Also emit globally so no emergency siren alert is missed under any circumstance
+      io.emit('SOS_ALARM_BROADCAST', sosAlarmPayload);
     }
 
     // 5. Send Web Push Notifications to all trusted contacts' devices

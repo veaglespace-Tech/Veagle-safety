@@ -6,9 +6,34 @@ import { ShieldAlert, Volume2, VolumeX, MapPin, ExternalLink, PhoneCall, X, Bell
 import { startEmergencySiren, stopEmergencySiren } from '../../utils/sirenAudio.js';
 
 export const EmergencyAlarmListener = () => {
+  const { user } = useSelector((state) => state?.auth || {});
   const [alarmData, setAlarmData] = useState(null);
   const [isSirenActive, setIsSirenActive] = useState(false);
   const dismissedSosIdsRef = useRef(new Set());
+  const socketRef = useRef(null);
+  const userRef = useRef(user);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  const registerUserRooms = (socketInstance, u) => {
+    if (!socketInstance || !u) return;
+    const cleanPhone = u.phone ? u.phone.replace(/\D/g, '') : null;
+    const userEmail = u.email ? u.email.trim().toLowerCase() : null;
+
+    socketInstance.emit('register-user', {
+      email: userEmail,
+      phone: cleanPhone,
+      role: u.role,
+    });
+
+    if (userEmail) socketInstance.emit('join-room', `user:${userEmail}`);
+    if (cleanPhone) socketInstance.emit('join-room', `user:${cleanPhone}`);
+    if (u.role === 'SUPER_ADMIN' || u.role === 'ADMIN') {
+      socketInstance.emit('join-room', 'admin-ops');
+    }
+  };
 
   useEffect(() => {
     let socket = null;
@@ -22,9 +47,13 @@ export const EmergencyAlarmListener = () => {
           reconnectionAttempts: 5,
           timeout: 10000,
         });
+        socketRef.current = socket;
 
         socket.on('connect', () => {
           console.log('[EmergencyAlarmListener] Connected to emergency server');
+          if (userRef.current) {
+            registerUserRooms(socket, userRef.current);
+          }
         });
 
         socket.on('SOS_ALARM_BROADCAST', (data) => {
@@ -58,9 +87,16 @@ export const EmergencyAlarmListener = () => {
       if (socket) {
         socket.disconnect();
       }
+      socketRef.current = null;
       stopEmergencySiren();
     };
   }, []);
+
+  useEffect(() => {
+    if (socketRef.current && user) {
+      registerUserRooms(socketRef.current, user);
+    }
+  }, [user]);
 
   const handleStartAudioSiren = () => {
     if (isSirenActive) {

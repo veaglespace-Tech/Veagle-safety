@@ -23,6 +23,29 @@ export function initSocketIO(httpServer) {
       console.log(`[Socket.IO] ${socket.id} joined room ${room}`);
     });
 
+    socket.on('register-user', (userData) => {
+      if (!userData) return;
+      const { email, phone, role } = userData;
+
+      if (email && typeof email === 'string') {
+        const emailRoom = `user:${email.trim().toLowerCase()}`;
+        socket.join(emailRoom);
+        console.log(`[Socket.IO] ${socket.id} joined email room: ${emailRoom}`);
+      }
+      if (phone && typeof phone === 'string') {
+        const cleanPhone = phone.replace(/\D/g, '');
+        if (cleanPhone) {
+          const phoneRoom = `user:${cleanPhone}`;
+          socket.join(phoneRoom);
+          console.log(`[Socket.IO] ${socket.id} joined phone room: ${phoneRoom}`);
+        }
+      }
+      if (role === 'SUPER_ADMIN' || role === 'ADMIN') {
+        socket.join('admin-ops');
+        console.log(`[Socket.IO] ${socket.id} joined admin room: admin-ops`);
+      }
+    });
+
     socket.on('sos:location-update', (data) => {
       ioInstance.to(`track:${data.token}`).emit('location-updated', {
         latitude: data.lat,
