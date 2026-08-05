@@ -244,8 +244,22 @@ export const resolveSos = async (req, res) => {
     const { sosSessionId, resolutionNote } = req.body;
     const userId = req.user?.id;
 
+    let targetId = sosSessionId ? parseInt(sosSessionId, 10) : null;
+    if ((!targetId || isNaN(targetId)) && userId) {
+      const activeSession = await prisma.sosSession.findFirst({
+        where: { userId, status: 'ACTIVE' },
+      });
+      if (activeSession) {
+        targetId = activeSession.id;
+      }
+    }
+
+    if (!targetId || isNaN(targetId)) {
+      return res.status(404).json({ error: 'No active SOS session found to resolve' });
+    }
+
     const session = await prisma.sosSession.update({
-      where: { id: sosSessionId },
+      where: { id: targetId },
       data: {
         status: 'RESOLVED',
         resolvedAt: new Date(),
@@ -276,7 +290,7 @@ export const resolveSos = async (req, res) => {
       await prisma.user.update({
         where: { id: targetUserId },
         data: { safetyStatus: 'SAFE' },
-      });
+      }).catch(() => {});
     }
 
     const latestLocation = session.locations?.[0];
@@ -299,25 +313,29 @@ export const resolveSos = async (req, res) => {
 
     // 2. Dispatch "I AM SAFE NOW" Confirmation Emails
     for (const email of recipientEmails) {
-      sendSosSafeAlert({
-        recipientEmail: email,
-        userName: session.user?.fullName || 'Sakhi Member',
-        userPhone: session.user?.phone || 'N/A',
-        userPhoto: session.user?.profilePhoto || null,
-        googleMapsUrl,
-        latitude,
-        longitude,
-        resolvedAt: session.resolvedAt,
-      });
+      try {
+        await sendSosSafeAlert({
+          recipientEmail: email,
+          userName: session.user?.fullName || 'Sakhi Member',
+          userPhone: session.user?.phone || 'N/A',
+          userPhoto: session.user?.profilePhoto || null,
+          googleMapsUrl,
+          latitude,
+          longitude,
+          resolvedAt: session.resolvedAt,
+        });
 
-      await prisma.sosAlert.create({
-        data: {
-          sosSessionId: session.id,
-          channel: 'EMAIL_SAFE_CONFIRMATION',
-          recipient: email,
-          status: 'SENT',
-        },
-      }).catch(() => {});
+        await prisma.sosAlert.create({
+          data: {
+            sosSessionId: session.id,
+            channel: 'EMAIL_SAFE_CONFIRMATION',
+            recipient: email,
+            status: 'SENT',
+          },
+        }).catch(() => {});
+      } catch (emailErr) {
+        console.error(`[Safe Email Error] Failed to send safe email to ${email}:`, emailErr.message);
+      }
     }
 
     // 3. Format WhatsApp Safe Confirmation Message Links

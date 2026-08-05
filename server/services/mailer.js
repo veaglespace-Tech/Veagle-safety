@@ -88,7 +88,7 @@ const getPublicAvatarUrl = (userPhoto, userName) => {
     }
   }
   const cleanName = encodeURIComponent(userName || 'Sakhi Member');
-  return `https://ui-avatars.com/api/?name=${cleanName}&background=FF2A6D&color=ffffff&size=128&bold=true`;
+  return `https://ui-avatars.com/api/?name=${cleanName}&background=FF2A6D&color=ffffff&size=128&bold=true&format=png`;
 };
 
 /**
