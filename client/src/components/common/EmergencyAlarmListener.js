@@ -121,9 +121,7 @@ export const EmergencyAlarmListener = () => {
     setAlarmData(null);
   };
 
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
-
-  if (!alarmData || isSuperAdmin) return null;
+  if (!alarmData) return null;
 
   const hasVictimPhoto = alarmData.victimPhoto && typeof alarmData.victimPhoto === 'string';
 
