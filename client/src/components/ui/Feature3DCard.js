@@ -33,7 +33,7 @@ export const Feature3DCard = ({
               <Icon className="w-5 h-5 stroke-[2.2]" />
             </div>
 
-            <h3 className="text-xl font-black mb-2 text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors duration-300">
+            <h3 className="text-xl font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors duration-300 min-h-[56px] flex items-start leading-tight mb-2">
               {title}
             </h3>
 
