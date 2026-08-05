@@ -138,7 +138,7 @@ export default function LandingPage() {
             desc="Trigger loud siren & instant SMS/WhatsApp alerts with exact GPS coordinates to trusted emergency contacts."
             backTitle="⚡ Emergency SOS Features"
             badgeText="ZERO DELAY DISPATCH"
-            gradient="bg-gradient-to-tr from-[#FF2A6D] via-[#E01A4F] to-[#2A0826]"
+            gradient="bg-gradient-to-br from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]"
             points={[
               '📢 High-Decibel Guardian Siren Broadcast',
               '📍 Precise GPS Coordinates & Maps Link',
@@ -152,7 +152,7 @@ export default function LandingPage() {
             desc="Share live movement updates securely during travel so guardians know you are safe in real time."
             backTitle="📍 Live Tracking Specs"
             badgeText="REAL-TIME TELEMETRY"
-            gradient="bg-gradient-to-tr from-[#2A0826] via-[#910A42] to-[#FF2A6D]"
+            gradient="bg-gradient-to-br from-[#FF2A6D] via-[#E01A4F] to-[#2A0826]"
             points={[
               '🛡️ AES-256 Encrypted Location Stream',
               '⏱️ 5-Minute Periodic Email Updates',
@@ -166,7 +166,7 @@ export default function LandingPage() {
             desc="Build your personal network of family & emergency guardians for automated response alerts."
             backTitle="👥 Guardian Circle Specs"
             badgeText="AUTOMATED RESPONSE"
-            gradient="bg-gradient-to-tr from-[#E01A4F] via-[#FF2A6D] to-[#2A0826]"
+            gradient="bg-gradient-to-br from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]"
             points={[
               '👨‍👩‍👧 Family & Parent Email Registration',
               '🔔 Multi-Device Guardian Audio Siren',
