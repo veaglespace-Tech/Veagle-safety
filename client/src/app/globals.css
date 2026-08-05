@@ -23,14 +23,17 @@ body {
 .custom-select-scrollbar::-webkit-scrollbar {
   width: 5px;
 }
+
 .custom-select-scrollbar::-webkit-scrollbar-track {
   background: transparent;
   margin: 10px 4px;
 }
+
 .custom-select-scrollbar::-webkit-scrollbar-thumb {
   background: #FF5C8A;
   border-radius: 10px;
 }
+
 .custom-select-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #FF2A6D;
 }
@@ -60,29 +63,50 @@ body {
 
 /* ANTIQUE VIBRANT ANIMATIONS */
 @keyframes chipBounce {
-  0% { transform: scale(0.92); }
-  60% { transform: scale(1.06); }
-  100% { transform: scale(1.03); }
+  0% {
+    transform: scale(0.92);
+  }
+
+  60% {
+    transform: scale(1.06);
+  }
+
+  100% {
+    transform: scale(1.03);
+  }
 }
 
 @keyframes neonGlowPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(255, 92, 138, 0.35), 0 0 40px rgba(255, 42, 109, 0.20);
   }
+
   50% {
     box-shadow: 0 0 32px rgba(255, 92, 138, 0.60), 0 0 60px rgba(255, 42, 109, 0.35);
   }
 }
 
 @keyframes buttonShimmerWave {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* LIVE MARQUEE CONTINUOUS SCROLL ANIMATION */
 @keyframes marqueeScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee-scroll {
@@ -98,11 +122,25 @@ body {
 
 /* 3D ROTATING COIN LOGO ANIMATION SYSTEM */
 @keyframes flip3DCoin {
-  0% { transform: rotateY(0deg); }
-  45% { transform: rotateY(0deg); }
-  50% { transform: rotateY(180deg); }
-  95% { transform: rotateY(180deg); }
-  100% { transform: rotateY(360deg); }
+  0% {
+    transform: rotateY(0deg);
+  }
+
+  45% {
+    transform: rotateY(0deg);
+  }
+
+  50% {
+    transform: rotateY(180deg);
+  }
+
+  95% {
+    transform: rotateY(180deg);
+  }
+
+  100% {
+    transform: rotateY(360deg);
+  }
 }
 
 .logo-3d-coin {
@@ -235,27 +273,47 @@ body {
   color: #2A0826;
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
 .nav-chip-hover:hover {
   background: rgba(255, 255, 255, 0.95);
   color: #FF2A6D;
   transform: translateY(-1.5px) scale(1.04);
   box-shadow: 0 6px 18px rgba(255, 92, 138, 0.22);
 }
+
 .nav-chip-hover:active {
   transform: translateY(0.5px) scale(0.97);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* NO SCROLLBAR UTILITY CLASS FOR INVISIBLE SCROLLBARS */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
 }
 
 /* CUSTOM SCROLLBAR */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: #FFF0F3;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #FFCCE1;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #FF5C8A;
 }

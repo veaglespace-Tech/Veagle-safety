@@ -88,12 +88,16 @@ export const sendSosEmergencyAlert = async ({
 }) => {
   try {
     const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
-    const isHttpUrl = userPhoto && typeof userPhoto === 'string' && (userPhoto.startsWith('http://') || userPhoto.startsWith('https://'));
+    const hasPhoto = userPhoto && typeof userPhoto === 'string' && (
+      userPhoto.startsWith('http://') || 
+      userPhoto.startsWith('https://') || 
+      userPhoto.startsWith('data:image/')
+    );
     const initials = (userName || 'Sakhi').split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase();
 
-    const avatarHtml = isHttpUrl ? `
+    const avatarHtml = hasPhoto ? `
       <td style="width: 60px; vertical-align: middle; padding-right: 14px;">
-        <img src="${userPhoto}" alt="${userName}" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 3px solid #FF2A6D;" />
+        <img src="${userPhoto}" alt="${userName}" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 3px solid #FF2A6D; display: block;" />
       </td>
     ` : `
       <td style="width: 60px; vertical-align: middle; padding-right: 14px;">
@@ -235,6 +239,7 @@ export const sendSos5MinLocationUpdate = async ({
   recipientEmail,
   victimName,
   victimPhone,
+  victimPhoto,
   trackingUrl,
   googleMapsUrl,
   latitude,
@@ -244,6 +249,24 @@ export const sendSos5MinLocationUpdate = async ({
 }) => {
   try {
     const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
+    const hasPhoto = victimPhoto && typeof victimPhoto === 'string' && (
+      victimPhoto.startsWith('http://') || 
+      victimPhoto.startsWith('https://') || 
+      victimPhoto.startsWith('data:image/')
+    );
+    const initials = (victimName || 'Sakhi').split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase();
+
+    const avatarHtml = hasPhoto ? `
+      <td style="width: 54px; vertical-align: middle; padding-right: 12px;">
+        <img src="${victimPhoto}" alt="${victimName}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2.5px solid #2563EB; display: block;" />
+      </td>
+    ` : `
+      <td style="width: 54px; vertical-align: middle; padding-right: 12px;">
+        <div style="width: 46px; height: 46px; border-radius: 50%; background: #2563EB; color: #ffffff; font-size: 18px; font-weight: 900; line-height: 46px; text-align: center; border: 2px solid #BFDBFE;">
+          ${initials}
+        </div>
+      </td>
+    `;
 
     const info = await transporter.sendMail({
       from: `"📍 Sakhi Suraksha Live GPS Update" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
@@ -261,12 +284,19 @@ export const sendSos5MinLocationUpdate = async ({
           </div>
 
           <div style="background-color: #ffffff; border-radius: 12px; padding: 14px; border: 1px solid #BFDBFE; margin-bottom: 14px;">
-            <p style="margin: 0; font-size: 13px; color: #1E3A8A; font-weight: 800;">
-              Sakhi Member: <strong>${victimName}</strong> (${victimPhone})
-            </p>
-            <p style="margin: 3px 0 0 0; font-size: 11px; color: #3B82F6;">
-              Emergency Triggered: <strong>${new Date(startedAt || Date.now()).toLocaleString('en-IN')}</strong>
-            </p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                ${avatarHtml}
+                <td style="vertical-align: middle;">
+                  <p style="margin: 0; font-size: 14px; color: #1E3A8A; font-weight: 800;">
+                    Sakhi Member: <strong>${victimName}</strong> (${victimPhone})
+                  </p>
+                  <p style="margin: 3px 0 0 0; font-size: 11px; color: #3B82F6;">
+                    Emergency Triggered: <strong>${new Date(startedAt || Date.now()).toLocaleString('en-IN')}</strong>
+                  </p>
+                </td>
+              </tr>
+            </table>
           </div>
 
           <div style="background: linear-gradient(135deg, #2563EB, #1D4ED8); border-radius: 14px; padding: 18px; text-align: center; color: #ffffff; margin-bottom: 14px;">
