@@ -23,6 +23,7 @@ model User {
   pincode               String?
   emergencyContactName  String?
   emergencyContactPhone String?
+  parentEmail           String?
   medicalNotes          String?
   isEmailVerified       Boolean           @default(false)
   emailOtp              String?

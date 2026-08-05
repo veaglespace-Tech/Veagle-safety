@@ -19,6 +19,7 @@ export const startSos = async (req, res) => {
         profilePhoto: true,
         emergencyContactName: true,
         emergencyContactPhone: true,
+        parentEmail: true,
       },
     });
 
@@ -66,6 +67,7 @@ export const startSos = async (req, res) => {
     // 1. Collect Recipient Emails (Admin + Parent Emergency Email + Guardian Contacts)
     const recipientEmails = new Set();
     if (adminEmail) recipientEmails.add(adminEmail);
+    if (currentUser?.parentEmail) recipientEmails.add(currentUser.parentEmail);
 
     contacts.forEach((c) => {
       if (c.email) recipientEmails.add(c.email);
@@ -98,10 +100,12 @@ export const startSos = async (req, res) => {
     }
 
     // 3. Format Direct WhatsApp Emergency Alert Links for Guardians
+    const baseMessageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${currentUser?.fullName || 'Sakhi Member'}\nPhone: ${currentUser?.phone || ''}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Map:\n${trackingUrl}\n\n🌐 Google Maps:\n${googleMapsUrl}`;
+    const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(baseMessageText)}`;
+
     const whatsappAlerts = contacts.map((contact) => {
       const cleanPhone = (contact.phone || '').replace(/\D/g, '');
-      const messageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${currentUser?.fullName || 'Sakhi Member'}\nPhone: ${currentUser?.phone || ''}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Map:\n${trackingUrl}\n\n🌐 Google Maps:\n${googleMapsUrl}`;
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(messageText)}`;
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(baseMessageText)}`;
 
       return {
         contactName: contact.name,
@@ -126,6 +130,7 @@ export const startSos = async (req, res) => {
         isSilent: session.isSilent,
         contacts: contacts.map((c) => ({ name: c.name, phone: c.phone, email: c.email })),
         whatsappAlerts,
+        whatsappShareUrl,
         timestamp: new Date().toISOString(),
       });
     }
@@ -150,6 +155,7 @@ export const startSos = async (req, res) => {
         trackingUrl,
         googleMapsUrl,
         whatsappAlerts,
+        whatsappShareUrl,
       },
     });
   } catch (error) {
@@ -209,6 +215,7 @@ export const resolveSos = async (req, res) => {
             phone: true,
             emergencyContactName: true,
             emergencyContactPhone: true,
+            parentEmail: true,
             trustedContacts: true,
           },
         },
@@ -236,6 +243,7 @@ export const resolveSos = async (req, res) => {
     // 1. Collect Recipient Emails for Safe Confirmation
     const recipientEmails = new Set();
     if (adminEmail) recipientEmails.add(adminEmail);
+    if (session.user?.parentEmail) recipientEmails.add(session.user.parentEmail);
 
     if (session.user?.trustedContacts && Array.isArray(session.user.trustedContacts)) {
       session.user.trustedContacts.forEach((c) => {

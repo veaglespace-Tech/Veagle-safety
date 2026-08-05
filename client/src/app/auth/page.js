@@ -69,6 +69,7 @@ function UserAuthForm() {
   const [emergencyContactName, setEmergencyContactName] = useState('');
   const [emergencyContactRelation, setEmergencyContactRelation] = useState('Parent');
   const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
+  const [parentEmail, setParentEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
 
@@ -164,6 +165,11 @@ function UserAuthForm() {
       return false;
     }
 
+    if (parentEmail.trim() && !emailRegex.test(parentEmail.trim())) {
+      setValidationError('Please enter a valid Parent Email address.');
+      return false;
+    }
+
     const phoneRegex = /^[6-9]\d{9}$/;
     const cleanPhone = phone.replace(/\D/g, '');
     if (!phoneRegex.test(cleanPhone)) {
@@ -214,6 +220,7 @@ function UserAuthForm() {
           emergencyContactName: emergencyContactName.trim(),
           emergencyContactRelation,
           emergencyContactPhone: emergencyContactPhone.replace(/\D/g, ''),
+          parentEmail: parentEmail.trim(),
           password,
         })
       );
@@ -589,6 +596,24 @@ function UserAuthForm() {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  {/* PARENT EMAIL ALERT FIELD */}
+                  <div>
+                    <label className="block text-[#684E67] font-extrabold mb-1">Parent Email Address (For Emergency SOS Mail Alerts)</label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-[#684E67] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="email"
+                        placeholder="parent.email@example.com"
+                        value={parentEmail}
+                        onChange={(e) => setParentEmail(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none text-xs"
+                      />
+                    </div>
+                    <p className="text-[10px] text-[#684E67] font-semibold mt-1">
+                      💡 Emergency SOS emails will automatically be dispatched to this Parent email along with admin alerts.
+                    </p>
                   </div>
 
                 </div>

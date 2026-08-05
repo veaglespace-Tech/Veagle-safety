@@ -26,6 +26,7 @@ export const register = asyncHandler(async (req, res) => {
     emergencyContactName,
     emergencyContactRelation,
     emergencyContactPhone,
+    parentEmail,
     medicalNotes,
   } = req.body;
 
@@ -60,6 +61,12 @@ export const register = asyncHandler(async (req, res) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+
+    if (parentEmail && typeof parentEmail === 'string' && parentEmail.trim()) {
+      if (!emailRegex.test(parentEmail.trim())) {
+        return res.status(400).json({ error: 'Please enter a valid Parent Email address.' });
+      }
     }
 
     // Mobile number validation (10 digits Indian format)
@@ -129,6 +136,7 @@ export const register = asyncHandler(async (req, res) => {
       pincode: pincode || '411001',
       emergencyContactName: emergencyContactName || null,
       emergencyContactPhone: emergencyContactPhone || null,
+      parentEmail: parentEmail ? parentEmail.trim().toLowerCase() : null,
       medicalNotes: medicalNotes || null,
       isEmailVerified: assignedRole === 'SUPER_ADMIN',
       emailOtp: assignedRole === 'USER' ? otp : null,
@@ -162,6 +170,7 @@ export const register = asyncHandler(async (req, res) => {
         fullName: user.fullName,
         email: user.email,
         phone: user.phone,
+        parentEmail: user.parentEmail,
         role: 'USER',
         otp,
         otpExpiresAt: otpExpires.getTime(),
@@ -486,6 +495,7 @@ export const getProfile = asyncHandler(async (req, res) => {
       pincode: true,
       emergencyContactName: true,
       emergencyContactPhone: true,
+      parentEmail: true,
       medicalNotes: true,
       createdAt: true,
       updatedAt: true,
@@ -564,6 +574,7 @@ export const updateSettings = asyncHandler(async (req, res) => {
       pincode,
       emergencyContactName,
       emergencyContactPhone,
+      parentEmail,
       medicalNotes,
       newPassword,
     } = req.body;
@@ -634,6 +645,9 @@ export const updateSettings = asyncHandler(async (req, res) => {
     if (emergencyContactPhone !== undefined) {
       updateData.emergencyContactPhone = typeof emergencyContactPhone === 'string' ? emergencyContactPhone.trim() : emergencyContactPhone;
     }
+    if (parentEmail !== undefined) {
+      updateData.parentEmail = typeof parentEmail === 'string' && parentEmail.trim() ? parentEmail.trim().toLowerCase() : null;
+    }
     if (medicalNotes !== undefined) {
       updateData.medicalNotes = typeof medicalNotes === 'string' ? medicalNotes.trim() : medicalNotes;
     }
@@ -657,6 +671,7 @@ export const updateSettings = asyncHandler(async (req, res) => {
         pincode: true,
         emergencyContactName: true,
         emergencyContactPhone: true,
+        parentEmail: true,
         medicalNotes: true,
       },
     });

@@ -17,6 +17,8 @@ import {
   Clock,
   MapPin,
   X,
+  MessageSquare,
+  Share2,
 } from 'lucide-react';
 
 export default function ActiveSOSLivePage() {
@@ -132,7 +134,7 @@ export default function ActiveSOSLivePage() {
 
         <div className="bg-white border border-blush-border rounded-card p-4 shadow-card">
           <p className="text-xs font-bold text-tichi-text mb-1.5">Live Tracking Link</p>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 mb-3">
             <div className="flex-1 bg-blush-subtle border border-blush-border rounded-xl px-3 py-2 min-w-0">
               <p className="text-[11px] text-tichi-muted font-mono truncate">{activeSession.trackingUrl}</p>
             </div>
@@ -146,6 +148,52 @@ export default function ActiveSOSLivePage() {
               <span>{copied ? 'Copied!' : 'Copy'}</span>
             </button>
           </div>
+
+          {/* MAIN WHATSAPP SOS SHARE BUTTON */}
+          {(() => {
+            const victimName = user?.fullName || 'Sakhi Member';
+            const victimPhone = user?.phone || '';
+            const gmapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+            const messageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${victimName}\nPhone: ${victimPhone}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Tracking:\n${activeSession?.trackingUrl || ''}\n\n🌐 Google Maps:\n${gmapUrl}`;
+            const generalWhatsappUrl = activeSession?.whatsappShareUrl || `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`;
+
+            return (
+              <div className="space-y-3">
+                <a
+                  href={generalWhatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-[#25D366] hover:bg-[#1EBE57] text-white font-extrabold py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center space-x-2.5 text-xs sm:text-sm active:scale-[0.98] cursor-pointer"
+                >
+                  <MessageSquare className="w-4 h-4 fill-white text-[#25D366]" />
+                  <span>SHARE SOS DETAILS ON WHATSAPP</span>
+                  <Share2 className="w-4 h-4 ml-auto" />
+                </a>
+
+                {activeSession?.whatsappAlerts && activeSession.whatsappAlerts.length > 0 && (
+                  <div className="pt-1">
+                    <p className="text-[10px] font-black text-tichi-muted uppercase tracking-wider mb-1.5">
+                      Direct WhatsApp to Guardians:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {activeSession.whatsappAlerts.map((wa, idx) => (
+                        <a
+                          key={idx}
+                          href={wa.whatsappUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/40 text-[#128C7E] px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold flex items-center space-x-1 transition-all"
+                        >
+                          <MessageSquare className="w-3 h-3 text-[#25D366]" />
+                          <span>Send to {wa.contactName}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
