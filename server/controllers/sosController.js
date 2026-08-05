@@ -318,6 +318,7 @@ export const resolveSos = async (req, res) => {
           recipientEmail: email,
           userName: session.user?.fullName || 'Sakhi Member',
           userPhone: session.user?.phone || 'N/A',
+          userEmail: session.user?.email || null,
           userPhoto: session.user?.profilePhoto || null,
           googleMapsUrl,
           latitude,
