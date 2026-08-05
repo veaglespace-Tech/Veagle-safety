@@ -29,8 +29,8 @@ export const Feature3DCard = ({
         {/* FRONT FACE OF 3D CARD (CLEAN & SLEEK) */}
         <div className="absolute inset-0 w-full h-full backface-hidden bg-white/95 backdrop-blur-2xl p-8 rounded-3xl border-1.5 border-[#FFCCE1] hover:border-[#FF5C8A] shadow-[0_10px_30px_rgba(255,92,138,0.10)] hover:shadow-[0_20px_50px_rgba(255,92,138,0.25)] flex flex-col justify-between transition-all duration-300">
           <div>
-            <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] border-1.5 border-[#FF5C8A] flex items-center justify-center mb-5 shadow-xs group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-              <Icon className="w-6.5 h-6.5 stroke-[2.5]" />
+            <div className="w-11 h-11 rounded-full bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center mb-5 shrink-0 group-hover:scale-110 group-hover:bg-[#FFCCE1]/60 transition-all duration-300">
+              <Icon className="w-5 h-5 stroke-[2.2]" />
             </div>
 
             <h3 className="text-xl font-black mb-2 text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors duration-300">
