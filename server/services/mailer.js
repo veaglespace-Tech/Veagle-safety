@@ -72,6 +72,23 @@ export const sendEmailVerificationOtp = async (arg1, arg2, arg3) => {
 
 /**
  * 🚨 Send High-Priority Emergency SOS Broadcast Email
+
+/**
+ * Helper to ensure a valid, publicly accessible profile photo image URL for email clients (Gmail, Outlook, etc.)
+ */
+const getPublicAvatarUrl = (userPhoto, userName) => {
+  if (userPhoto && typeof userPhoto === 'string') {
+    const trimmed = userPhoto.trim();
+    if ((trimmed.startsWith('https://') || trimmed.startsWith('http://')) && !trimmed.includes('localhost') && !trimmed.includes('127.0.0.1')) {
+      return trimmed;
+    }
+  }
+  const cleanName = encodeURIComponent(userName || 'Sakhi Member');
+  return `https://ui-avatars.com/api/?name=${cleanName}&background=FF2A6D&color=ffffff&size=128&bold=true`;
+};
+
+/**
+ * 🚨 Send High-Priority Emergency SOS Broadcast Email
  */
 export const sendSosEmergencyAlert = async ({
   recipientEmail,
@@ -88,20 +105,7 @@ export const sendSosEmergencyAlert = async ({
 }) => {
   try {
     const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
-    const isHttpUrl = userPhoto && typeof userPhoto === 'string' && (userPhoto.startsWith('http://') || userPhoto.startsWith('https://'));
-    const initials = (userName || 'Sakhi').split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase();
-
-    const avatarHtml = isHttpUrl ? `
-      <td style="width: 60px; vertical-align: middle; padding-right: 14px;">
-        <img src="${userPhoto}" alt="${userName}" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 3px solid #FF2A6D;" />
-      </td>
-    ` : `
-      <td style="width: 60px; vertical-align: middle; padding-right: 14px;">
-        <div style="width: 50px; height: 50px; border-radius: 50%; background: #FF2A6D; color: #ffffff; font-size: 20px; font-weight: 900; line-height: 50px; text-align: center; border: 2px solid #FFCCE1;">
-          ${initials}
-        </div>
-      </td>
-    `;
+    const avatarUrl = getPublicAvatarUrl(userPhoto, userName);
 
     const info = await transporter.sendMail({
       from: `"🚨 Sakhi Suraksha Emergency Command" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
@@ -121,7 +125,9 @@ export const sendSosEmergencyAlert = async ({
           <div style="background-color: #ffffff; border-radius: 14px; padding: 18px; border: 1.5px solid #FFCCE1; margin-bottom: 18px;">
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
-                ${avatarHtml}
+                <td style="width: 66px; vertical-align: middle; padding-right: 14px;">
+                  <img src="${avatarUrl}" alt="${userName}" width="56" height="56" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 3px solid #FF2A6D; display: block;" />
+                </td>
                 <td style="vertical-align: middle;">
                   <h3 style="margin: 0 0 3px 0; color: #2A0826; font-size: 17px; font-weight: 900;">${userName}</h3>
                   <p style="margin: 0; color: #FF2A6D; font-weight: 800; font-size: 13px;">📞 Phone: ${userPhone || 'N/A'}</p>
@@ -172,6 +178,7 @@ export const sendSosSafeAlert = async ({
   recipientEmail,
   userName,
   userPhone,
+  userPhoto,
   googleMapsUrl,
   latitude,
   longitude,
@@ -179,6 +186,7 @@ export const sendSosSafeAlert = async ({
 }) => {
   try {
     const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
+    const avatarUrl = getPublicAvatarUrl(userPhoto, userName);
 
     const info = await transporter.sendMail({
       from: `"✅ Sakhi Suraksha Safety Status" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
@@ -196,12 +204,21 @@ export const sendSosSafeAlert = async ({
           </div>
 
           <div style="background-color: #ffffff; border-radius: 14px; padding: 18px; border: 1.5px solid #A7F3D0; margin-bottom: 18px;">
-            <p style="font-size: 14px; color: #065F46; margin: 0 0 10px 0; font-weight: 700;">
-              Great news! <strong>${userName}</strong> (${userPhone || ''}) has safely resolved their emergency SOS session.
-            </p>
-            <p style="font-size: 12px; color: #047857; margin: 0;">
-              🕒 Time of Safety Resolution: <strong>${new Date(resolvedAt || Date.now()).toLocaleString('en-IN')}</strong>
-            </p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="width: 60px; vertical-align: middle; padding-right: 14px;">
+                  <img src="${avatarUrl}" alt="${userName}" width="50" height="50" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2.5px solid #10B981; display: block;" />
+                </td>
+                <td style="vertical-align: middle;">
+                  <p style="font-size: 14px; color: #065F46; margin: 0 0 4px 0; font-weight: 700;">
+                    Great news! <strong>${userName}</strong> (${userPhone || ''}) has safely resolved their emergency SOS session.
+                  </p>
+                  <p style="font-size: 12px; color: #047857; margin: 0;">
+                    🕒 Time of Resolution: <strong>${new Date(resolvedAt || Date.now()).toLocaleString('en-IN')}</strong>
+                  </p>
+                </td>
+              </tr>
+            </table>
           </div>
 
           <div style="background-color: #ffffff; border-radius: 12px; padding: 14px; border: 1px solid #A7F3D0; text-align: center;">
@@ -235,6 +252,7 @@ export const sendSos5MinLocationUpdate = async ({
   recipientEmail,
   victimName,
   victimPhone,
+  victimPhoto,
   trackingUrl,
   googleMapsUrl,
   latitude,
@@ -244,6 +262,7 @@ export const sendSos5MinLocationUpdate = async ({
 }) => {
   try {
     const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
+    const avatarUrl = getPublicAvatarUrl(victimPhoto, victimName);
 
     const info = await transporter.sendMail({
       from: `"📍 Sakhi Suraksha Live GPS Update" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
@@ -261,12 +280,21 @@ export const sendSos5MinLocationUpdate = async ({
           </div>
 
           <div style="background-color: #ffffff; border-radius: 12px; padding: 14px; border: 1px solid #BFDBFE; margin-bottom: 14px;">
-            <p style="margin: 0; font-size: 13px; color: #1E3A8A; font-weight: 800;">
-              Sakhi Member: <strong>${victimName}</strong> (${victimPhone})
-            </p>
-            <p style="margin: 3px 0 0 0; font-size: 11px; color: #3B82F6;">
-              Emergency Triggered: <strong>${new Date(startedAt || Date.now()).toLocaleString('en-IN')}</strong>
-            </p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="width: 56px; vertical-align: middle; padding-right: 12px;">
+                  <img src="${avatarUrl}" alt="${victimName}" width="48" height="48" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #2563EB; display: block;" />
+                </td>
+                <td style="vertical-align: middle;">
+                  <p style="margin: 0; font-size: 13px; color: #1E3A8A; font-weight: 800;">
+                    Sakhi Member: <strong>${victimName}</strong> (${victimPhone || 'N/A'})
+                  </p>
+                  <p style="margin: 3px 0 0 0; font-size: 11px; color: #3B82F6;">
+                    Emergency Triggered: <strong>${new Date(startedAt || Date.now()).toLocaleString('en-IN')}</strong>
+                  </p>
+                </td>
+              </tr>
+            </table>
           </div>
 
           <div style="background: linear-gradient(135deg, #2563EB, #1D4ED8); border-radius: 14px; padding: 18px; text-align: center; color: #ffffff; margin-bottom: 14px;">
@@ -305,8 +333,10 @@ export const sendSos5MinLocationUpdate = async ({
 /**
  * Send Welcome Email on User Registration
  */
-export const sendWelcomeEmail = async ({ recipientEmail, userName }) => {
+export const sendWelcomeEmail = async ({ recipientEmail, userName, userPhoto }) => {
   try {
+    const avatarUrl = getPublicAvatarUrl(userPhoto, userName);
+
     const info = await transporter.sendMail({
       from: `"Sakhi Suraksha SOS" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
       to: recipientEmail,
@@ -319,8 +349,17 @@ export const sendWelcomeEmail = async ({ recipientEmail, userName }) => {
           </div>
           
           <div style="background-color: #ffffff; border-radius: 12px; padding: 20px; border: 1px solid #FFCCE1;">
-            <p style="font-size: 15px; color: #2A0826; margin-top: 0;">Dear <strong>${userName || 'Sakhi Member'}</strong>,</p>
-            <p style="font-size: 13px; color: #555555; line-height: 1.6;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+              <tr>
+                <td style="width: 56px; vertical-align: middle; padding-right: 12px;">
+                  <img src="${avatarUrl}" alt="${userName}" width="48" height="48" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #FF2A6D; display: block;" />
+                </td>
+                <td style="vertical-align: middle;">
+                  <p style="font-size: 16px; color: #2A0826; margin: 0; font-weight: 800;">Dear ${userName || 'Sakhi Member'},</p>
+                </td>
+              </tr>
+            </table>
+            <p style="font-size: 13px; color: #555555; line-height: 1.6; margin: 0;">
               Welcome to <strong>Sakhi Suraksha SOS</strong>! Your account has been registered successfully. You now have access to 24/7 encrypted GPS emergency broadcasts, instant siren alerts, and your trusted guardian network.
             </p>
           </div>
@@ -362,3 +401,4 @@ export const sendPasswordResetEmail = async ({ recipientEmail, userName, resetLi
     return false;
   }
 };
+

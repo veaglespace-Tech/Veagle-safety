@@ -381,6 +381,7 @@ export const adminResolveSos = asyncHandler(async (req, res) => {
           fullName: true,
           email: true,
           phone: true,
+          profilePhoto: true,
           emergencyContactName: true,
           emergencyContactPhone: true,
           trustedContacts: true,
@@ -406,8 +407,9 @@ export const adminResolveSos = asyncHandler(async (req, res) => {
   const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
   const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
 
-  // Dispatch Safe Confirmation Emails to Admin & Guardians
+  // Dispatch Safe Confirmation Emails to User, Admin & Guardians
   const recipientEmails = new Set();
+  if (session.user?.email) recipientEmails.add(session.user.email);
   if (adminEmail) recipientEmails.add(adminEmail);
   if (session.user?.trustedContacts && Array.isArray(session.user.trustedContacts)) {
     session.user.trustedContacts.forEach((c) => {
@@ -420,6 +422,7 @@ export const adminResolveSos = asyncHandler(async (req, res) => {
       recipientEmail: email,
       userName: session.user?.fullName || 'Sakhi Member',
       userPhone: session.user?.phone || 'N/A',
+      userPhoto: session.user?.profilePhoto || null,
       googleMapsUrl,
       latitude,
       longitude,
