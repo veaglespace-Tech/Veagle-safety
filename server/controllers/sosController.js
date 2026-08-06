@@ -3,6 +3,7 @@ import { config } from '../config/index.js';
 import { sendSosEmergencyAlert, sendSosSafeAlert } from '../services/mailer.js';
 import { getIO } from '../socket.js';
 import { sendEmergencyPushToEmails } from './pushController.js';
+import { collectEmergencyRecipients } from '../utils/recipientHelper.js';
 
 export const startSos = async (req, res) => {
   try {
@@ -62,43 +63,41 @@ export const startSos = async (req, res) => {
     const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
     const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
-    const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
 
     // 1. Collect Recipient Emails (User + Admin + Parent Emergency Email + Guardian Contacts)
-    const recipientEmails = new Set();
-    if (currentUser?.email) recipientEmails.add(currentUser.email);
-    if (adminEmail) recipientEmails.add(adminEmail);
-    if (currentUser?.parentEmail) recipientEmails.add(currentUser.parentEmail);
+    const recipientEmails = collectEmergencyRecipients(currentUser, contacts);
 
-    contacts.forEach((c) => {
-      if (c.email) recipientEmails.add(c.email);
-    });
+    // 2. Dispatch High-Priority Emergency Emails concurrently
+    await Promise.all(
+      recipientEmails.map(async (email) => {
+        try {
+          await sendSosEmergencyAlert({
+            recipientEmail: email,
+            recipientName: 'Safety Guardian',
+            userName: currentUser?.fullName || 'Sakhi User',
+            userPhone: currentUser?.phone || 'N/A',
+            userEmail: currentUser?.email || 'N/A',
+            userPhoto: currentUser?.profilePhoto || null,
+            trackingUrl,
+            googleMapsUrl,
+            latitude,
+            longitude,
+            sosId: session.id,
+          });
 
-    // 2. Dispatch High-Priority Emergency Emails
-    for (const email of recipientEmails) {
-      sendSosEmergencyAlert({
-        recipientEmail: email,
-        recipientName: 'Safety Guardian',
-        userName: currentUser?.fullName || 'Sakhi User',
-        userPhone: currentUser?.phone || 'N/A',
-        userEmail: currentUser?.email || 'N/A',
-        userPhoto: currentUser?.profilePhoto || null,
-        trackingUrl,
-        googleMapsUrl,
-        latitude,
-        longitude,
-        sosId: session.id,
-      });
-
-      await prisma.sosAlert.create({
-        data: {
-          sosSessionId: session.id,
-          channel: 'EMAIL',
-          recipient: email,
-          status: 'SENT',
-        },
-      }).catch(() => {});
-    }
+          await prisma.sosAlert.create({
+            data: {
+              sosSessionId: session.id,
+              channel: 'EMAIL',
+              recipient: email,
+              status: 'SENT',
+            },
+          }).catch(() => {});
+        } catch (emailErr) {
+          console.error(`[Emergency Email Error] Failed for ${email}:`, emailErr.message);
+        }
+      })
+    );
 
     // 3. Format Direct WhatsApp Emergency Alert Links for Guardians
     const baseMessageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${currentUser?.fullName || 'Sakhi Member'}\nPhone: ${currentUser?.phone || ''}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Map:\n${trackingUrl}\n\n🌐 Google Maps:\n${googleMapsUrl}`;
@@ -267,7 +266,13 @@ export const resolveSos = async (req, res) => {
       },
       include: {
         user: {
-          include: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            phone: true,
+            profilePhoto: true,
+            parentEmail: true,
             trustedContacts: true,
           },
         },
@@ -290,47 +295,47 @@ export const resolveSos = async (req, res) => {
     const latitude = latestLocation?.latitude || session.latitude || 18.5204;
     const longitude = latestLocation?.longitude || session.longitude || 73.8567;
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
-    const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
 
     // 1. Collect Recipient Emails for Safe Confirmation (User + Admin + Parent + Guardians)
-    const recipientEmails = new Set();
-    if (session.user?.email) recipientEmails.add(session.user.email);
-    if (adminEmail) recipientEmails.add(adminEmail);
-    if (session.user?.parentEmail) recipientEmails.add(session.user.parentEmail);
+    const recipientEmails = collectEmergencyRecipients(session.user);
 
-    if (session.user?.trustedContacts && Array.isArray(session.user.trustedContacts)) {
-      session.user.trustedContacts.forEach((c) => {
-        if (c.email) recipientEmails.add(c.email);
-      });
-    }
+    console.log('[resolveSos] ===== SAFE EMAIL DEBUG =====');
+    console.log('[resolveSos] User:', session.user?.fullName, '| email:', session.user?.email);
+    console.log('[resolveSos] Parent email:', session.user?.parentEmail);
+    console.log('[resolveSos] Sending safe emails to:', recipientEmails);
 
-    // 2. Dispatch "I AM SAFE NOW" Confirmation Emails
-    for (const email of recipientEmails) {
-      try {
-        await sendSosSafeAlert({
-          recipientEmail: email,
-          userName: session.user?.fullName || 'Sakhi Member',
-          userPhone: session.user?.phone || 'N/A',
-          userEmail: session.user?.email || null,
-          userPhoto: session.user?.profilePhoto || null,
-          googleMapsUrl,
-          latitude,
-          longitude,
-          resolvedAt: session.resolvedAt,
-        });
+    // 2. Dispatch "I AM SAFE NOW" Confirmation Emails concurrently
+    await Promise.all(
+      recipientEmails.map(async (email) => {
+        try {
+          console.log(`[resolveSos] Sending safe email to: ${email}`);
+          const result = await sendSosSafeAlert({
+            recipientEmail: email,
+            userName: session.user?.fullName || 'Sakhi Member',
+            userPhone: session.user?.phone || 'N/A',
+            userEmail: session.user?.email || null,
+            userPhoto: session.user?.profilePhoto || null,
+            googleMapsUrl,
+            latitude,
+            longitude,
+            resolvedAt: session.resolvedAt,
+          });
+          console.log(`[resolveSos] Safe email result for ${email}:`, result);
 
-        await prisma.sosAlert.create({
-          data: {
-            sosSessionId: session.id,
-            channel: 'EMAIL_SAFE_CONFIRMATION',
-            recipient: email,
-            status: 'SENT',
-          },
-        }).catch(() => {});
-      } catch (emailErr) {
-        console.error(`[Safe Email Error] Failed to send safe email to ${email}:`, emailErr.message);
-      }
-    }
+          await prisma.sosAlert.create({
+            data: {
+              sosSessionId: session.id,
+              channel: 'EMAIL_SAFE_CONFIRMATION',
+              recipient: email,
+              status: result ? 'SENT' : 'FAILED',
+            },
+          }).catch(() => {});
+        } catch (emailErr) {
+          console.error(`[Safe Email Error] Failed to send safe email to ${email}:`, emailErr.message);
+        }
+      })
+    );
+    console.log('[resolveSos] ===== SAFE EMAIL DONE =====');
 
     // 3. Format WhatsApp Safe Confirmation Message Links
     const whatsappSafeAlerts = (session.user?.trustedContacts || []).map((contact) => {

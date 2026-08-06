@@ -36,9 +36,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchContacts } from '../../redux/slices/contactSlice.js';
 import { checkActiveSos } from '../../redux/slices/sosSlice.js';
 import { fetchUser } from '../../redux/slices/authSlice.js';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardAppPage() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const { user } = useSelector((state) => state?.auth || {});
   const { activeSession } = useSelector((state) => state?.sos || {});
@@ -320,7 +322,12 @@ export default function DashboardAppPage() {
               {contacts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {contacts.slice(0, 2).map((contact) => (
-                    <TrustedContactCard key={contact.id} contact={contact} onEdit={() => {}} onDelete={() => {}} />
+                    <TrustedContactCard
+                      key={contact.id}
+                      contact={contact}
+                      onEdit={() => router.push('/contacts')}
+                      onDelete={() => router.push('/contacts')}
+                    />
                   ))}
                 </div>
               ) : (

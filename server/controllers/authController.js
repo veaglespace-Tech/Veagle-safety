@@ -153,7 +153,7 @@ export const register = asyncHandler(async (req, res) => {
           name: emergencyContactName,
           relationship: emergencyContactRelation || 'Guardian',
           phone: emergencyContactPhone,
-          email: user.email,
+          email: user.parentEmail || '',   // ← use parentEmail entered during registration
           isVerified: true,
           priorityOrder: 1,
         },

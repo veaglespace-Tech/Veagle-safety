@@ -29,6 +29,7 @@ export default function ActiveSOSLivePage() {
   const [showConfirmSafeModal, setShowConfirmSafeModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [isResolving, setIsResolving] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -54,13 +55,20 @@ export default function ActiveSOSLivePage() {
   };
 
   const handleMarkSafe = async () => {
+    if (isResolving) return;
+    setIsResolving(true);
     try {
+      console.log('[handleMarkSafe] Resolving SOS session:', activeSession?.id);
       await dispatch(resolveEmergencySos(activeSession?.id)).unwrap();
+      console.log('[handleMarkSafe] SOS resolved successfully');
       setShowConfirmSafeModal(false);
       router.push('/dashboard');
     } catch (e) {
+      console.error('[handleMarkSafe] Error resolving SOS:', e);
       setShowConfirmSafeModal(false);
       router.push('/dashboard');
+    } finally {
+      setIsResolving(false);
     }
   };
 
@@ -222,7 +230,7 @@ export default function ActiveSOSLivePage() {
 
         <div className="grid grid-cols-2 gap-3">
           <button
-            onClick={() => toggleAlarm()}
+            onClick={() => dispatch(toggleAlarm())}
             className={`font-bold p-4 rounded-card flex flex-col items-center justify-center space-y-1.5 border transition-all active:scale-95 ${
               isAlarmPlaying
                 ? 'bg-amber-500 text-white border-amber-600 shadow-lg animate-pulse'
@@ -268,9 +276,10 @@ export default function ActiveSOSLivePage() {
               <div className="space-y-2">
                 <button
                   onClick={handleMarkSafe}
-                  className="w-full bg-tichi-success text-white font-extrabold py-3.5 rounded-card text-sm shadow hover:brightness-105 transition-all active:scale-[0.98]"
+                  disabled={isResolving}
+                  className="w-full bg-tichi-success text-white font-extrabold py-3.5 rounded-card text-sm shadow hover:brightness-105 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  YES — I'M SAFE NOW
+                  {isResolving ? 'Processing...' : "YES — I'M SAFE NOW"}
                 </button>
                 <button
                   onClick={() => setShowConfirmSafeModal(false)}
