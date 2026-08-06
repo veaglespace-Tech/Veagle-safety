@@ -386,8 +386,9 @@ export default function UserProfileSettingsPage() {
                 <Sliders className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="font-black text-xl sm:text-2xl text-[#2A0826] tracking-tight">
-                  Account Settings & Profile Management
+                <h1 className="font-black text-xl sm:text-2xl tracking-tight">
+                  <span className="heading-gradient-hero">Account Settings & </span>
+                  <span className="heading-gradient-rose">Profile Management</span>
                 </h1>
                 <p className="text-xs text-[#684E67] font-bold leading-snug">
                   Click <span className="text-[#FF2A6D] font-black">UPDATE PROFILE</span> to unlock and edit any of your profile details.

@@ -107,7 +107,10 @@ export default function UserTrackJourneyPage() {
             <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-[#FFF0F3] via-white to-[#FFF0F3] text-[#FF2A6D] border-2 border-[#FFCCE1] flex items-center justify-center mx-auto shadow-[0_8px_25px_rgba(255,92,138,0.2)]">
               <Navigation className="w-8 h-8 text-[#FF2A6D] animate-pulse" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-[#2A0826] tracking-tight">Stay Protected</h1>
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+              <span className="heading-gradient-hero">Stay </span>
+              <span className="heading-gradient-rose">Protected</span>
+            </h1>
             <p className="text-xs sm:text-sm font-extrabold text-[#684E67] max-w-md mx-auto">
               Real-time GPS trip tracking & custom safety check-in timer alarms
             </p>

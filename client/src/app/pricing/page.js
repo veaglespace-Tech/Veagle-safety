@@ -74,8 +74,9 @@ export default function PlatformPricingPage() {
             <span>Official Protection Plans</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-black text-[#2A0826] tracking-tight">
-            Simple, Transparent Safety Pricing
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+            <span className="heading-gradient-hero">Simple, Transparent </span>
+            <span className="heading-gradient-rose">Safety Pricing</span>
           </h1>
           
           <p className="text-xs sm:text-sm text-[#684E67] font-bold">

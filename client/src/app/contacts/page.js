@@ -91,7 +91,10 @@ export default function UserTrustedContactsPage() {
       <div className="max-w-xl mx-auto px-4 pt-6 pb-4 space-y-6 lg:max-w-2xl">
         <div className="flex items-end justify-between animate-fade-up">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#2A0826] tracking-tight">Trusted Contacts</h1>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+              <span className="heading-gradient-hero">Trusted </span>
+              <span className="heading-gradient-rose">Contacts</span>
+            </h1>
             <p className="text-xs sm:text-sm font-extrabold text-[#684E67] mt-0.5">
               {contacts.length > 0
                 ? `${contacts.length} of ${MAX_CONTACTS} emergency contacts connected`

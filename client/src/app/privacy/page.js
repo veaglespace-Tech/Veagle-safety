@@ -23,7 +23,10 @@ export default function PrivacyPage() {
       <div className="max-w-4xl mx-auto px-6 py-12 space-y-8">
 
         <div className="text-center space-y-2">
-          <h1 className="text-3xl sm:text-4xl font-black text-[#2A0826]">Privacy Policy</h1>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
+            <span className="heading-gradient-hero">Privacy </span>
+            <span className="heading-gradient-rose">Policy</span>
+          </h1>
           <p className="text-xs text-[#684E67] font-bold">Last updated: July 2026</p>
         </div>
 

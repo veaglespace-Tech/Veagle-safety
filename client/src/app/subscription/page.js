@@ -57,8 +57,9 @@ export default function SubscriptionPage() {
                 <Crown className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="font-black text-xl sm:text-2xl text-[#2A0826] tracking-tight">
-                  Subscription & Plan Status
+                <h1 className="font-black text-xl sm:text-2xl tracking-tight">
+                  <span className="heading-gradient-hero">Subscription & </span>
+                  <span className="heading-gradient-rose">Plan Status</span>
                 </h1>
                 <p className="text-xs font-bold text-[#684E67] mt-0.5">
                   Manage your active 24/7 emergency protection plan & coverage validity

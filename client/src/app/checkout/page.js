@@ -147,8 +147,9 @@ function CheckoutContent() {
             <CreditCard className="w-4 h-4 text-[#FF2A6D] animate-pulse" />
             <span>Secure Checkout Portal</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#2A0826] tracking-tight">
-            Complete Your Protection
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+            <span className="heading-gradient-hero">Complete Your </span>
+            <span className="heading-gradient-rose">Protection</span>
           </h1>
           <p className="text-xs sm:text-sm font-extrabold text-[#684E67] leading-relaxed">
             Review your plan summary with itemized GST breakdown before secure PayU activation.
