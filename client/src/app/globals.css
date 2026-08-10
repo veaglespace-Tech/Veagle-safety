@@ -44,6 +44,9 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline-block;
+  padding-bottom: 0.15em;
+  padding-top: 0.05em;
 }
 
 .heading-gradient-rose {
@@ -51,6 +54,9 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline-block;
+  padding-bottom: 0.15em;
+  padding-top: 0.05em;
 }
 
 .heading-highlight-pill {
@@ -59,6 +65,8 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  padding-bottom: 0.15em;
+  padding-top: 0.05em;
 }
 
 /* ANTIQUE VIBRANT ANIMATIONS */

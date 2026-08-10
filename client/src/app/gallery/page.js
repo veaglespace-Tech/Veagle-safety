@@ -195,7 +195,7 @@ export default function PlatformGalleryPage() {
         {/* TOP HERO HEADER */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
 
-          <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
+          <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight leading-normal pb-2">
             <span className="heading-gradient-hero">Designed for </span>
             <span className="heading-highlight-pill">Simplicity, Speed & Safety</span>
           </AnimatedHeading>
