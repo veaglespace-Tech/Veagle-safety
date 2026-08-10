@@ -45,8 +45,11 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: inline-block;
-  padding-bottom: 0.15em;
-  padding-top: 0.05em;
+  padding-left: 0.1em;
+  padding-right: 0.3em;
+  padding-bottom: 0.25em;
+  padding-top: 0.1em;
+  margin-right: -0.2em;
 }
 
 .heading-gradient-rose {
@@ -55,8 +58,11 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: inline-block;
-  padding-bottom: 0.15em;
-  padding-top: 0.05em;
+  padding-left: 0.1em;
+  padding-right: 0.3em;
+  padding-bottom: 0.25em;
+  padding-top: 0.1em;
+  margin-right: -0.2em;
 }
 
 .heading-highlight-pill {
@@ -65,8 +71,11 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  padding-bottom: 0.15em;
-  padding-top: 0.05em;
+  padding-left: 0.1em;
+  padding-right: 0.3em;
+  padding-bottom: 0.25em;
+  padding-top: 0.1em;
+  margin-right: -0.2em;
 }
 
 /* ANTIQUE VIBRANT ANIMATIONS */
