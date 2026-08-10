@@ -130,19 +130,22 @@ export default function ParentDashboard() {
       <div className="max-w-5xl mx-auto px-4 py-6 sm:py-8 space-y-6">
         
         {/* PARENTAL HEADER BAR */}
-        <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] text-white flex items-center justify-center shadow-md shrink-0">
-              <Shield className="w-7 h-7 text-white" />
+        <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white p-4 sm:p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center space-x-3.5 sm:space-x-4 min-w-0 w-full sm:w-auto">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#FFD166] text-white flex items-center justify-center shadow-md shrink-0 mt-0.5 sm:mt-0">
+              <Shield className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white bg-[#FF2A6D] px-2.5 py-0.5 rounded-full shadow-sm">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-widest text-white bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] px-2.5 py-0.5 rounded-full shadow-xs">
                   PARENTAL CONTROL
                 </span>
-                <span className="text-xs font-bold text-[#684E67]">● Child Safety Guardian</span>
+                <span className="text-[11px] sm:text-xs font-bold text-[#684E67] flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#059669] inline-block shrink-0 animate-pulse" />
+                  <span>Child Safety Guardian</span>
+                </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-[#2A0826] tracking-tight mt-1">
+              <h1 className="text-xl sm:text-3xl font-black text-[#2A0826] tracking-tight mt-1 truncate">
                 {user?.fullName || 'Parent Safety Command'}
               </h1>
             </div>
@@ -152,7 +155,7 @@ export default function ParentDashboard() {
             type="button"
             onClick={fetchOverview}
             disabled={loading}
-            className="btn-3d-white-pop px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center space-x-2 cursor-pointer shrink-0"
+            className="w-full sm:w-auto btn-3d-white-pop px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer shrink-0"
           >
             <RefreshCw className={`w-4 h-4 text-[#FF2A6D] ${loading ? 'animate-spin' : ''}`} />
             <span>REFRESH GPS</span>
