@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { startEmergencySos } from '../../redux/slices/sosSlice.js';
+import { openWhatsAppSosEmergency } from '../../utils/whatsappHelper.js';
 import { Command, RefreshCw, Zap } from 'lucide-react';
 
 export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
@@ -20,12 +21,19 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
     }
     if (confirm('🚨 ACTIVATE SUPERADMIN EMERGENCY SOS BROADCAST?\nThis will alert your guardian network with real-time GPS location.')) {
       try {
-        await dispatch(startEmergencySos({
+        const res = await dispatch(startEmergencySos({
           isSilent: false,
           latitude,
           longitude,
           emergencyMessage: 'SUPERADMIN EMERGENCY SOS BROADCAST! URGENT ASSISTANCE REQUIRED!'
         })).unwrap();
+
+        openWhatsAppSosEmergency({
+          latitude,
+          longitude,
+          publicShareToken: res?.publicShareToken,
+        });
+
         router.push('/active-sos');
       } catch (err) {
         alert(err || 'Failed to dispatch SuperAdmin SOS');

@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ShieldAlert, VolumeX, Volume2, Radio, Sparkles, AlertCircle } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { startEmergencySos } from '../../redux/slices/sosSlice.js';
+import { openWhatsAppSosEmergency } from '../../utils/whatsappHelper.js';
 import { useRouter } from 'next/navigation';
 
 export const SOSHeroButton = ({ onTriggerComplete }) => {
@@ -67,7 +68,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
       navigator.vibrate([300, 100, 300, 100, 400]);
     }
     try {
-      await dispatch(
+      const res = await dispatch(
         startEmergencySos({
           isSilent,
           latitude: latitude || 18.5204,
@@ -75,6 +76,13 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
           emergencyMessage: isSilent ? 'Discreet Emergency SOS Triggered' : 'EMERGENCY SOS! I NEED HELP IMMEDIATELY!',
         })
       ).unwrap();
+
+      // Instantly open WhatsApp with live location & tracking details
+      openWhatsAppSosEmergency({
+        latitude: latitude || 18.5204,
+        longitude: longitude || 73.8567,
+        publicShareToken: res?.publicShareToken,
+      });
 
       if (onTriggerComplete) onTriggerComplete();
       router.push('/active-sos');
