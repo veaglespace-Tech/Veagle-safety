@@ -275,6 +275,28 @@ export default function UserProfileSettingsPage() {
     e.preventDefault();
     setToastMessage(null);
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
+
+    if (!email.trim() || !emailRegex.test(email.trim())) {
+      setToastMessage({ type: 'error', text: 'Please enter a valid email address (e.g. name@example.com).' });
+      return;
+    }
+
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (!cleanPhone || !phoneRegex.test(cleanPhone)) {
+      setToastMessage({ type: 'error', text: 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.' });
+      return;
+    }
+
+    if (emergencyContactPhone && emergencyContactPhone.trim()) {
+      const cleanEmergencyPhone = emergencyContactPhone.replace(/\D/g, '');
+      if (!phoneRegex.test(cleanEmergencyPhone)) {
+        setToastMessage({ type: 'error', text: 'Emergency contact mobile number must be a valid 10-digit number starting with 6, 7, 8, or 9.' });
+        return;
+      }
+    }
+
     if (isEmailChanged && !isInlineEmailVerified) {
       setToastMessage({
         type: 'error',

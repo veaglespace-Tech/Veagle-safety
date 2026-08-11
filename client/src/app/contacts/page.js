@@ -53,7 +53,26 @@ export default function UserTrustedContactsPage() {
 
   const handleSaveContact = async (e) => {
     e.preventDefault();
-    if (!name || !phone) return;
+    if (!name.trim() || !phone.trim()) {
+      alert('Contact Name and Mobile Number are required.');
+      return;
+    }
+
+    const cleanPhone = phone.replace(/\D/g, '');
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(cleanPhone)) {
+      alert('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.');
+      return;
+    }
+
+    if (email && email.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       if (editingContact) {

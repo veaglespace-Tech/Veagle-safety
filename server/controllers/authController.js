@@ -30,12 +30,41 @@ export const register = asyncHandler(async (req, res) => {
     medicalNotes,
   } = req.body;
 
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const PHONE_REGEX = /^[6-9]\d{9}$/;
+
+  const cleanEmail = email ? email.trim().toLowerCase() : '';
+  const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
+  const cleanFullName = fullName ? fullName.trim() : '';
+
+  if (!cleanEmail || !EMAIL_REGEX.test(cleanEmail)) {
+    return res.status(400).json({ error: 'Please enter a valid email address (e.g. name@example.com).' });
+  }
+
+  if (!cleanPhone || !PHONE_REGEX.test(cleanPhone)) {
+    return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.' });
+  }
+
+  if (emergencyContactPhone) {
+    const cleanEmergencyPhone = emergencyContactPhone.replace(/\D/g, '');
+    if (cleanEmergencyPhone && !PHONE_REGEX.test(cleanEmergencyPhone)) {
+      return res.status(400).json({ error: 'Emergency contact phone must be a valid 10-digit mobile number starting with 6, 7, 8, or 9.' });
+    }
+  }
+
+  if (parentEmail && parentEmail.trim()) {
+    const cleanParentEmail = parentEmail.trim().toLowerCase();
+    if (!EMAIL_REGEX.test(cleanParentEmail)) {
+      return res.status(400).json({ error: 'Please enter a valid parent email address.' });
+    }
+  }
+
   let assignedRole = 'USER';
   if (role === 'SUPER_ADMIN') assignedRole = 'SUPER_ADMIN';
   else if (role === 'ORGANIZATION') assignedRole = 'ORGANIZATION';
   else if (role === 'PARENT') assignedRole = 'PARENT';
 
-  const existingUser = await prisma.user.findUnique({ where: { email } });
+  const existingUser = await prisma.user.findUnique({ where: { email: cleanEmail } });
   if (existingUser) {
     if (assignedRole === 'PARENT' || assignedRole === 'ORGANIZATION') {
       const passwordHash = await bcrypt.hash(password, 10);
@@ -100,31 +129,39 @@ export const register = asyncHandler(async (req, res) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-  // Create User entry in Database immediately upon registration
-  const user = await prisma.user.create({
-    data: {
-      fullName,
-      email,
-      phone,
-      passwordHash,
-      role: assignedRole,
-      profilePhoto: profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
-      bloodGroup: bloodGroup || 'O+',
-      address: address || 'Not Specified',
-      city: city || 'Pune',
-      state: state || 'Maharashtra',
-      country: country || 'India',
-      pincode: pincode || '411001',
-      emergencyContactName: assignedRole === 'USER' ? (emergencyContactName || null) : null,
-      emergencyContactPhone: assignedRole === 'USER' ? (emergencyContactPhone || null) : null,
-      parentEmail: parentEmail ? parentEmail.trim().toLowerCase() : null,
-      medicalNotes: medicalNotes || null,
-      isEmailVerified: assignedRole !== 'USER',
-      emailOtp: assignedRole === 'USER' ? otp : null,
-      emailOtpExpiresAt: assignedRole === 'USER' ? otpExpires : null,
-      subscriptionStatus: assignedRole === 'SUPER_ADMIN' ? 'ACTIVE' : 'INACTIVE',
-    },
-  });
+  let user;
+  try {
+    user = await prisma.user.create({
+      data: {
+        fullName: cleanFullName,
+        email: cleanEmail,
+        phone: cleanPhone,
+        passwordHash,
+        role: assignedRole,
+        profilePhoto: profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
+        bloodGroup: bloodGroup || 'O+',
+        address: address || 'Not Specified',
+        city: city || 'Pune',
+        state: state || 'Maharashtra',
+        country: country || 'India',
+        pincode: pincode || '411001',
+        emergencyContactName: assignedRole === 'USER' ? (emergencyContactName || null) : null,
+        emergencyContactPhone: assignedRole === 'USER' ? (emergencyContactPhone || null) : null,
+        parentEmail: parentEmail ? parentEmail.trim().toLowerCase() : null,
+        medicalNotes: medicalNotes || null,
+        isEmailVerified: assignedRole !== 'USER',
+        emailOtp: assignedRole === 'USER' ? otp : null,
+        emailOtpExpiresAt: assignedRole === 'USER' ? otpExpires : null,
+        subscriptionStatus: assignedRole === 'SUPER_ADMIN' ? 'ACTIVE' : 'INACTIVE',
+      },
+    });
+  } catch (dbErr) {
+    if (dbErr.code === 'P2002') {
+      return res.status(409).json({ error: 'An account with this email or mobile number already exists. Please Sign In.' });
+    }
+    console.error('[Registration DB Error]:', dbErr);
+    return res.status(400).json({ error: dbErr.message || 'Failed to create account. Please try again.' });
+  }
 
   if (assignedRole === 'USER' && emergencyContactName && emergencyContactPhone && emergencyContactName !== 'N/A') {
     try {

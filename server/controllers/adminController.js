@@ -657,27 +657,61 @@ export const getPaymentHistory = asyncHandler(async (req, res) => {
  * Super Admin Create User Directly
  */
 export const createUserByAdmin = asyncHandler(async (req, res) => {
-  const { fullName, email, phone, password, role, bloodGroup } = req.body;
+  const {
+    fullName,
+    email,
+    phone,
+    password,
+    role,
+    bloodGroup,
+    city,
+    address,
+    emergencyContactName,
+    emergencyContactPhone,
+    childIdentifier,
+    grantFreePlan,
+    planDurationDays,
+  } = req.body;
 
   if (!fullName || !email || !password) {
     return res.status(400).json({ error: 'Full name, email, and password are required.' });
   }
 
-  const existingUser = await prisma.user.findUnique({ where: { email } });
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
+  const cleanFullName = fullName.trim();
+
+  const existingUser = await prisma.user.findUnique({ where: { email: cleanEmail } });
   if (existingUser) {
-    return res.status(400).json({ error: 'User with this email already exists.' });
+    return res.status(400).json({ error: 'An account with this email address already exists.' });
   }
 
+  let assignedRole = 'USER';
+  if (role === 'SUPER_ADMIN') assignedRole = 'SUPER_ADMIN';
+  else if (role === 'ORGANIZATION') assignedRole = 'ORGANIZATION';
+  else if (role === 'PARENT') assignedRole = 'PARENT';
+  else if (role === 'USER') assignedRole = 'USER';
+
   const passwordHash = await bcrypt.hash(password, 10);
+  const isFreePlanGranted = assignedRole === 'ORGANIZATION' || assignedRole === 'SUPER_ADMIN' || Boolean(grantFreePlan);
+  const daysToGrant = Number(planDurationDays) || 365;
+  const expiryDate = isFreePlanGranted ? new Date(Date.now() + daysToGrant * 24 * 60 * 60 * 1000) : null;
+
   const newUser = await prisma.user.create({
     data: {
-      fullName,
-      email,
-      phone: phone || '+91 90000 00000',
+      fullName: cleanFullName,
+      email: cleanEmail,
+      phone: cleanPhone,
       passwordHash,
-      role: role === 'SUPER_ADMIN' ? 'SUPER_ADMIN' : 'USER',
+      role: assignedRole,
+      city: city || 'Pune',
+      address: address || null,
       bloodGroup: bloodGroup || 'O+',
+      emergencyContactName: emergencyContactName || null,
+      emergencyContactPhone: emergencyContactPhone ? emergencyContactPhone.replace(/\D/g, '') : null,
       isEmailVerified: true,
+      subscriptionStatus: isFreePlanGranted ? 'ACTIVE' : 'INACTIVE',
+      subscriptionExpiresAt: expiryDate,
       onboardingStep: 7,
     },
     select: {
@@ -687,12 +721,58 @@ export const createUserByAdmin = asyncHandler(async (req, res) => {
       phone: true,
       role: true,
       bloodGroup: true,
+      subscriptionStatus: true,
       createdAt: true,
     },
   });
 
+  // Role-specific linking logic
+  if (assignedRole === 'PARENT' && childIdentifier && childIdentifier.trim()) {
+    const cleanChildId = childIdentifier.trim().toLowerCase();
+    const cleanChildPhone = childIdentifier.replace(/\D/g, '');
+
+    const childUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: cleanChildId },
+          cleanChildPhone ? { phone: cleanChildPhone } : undefined,
+        ].filter(Boolean),
+      },
+    });
+
+    if (childUser) {
+      try {
+        await prisma.parentChildLink.create({
+          data: {
+            parentId: newUser.id,
+            childId: childUser.id,
+            relationship: 'Parent',
+            status: 'ACTIVE',
+          },
+        });
+      } catch (e) {
+        console.log('[Admin Create Parent Link Notice]:', e.message);
+      }
+    }
+  }
+
+  if (assignedRole === 'USER' && emergencyContactName && emergencyContactPhone && emergencyContactName !== 'N/A') {
+    try {
+      await prisma.trustedContact.create({
+        data: {
+          userId: newUser.id,
+          name: emergencyContactName.trim(),
+          relationship: 'Guardian',
+          phone: emergencyContactPhone.replace(/\D/g, ''),
+          isVerified: true,
+          priorityOrder: 1,
+        },
+      });
+    } catch (e) {}
+  }
+
   return res.status(201).json({
-    message: `Account created successfully for ${newUser.fullName} (${newUser.role})`,
+    message: `${assignedRole === 'ORGANIZATION' ? 'Organization HQ' : assignedRole === 'PARENT' ? 'Parent Guardian' : assignedRole} account created successfully for ${newUser.fullName}!`,
     user: newUser,
   });
 });
