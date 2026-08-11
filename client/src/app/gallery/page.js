@@ -141,25 +141,25 @@ export default function PlatformGalleryPage() {
             {filteredItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white/95 backdrop-blur-xl p-4 rounded-3xl space-y-4 flex flex-col group border-1.5 border-[#FFCCE1] shadow-[0_10px_30px_rgba(255,92,138,0.10)] overflow-hidden"
+                className="space-y-3 flex flex-col group cursor-pointer"
               >
                 {/* CARD MEDIA PREVIEW WITH LIGHTBOX HOVER ICON */}
-                <div className="relative w-full h-56 rounded-2xl overflow-hidden bg-[#FFF0F3]">
+                <div className="relative w-full h-64 sm:h-72 rounded-[2rem] overflow-hidden bg-white/40 backdrop-blur-sm border-2 border-white shadow-sm transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
                   {renderMedia(item, false)}
                   {item.badge && (
-                    <span className="absolute top-3 left-3 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider bg-white/90 backdrop-blur-md text-[#FF2A6D] shadow-sm">
+                    <span className="absolute top-4 left-4 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest bg-white text-[#FF2A6D] shadow-sm">
                       {item.badge}
                     </span>
                   )}
                 </div>
 
                 {/* TITLE & DETAILS */}
-                <div className="px-2 pb-2 space-y-1">
-                  <h3 className="text-lg font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors line-clamp-1">
+                <div className="px-2 space-y-0.5">
+                  <h3 className="text-xl font-black text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors line-clamp-1">
                     {item.title}
                   </h3>
                   {item.subtitle && (
-                    <p className="text-xs font-extrabold text-[#684E67] line-clamp-1">
+                    <p className="text-sm font-bold text-[#684E67] line-clamp-1">
                       {item.subtitle}
                     </p>
                   )}
