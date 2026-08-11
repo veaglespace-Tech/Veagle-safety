@@ -83,9 +83,26 @@ export default function ParentDashboard() {
     e.preventDefault();
     setModalError('');
     setModalSuccess('');
-    if (!childIdentifier.trim()) {
+    const inputVal = childIdentifier.trim();
+    if (!inputVal) {
       setModalError('Please enter child mobile number or email address.');
       return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
+    const cleanDigits = inputVal.replace(/\D/g, '');
+
+    if (inputVal.includes('@')) {
+      if (!emailRegex.test(inputVal)) {
+        setModalError('Please enter a valid email address (e.g. child@example.com).');
+        return;
+      }
+    } else {
+      if (!phoneRegex.test(cleanDigits)) {
+        setModalError('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.');
+        return;
+      }
     }
 
     try {
