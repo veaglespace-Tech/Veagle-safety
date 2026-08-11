@@ -50,9 +50,11 @@ export default function AdminUsersPage() {
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState('USER');
   const [newCity, setNewCity] = useState('Pune');
+  const [newAddress, setNewAddress] = useState('');
   const [newBloodGroup, setNewBloodGroup] = useState('O+');
   const [newEmergencyName, setNewEmergencyName] = useState('');
   const [newEmergencyPhone, setNewEmergencyPhone] = useState('');
+  const [newChildIdentifier, setNewChildIdentifier] = useState('');
   const [grantFreePlanOnCreate, setGrantFreePlanOnCreate] = useState(true);
   const [isSubmittingCreateUser, setIsSubmittingCreateUser] = useState(false);
 
@@ -68,7 +70,7 @@ export default function AdminUsersPage() {
   const handleCreateUserSubmit = async (e) => {
     e.preventDefault();
     if (!newFullName || !newEmail || !newPassword) {
-      showToast('error', 'Please fill in full name, email, and password');
+      showToast('error', 'Please fill in name, email, and password');
       return;
     }
     try {
@@ -80,14 +82,16 @@ export default function AdminUsersPage() {
         password: newPassword,
         role: newRole,
         city: newCity,
+        address: newAddress,
         bloodGroup: newBloodGroup,
         emergencyContactName: newEmergencyName,
         emergencyContactPhone: newEmergencyPhone,
+        childIdentifier: newChildIdentifier,
         grantFreePlan: grantFreePlanOnCreate,
         planDurationDays: 365,
       });
 
-      showToast('success', res.data.message || 'User created successfully');
+      showToast('success', res.data.message || 'Account created successfully');
       setIsCreateModalOpen(false);
       setNewFullName('');
       setNewEmail('');
@@ -95,13 +99,15 @@ export default function AdminUsersPage() {
       setNewPassword('');
       setNewRole('USER');
       setNewCity('Pune');
+      setNewAddress('');
       setNewBloodGroup('O+');
       setNewEmergencyName('');
       setNewEmergencyPhone('');
+      setNewChildIdentifier('');
       setGrantFreePlanOnCreate(true);
       fetchUsersData();
     } catch (err) {
-      showToast('error', err.response?.data?.error || 'Failed to create user');
+      showToast('error', err.response?.data?.error || 'Failed to create account');
     } finally {
       setIsSubmittingCreateUser(false);
     }
@@ -283,8 +289,10 @@ export default function AdminUsersPage() {
               <CustomSelect
                 options={[
                   { value: 'ALL', label: 'All Roles' },
-                  { value: 'USER', label: 'Standard Sakhi Member' },
-                  { value: 'SUPER_ADMIN', label: 'SuperAdmin' },
+                  { value: 'USER', label: 'Standard Sakhi Member (USER)' },
+                  { value: 'ORGANIZATION', label: 'Organization HQ (ORGANIZATION)' },
+                  { value: 'PARENT', label: 'Parent Guardian (PARENT)' },
+                  { value: 'SUPER_ADMIN', label: 'SuperAdmin (SUPER_ADMIN)' },
                 ]}
                 value={userRoleFilter}
                 onChange={(e) => { setUserRoleFilter(e.target.value); setUserPage(1); }}
@@ -359,6 +367,14 @@ export default function AdminUsersPage() {
                                 <span className="inline-flex items-center space-x-1 text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-full uppercase shrink-0 whitespace-nowrap shadow-xs">
                                   <Command className="w-3 h-3 text-amber-600 shrink-0" />
                                   <span>SUPERADMIN</span>
+                                </span>
+                              ) : u.role === 'ORGANIZATION' ? (
+                                <span className="inline-flex items-center space-x-1 text-[10px] font-black bg-purple-100 text-purple-900 border border-purple-300 px-2.5 py-1 rounded-full uppercase shrink-0 whitespace-nowrap shadow-xs">
+                                  <span>ORGANIZATION</span>
+                                </span>
+                              ) : u.role === 'PARENT' ? (
+                                <span className="inline-flex items-center space-x-1 text-[10px] font-black bg-teal-100 text-teal-900 border border-teal-300 px-2.5 py-1 rounded-full uppercase shrink-0 whitespace-nowrap shadow-xs">
+                                  <span>PARENT</span>
                                 </span>
                               ) : (
                                 <span className="text-[10px] font-black bg-gray-100 text-gray-700 border border-gray-300 px-2.5 py-1 rounded-full uppercase shrink-0 whitespace-nowrap shadow-xs">
@@ -449,7 +465,7 @@ export default function AdminUsersPage() {
         {/* MODAL 0: CREATE NEW USER MODAL */}
         {isCreateModalOpen && (
           <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white rounded-[36px] max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl border-2 border-[#FFCCE1] relative my-8 animate-scale-up">
+            <div className="bg-white rounded-[36px] max-w-lg w-full p-6 sm:p-8 pb-36 space-y-5 shadow-2xl border-2 border-[#FFCCE1] relative my-8 animate-scale-up">
               <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 rounded-2xl bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] flex items-center justify-center font-black">
@@ -472,11 +488,13 @@ export default function AdminUsersPage() {
 
               <form onSubmit={handleCreateUserSubmit} className="space-y-4 text-left">
                 <div>
-                  <label className="block text-xs font-black text-[#2A0826] mb-1">Full Legal Name *</label>
+                  <label className="block text-xs font-black text-[#2A0826] mb-1">
+                    {newRole === 'ORGANIZATION' ? 'Organization / Institution Name *' : newRole === 'PARENT' ? 'Parent / Guardian Name *' : 'Full Legal Name *'}
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Kaveri Sharma"
+                    placeholder={newRole === 'ORGANIZATION' ? 'e.g. Pune Women College' : newRole === 'PARENT' ? 'e.g. Rajesh Sharma (Parent)' : 'e.g. Kaveri Sharma'}
                     value={newFullName}
                     onChange={(e) => setNewFullName(e.target.value)}
                     className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none focus:border-[#FF2A6D]"
@@ -485,11 +503,13 @@ export default function AdminUsersPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-black text-[#2A0826] mb-1">Email Address *</label>
+                    <label className="block text-xs font-black text-[#2A0826] mb-1">
+                      {newRole === 'ORGANIZATION' ? 'Official Org Email *' : 'Email Address *'}
+                    </label>
                     <input
                       type="email"
                       required
-                      placeholder="kaveri@example.com"
+                      placeholder="email@example.com"
                       value={newEmail}
                       onChange={(e) => setNewEmail(e.target.value)}
                       className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none focus:border-[#FF2A6D]"
@@ -497,7 +517,9 @@ export default function AdminUsersPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-black text-[#2A0826] mb-1">Phone Number</label>
+                    <label className="block text-xs font-black text-[#2A0826] mb-1">
+                      {newRole === 'ORGANIZATION' ? 'HQ Mobile Number' : 'Mobile Number'}
+                    </label>
                     <input
                       type="tel"
                       placeholder="10-digit mobile"
@@ -538,12 +560,14 @@ export default function AdminUsersPage() {
                       className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-black text-[#2A0826] outline-none cursor-pointer"
                     >
                       <option value="USER">Standard Sakhi Member</option>
-                      <option value="SUPER_ADMIN">SuperAdmin</option>
+                      <option value="ORGANIZATION">Organization HQ</option>
+                      <option value="PARENT">Parent Guardian</option>
+                      <option value="SUPER_ADMIN">SuperAdmin Dispatcher</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-black text-[#2A0826] mb-1">City</label>
+                    <label className="block text-xs font-black text-[#2A0826] mb-1">City / Location</label>
                     <input
                       type="text"
                       placeholder="e.g. Pune"
@@ -554,29 +578,58 @@ export default function AdminUsersPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* ROLE SPECIFIC EXTRA FIELDS */}
+                {newRole === 'ORGANIZATION' && (
                   <div>
-                    <label className="block text-xs font-black text-[#2A0826] mb-1">Emergency Contact Name</label>
+                    <label className="block text-xs font-black text-[#2A0826] mb-1">Organization HQ Address</label>
                     <input
                       type="text"
-                      placeholder="Guardian Name"
-                      value={newEmergencyName}
-                      onChange={(e) => setNewEmergencyName(e.target.value)}
+                      placeholder="Campus / Office Address"
+                      value={newAddress}
+                      onChange={(e) => setNewAddress(e.target.value)}
                       className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none focus:border-[#FF2A6D]"
                     />
                   </div>
+                )}
 
+                {newRole === 'PARENT' && (
                   <div>
-                    <label className="block text-xs font-black text-[#2A0826] mb-1">Emergency Contact Phone</label>
+                    <label className="block text-xs font-black text-[#2A0826] mb-1">Link Child Account (Mobile or Email)</label>
                     <input
-                      type="tel"
-                      placeholder="Guardian Phone"
-                      value={newEmergencyPhone}
-                      onChange={(e) => setNewEmergencyPhone(e.target.value.replace(/\D/g, ''))}
-                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none focus:border-[#FF2A6D] font-mono"
+                      type="text"
+                      placeholder="Child's 10-digit mobile or email address"
+                      value={newChildIdentifier}
+                      onChange={(e) => setNewChildIdentifier(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none focus:border-[#FF2A6D]"
                     />
                   </div>
-                </div>
+                )}
+
+                {newRole === 'USER' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-black text-[#2A0826] mb-1">Emergency Contact Name</label>
+                      <input
+                        type="text"
+                        placeholder="Guardian Name"
+                        value={newEmergencyName}
+                        onChange={(e) => setNewEmergencyName(e.target.value)}
+                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none focus:border-[#FF2A6D]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-[#2A0826] mb-1">Emergency Contact Phone</label>
+                      <input
+                        type="tel"
+                        placeholder="Guardian Phone"
+                        value={newEmergencyPhone}
+                        onChange={(e) => setNewEmergencyPhone(e.target.value.replace(/\D/g, ''))}
+                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none focus:border-[#FF2A6D] font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex items-center space-x-2 pt-2">
                   <input
@@ -665,14 +718,16 @@ export default function AdminUsersPage() {
 
                 <div>
                   <label className="block text-xs font-black text-[#684E67] mb-1">Account Role</label>
-                  <select
+                  <CustomSelect
+                    options={[
+                      { value: 'USER', label: 'Standard Sakhi Member' },
+                      { value: 'ORGANIZATION', label: 'Organization HQ' },
+                      { value: 'PARENT', label: 'Parent Guardian' },
+                      { value: 'SUPER_ADMIN', label: 'SuperAdmin Dispatcher' },
+                    ]}
                     value={editRole}
                     onChange={(e) => setEditRole(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-black text-[#2A0826] outline-none cursor-pointer"
-                  >
-                    <option value="USER">Standard Sakhi Member</option>
-                    <option value="SUPER_ADMIN">SuperAdmin Dispatcher</option>
-                  </select>
+                  />
                 </div>
 
                 <div>

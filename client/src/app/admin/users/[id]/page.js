@@ -10,6 +10,7 @@ import {
   PhoneCall, Mail, MapPin, AlertOctagon, Plus, CheckCircle2,
   X, RefreshCw, Sparkles, Camera, Upload, UserPlus
 } from 'lucide-react';
+import { CustomSelect } from '../../../../components/ui/CustomSelect.js';
 
 const RELATIONSHIPS = ['Sister', 'Mother', 'Father', 'Brother', 'Friend', 'Spouse', 'Guardian', 'Colleague'];
 
@@ -326,14 +327,14 @@ export default function AdminUserDetailPage() {
         />
 
         {/* MEMBER PROFILE HEADER CARD */}
-        <div className="bg-white rounded-[36px] border-2 border-[#FFCCE1] p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-6 animate-fade-up">
+        <div className="bg-white rounded-[36px] border-2 border-[#FFCCE1] p-5 sm:p-8 shadow-xl relative overflow-hidden space-y-6 animate-fade-up">
           <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
 
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-2">
-            <div className="flex items-center space-x-5">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-6 pt-2 text-center lg:text-left">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 w-full lg:w-auto">
               
               {/* PROFILE PHOTO AVATAR WITH PREVIEW & FALLBACK */}
-              <div className="relative w-20 h-20 rounded-3xl bg-gradient-to-br from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center text-2xl font-black shadow-lg shadow-[#FF2A6D]/30 border-2 border-white shrink-0 overflow-hidden">
+              <div className="relative w-20 h-20 sm:w-22 sm:h-22 rounded-3xl bg-gradient-to-br from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center text-2xl font-black shadow-lg shadow-[#FF2A6D]/30 border-2 border-white shrink-0 overflow-hidden mx-auto sm:mx-0">
                 {userData.profilePhoto ? (
                   <img
                     src={userData.profilePhoto}
@@ -345,13 +346,21 @@ export default function AdminUserDetailPage() {
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+              <div className="space-y-2 text-center sm:text-left w-full">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                   <h2 className="text-xl sm:text-2xl font-black text-[#2A0826] tracking-tight">{userData.fullName}</h2>
                   {userData.role === 'SUPER_ADMIN' ? (
                     <span className="inline-flex items-center space-x-1 text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 px-3 py-0.5 rounded-full uppercase">
                       <Crown className="w-3.5 h-3.5 text-amber-600" />
                       <span>SUPERADMIN</span>
+                    </span>
+                  ) : userData.role === 'ORGANIZATION' ? (
+                    <span className="inline-flex items-center space-x-1 text-[10px] font-black bg-purple-100 text-purple-900 border border-purple-300 px-3 py-0.5 rounded-full uppercase">
+                      <span>ORGANIZATION HQ</span>
+                    </span>
+                  ) : userData.role === 'PARENT' ? (
+                    <span className="inline-flex items-center space-x-1 text-[10px] font-black bg-teal-100 text-teal-900 border border-teal-300 px-3 py-0.5 rounded-full uppercase">
+                      <span>PARENT GUARDIAN</span>
                     </span>
                   ) : (
                     <span className="text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200 px-3 py-0.5 rounded-full uppercase">
@@ -374,31 +383,29 @@ export default function AdminUserDetailPage() {
                   )}
                 </div>
 
-                <p className="text-xs text-[#684E67] font-bold flex items-center space-x-3 flex-wrap">
-                  <span className="flex items-center space-x-1">
-                    <Mail className="w-3.5 h-3.5 text-[#FF2A6D]" />
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1.5 text-xs text-[#684E67] font-bold">
+                  <span className="flex items-center space-x-1.5">
+                    <Mail className="w-3.5 h-3.5 text-[#FF2A6D] shrink-0" />
                     <span>{userData.email}</span>
                   </span>
-                  <span>•</span>
-                  <span className="flex items-center space-x-1">
-                    <PhoneCall className="w-3.5 h-3.5 text-[#FF2A6D]" />
+                  <span className="flex items-center space-x-1.5">
+                    <PhoneCall className="w-3.5 h-3.5 text-[#FF2A6D] shrink-0" />
                     <span>{userData.phone || 'No Phone'}</span>
                   </span>
-                  <span>•</span>
-                  <span className="flex items-center space-x-1">
-                    <MapPin className="w-3.5 h-3.5 text-[#FF2A6D]" />
+                  <span className="flex items-center space-x-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-[#FF2A6D] shrink-0" />
                     <span>{userData.city || 'Pune'}, {userData.state || 'Maharashtra'}</span>
                   </span>
-                </p>
+                </div>
               </div>
             </div>
 
             {/* QUICK ACTION BUTTONS */}
-            <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center lg:justify-end gap-2.5 w-full lg:w-auto pt-2 lg:pt-0">
               <button
                 type="button"
                 onClick={openEditModal}
-                className="px-4 py-2.5 bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] rounded-2xl text-xs font-black hover:bg-[#FF2A6D] hover:text-white transition-all flex items-center space-x-1.5 cursor-pointer shadow-sm"
+                className="px-4 py-2.5 bg-[#FFF0F3] text-[#FF2A6D] border border-[#FFCCE1] rounded-2xl text-xs font-black hover:bg-[#FF2A6D] hover:text-white transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-sm w-full sm:w-auto"
               >
                 <Edit3 className="w-4 h-4" />
                 <span>EDIT PROFILE & PHOTO</span>
@@ -407,7 +414,7 @@ export default function AdminUserDetailPage() {
               <button
                 type="button"
                 onClick={() => setIsPlanModalOpen(true)}
-                className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl text-xs font-black hover:scale-105 transition-all flex items-center space-x-1.5 cursor-pointer shadow-md shadow-emerald-500/20"
+                className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl text-xs font-black hover:scale-105 transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-md shadow-emerald-500/20 w-full sm:w-auto"
               >
                 <Sparkles className="w-4 h-4 text-amber-300" />
                 <span>ASSIGN / RENEW PLAN (FREE)</span>
@@ -416,7 +423,7 @@ export default function AdminUserDetailPage() {
               <button
                 type="button"
                 onClick={handleToggleBlock}
-                className={`px-4 py-2.5 rounded-2xl text-xs font-black border transition-all flex items-center space-x-1.5 cursor-pointer shadow-sm ${
+                className={`px-4 py-2.5 rounded-2xl text-xs font-black border transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-sm w-full sm:w-auto ${
                   isBlocked
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-600 hover:text-white'
                     : 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-600 hover:text-white'
@@ -436,14 +443,14 @@ export default function AdminUserDetailPage() {
           <div className="lg:col-span-2 space-y-8">
             
             {/* SUBSCRIPTION & PLAN STATUS CARD */}
-            <div className="bg-white p-6 sm:p-8 rounded-[36px] border-2 border-[#FFCCE1] shadow-md space-y-5">
-              <div className="flex items-center justify-between border-b border-[#FFCCE1] pb-4">
+            <div className="bg-white p-5 sm:p-8 rounded-[36px] border-2 border-[#FFCCE1] shadow-md space-y-5">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#FFCCE1] pb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shrink-0">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg text-[#2A0826]">Current Subscription & Plan</h3>
+                    <h3 className="font-black text-base sm:text-lg text-[#2A0826]">Current Subscription & Plan</h3>
                     <p className="text-xs text-[#684E67] font-bold">Admin can assign or renew any plan for free at 0 cost</p>
                   </div>
                 </div>
@@ -451,9 +458,9 @@ export default function AdminUserDetailPage() {
                 <button
                   type="button"
                   onClick={() => setIsPlanModalOpen(true)}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center space-x-1 cursor-pointer"
+                  className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center space-x-1.5 cursor-pointer w-full sm:w-auto shrink-0 shadow-sm"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-4 h-4" />
                   <span>UPDATE / RENEW PLAN (FREE)</span>
                 </button>
               </div>
@@ -578,24 +585,25 @@ export default function AdminUserDetailPage() {
           {/* RIGHT 1 COL: EMERGENCY GUARDIANS & TRUSTED CONTACTS */}
           <div className="space-y-8">
             <div className="bg-white p-6 sm:p-8 rounded-[36px] border-2 border-[#FFCCE1] shadow-md space-y-5">
-              <div className="flex items-center justify-between border-b border-[#FFCCE1] pb-4">
+              {/* STYLISH MODERN HEADER */}
+              <div className="space-y-4 border-b border-[#FFCCE1] pb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-2xl bg-rose-50 text-[#FF2A6D] border border-rose-200 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center shadow-md shadow-[#FF2A6D]/20 shrink-0">
                     <Users className="w-5 h-5" />
                   </div>
                   <div>
                     <h3 className="font-black text-lg text-[#2A0826]">Emergency Guardians</h3>
-                    <p className="text-xs text-[#684E67] font-bold">Trusted contact network</p>
+                    <p className="text-xs text-[#684E67] font-bold">Trusted contact network ({userData.trustedContacts?.length || 0}/5)</p>
                   </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={openAddContactModal}
-                  className="px-3 py-1.5 bg-[#FF2A6D] text-white rounded-xl text-xs font-black hover:bg-[#E01A4F] transition-all flex items-center space-x-1 cursor-pointer shadow-xs"
+                  className="w-full py-3 bg-[#FFF0F3] hover:bg-[#FF2A6D] text-[#FF2A6D] hover:text-white border-2 border-dashed border-[#FFCCE1] hover:border-[#FF2A6D] rounded-2xl text-xs font-black transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-xs group"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>ADD</span>
+                  <Plus className="w-4 h-4 text-[#FF2A6D] group-hover:text-white transition-colors" />
+                  <span>ADD NEW EMERGENCY GUARDIAN</span>
                 </button>
               </div>
 
@@ -677,7 +685,7 @@ export default function AdminUserDetailPage() {
               </div>
 
               {/* INNER SCROLLABLE CONTENT BODY */}
-              <div className="p-6 sm:p-8 overflow-y-auto flex-1 space-y-6">
+              <div className="p-6 sm:p-8 pb-36 overflow-y-auto flex-1 space-y-6">
                 <form onSubmit={handleSaveProfileEdit} className="space-y-4">
                   
                   {/* CLEAN PROFILE PHOTO UPLOAD CONTROL */}
@@ -757,24 +765,33 @@ export default function AdminUserDetailPage() {
 
                     <div>
                       <label className="block text-xs font-black text-[#684E67] mb-1">Role</label>
-                      <select
+                      <CustomSelect
+                        options={[
+                          { value: 'USER', label: 'Standard Sakhi Member' },
+                          { value: 'ORGANIZATION', label: 'Organization HQ' },
+                          { value: 'PARENT', label: 'Parent Guardian' },
+                          { value: 'SUPER_ADMIN', label: 'SuperAdmin Dispatcher' },
+                        ]}
                         value={editForm.role}
                         onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-black outline-none cursor-pointer"
-                      >
-                        <option value="USER">Standard Sakhi Member</option>
-                        <option value="SUPER_ADMIN">SuperAdmin Dispatcher</option>
-                      </select>
+                      />
                     </div>
 
                     <div>
                       <label className="block text-xs font-black text-[#684E67] mb-1">Blood Group</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. O+"
-                        value={editForm.bloodGroup}
+                      <CustomSelect
+                        options={[
+                          { value: 'A+', label: 'A+' },
+                          { value: 'A-', label: 'A-' },
+                          { value: 'B+', label: 'B+' },
+                          { value: 'B-', label: 'B-' },
+                          { value: 'AB+', label: 'AB+' },
+                          { value: 'AB-', label: 'AB-' },
+                          { value: 'O+', label: 'O+' },
+                          { value: 'O-', label: 'O-' },
+                        ]}
+                        value={editForm.bloodGroup || 'O+'}
                         onChange={(e) => setEditForm({ ...editForm, bloodGroup: e.target.value })}
-                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-bold outline-none"
                       />
                     </div>
 

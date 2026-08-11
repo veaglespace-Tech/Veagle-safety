@@ -127,6 +127,28 @@ export default function DashboardAppPage() {
             </div>
           )}
 
+          {/* INACTIVE SUBSCRIPTION BANNER */}
+          {mounted && user?.subscriptionStatus !== 'ACTIVE' && (
+            <div className="bg-gradient-to-r from-amber-500 via-rose-500 to-[#FF2A6D] text-white p-5 rounded-3xl shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 border-2 border-white">
+              <div className="flex items-center space-x-3 text-center sm:text-left">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-md shrink-0">
+                  <Sparkles className="w-6 h-6 text-amber-200 animate-spin" />
+                </div>
+                <div>
+                  <p className="font-black text-base uppercase tracking-wider">PROTECTION PLAN PENDING ACTIVATION</p>
+                  <p className="text-xs text-white/90 font-bold">Activate 24/7 Live GPS Guardian & Encrypted Emergency Dispatcher Coverage</p>
+                </div>
+              </div>
+              <Link
+                href="/pricing"
+                className="w-full sm:w-auto bg-white text-[#FF2A6D] hover:bg-amber-50 font-black text-xs px-6 py-3.5 rounded-2xl shadow-xl transition-all flex items-center justify-center space-x-2 uppercase tracking-wider shrink-0 cursor-pointer"
+              >
+                <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+                <span>ACTIVATE PLAN NOW (PAYMENT)</span>
+              </Link>
+            </div>
+          )}
+
           {/* PROTECTED JOURNEY BANNER */}
           {activeJourney && !activeSession && (
             <div className="card-antique-pink p-5 border-2 border-rose shadow-md flex items-center justify-between gap-4">

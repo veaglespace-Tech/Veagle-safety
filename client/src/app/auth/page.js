@@ -102,12 +102,10 @@ function UserAuthForm() {
 
   useEffect(() => {
     if (wasOtpModalOpened && !showOtpModal) {
-      // Case 1: New user pending payment (registrationToken from verify)
       if (registrationToken) {
         router.push('/pricing');
         return;
       }
-      // Case 2: Existing DB user verified
       if (user && token) {
         if (user.role === 'ORGANIZATION') {
           router.push('/organization');
@@ -119,6 +117,10 @@ function UserAuthForm() {
         }
         if (user.role === 'SUPER_ADMIN') {
           router.push('/admin');
+          return;
+        }
+        if (user.subscriptionStatus !== 'ACTIVE') {
+          router.push('/pricing');
           return;
         }
         router.push('/dashboard');
@@ -135,6 +137,8 @@ function UserAuthForm() {
         router.push('/organization');
       } else if (user.role === 'PARENT') {
         router.push('/parent');
+      } else if (user.subscriptionStatus !== 'ACTIVE') {
+        router.push('/pricing');
       } else {
         router.push('/dashboard');
       }

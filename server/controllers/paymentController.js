@@ -186,21 +186,26 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
     email,
   });
 
-  // Save pending transaction record (if user exists in DB, attach userId; if pending, store registrationToken)
-  if (!user.isPendingRegistration) {
-    await prisma.paymentHistory.create({
-      data: {
-        userId: user.id,
-        planId: plan ? plan.id : null,
-        txnid,
-        amount: totalAmount,
-        baseAmount,
-        gstAmount,
-        gstPercentage,
-        status: 'PENDING',
-        hash,
-      },
-    });
+  // Save pending transaction record (if user exists in DB, attach userId)
+  let dbUser = user.id ? user : (email ? await prisma.user.findUnique({ where: { email } }) : null);
+  if (dbUser && dbUser.id) {
+    try {
+      await prisma.paymentHistory.create({
+        data: {
+          userId: dbUser.id,
+          planId: plan ? plan.id : null,
+          txnid,
+          amount: totalAmount,
+          baseAmount,
+          gstAmount,
+          gstPercentage,
+          status: 'PENDING',
+          hash,
+        },
+      });
+    } catch (payHistErr) {
+      console.warn('[Payment Notice] Pending payment history log notice:', payHistErr.message);
+    }
   }
 
   const surl = `${config.payu.serverBaseUrl}/api/payment/payu-success`;
