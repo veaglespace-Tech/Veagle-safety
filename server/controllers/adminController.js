@@ -271,7 +271,10 @@ export const getUserByIdAdmin = asyncHandler(async (req, res) => {
     return res.status(404).json({ error: 'User account not found' });
   }
 
-  const allPlans = await prisma.plan.findMany({ orderBy: { basePrice: 'asc' } });
+  const allPlans = await prisma.plan.findMany({ 
+    where: { isActive: true },
+    orderBy: { basePrice: 'asc' } 
+  });
 
   return res.json({ user, allPlans });
 });

@@ -6,7 +6,8 @@ import { useSelector } from 'react-redux';
 import { settingApi } from '../../../redux/api/settingApi';
 import { 
   Save, Plus, Trash2, Settings, Mail, 
-  Image as ImageIcon, Video, Eye, Layout, ShieldCheck, Link2, ArrowLeft, Upload
+  Image as ImageIcon, Video, Eye, Layout, ShieldCheck, Link2, ArrowLeft, Upload,
+  ChevronUp, ChevronDown, ChevronRight
 } from 'lucide-react';
 
 export default function AdminSettingsPage() {
@@ -27,6 +28,8 @@ export default function AdminSettingsPage() {
     categories: 'ALL, EMERGENCY, TRACKING, NETWORK, AUTOMATION, COMMAND'
   });
   
+  const [collapsedItems, setCollapsedItems] = useState({});
+
   // Track original states for unsaved changes detection
   const [originalState, setOriginalState] = useState({ email: '', items: [], meta: null });
 
@@ -185,6 +188,37 @@ export default function AdminSettingsPage() {
   const removeGalleryItem = (index) => {
     if(!confirm('Are you sure you want to remove this gallery item?')) return;
     const newItems = galleryItems.filter((_, i) => i !== index);
+    setGalleryItems(newItems);
+    checkUnsavedChanges(supportEmail, newItems, galleryMeta);
+  };
+
+  const toggleCollapse = (index) => {
+    setCollapsedItems(prev => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  const moveGalleryItem = (index, direction) => {
+    const newItems = [...galleryItems];
+    if (direction === 'up' && index > 0) {
+      [newItems[index], newItems[index - 1]] = [newItems[index - 1], newItems[index]];
+      
+      // Keep collapsed states in sync
+      const newCollapsed = { ...collapsedItems };
+      const tempCol = newCollapsed[index];
+      newCollapsed[index] = newCollapsed[index - 1];
+      newCollapsed[index - 1] = tempCol;
+      setCollapsedItems(newCollapsed);
+      
+    } else if (direction === 'down' && index < newItems.length - 1) {
+      [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+      
+      const newCollapsed = { ...collapsedItems };
+      const tempCol = newCollapsed[index];
+      newCollapsed[index] = newCollapsed[index + 1];
+      newCollapsed[index + 1] = tempCol;
+      setCollapsedItems(newCollapsed);
+    } else {
+      return;
+    }
     setGalleryItems(newItems);
     checkUnsavedChanges(supportEmail, newItems, galleryMeta);
   };
@@ -396,17 +430,54 @@ export default function AdminSettingsPage() {
                     </div>
                   ) : (
                     galleryItems.map((item, index) => (
-                      <div key={item.id || index} className="p-6 border border-gray-200 rounded-[28px] space-y-6 bg-[#FAFAFA] relative group hover:border-[#FFCCE1] transition-all">
+                      <div key={item.id || index} className={`p-6 border border-gray-200 rounded-[28px] bg-[#FAFAFA] relative group hover:border-[#FFCCE1] transition-all ${collapsedItems[index] ? 'pb-6' : 'space-y-6'}`}>
                         
-                        {/* Remove Button */}
-                        <button
-                          onClick={() => removeGalleryItem(index)}
-                          className="absolute top-6 right-6 text-gray-400 hover:text-red-500 bg-white p-2.5 rounded-xl shadow-sm hover:shadow-md transition-all z-10"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                        
-                        <div className="flex flex-col xl:flex-row gap-8">
+                        {/* Header & Controls */}
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => toggleCollapse(index)}>
+                            <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 shadow-sm">
+                              {collapsedItems[index] ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </div>
+                            <div>
+                              <h4 className="font-black text-sm text-[#2A0826] flex items-center space-x-2">
+                                <span>{item.title || `Media Item #${index + 1}`}</span>
+                                {item.badge && <span className="text-[9px] bg-[#FF2A6D] text-white px-2 py-0.5 rounded-full uppercase tracking-wider">{item.badge}</span>}
+                              </h4>
+                              <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">{item.mediaType} • {item.category || 'Uncategorized'}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => moveGalleryItem(index, 'up')}
+                              disabled={index === 0}
+                              className="p-2 text-gray-400 hover:text-[#FF2A6D] disabled:opacity-30 disabled:hover:text-gray-400 bg-white rounded-xl shadow-sm border border-gray-100 transition-colors"
+                              title="Move Up"
+                            >
+                              <ChevronUp className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => moveGalleryItem(index, 'down')}
+                              disabled={index === galleryItems.length - 1}
+                              className="p-2 text-gray-400 hover:text-[#FF2A6D] disabled:opacity-30 disabled:hover:text-gray-400 bg-white rounded-xl shadow-sm border border-gray-100 transition-colors"
+                              title="Move Down"
+                            >
+                              <ChevronDown className="w-4 h-4" />
+                            </button>
+                            <div className="w-px h-6 bg-gray-200 mx-1"></div>
+                            <button
+                              onClick={() => removeGalleryItem(index)}
+                              className="p-2 text-gray-400 hover:text-red-500 bg-white rounded-xl shadow-sm border border-gray-100 transition-colors"
+                              title="Remove Item"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Collapsible Content */}
+                        {!collapsedItems[index] && (
+                        <div className="flex flex-col xl:flex-row gap-8 pt-4 border-t border-gray-200">
                           
                           {/* Live Preview Pane */}
                           <div className="xl:w-1/3 shrink-0">
@@ -555,6 +626,7 @@ export default function AdminSettingsPage() {
 
                           </div>
                         </div>
+                        )}
                       </div>
                     ))
                   )}

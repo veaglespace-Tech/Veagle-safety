@@ -53,7 +53,7 @@ export default function PlatformGalleryPage() {
   const renderMedia = (item, isModal = false) => {
     const className = isModal 
       ? "w-full h-auto max-h-[60vh] object-contain rounded-2xl" 
-      : "absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105";
+      : "absolute inset-0 w-full h-full object-contain p-2 md:p-4 transition-transform duration-500 group-hover:scale-105";
 
     if (!item.mediaUrl) {
       return (
