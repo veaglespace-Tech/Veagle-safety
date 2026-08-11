@@ -92,12 +92,13 @@ export const getParentOverview = asyncHandler(async (req, res) => {
             take: 1,
           },
           journeys: {
-            where: { status: 'IN_PROGRESS' },
+            where: { status: { in: ['IN_PROGRESS', 'OVERDUE'] } },
             select: {
               id: true,
               originName: true,
               destinationName: true,
               expectedArrival: true,
+              shareToken: true,
               status: true,
             },
             take: 1,

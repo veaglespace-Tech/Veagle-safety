@@ -431,11 +431,37 @@ export const getPublicSosTracking = async (req, res) => {
       },
     });
 
-    if (!session) {
-      return res.status(404).json({ error: 'Tracking session not found or expired' });
+    if (session) {
+      return res.json({ session });
     }
 
-    return res.json({ session });
+    // Fallback: Check if token belongs to an active or overdue Journey
+    const journey = await prisma.journey.findUnique({
+      where: { shareToken: token },
+      include: {
+        user: { select: { fullName: true, phone: true, profilePhoto: true, bloodGroup: true } },
+        locations: { orderBy: { recordedAt: 'desc' }, take: 20 },
+      },
+    });
+
+    if (journey) {
+      const normalizedSession = {
+        id: journey.id,
+        shareToken: journey.shareToken,
+        status: journey.status === 'OVERDUE' ? 'ACTIVE' : journey.status,
+        isJourney: true,
+        destinationName: journey.destinationName,
+        originName: journey.originName,
+        expectedArrival: journey.expectedArrival,
+        user: journey.user,
+        locations: journey.locations && journey.locations.length > 0 ? journey.locations : [
+          { latitude: journey.originLat, longitude: journey.originLng, recordedAt: journey.startedAt }
+        ],
+      };
+      return res.json({ session: normalizedSession, journey });
+    }
+
+    return res.status(404).json({ error: 'Tracking session not found or expired' });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to fetch tracking data' });
   }
