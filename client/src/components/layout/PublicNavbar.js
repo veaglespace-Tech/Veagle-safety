@@ -52,7 +52,7 @@ export const PublicNavbar = () => {
   ];
 
   if (mounted && token && isSuperAdmin) {
-    navLinks.splice(1, 0, { href: '/admin', label: 'Admin HQ', icon: Crown });
+    navLinks.splice(1, 0, { href: '/admin', label: 'Admin', icon: Crown });
   }
 
   const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));

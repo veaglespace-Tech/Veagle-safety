@@ -157,7 +157,7 @@ export default function SubscriptionPage() {
                   'Instant Multi-Channel Guardian Alerts (SMS, Email, App)',
                   'Loud Siren Audio Alarm & Device Vibration Drill',
                   '5 Verified Emergency Trusted Guardians Network',
-                  'HQ SuperAdmin Emergency Command Center Monitoring',
+                  'SuperAdmin Emergency Command Center Monitoring',
                 ].map((feature, idx) => (
                   <div key={idx} className="flex items-center space-x-2.5 bg-white p-3 rounded-xl border border-[#FFCCE1] text-xs font-bold text-[#2A0826]">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />

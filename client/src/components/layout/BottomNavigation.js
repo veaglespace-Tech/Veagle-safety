@@ -41,7 +41,7 @@ export const BottomNavigation = () => {
   ];
 
   const adminNavItems = [
-    { path: '/admin', label: 'SOS HQ', icon: AlertOctagon },
+    { path: '/admin', label: 'SOS', icon: AlertOctagon },
     { path: '/admin/users', label: 'Users', icon: Users },
     { path: '/admin/plans', label: 'Plans', icon: Sliders },
     { path: '/admin/payments', label: 'Pay', icon: CreditCard },

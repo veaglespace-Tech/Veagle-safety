@@ -284,7 +284,7 @@ export default function AdminUsersPage() {
                 options={[
                   { value: 'ALL', label: 'All Roles' },
                   { value: 'USER', label: 'Standard Sakhi Member' },
-                  { value: 'SUPER_ADMIN', label: 'SuperAdmin HQ' },
+                  { value: 'SUPER_ADMIN', label: 'SuperAdmin' },
                 ]}
                 value={userRoleFilter}
                 onChange={(e) => { setUserRoleFilter(e.target.value); setUserPage(1); }}
@@ -538,7 +538,7 @@ export default function AdminUsersPage() {
                       className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-black text-[#2A0826] outline-none cursor-pointer"
                     >
                       <option value="USER">Standard Sakhi Member</option>
-                      <option value="SUPER_ADMIN">SuperAdmin HQ</option>
+                      <option value="SUPER_ADMIN">SuperAdmin</option>
                     </select>
                   </div>
 
@@ -671,7 +671,7 @@ export default function AdminUsersPage() {
                     className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-black text-[#2A0826] outline-none cursor-pointer"
                   >
                     <option value="USER">Standard Sakhi Member</option>
-                    <option value="SUPER_ADMIN">SuperAdmin HQ Dispatcher</option>
+                    <option value="SUPER_ADMIN">SuperAdmin Dispatcher</option>
                   </select>
                 </div>
 

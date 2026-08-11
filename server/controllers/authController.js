@@ -35,60 +35,15 @@ export const register = asyncHandler(async (req, res) => {
   else if (role === 'ORGANIZATION') assignedRole = 'ORGANIZATION';
   else if (role === 'PARENT') assignedRole = 'PARENT';
 
-  const cleanEmail = email && typeof email === 'string' ? email.trim().toLowerCase() : '';
-  const cleanPhone = phone && typeof phone === 'string' ? phone.replace(/\D/g, '') : '';
-  const cleanFullName = fullName && typeof fullName === 'string' ? fullName.trim() : '';
-
-  if (!cleanEmail || !password) {
-    return res.status(400).json({ error: 'Email Address and Password are required.' });
-  }
-
-  // Universal Field Validations for ALL Roles (USER, PARENT, ORGANIZATION, SUPER_ADMIN)
-  if (!cleanFullName || !cleanEmail || !cleanPhone || !password) {
-    return res.status(400).json({ error: 'Please fill in all required fields: Full Name, Email, Mobile Phone, and Password.' });
-  }
-
-  // Email format validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(cleanEmail)) {
-    return res.status(400).json({ error: 'Please enter a valid email address.' });
-  }
-
-  if (parentEmail && typeof parentEmail === 'string' && parentEmail.trim()) {
-    if (!emailRegex.test(parentEmail.trim())) {
-      return res.status(400).json({ error: 'Please enter a valid Parent Email address.' });
-    }
-  }
-
-  // Mobile number validation (10 digits Indian format)
-  const phoneRegex = /^[6-9]\d{9}$/;
-  if (!phoneRegex.test(cleanPhone)) {
-    return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.' });
-  }
-
-  if (emergencyContactPhone) {
-    const cleanEmergencyPhone = emergencyContactPhone.replace(/\D/g, '');
-    if (cleanEmergencyPhone && !phoneRegex.test(cleanEmergencyPhone)) {
-      return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number for Emergency Guardian Contact.' });
-    }
-  }
-
-  if (pincode && pincode.trim() && pincode !== '411001') {
-    const pincodeRegex = /^\d{6}$/;
-    if (!pincodeRegex.test(pincode.trim())) {
-      return res.status(400).json({ error: 'Please enter a valid 6-digit Pincode.' });
-    }
-  }
-
-  const existingUser = await prisma.user.findUnique({ where: { email: cleanEmail } });
+  const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
     if (assignedRole === 'PARENT' || assignedRole === 'ORGANIZATION') {
       const passwordHash = await bcrypt.hash(password, 10);
       const updatedUser = await prisma.user.update({
         where: { id: existingUser.id },
         data: {
-          fullName: cleanFullName || existingUser.fullName,
-          phone: cleanPhone || existingUser.phone,
+          fullName,
+          phone,
           passwordHash,
           role: assignedRole,
           isEmailVerified: true,
@@ -148,9 +103,9 @@ export const register = asyncHandler(async (req, res) => {
   // Create User entry in Database immediately upon registration
   const user = await prisma.user.create({
     data: {
-      fullName: cleanFullName,
-      email: cleanEmail,
-      phone: cleanPhone || '+91 98765 43210',
+      fullName,
+      email,
+      phone,
       passwordHash,
       role: assignedRole,
       profilePhoto: profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',

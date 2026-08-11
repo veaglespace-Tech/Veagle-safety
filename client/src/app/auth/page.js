@@ -730,7 +730,7 @@ function UserAuthForm() {
                     ? 'PROCESSING...'
                     : isLogin
                       ? selectedRole === 'ORGANIZATION'
-                        ? 'SIGN IN TO ORGANIZATION HQ'
+                        ? 'SIGN IN TO ORGANIZATION'
                         : selectedRole === 'PARENT'
                           ? 'SIGN IN TO PARENT PORTAL'
                           : 'SIGN IN TO DASHBOARD'

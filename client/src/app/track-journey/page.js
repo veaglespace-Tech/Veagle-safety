@@ -28,14 +28,18 @@ export default function UserTrackJourneyPage() {
     try {
       const res = await api.get('/journey/active');
       setJourney(res.data.journey);
-    } catch (err) {}
+    } catch (err) {
+      console.warn('No active journey found or failed to load.');
+    }
   };
 
   const loadActiveCheckin = async () => {
     try {
       const res = await api.get('/checkin/active');
       setCheckin(res.data.checkin);
-    } catch (err) {}
+    } catch (err) {
+      console.warn('No active checkin found or failed to load.');
+    }
   };
 
   const handleStartJourney = async (e) => {
@@ -67,7 +71,9 @@ export default function UserTrackJourneyPage() {
     try {
       await api.post('/journey/complete', { journeyId: journey.id });
       setJourney(null);
-    } catch (err) {}
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to complete journey.');
+    }
   };
 
   const handleStartCheckin = async () => {
@@ -79,7 +85,9 @@ export default function UserTrackJourneyPage() {
     try {
       const res = await api.post('/checkin/start', { intervalMins: checkinInterval });
       setCheckin(res.data.checkin);
-    } catch (err) {} finally {
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to start check-in.');
+    } finally {
       setLoading(false);
     }
   };
@@ -89,7 +97,9 @@ export default function UserTrackJourneyPage() {
     try {
       await api.post('/checkin/safe', { checkinId: checkin.id });
       setCheckin(null);
-    } catch (err) {}
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to confirm safety.');
+    }
   };
 
   return (

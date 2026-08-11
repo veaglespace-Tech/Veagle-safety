@@ -50,6 +50,11 @@ model User {
   managedOrganizations   OrganizationMember[] @relation("OrgOwner")
   parentLinks             ParentChildLink[]    @relation("ParentLinks")
   childLinks              ParentChildLink[]    @relation("ChildLinks")
+
+  referredByPartnerId     Int?
+  referredByPartner       ReferralPartner?     @relation("ReferredByPartner", fields: [referredByPartnerId], references: [id])
+  assignedCoupons         Coupon[]             @relation("AssignedCoupons")
+  createdCoupons          Coupon[]             @relation("CreatedCoupons")
 }
 
 model Plan {
@@ -83,6 +88,10 @@ model PaymentHistory {
   payuMoneyId   String?
   paymentMode   String?
   hash          String?
+  
+  couponId      Int?
+  coupon        Coupon?  @relation(fields: [couponId], references: [id])
+  
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -90,7 +99,7 @@ model PaymentHistory {
 model SystemSetting {
   id        Int      @id @default(autoincrement())
   key       String   @unique
-  value     String
+  value     String   @db.LongText
   updatedAt DateTime @updatedAt
 }
 
@@ -263,4 +272,38 @@ model ParentChildLink {
   createdAt    DateTime @default(now())
 
   @@unique([parentId, childId])
+}
+
+model ReferralPartner {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  email               String   @unique
+  mobile              String?
+  partnerReferralCode String   @unique
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  referredUsers       User[]   @relation("ReferredByPartner")
+}
+
+model Coupon {
+  id                  Int      @id @default(autoincrement())
+  code                String   @unique
+  discountType        String   // PERCENTAGE, FLAT_AMOUNT
+  discountValue       Float
+  maxUses             Int?
+  usesCount           Int      @default(0)
+  assignedUserId      Int?
+  createdById         Int?
+  isActive            Boolean  @default(true)
+  validFrom           DateTime?
+  validUntil          DateTime?
+  applicablePlanCodes Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  assignedUser        User?    @relation("AssignedCoupons", fields: [assignedUserId], references: [id])
+  creator             User?    @relation("CreatedCoupons", fields: [createdById], references: [id])
+  payments            PaymentHistory[]
 }

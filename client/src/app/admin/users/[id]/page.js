@@ -351,7 +351,7 @@ export default function AdminUserDetailPage() {
                   {userData.role === 'SUPER_ADMIN' ? (
                     <span className="inline-flex items-center space-x-1 text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 px-3 py-0.5 rounded-full uppercase">
                       <Crown className="w-3.5 h-3.5 text-amber-600" />
-                      <span>SUPERADMIN HQ</span>
+                      <span>SUPERADMIN</span>
                     </span>
                   ) : (
                     <span className="text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200 px-3 py-0.5 rounded-full uppercase">
@@ -763,7 +763,7 @@ export default function AdminUserDetailPage() {
                         className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-xs font-black outline-none cursor-pointer"
                       >
                         <option value="USER">Standard Sakhi Member</option>
-                        <option value="SUPER_ADMIN">SuperAdmin HQ Dispatcher</option>
+                        <option value="SUPER_ADMIN">SuperAdmin Dispatcher</option>
                       </select>
                     </div>
 

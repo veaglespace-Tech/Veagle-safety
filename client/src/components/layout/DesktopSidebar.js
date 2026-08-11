@@ -18,12 +18,15 @@ import {
   Sparkles,
   ChevronRight,
   CreditCard,
+  Settings,
   AlertOctagon,
   Navigation,
   Activity,
   Heart,
   Menu,
   X,
+  Network,
+  Ticket
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout as reduxLogout } from '../../redux/slices/authSlice.js';
@@ -81,11 +84,14 @@ export const DesktopSidebar = () => {
   const orgNavItems = [];
 
   const adminNavItems = [
-    { path: '/admin', label: 'Emergency Command', icon: AlertOctagon, desc: 'Active SOS & Incident HQ' },
+    { path: '/admin', label: 'Emergency Command', icon: AlertOctagon, desc: 'Active SOS & Incident' },
     { path: '/admin/users', label: 'User Management', icon: Users, desc: 'All Users & Free Grants' },
     { path: '/admin/plans', label: 'Plans & Dynamic GST', icon: Sliders, desc: 'DB Plans & Global GST' },
     { path: '/admin/payments', label: 'Payment Receipts', icon: CreditCard, desc: 'Txn History & Revenue' },
+    { path: '/admin/settings', label: 'Platform Settings', icon: Settings, desc: 'Site & Gallery Setup' },
     { path: '/admin/enquiries', label: 'Contact Support', icon: HelpCircle, desc: 'Support & Inquiries' },
+    { path: '/admin/referrals', label: 'Referral Partners', icon: Network, desc: 'Partner Network & Codes' },
+    { path: '/admin/coupons', label: 'Coupons & Discounts', icon: Ticket, desc: 'Manage Promo Codes' },
     { path: '/contacts', label: 'My Guardians', icon: Users, desc: 'Personal Safety Contacts' },
     { path: '/track-journey', label: 'Track My Journey', icon: MapPin, desc: 'Live Route Sharing' },
   ];
@@ -140,7 +146,7 @@ export const DesktopSidebar = () => {
             {isSuperAdmin && (
               <div className="flex items-center space-x-2 px-2 pb-1 text-[11px] font-black text-[#FF2A6D] uppercase tracking-wider">
                 <Command className="w-4 h-4 text-[#FF2A6D]" />
-                <span>SuperAdmin Command HQ</span>
+                <span>SuperAdmin Command</span>
               </div>
             )}
             {isParent && (
@@ -153,7 +159,7 @@ export const DesktopSidebar = () => {
                 }`}
               >
                 <ShieldCheck className="w-5 h-5 shrink-0" />
-                <span>CHILD SAFETY GUARDIAN HQ</span>
+                <span>CHILD SAFETY GUARDIAN</span>
               </Link>
             )}
             {isOrganization && (
@@ -166,7 +172,7 @@ export const DesktopSidebar = () => {
                 }`}
               >
                 <Users className="w-5 h-5 shrink-0" />
-                <span>ORGANIZATION MONITOR HQ</span>
+                <span>ORGANIZATION MONITOR</span>
               </Link>
             )}
 
@@ -283,7 +289,7 @@ export const DesktopSidebar = () => {
                         Sakhi Suraksha
                       </h2>
                       <p className="text-[9px] font-black text-[#FF2A6D] tracking-widest uppercase mt-0.5">
-                        SuperAdmin Mobile HQ
+                        SuperAdmin Mobile
                       </p>
                     </div>
                   </Link>
@@ -310,7 +316,7 @@ export const DesktopSidebar = () => {
                 <nav className="flex-1 px-4 py-5 space-y-2.5 overflow-y-auto scrollbar-none">
                   <div className="flex items-center space-x-2 px-2 pb-1 text-[11px] font-black text-[#FF2A6D] uppercase tracking-wider">
                     <Command className="w-4 h-4 text-[#FF2A6D]" />
-                    <span>SuperAdmin Command HQ</span>
+                    <span>SuperAdmin Command</span>
                   </div>
 
                   {adminNavItems.map((item) => {
