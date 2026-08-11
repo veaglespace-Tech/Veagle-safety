@@ -9,15 +9,23 @@ import * as organizationController from '../controllers/organizationController.j
 import * as parentController from '../controllers/parentController.js';
 import * as paymentController from '../controllers/paymentController.js';
 import * as pushController from '../controllers/pushController.js';
+import * as settingController from '../controllers/settingController.js';
+import * as referralController from '../controllers/referralController.js';
+import * as couponController from '../controllers/couponController.js';
 import { authenticateToken, optionalAuthToken, requireSuperAdmin } from '../middleware/auth.js';
+import { upload } from '../middleware/upload.js';
+import { validate } from '../middleware/validate.js';
+import { registerSchema, loginSchema, verifyEmailSchema } from '../utils/schemas.js';
+import { imagekit } from '../services/imagekit.js';
+import fs from 'fs';
 
 const router = Router();
 
 // Auth & User
-router.post('/auth/register', authController.register);
-router.post('/auth/verify-email', authController.verifyEmail);
+router.post('/auth/register', validate(registerSchema), authController.register);
+router.post('/auth/verify-email', validate(verifyEmailSchema), authController.verifyEmail);
 router.post('/auth/resend-otp', authController.resendOtp);
-router.post('/auth/login', authController.login);
+router.post('/auth/login', validate(loginSchema), authController.login);
 router.post('/auth/logout', authController.logout);
 router.get('/auth/me', authenticateToken, authController.getProfile);
 router.put('/auth/settings', authenticateToken, authController.updateSettings);
@@ -102,5 +110,55 @@ router.delete('/parent/children/:linkId', authenticateToken, parentController.un
 router.get('/push/vapid-key', pushController.getVapidPublicKey);
 router.post('/push/subscribe', authenticateToken, pushController.savePushSubscription);
 router.post('/push/subscribe-email', pushController.savePushSubscriptionByEmail);
+
+// System Settings
+router.get('/settings', settingController.getSettings);
+router.put('/settings', authenticateToken, requireSuperAdmin, settingController.updateSettings);
+
+// Media Upload
+router.post('/upload', authenticateToken, requireSuperAdmin, upload.single('media'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    
+    // Read the file buffer for ImageKit
+    const fileBuffer = fs.readFileSync(req.file.path);
+    
+    const response = await imagekit.upload({
+      file: fileBuffer,
+      fileName: req.file.filename,
+      useUniqueFileName: false,
+    });
+    
+    // Optionally delete the local file after upload
+    fs.unlinkSync(req.file.path);
+
+    res.status(200).json({ 
+      success: true, 
+      url: response.url,
+      mediaType: req.file.mimetype.startsWith('video/') ? 'video' : 'image' 
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ success: false, message: 'File upload failed' });
+  }
+});
+
+// Referral Partners
+router.post('/partners', authenticateToken, requireSuperAdmin, referralController.createPartner);
+router.get('/partners', authenticateToken, requireSuperAdmin, referralController.getAllPartners);
+router.get('/partners/:id', authenticateToken, requireSuperAdmin, referralController.getPartnerById);
+router.put('/partners/:id', authenticateToken, requireSuperAdmin, referralController.updatePartner);
+router.post('/partners/stats', referralController.getPartnerStats); // Public/dashboard stats
+
+// Coupons
+router.post('/coupons', authenticateToken, requireSuperAdmin, couponController.createCoupon);
+router.get('/coupons', authenticateToken, requireSuperAdmin, couponController.getAllCoupons);
+router.put('/coupons/:id', authenticateToken, requireSuperAdmin, couponController.updateCoupon);
+router.delete('/coupons/:id', authenticateToken, requireSuperAdmin, couponController.deleteCoupon);
+router.get('/coupons/assignable-users', authenticateToken, requireSuperAdmin, couponController.getAssignableUsers);
+router.get('/coupons/my-coupons', authenticateToken, couponController.getMyCoupons);
+router.post('/coupons/validate', authenticateToken, couponController.validateCoupon);
 
 export default router;

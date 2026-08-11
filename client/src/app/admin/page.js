@@ -229,7 +229,7 @@ export default function SuperAdminOverviewPage() {
               <div className="p-8 text-center bg-[#FFF0F3]/40 rounded-3xl border border-dashed border-[#FFCCE1] space-y-2">
                 <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
                 <p className="font-black text-sm text-[#2A0826]">All Clear — No Active Emergency SOS Incidents</p>
-                <p className="text-xs text-[#684E67] font-extrabold">All Sakhi members are safe and monitored 24/7 by HQ command dispatch.</p>
+                <p className="text-xs text-[#684E67] font-extrabold">All Sakhi members are safe and monitored 24/7 by command dispatch.</p>
               </div>
             )}
           </div>

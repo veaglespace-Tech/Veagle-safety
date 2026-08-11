@@ -373,7 +373,7 @@ export const adminResolveSos = asyncHandler(async (req, res) => {
     data: {
       status: 'RESOLVED',
       resolvedAt: new Date(),
-      resolutionNote: note || 'Resolved by SuperAdmin Command HQ',
+      resolutionNote: note || 'Resolved by SuperAdmin Command',
     },
     include: {
       user: {
@@ -440,7 +440,7 @@ export const adminResolveSos = asyncHandler(async (req, res) => {
   }
 
   return res.status(200).json({
-    message: `Emergency SOS Incident #${targetId} resolved successfully by Command HQ`,
+    message: `Emergency SOS Incident #${targetId} resolved successfully by Command`,
     session,
   });
 });
@@ -481,7 +481,7 @@ export const getPlans = asyncHandler(async (req, res) => {
     const defaultPlan = await prisma.plan.create({
       data: {
         name: 'Sakhi Suraksha 365 Yearly Protection Plan',
-        description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
+        description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and Command Dispatch',
         basePrice: 24.0,
         gstPercentage: 18.0,
         totalPrice: 28.32,

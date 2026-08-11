@@ -43,7 +43,7 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
 
   return (
     <div className="space-y-6">
-      {/* SUPERADMIN HQ HERO HEADER BANNER */}
+      {/* SUPERADMIN HERO HEADER BANNER */}
       <div className="bg-gradient-to-r from-[#2A0826] via-[#4A154B] to-[#2A0826] rounded-[28px] sm:rounded-[36px] p-5 sm:p-7 md:p-8 text-white shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-5 border border-[#FFCCE1]/30">
         <div className="flex items-center space-x-3.5 sm:space-x-4 z-10 min-w-0">
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] flex items-center justify-center shadow-lg shadow-[#FF2A6D]/40 border-2 border-white/20 shrink-0">
@@ -51,7 +51,7 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
           </div>
           <div className="min-w-0">
             <div className="flex items-center space-x-2 flex-wrap">
-              <h1 className="text-lg sm:text-2xl font-black tracking-tight text-white truncate">SuperAdmin Command HQ</h1>
+              <h1 className="text-lg sm:text-2xl font-black tracking-tight text-white truncate">SuperAdmin Command</h1>
             </div>
             <p className="text-xs text-[#FFCCE1] font-bold mt-0.5 truncate">
               Central Operations & System Control Portal

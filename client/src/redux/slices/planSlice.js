@@ -4,7 +4,7 @@ import { api } from '../../utils/api.js';
 const SINGLE_YEARLY_PLAN = {
   id: 'plan_yearly_24',
   name: 'Sakhi Suraksha 365 Yearly Protection Plan',
-  description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and HQ Command Dispatch',
+  description: 'Complete 365-Day 24/7 Unlimited SOS Emergency Broadcast, Live GPS Map Sharing, 5 Trusted Contacts Network, and Command Dispatch',
   basePrice: 24,
   gstPercentage: 18,
   totalPrice: 28.32,

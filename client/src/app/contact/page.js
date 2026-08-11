@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { Footer } from '../../components/layout/Footer.js';
 import { api } from '../../utils/api.js';
+import { settingApi } from '../../redux/api/settingApi.js';
 import { 
   PhoneCall, Mail, MapPin, Send, ShieldCheck, 
   Clock, User, MessageSquare, CheckCircle2, Phone, 
@@ -18,6 +19,21 @@ export default function ContactSupportPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorNotice, setErrorNotice] = useState(null);
+  const [supportEmail, setSupportEmail] = useState('support@sakhisuraksha.org');
+
+  React.useEffect(() => {
+    const fetchEmail = async () => {
+      try {
+        const res = await settingApi.fetchSettings(['SUPPORT_EMAIL']);
+        if (res.success && res.data.SUPPORT_EMAIL) {
+          setSupportEmail(res.data.SUPPORT_EMAIL);
+        }
+      } catch (err) {
+        // Fallback to default
+      }
+    };
+    fetchEmail();
+  }, []);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -71,7 +87,7 @@ export default function ContactSupportPage() {
         {/* 2-COLUMN MAIN CONTENT GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-6xl mx-auto items-start">
           
-          {/* LEFT COLUMN: EMERGENCY HELPLINES & HQ DETAILS */}
+          {/* LEFT COLUMN: EMERGENCY HELPLINES & DETAILS */}
           <div className="space-y-8">
             
             {/* NATIONAL EMERGENCY HELPLINES CARD */}
@@ -157,26 +173,26 @@ export default function ContactSupportPage() {
               </ul>
             </div>
 
-            {/* HQ COMMAND CENTER CARD */}
+            {/* COMMAND CENTER CARD */}
             <div className="bg-white/95 backdrop-blur-xl p-8 rounded-3xl space-y-5 border-1.5 border-[#FFCCE1] shadow-[0_10px_35px_rgba(255,92,138,0.10)] relative overflow-hidden">
               <div className="flex items-center space-x-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF0F3] to-[#FFCCE1] text-[#FF2A6D] flex items-center justify-center border-1.5 border-[#FF5C8A] shadow-sm">
                   <MapPin className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-[#2A0826]">Sakhi Suraksha SOS HQ Command</h3>
+                  <h3 className="text-xl font-black text-[#2A0826]">Sakhi Suraksha SOS Command</h3>
                   <p className="text-xs text-[#684E67] font-bold">Veagle Safety Network Operations</p>
                 </div>
               </div>
 
               <p className="text-xs text-[#684E67] leading-relaxed font-bold">
-                Veagle Safety Network Operations HQ, Pune & Mumbai Data Centers, Maharashtra, India.
+                Veagle Safety Network Operations, Pune & Mumbai Data Centers, Maharashtra, India.
               </p>
 
               <div className="pt-3 border-t-1.5 border-[#FFCCE1] space-y-2.5 text-xs font-extrabold">
                 <div className="flex items-center space-x-2.5 text-[#2A0826]">
                   <Mail className="w-4 h-4 text-[#FF5C8A] shrink-0" />
-                  <span>Email: <a href="mailto:support@sakhisuraksha.org" className="text-[#FF2A6D] underline">support@sakhisuraksha.org</a></span>
+                  <span>Email: <a href={`mailto:${supportEmail}`} className="text-[#FF2A6D] underline">{supportEmail}</a></span>
                 </div>
                 <div className="flex items-center space-x-2.5 text-[#2A0826]">
                   <Clock className="w-4 h-4 text-[#FF5C8A] shrink-0" />
@@ -193,7 +209,7 @@ export default function ContactSupportPage() {
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
 
             <div className="space-y-1.5">
-              <h3 className="text-2xl font-black text-[#2A0826]">Send Message to Safety HQ</h3>
+              <h3 className="text-2xl font-black text-[#2A0826]">Send Message to Safety</h3>
               <p className="text-xs text-[#684E67] font-bold">
                 Fill out the details below and our dedicated safety command team will respond shortly.
               </p>
@@ -299,7 +315,7 @@ export default function ContactSupportPage() {
                     type="submit"
                     className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
                   >
-                    <span>SEND INQUIRY TO SAFETY HQ</span>
+                    <span>SEND INQUIRY TO SAFETY</span>
                     <Send className="w-4 h-4 shrink-0" />
                   </button>
                 </div>

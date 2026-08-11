@@ -148,7 +148,7 @@ export default function DashboardAppPage() {
             </div>
           )}
 
-          {/* SUPER ADMIN HQ ACCESSIBILITY BAR */}
+          {/* SUPER ADMIN ACCESSIBILITY BAR */}
           {isSuperAdmin && (
             <div className="bg-gradient-to-r from-tichi-text via-[#3D0C38] to-tichi-text border-2 border-gold/40 text-gold p-4 sm:p-5 rounded-3xl shadow-lg flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -162,7 +162,7 @@ export default function DashboardAppPage() {
                 href="/admin"
                 className="bg-gold text-tichi-text font-black text-xs px-4 py-2 rounded-xl shadow hover:brightness-110 transition-all flex items-center space-x-1 uppercase tracking-wider"
               >
-                <span>HQ PORTAL</span>
+                <span>PORTAL</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>

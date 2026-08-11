@@ -157,19 +157,25 @@ export const Header = () => {
             </div>
           )}
 
-          {/* MOBILE MENU TOGGLE BUTTON (ONLY FOR PUBLIC GUESTS) */}
-          {!isLoggedIn && (
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm shrink-0"
-              aria-label="Toggle navigation menu"
-            >
-              <div className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
-                {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-              </div>
-            </button>
-          )}
+          {/* MOBILE MENU TOGGLE BUTTON (FOR ALL USERS) */}
+          <button
+            type="button"
+            onClick={() => {
+              if (isLoggedIn) {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new Event('toggle-admin-drawer'));
+                }
+              } else {
+                setMobileMenuOpen(!mobileMenuOpen);
+              }
+            }}
+            className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#FFF0F3] border-1.5 border-[#FFCCE1] flex items-center justify-center text-[#FF5C8A] cursor-pointer hover:bg-[#FF5C8A] hover:text-white transition-all duration-300 shadow-sm shrink-0"
+            aria-label="Toggle navigation menu"
+          >
+            <div className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
+              {mobileMenuOpen && !isLoggedIn ? <X size={18} /> : <Menu size={18} />}
+            </div>
+          </button>
         </div>
       </div>
 
@@ -208,7 +214,7 @@ export const Header = () => {
                 className="flex items-center gap-3 p-3 rounded-xl text-xs font-black bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30"
               >
                 <Home size={16} />
-                <span>{isSuperAdmin ? 'Admin HQ Command' : 'My Safety Dashboard'}</span>
+                <span>{isSuperAdmin ? 'Admin Command' : 'My Safety Dashboard'}</span>
               </Link>
 
               <button

@@ -155,7 +155,7 @@ export default function OrganizationDashboard() {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-widest text-white bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] px-2.5 py-0.5 rounded-full shadow-xs">
-                  ORGANIZATION HQ
+                  ORGANIZATION
                 </span>
                 <span className="text-[11px] sm:text-xs font-bold text-[#684E67] flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#059669] inline-block shrink-0 animate-pulse" />

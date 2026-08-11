@@ -69,12 +69,12 @@ export default function SuperAdminLoginPage() {
 
             <div className="inline-flex items-center space-x-2 bg-white/90 border border-[#FFCCE1] px-3.5 py-1 rounded-full text-[10px] font-black text-[#FF2A6D] uppercase tracking-widest shadow-sm">
               <Sparkles className="w-3 h-3 text-[#FF5C8A] animate-pulse" />
-              <span>HQ Operations Clearance Required</span>
+              <span>Operations Clearance Required</span>
             </div>
 
             <AnimatedHeading as="h1" variant="shimmer" className="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
               <span className="heading-gradient-hero">Super Admin </span>
-              <span className="heading-highlight-pill">HQ Portal</span>
+              <span className="heading-highlight-pill">Portal</span>
             </AnimatedHeading>
 
             <p className="text-xs text-[#684E67] font-bold max-w-xs leading-relaxed">

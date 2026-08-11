@@ -1,6 +1,7 @@
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
+import path from 'path';
 import { config } from './config/index.js';
 import { prisma } from './config/prisma.js';
 import apiRouter from './routes/api.js';
@@ -27,6 +28,9 @@ app.use(
     extended: true,
   })
 );
+
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 
 // API Routes
 app.use("/api", apiRouter);

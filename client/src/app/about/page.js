@@ -15,7 +15,7 @@ export default function AboutUsPage() {
     {
       icon: Radio,
       title: '3-Second Ultra-Fast SOS Broadcast',
-      description: 'Engineered for extreme emergency speed. Pressing the SOS trigger broadcasts your precise GPS location to 5 trusted guardians and HQ within sub-seconds.',
+      description: 'Engineered for extreme emergency speed. Pressing the SOS trigger broadcasts your precise GPS location to 5 trusted guardians within sub-seconds.',
       badge: 'SUB-SECOND RESPONSE',
     },
     {
@@ -26,7 +26,7 @@ export default function AboutUsPage() {
     },
     {
       icon: Shield,
-      title: '24/7 HQ Command & Dispatch Monitoring',
+      title: '24/7 Command & Dispatch Monitoring',
       description: 'Integrated with national helplines (112, 1091, 181) to ensure continuous monitoring and emergency escalation.',
       badge: '24/7 COMMAND ONLINE',
     },

@@ -49,7 +49,7 @@ export const SuperAdminQuickJump = () => {
   }
 
   const targetHref = isAdminPage ? '/' : '/admin';
-  const targetTitle = isAdminPage ? 'Switch to Main Website' : 'Super Admin HQ';
+  const targetTitle = isAdminPage ? 'Switch to Main Website' : 'Super Admin';
   const targetDesc = isAdminPage ? 'Explore Public Landing Page & Safety Features' : 'Access Operations & Dispatch Control Center';
 
   return (
