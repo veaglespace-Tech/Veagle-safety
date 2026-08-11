@@ -8,6 +8,7 @@ import { BottomNavigation } from './BottomNavigation.js';
 import { DesktopSidebar } from './DesktopSidebar.js';
 
 import { GeoLocationTracker } from '../common/GeoLocationTracker.js';
+import { EmergencyAlarmListener } from '../common/EmergencyAlarmListener.js';
 
 export const AppLayout = ({ children, fullScreen = false }) => {
   const pathname = usePathname();
