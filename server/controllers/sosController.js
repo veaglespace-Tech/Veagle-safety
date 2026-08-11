@@ -60,6 +60,16 @@ export const startSos = async (req, res) => {
       where: { userId },
     });
 
+    const parentLinks = await prisma.parentChildLink.findMany({
+      where: { childId: userId, status: 'ACTIVE' },
+      include: { parent: true },
+    }).catch(() => []);
+
+    const orgMemberships = await prisma.organizationMember.findMany({
+      where: { userId, status: 'ACTIVE' },
+      include: { organization: true },
+    }).catch(() => []);
+
     const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
     const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -67,9 +77,17 @@ export const startSos = async (req, res) => {
     // 1. Collect Recipient Emails (User + Admin + Parent Emergency Email + Guardian Contacts)
     const recipientEmails = collectEmergencyRecipients(currentUser, contacts);
 
+    // Also add linked Parent & Organization emails to emergency dispatch list
+    parentLinks.forEach((link) => {
+      if (link.parent?.email) recipientEmails.push(link.parent.email.trim().toLowerCase());
+    });
+    orgMemberships.forEach((org) => {
+      if (org.organization?.email) recipientEmails.push(org.organization.email.trim().toLowerCase());
+    });
+
     // 2. Dispatch High-Priority Emergency Emails concurrently
     await Promise.all(
-      recipientEmails.map(async (email) => {
+      Array.from(new Set(recipientEmails)).map(async (email) => {
         try {
           await sendSosEmergencyAlert({
             recipientEmail: email,
@@ -137,6 +155,22 @@ export const startSos = async (req, res) => {
       // Collect all guardian & recipient rooms (email rooms, phone rooms, admin room)
       const targetRooms = new Set();
       targetRooms.add('admin-ops');
+
+      parentLinks.forEach((link) => {
+        if (link.parent?.email) targetRooms.add(`user:${link.parent.email.trim().toLowerCase()}`);
+        if (link.parent?.phone) {
+          const cleanP = link.parent.phone.replace(/\D/g, '');
+          if (cleanP) targetRooms.add(`user:${cleanP}`);
+        }
+      });
+
+      orgMemberships.forEach((org) => {
+        if (org.organization?.email) targetRooms.add(`user:${org.organization.email.trim().toLowerCase()}`);
+        if (org.organization?.phone) {
+          const cleanO = org.organization.phone.replace(/\D/g, '');
+          if (cleanO) targetRooms.add(`user:${cleanO}`);
+        }
+      });
 
       if (currentUser?.parentEmail) {
         targetRooms.add(`user:${currentUser.parentEmail.trim().toLowerCase()}`);
@@ -397,11 +431,37 @@ export const getPublicSosTracking = async (req, res) => {
       },
     });
 
-    if (!session) {
-      return res.status(404).json({ error: 'Tracking session not found or expired' });
+    if (session) {
+      return res.json({ session });
     }
 
-    return res.json({ session });
+    // Fallback: Check if token belongs to an active or overdue Journey
+    const journey = await prisma.journey.findUnique({
+      where: { shareToken: token },
+      include: {
+        user: { select: { fullName: true, phone: true, profilePhoto: true, bloodGroup: true } },
+        locations: { orderBy: { recordedAt: 'desc' }, take: 20 },
+      },
+    });
+
+    if (journey) {
+      const normalizedSession = {
+        id: journey.id,
+        shareToken: journey.shareToken,
+        status: journey.status === 'OVERDUE' ? 'ACTIVE' : journey.status,
+        isJourney: true,
+        destinationName: journey.destinationName,
+        originName: journey.originName,
+        expectedArrival: journey.expectedArrival,
+        user: journey.user,
+        locations: journey.locations && journey.locations.length > 0 ? journey.locations : [
+          { latitude: journey.originLat, longitude: journey.originLng, recordedAt: journey.startedAt }
+        ],
+      };
+      return res.json({ session: normalizedSession, journey });
+    }
+
+    return res.status(404).json({ error: 'Tracking session not found or expired' });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to fetch tracking data' });
   }

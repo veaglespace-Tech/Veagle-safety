@@ -142,6 +142,88 @@ export const startSosPeriodicWorker = () => {
         }
       }
 
+      // 2. Fetch all IN_PROGRESS Journeys that have passed their expected arrival time
+      const overdueJourneys = await prisma.journey.findMany({
+        where: {
+          status: 'IN_PROGRESS',
+          expectedArrival: { lte: new Date() },
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+              phone: true,
+              profilePhoto: true,
+              parentEmail: true,
+              emergencyContactPhone: true,
+              trustedContacts: true,
+            },
+          },
+        },
+      });
+
+      for (const journey of overdueJourneys) {
+        console.log(`🚨 [SOS Worker] Journey #${journey.id} for ${journey.user.fullName} is OVERDUE! Escalating emergency alert...`);
+
+        // Mark journey as OVERDUE
+        await prisma.journey.update({
+          where: { id: journey.id },
+          data: { status: 'OVERDUE' },
+        });
+
+        // Mark user safety status as SOS_ACTIVE
+        await prisma.user.update({
+          where: { id: journey.userId },
+          data: { safetyStatus: 'SOS_ACTIVE' },
+        });
+
+        // Create or get active SOS Session for emergency escalation
+        let session = await prisma.sosSession.findFirst({
+          where: { userId: journey.userId, status: 'ACTIVE' },
+        });
+
+        if (!session) {
+          session = await prisma.sosSession.create({
+            data: {
+              userId: journey.userId,
+              status: 'ACTIVE',
+              isSilent: false,
+              shareToken: journey.shareToken,
+            },
+          });
+        }
+
+        const latitude = journey.destLat || 18.5204;
+        const longitude = journey.destLng || 73.8567;
+        const trackingUrl = `${clientBaseUrl}/live-track/${journey.shareToken}`;
+        const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+        const sosAlarmPayload = {
+          sosId: session.id,
+          journeyId: journey.id,
+          isOverdueJourney: true,
+          victimName: journey.user.fullName || 'Sakhi Suraksha User',
+          victimPhone: journey.user.phone || '',
+          victimPhoto: journey.user.profilePhoto || null,
+          shareToken: journey.shareToken,
+          trackingUrl,
+          googleMapsUrl,
+          latitude,
+          longitude,
+          destinationName: journey.destinationName,
+          expectedArrival: journey.expectedArrival,
+          timestamp: new Date().toISOString(),
+        };
+
+        // Broadcast real-time siren alert to all connected parents, guardians & sockets
+        const io = getIO();
+        if (io) {
+          io.emit('SOS_ALARM_BROADCAST', sosAlarmPayload);
+        }
+      }
+
       // Cleanup stale entries from lastSentMap (sessions older than 24h)
       for (const [key, sentAt] of lastSentMap.entries()) {
         if (now - sentAt > 24 * 60 * 60 * 1000) {

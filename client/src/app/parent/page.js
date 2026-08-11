@@ -320,20 +320,33 @@ export default function ParentDashboard() {
                         )}
                       </div>
 
-                      {/* LIVE TRACK BUTTON IF SOS */}
-                      {item.activeSos && item.activeSos.shareToken && (
-                        <div className="pt-1">
+                      {/* LIVE TRACK BUTTON IF SOS OR JOURNEY */}
+                      <div className="pt-1 space-y-2">
+                        {item.activeSos && item.activeSos.shareToken && (
                           <a
                             href={`/live-track/${item.activeSos.shareToken}`}
                             target="_blank"
                             rel="noreferrer"
                             className="w-full btn-3d-rose-pop py-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2"
                           >
-                            <span>OPEN LIVE MAP & GPS STREAM FOR {c.fullName.toUpperCase()}</span>
+                            <span>🚨 OPEN EMERGENCY SOS LIVE GPS STREAM FOR {c.fullName.toUpperCase()}</span>
                             <ArrowUpRight className="w-4 h-4" />
                           </a>
-                        </div>
-                      )}
+                        )}
+
+                        {item.activeJourney && item.activeJourney.shareToken && !item.activeSos && (
+                          <a
+                            href={`/live-track/${item.activeJourney.shareToken}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 shadow-md shadow-emerald-500/20"
+                          >
+                            <Navigation className="w-4 h-4" />
+                            <span>OPEN LIVE JOURNEY MAP FOR {c.fullName.toUpperCase()} ({item.activeJourney.destinationName})</span>
+                            <ArrowUpRight className="w-4 h-4" />
+                          </a>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
