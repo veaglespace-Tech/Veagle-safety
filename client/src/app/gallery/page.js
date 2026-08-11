@@ -53,7 +53,7 @@ export default function PlatformGalleryPage() {
   const renderMedia = (item, isModal = false) => {
     const className = isModal 
       ? "w-full h-auto max-h-[60vh] object-contain rounded-2xl" 
-      : "absolute inset-0 w-full h-full object-contain p-2 md:p-4 transition-transform duration-500 group-hover:scale-105";
+      : "w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105";
 
     if (!item.mediaUrl) {
       return (
@@ -144,7 +144,7 @@ export default function PlatformGalleryPage() {
                 className="space-y-3 flex flex-col group cursor-pointer"
               >
                 {/* CARD MEDIA PREVIEW WITH LIGHTBOX HOVER ICON */}
-                <div className="relative w-full h-64 sm:h-72 rounded-[2rem] overflow-hidden bg-white/40 backdrop-blur-sm border-2 border-white shadow-sm transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
+                <div className="relative w-full rounded-[2rem] overflow-hidden shadow-sm transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
                   {renderMedia(item, false)}
                   {item.badge && (
                     <span className="absolute top-4 left-4 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest bg-white text-[#FF2A6D] shadow-sm">
