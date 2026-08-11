@@ -21,6 +21,11 @@ export const referralApi = {
     return response.data;
   },
 
+  deletePartner: async (id) => {
+    const response = await apiClient.delete(`/partners/${id}`);
+    return response.data;
+  },
+
   getPartnerStats: async (email, code) => {
     const response = await apiClient.post('/partners/stats', { email, code });
     return response.data;

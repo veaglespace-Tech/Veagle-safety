@@ -150,6 +150,7 @@ router.post('/partners', authenticateToken, requireSuperAdmin, referralControlle
 router.get('/partners', authenticateToken, requireSuperAdmin, referralController.getAllPartners);
 router.get('/partners/:id', authenticateToken, requireSuperAdmin, referralController.getPartnerById);
 router.put('/partners/:id', authenticateToken, requireSuperAdmin, referralController.updatePartner);
+router.delete('/partners/:id', authenticateToken, requireSuperAdmin, referralController.deletePartner);
 router.post('/partners/stats', referralController.getPartnerStats); // Public/dashboard stats
 
 // Coupons

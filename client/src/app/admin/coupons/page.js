@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../../components/admin/AdminHeaderNav.js';
 import { couponApi } from '../../../redux/api/couponApi.js';
-import { Ticket, Plus, X, Trash2, PowerOff, Power } from 'lucide-react';
+import { Ticket, Plus, X, Trash2, PowerOff, Power, Edit } from 'lucide-react';
 
 export default function AdminCouponsPage() {
   const [mounted, setMounted] = useState(false);
@@ -13,6 +13,8 @@ export default function AdminCouponsPage() {
   const [toast, setToast] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingCouponId, setEditingCouponId] = useState(null);
 
   const [form, setForm] = useState({
     code: '',
@@ -45,19 +47,48 @@ export default function AdminCouponsPage() {
     fetchCoupons();
   }, []);
 
-  const handleCreateCoupon = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await couponApi.createCoupon(form);
+      let res;
+      if (isEditMode) {
+        res = await couponApi.updateCoupon(editingCouponId, form);
+      } else {
+        res = await couponApi.createCoupon(form);
+      }
+      
       if (res.success) {
-        showToast('success', 'Coupon created successfully!');
+        showToast('success', isEditMode ? 'Coupon updated successfully!' : 'Coupon created successfully!');
         setIsModalOpen(false);
+        setIsEditMode(false);
+        setEditingCouponId(null);
         setForm({ code: '', discountType: 'PERCENTAGE', discountValue: '', maxUses: '', validFrom: '', validUntil: '' });
         fetchCoupons();
       }
     } catch (err) {
-      showToast('error', err.response?.data?.message || 'Failed to create coupon');
+      showToast('error', err.response?.data?.message || (isEditMode ? 'Failed to update coupon' : 'Failed to create coupon'));
     }
+  };
+
+  const handleEditClick = (coupon) => {
+    setForm({
+      code: coupon.code,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+      maxUses: coupon.maxUses || '',
+      validFrom: coupon.validFrom ? new Date(coupon.validFrom).toISOString().split('T')[0] : '',
+      validUntil: coupon.validUntil ? new Date(coupon.validUntil).toISOString().split('T')[0] : '',
+    });
+    setIsEditMode(true);
+    setEditingCouponId(coupon.id);
+    setIsModalOpen(true);
+  };
+
+  const openCreateModal = () => {
+    setForm({ code: '', discountType: 'PERCENTAGE', discountValue: '', maxUses: '', validFrom: '', validUntil: '' });
+    setIsEditMode(false);
+    setEditingCouponId(null);
+    setIsModalOpen(true);
   };
 
   const handleToggleStatus = async (coupon) => {
@@ -105,7 +136,7 @@ export default function AdminCouponsPage() {
               </div>
             </div>
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={openCreateModal}
               className="px-5 py-3.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black rounded-2xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2 cursor-pointer uppercase tracking-wider"
             >
               <Plus className="w-4 h-4" />
@@ -165,6 +196,13 @@ export default function AdminCouponsPage() {
                         <td className="p-5 text-right">
                           <div className="flex items-center justify-end space-x-2">
                             <button
+                              onClick={() => handleEditClick(coupon)}
+                              className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors"
+                              title="Edit Coupon"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => handleToggleStatus(coupon)}
                               className={`p-2 rounded-xl transition-colors ${coupon.isActive ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
                               title={coupon.isActive ? "Disable Coupon" : "Enable Coupon"}
@@ -197,14 +235,14 @@ export default function AdminCouponsPage() {
             <div className="p-6 border-b border-[#FFCCE1] flex items-center justify-between bg-[#FFF0F3]/30">
               <h3 className="font-black text-lg text-[#2A0826] flex items-center space-x-2">
                 <Ticket className="w-5 h-5 text-[#FF2A6D] transform -rotate-45" />
-                <span>Create New Coupon</span>
+                <span>{isEditMode ? 'Edit Coupon' : 'Create New Coupon'}</span>
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-[#FFCCE1] rounded-full text-[#684E67] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
             
-            <form onSubmit={handleCreateCoupon} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div className="space-y-1.5">
                 <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Coupon Code *</label>
                 <input required type="text" value={form.code} onChange={e => setForm({...form, code: e.target.value.toUpperCase()})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-black text-[#FF2A6D] tracking-widest outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all uppercase" placeholder="e.g. SUMMER50" />
@@ -242,7 +280,7 @@ export default function AdminCouponsPage() {
 
               <div className="pt-4">
                 <button type="submit" className="w-full py-4 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer uppercase tracking-wider">
-                  Create Coupon
+                  {isEditMode ? 'Update Coupon' : 'Create Coupon'}
                 </button>
               </div>
             </form>

@@ -117,17 +117,69 @@ export const getPartnerById = async (req, res) => {
 export const updatePartner = async (req, res) => {
   try {
     const { id } = req.params;
-    const { isActive } = req.body;
+    const { partnerName, email, partnerReferralCode, discountPercentage, isActive } = req.body;
+
+    const partnerId = parseInt(id);
+
+    // Check if updating email or code to an existing one
+    if (email || partnerReferralCode) {
+      const existing = await prisma.referralPartner.findFirst({
+        where: {
+          OR: [
+            ...(email ? [{ email }] : []),
+            ...(partnerReferralCode ? [{ partnerReferralCode }] : []),
+          ],
+          NOT: { id: partnerId }
+        }
+      });
+      if (existing) {
+        return res.status(400).json({ success: false, message: 'Email or Referral Code already in use by another partner.' });
+      }
+    }
 
     const partner = await prisma.referralPartner.update({
-      where: { id: parseInt(id) },
-      data: { isActive },
+      where: { id: partnerId },
+      data: { 
+        ...(partnerName && { partnerName }),
+        ...(email && { email }),
+        ...(partnerReferralCode && { partnerReferralCode }),
+        ...(discountPercentage !== undefined && { discountPercentage: parseFloat(discountPercentage) }),
+        ...(isActive !== undefined && { isActive })
+      },
     });
 
     res.status(200).json({ success: true, partner });
   } catch (error) {
     console.error('Error updating partner:', error);
     res.status(500).json({ success: false, message: 'Failed to update partner.' });
+  }
+};
+
+export const deletePartner = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const partnerId = parseInt(id);
+
+    // Check if partner has referred users
+    const referredUsersCount = await prisma.user.count({
+      where: { referredByPartnerId: partnerId }
+    });
+
+    if (referredUsersCount > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Cannot delete partner because they have referred users. Please disable them instead.' 
+      });
+    }
+
+    await prisma.referralPartner.delete({
+      where: { id: partnerId }
+    });
+
+    res.status(200).json({ success: true, message: 'Partner deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting partner:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete partner.' });
   }
 };
 

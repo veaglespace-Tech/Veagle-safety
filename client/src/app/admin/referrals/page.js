@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../../components/admin/AdminHeaderNav.js';
 import { referralApi } from '../../../redux/api/referralApi.js';
-import { Network, Plus, Users, X, Link as LinkIcon, CheckCircle2, ShieldCheck, Mail, Phone, Calendar } from 'lucide-react';
+import { Network, Plus, Users, X, Link as LinkIcon, CheckCircle2, ShieldCheck, Mail, Phone, Calendar, Edit, Trash2, PowerOff, Power } from 'lucide-react';
 
 export default function AdminReferralsPage() {
   const [mounted, setMounted] = useState(false);
@@ -13,6 +13,9 @@ export default function AdminReferralsPage() {
   const [toast, setToast] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingPartnerId, setEditingPartnerId] = useState(null);
+  
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState(null);
 
@@ -21,6 +24,7 @@ export default function AdminReferralsPage() {
     email: '',
     mobile: '',
     partnerReferralCode: '',
+    discountPercentage: '',
     isActive: true,
   });
 
@@ -46,19 +50,82 @@ export default function AdminReferralsPage() {
     fetchPartners();
   }, []);
 
-  const handleCreatePartner = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await referralApi.createPartner(form);
+      const payload = {
+        partnerName: form.name,
+        email: form.email,
+        mobile: form.mobile,
+        partnerReferralCode: form.partnerReferralCode,
+        discountPercentage: form.discountPercentage,
+        isActive: form.isActive
+      };
+      
+      let res;
+      if (isEditMode) {
+        res = await referralApi.updatePartner(editingPartnerId, payload);
+      } else {
+        res = await referralApi.createPartner(payload);
+      }
+      
       if (res.success) {
-        showToast('success', 'Referral partner created successfully!');
+        showToast('success', isEditMode ? 'Referral partner updated successfully!' : 'Referral partner created successfully!');
         setIsModalOpen(false);
-        setForm({ name: '', email: '', mobile: '', partnerReferralCode: '', isActive: true });
+        setIsEditMode(false);
+        setEditingPartnerId(null);
+        setForm({ name: '', email: '', mobile: '', partnerReferralCode: '', discountPercentage: '', isActive: true });
         fetchPartners();
       }
     } catch (err) {
-      showToast('error', err.response?.data?.message || 'Failed to create partner');
+      showToast('error', err.response?.data?.message || (isEditMode ? 'Failed to update partner' : 'Failed to create partner'));
     }
+  };
+
+  const handleEditClick = (partner) => {
+    setForm({
+      name: partner.name,
+      email: partner.email,
+      mobile: partner.mobile || '',
+      partnerReferralCode: partner.partnerReferralCode || '',
+      discountPercentage: partner.discountPercentage || '',
+      isActive: partner.isActive,
+    });
+    setIsEditMode(true);
+    setEditingPartnerId(partner.id);
+    setIsModalOpen(true);
+  };
+
+  const handleDeletePartner = async (id) => {
+    if (!confirm('Are you sure you want to delete this partner?')) return;
+    try {
+      const res = await referralApi.deletePartner(id);
+      if (res.success) {
+        showToast('success', 'Partner deleted successfully.');
+        fetchPartners();
+      }
+    } catch (err) {
+      showToast('error', err.response?.data?.message || 'Failed to delete partner');
+    }
+  };
+
+  const handleToggleStatus = async (partner) => {
+    try {
+      const res = await referralApi.updatePartner(partner.id, { isActive: !partner.isActive });
+      if (res.success) {
+        showToast('success', 'Partner status updated');
+        fetchPartners();
+      }
+    } catch (err) {
+      showToast('error', 'Failed to update status');
+    }
+  };
+
+  const openCreateModal = () => {
+    setForm({ name: '', email: '', mobile: '', partnerReferralCode: '', discountPercentage: '', isActive: true });
+    setIsEditMode(false);
+    setEditingPartnerId(null);
+    setIsModalOpen(true);
   };
 
   const openPartnerStats = async (id) => {
@@ -93,7 +160,7 @@ export default function AdminReferralsPage() {
               </div>
             </div>
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={openCreateModal}
               className="px-5 py-3.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black rounded-2xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2 cursor-pointer uppercase tracking-wider"
             >
               <Plus className="w-4 h-4" />
@@ -151,12 +218,36 @@ export default function AdminReferralsPage() {
                           )}
                         </td>
                         <td className="p-5 text-right">
-                          <button
-                            onClick={() => openPartnerStats(partner.id)}
-                            className="text-xs font-black text-[#FF2A6D] hover:text-[#2A0826] transition-colors uppercase tracking-wider bg-[#FFF0F3] px-3 py-1.5 rounded-lg border border-[#FFCCE1]"
-                          >
-                            View Stats
-                          </button>
+                          <div className="flex items-center justify-end space-x-2">
+                            <button
+                              onClick={() => openPartnerStats(partner.id)}
+                              className="text-[10px] font-black text-[#FF2A6D] hover:text-white transition-colors uppercase tracking-wider bg-[#FFF0F3] hover:bg-[#FF2A6D] px-2 py-1.5 rounded-lg border border-[#FFCCE1] whitespace-nowrap mr-2"
+                              title="View Stats"
+                            >
+                              Stats
+                            </button>
+                            <button
+                              onClick={() => handleEditClick(partner)}
+                              className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors"
+                              title="Edit Partner"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleToggleStatus(partner)}
+                              className={`p-2 rounded-xl transition-colors ${partner.isActive ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                              title={partner.isActive ? "Disable Partner" : "Enable Partner"}
+                            >
+                              {partner.isActive ? <PowerOff className="w-4 h-4" /> : <Power className="w-4 h-4" />}
+                            </button>
+                            <button
+                              onClick={() => handleDeletePartner(partner.id)}
+                              className="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100 transition-colors"
+                              title="Delete Partner"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -175,14 +266,14 @@ export default function AdminReferralsPage() {
             <div className="p-6 border-b border-[#FFCCE1] flex items-center justify-between bg-[#FFF0F3]/30">
               <h3 className="font-black text-lg text-[#2A0826] flex items-center space-x-2">
                 <Network className="w-5 h-5 text-[#FF2A6D]" />
-                <span>Add Referral Partner</span>
+                <span>{isEditMode ? 'Edit Referral Partner' : 'Add Referral Partner'}</span>
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-[#FFCCE1] rounded-full text-[#684E67] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
             
-            <form onSubmit={handleCreatePartner} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div className="space-y-1.5">
                 <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Partner Name *</label>
                 <input required type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all" placeholder="e.g. Acme NGO" />
@@ -195,17 +286,22 @@ export default function AdminReferralsPage() {
                 <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Mobile Number (Optional)</label>
                 <input type="text" value={form.mobile} onChange={e => setForm({...form, mobile: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all" placeholder="+91..." />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider flex justify-between">
-                  <span>Custom Referral Code</span>
-                  <span className="text-[#FF2A6D] normal-case tracking-normal">(Leave blank to auto-generate)</span>
-                </label>
-                <input type="text" value={form.partnerReferralCode} onChange={e => setForm({...form, partnerReferralCode: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-black text-amber-700 outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all uppercase" placeholder="e.g. SAKHI100" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider flex justify-between">
+                    <span>Custom Referral Code</span>
+                  </label>
+                  <input type="text" value={form.partnerReferralCode} onChange={e => setForm({...form, partnerReferralCode: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-black text-amber-700 outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all uppercase" placeholder="e.g. SAKHI100" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Discount (%)</label>
+                  <input type="number" step="0.1" min="0" max="100" value={form.discountPercentage} onChange={e => setForm({...form, discountPercentage: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all" placeholder="e.g. 10" />
+                </div>
               </div>
 
               <div className="pt-4">
                 <button type="submit" className="w-full py-4 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer uppercase tracking-wider">
-                  Create Partner
+                  {isEditMode ? 'Update Partner' : 'Create Partner'}
                 </button>
               </div>
             </form>

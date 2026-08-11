@@ -54,15 +54,28 @@ export const getAllCoupons = async (req, res) => {
 export const updateCoupon = async (req, res) => {
   try {
     const { id } = req.params;
-    const { isActive, validUntil, maxUses, assignedUserId } = req.body;
+    const { code, discountType, discountValue, isActive, validUntil, maxUses, assignedUserId } = req.body;
+    const couponId = parseInt(id);
+
+    if (code) {
+      const existing = await prisma.coupon.findFirst({
+        where: { code, NOT: { id: couponId } }
+      });
+      if (existing) {
+        return res.status(400).json({ success: false, message: 'Coupon code already exists.' });
+      }
+    }
 
     const coupon = await prisma.coupon.update({
-      where: { id: parseInt(id) },
+      where: { id: couponId },
       data: {
-        isActive,
-        validUntil: validUntil ? new Date(validUntil) : undefined,
-        maxUses: maxUses ? parseInt(maxUses) : undefined,
-        assignedUserId: assignedUserId ? parseInt(assignedUserId) : undefined,
+        ...(code && { code }),
+        ...(discountType && { discountType }),
+        ...(discountValue !== undefined && { discountValue: parseFloat(discountValue) }),
+        ...(isActive !== undefined && { isActive }),
+        ...(validUntil !== undefined && { validUntil: validUntil ? new Date(validUntil) : null }),
+        ...(maxUses !== undefined && { maxUses: maxUses ? parseInt(maxUses) : null }),
+        ...(assignedUserId !== undefined && { assignedUserId: assignedUserId ? parseInt(assignedUserId) : null }),
       }
     });
 
