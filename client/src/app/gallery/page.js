@@ -53,11 +53,11 @@ export default function PlatformGalleryPage() {
   const renderMedia = (item, isModal = false) => {
     const className = isModal 
       ? "w-full h-auto max-h-[60vh] object-contain rounded-2xl" 
-      : "w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105";
+      : "w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105";
 
     if (!item.mediaUrl) {
       return (
-        <div className={`flex items-center justify-center bg-gray-100 text-gray-400 font-bold ${isModal ? 'h-64 rounded-2xl' : 'absolute inset-0 w-full h-full'}`}>
+        <div className={`flex items-center justify-center bg-gray-100 text-gray-400 font-bold ${isModal ? 'h-64 rounded-2xl' : 'w-full h-full'}`}>
           No Media Available
         </div>
       );
