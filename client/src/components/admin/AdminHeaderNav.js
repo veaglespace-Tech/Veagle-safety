@@ -19,14 +19,20 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
       router.push('/active-sos');
       return;
     }
-    if (confirm('🚨 ACTIVATE SUPERADMIN EMERGENCY SOS BROADCAST?\nThis will alert your guardian network with real-time GPS location.')) {
+    if (
+      confirm(
+        '🚨 ACTIVATE SUPERADMIN EMERGENCY SOS BROADCAST?\nThis will alert your guardian network with real-time GPS location.'
+      )
+    ) {
       try {
-        const res = await dispatch(startEmergencySos({
-          isSilent: false,
-          latitude,
-          longitude,
-          emergencyMessage: 'SUPERADMIN EMERGENCY SOS BROADCAST! URGENT ASSISTANCE REQUIRED!'
-        })).unwrap();
+        const res = await dispatch(
+          startEmergencySos({
+            isSilent: false,
+            latitude,
+            longitude,
+            emergencyMessage: 'SUPERADMIN EMERGENCY SOS BROADCAST! URGENT ASSISTANCE REQUIRED!',
+          })
+        ).unwrap();
 
         openWhatsAppSosEmergency({
           latitude,
@@ -51,7 +57,9 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
           </div>
           <div className="min-w-0">
             <div className="flex items-center space-x-2 flex-wrap">
-              <h1 className="text-lg sm:text-2xl font-black tracking-tight text-white truncate">SuperAdmin Command</h1>
+              <h1 className="text-lg sm:text-2xl font-black tracking-tight text-white truncate">
+                SuperAdmin Command
+              </h1>
             </div>
             <p className="text-xs text-[#FFCCE1] font-bold mt-0.5 truncate">
               Central Operations & System Control Portal
@@ -77,7 +85,9 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
               title="Refresh Data"
             >
               <RefreshCw className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-              <span className="text-xs font-black uppercase tracking-wider hidden sm:inline">REFRESH</span>
+              <span className="text-xs font-black uppercase tracking-wider hidden sm:inline">
+                REFRESH
+              </span>
             </button>
           )}
         </div>
@@ -85,11 +95,13 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
 
       {/* TOAST MESSAGE */}
       {toast && (
-        <div className={`p-4 rounded-2xl text-xs font-black text-center shadow-sm animate-fade-in ${
-          toast.type === 'error'
-            ? 'bg-rose-50 text-[#FF2A6D] border border-[#FF2A6D]/60'
-            : 'bg-emerald-50 text-emerald-800 border border-emerald-300'
-        }`}>
+        <div
+          className={`p-4 rounded-2xl text-xs font-black text-center shadow-sm animate-fade-in ${
+            toast.type === 'error'
+              ? 'bg-rose-50 text-[#FF2A6D] border border-[#FF2A6D]/60'
+              : 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+          }`}
+        >
           {toast.text}
         </div>
       )}

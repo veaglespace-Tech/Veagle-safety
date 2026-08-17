@@ -5,7 +5,7 @@ export const couponApi = {
     const response = await apiClient.post('/coupons', data);
     return response.data;
   },
-  
+
   getAllCoupons: async () => {
     const response = await apiClient.get('/coupons');
     return response.data;
@@ -34,5 +34,5 @@ export const couponApi = {
   validateCoupon: async (code, planId) => {
     const response = await apiClient.post('/coupons/validate', { code, planId });
     return response.data;
-  }
+  },
 };

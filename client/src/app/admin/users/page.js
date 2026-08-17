@@ -7,8 +7,19 @@ import { AppLayout } from '../../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../../components/admin/AdminHeaderNav.js';
 import { api } from '../../../utils/api.js';
 import {
-  Users, Search, Lock, Unlock, Crown, Command, Edit3, Plus, Eye,
-  ChevronLeft, ChevronRight, X, ChevronRight as ArrowRightIcon
+  Users,
+  Search,
+  Lock,
+  Unlock,
+  Crown,
+  Command,
+  Edit3,
+  Plus,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  ChevronRight as ArrowRightIcon,
 } from 'lucide-react';
 import { CustomSelect } from '../../../components/ui/CustomSelect.js';
 
@@ -187,7 +198,10 @@ export default function AdminUsersPage() {
     try {
       const payload = {
         durationDays: parseInt(freePlanDuration, 10),
-        planName: freePlanDuration === '365' ? 'Free 1-Year Sakhi Protection' : `Free ${freePlanDuration}-Day Pass`,
+        planName:
+          freePlanDuration === '365'
+            ? 'Free 1-Year Sakhi Protection'
+            : `Free ${freePlanDuration}-Day Pass`,
         ...(customStartDate && { customStartDate }),
         ...(customExpiryDate && { customExpiryDate }),
       };
@@ -225,17 +239,19 @@ export default function AdminUsersPage() {
   });
 
   const totalUserPages = Math.ceil(filteredUsers.length / usersPerPage) || 1;
-  const paginatedUsers = filteredUsers.slice((userPage - 1) * usersPerPage, userPage * usersPerPage);
+  const paginatedUsers = filteredUsers.slice(
+    (userPage - 1) * usersPerPage,
+    userPage * usersPerPage
+  );
 
   const metrics = {
     totalUsers: users.length,
-    activePlansCount: users.filter(u => u.subscriptionStatus === 'ACTIVE').length,
+    activePlansCount: users.filter((u) => u.subscriptionStatus === 'ACTIVE').length,
   };
 
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
-        
         {/* HEADER NAVIGATION */}
         <AdminHeaderNav
           metrics={metrics}
@@ -246,13 +262,14 @@ export default function AdminUsersPage() {
 
         {/* USER MANAGEMENT CONTENT */}
         <div className="space-y-6 animate-fade-up">
-          
           {/* DIRECTORY ACTION HEADER BAR */}
           <div className="bg-white p-5 sm:p-6 rounded-[28px] sm:rounded-3xl border-2 border-[#FFCCE1] shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2">
                 <Users className="w-5 h-5 text-[#FF2A6D]" />
-                <h3 className="font-black text-lg text-[#2A0826]">Sakhi Member Directory ({users.length})</h3>
+                <h3 className="font-black text-lg text-[#2A0826]">
+                  Sakhi Member Directory ({users.length})
+                </h3>
               </div>
               <p className="text-xs font-bold text-[#684E67] mt-0.5">
                 Register new accounts directly, edit details, and grant safety protection plans
@@ -280,7 +297,10 @@ export default function AdminUsersPage() {
                 type="text"
                 placeholder="Search member name, email, phone, city..."
                 value={userSearch}
-                onChange={(e) => { setUserSearch(e.target.value); setUserPage(1); }}
+                onChange={(e) => {
+                  setUserSearch(e.target.value);
+                  setUserPage(1);
+                }}
                 className="w-full pl-11 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none"
               />
             </div>
@@ -295,7 +315,10 @@ export default function AdminUsersPage() {
                   { value: 'SUPER_ADMIN', label: 'SuperAdmin (SUPER_ADMIN)' },
                 ]}
                 value={userRoleFilter}
-                onChange={(e) => { setUserRoleFilter(e.target.value); setUserPage(1); }}
+                onChange={(e) => {
+                  setUserRoleFilter(e.target.value);
+                  setUserPage(1);
+                }}
               />
 
               <CustomSelect
@@ -305,7 +328,10 @@ export default function AdminUsersPage() {
                   { value: 'INACTIVE', label: 'Inactive / Expired' },
                 ]}
                 value={userSubFilter}
-                onChange={(e) => { setUserSubFilter(e.target.value); setUserPage(1); }}
+                onChange={(e) => {
+                  setUserSubFilter(e.target.value);
+                  setUserPage(1);
+                }}
               />
 
               <CustomSelect
@@ -315,7 +341,10 @@ export default function AdminUsersPage() {
                   { value: 'BLOCKED', label: 'Blocked Accounts' },
                 ]}
                 value={userStatusFilter}
-                onChange={(e) => { setUserStatusFilter(e.target.value); setUserPage(1); }}
+                onChange={(e) => {
+                  setUserStatusFilter(e.target.value);
+                  setUserPage(1);
+                }}
                 alignRight={true}
               />
             </div>
@@ -350,15 +379,21 @@ export default function AdminUsersPage() {
                                 {u.fullName ? u.fullName.charAt(0).toUpperCase() : 'U'}
                               </div>
                               <div>
-                                <p className="font-black text-[#2A0826] group-hover:text-[#FF2A6D]">{u.fullName}</p>
-                                <span className="text-[10px] text-gray-500 font-bold">ID #{u.id}</span>
+                                <p className="font-black text-[#2A0826] group-hover:text-[#FF2A6D]">
+                                  {u.fullName}
+                                </p>
+                                <span className="text-[10px] text-gray-500 font-bold">
+                                  ID #{u.id}
+                                </span>
                               </div>
                             </div>
                           </td>
 
                           <td className="py-4 px-6 space-y-0.5">
                             <p className="font-bold text-[#2A0826]">{u.email}</p>
-                            <p className="text-[11px] text-[#684E67]">{u.phone || 'No Phone'} • {u.city || 'Pune'}</p>
+                            <p className="text-[11px] text-[#684E67]">
+                              {u.phone || 'No Phone'} • {u.city || 'Pune'}
+                            </p>
                           </td>
 
                           <td className="py-4 px-6 text-center space-y-1.5">
@@ -382,11 +417,13 @@ export default function AdminUsersPage() {
                                 </span>
                               )}
 
-                              <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase shrink-0 whitespace-nowrap shadow-xs ${
-                                u.subscriptionStatus === 'ACTIVE'
-                                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-300'
-                                  : 'bg-rose-50 text-rose-600 border border-rose-300'
-                              }`}>
+                              <span
+                                className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase shrink-0 whitespace-nowrap shadow-xs ${
+                                  u.subscriptionStatus === 'ACTIVE'
+                                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-300'
+                                    : 'bg-rose-50 text-rose-600 border border-rose-300'
+                                }`}
+                              >
                                 {u.subscriptionStatus === 'ACTIVE' ? 'ACTIVE PLAN' : 'INACTIVE'}
                               </span>
                             </div>
@@ -402,12 +439,23 @@ export default function AdminUsersPage() {
 
                           <td className="py-4 px-6 text-right text-xs text-[#684E67] font-bold">
                             {u.emergencyContactName ? (
-                              <p className="font-black text-[#2A0826]">{u.emergencyContactName} <span className="text-gray-500 font-bold">({u.emergencyContactPhone || 'N/A'})</span></p>
+                              <p className="font-black text-[#2A0826]">
+                                {u.emergencyContactName}{' '}
+                                <span className="text-gray-500 font-bold">
+                                  ({u.emergencyContactPhone || 'N/A'})
+                                </span>
+                              </p>
                             ) : u.trustedContacts && u.trustedContacts.length > 0 ? (
                               <div>
-                                <p className="font-black text-[#2A0826]">{u.trustedContacts[0].name} <span className="text-gray-500 font-bold">({u.trustedContacts[0].phone || 'N/A'})</span></p>
+                                <p className="font-black text-[#2A0826]">
+                                  {u.trustedContacts[0].name}{' '}
+                                  <span className="text-gray-500 font-bold">
+                                    ({u.trustedContacts[0].phone || 'N/A'})
+                                  </span>
+                                </p>
                                 <span className="text-[9px] font-black text-[#FF2A6D] bg-[#FFF0F3] px-2 py-0.5 rounded-full border border-[#FFCCE1] inline-block mt-0.5">
-                                  {u.trustedContacts.length} Guardian{u.trustedContacts.length > 1 ? 's' : ''} Listed
+                                  {u.trustedContacts.length} Guardian
+                                  {u.trustedContacts.length > 1 ? 's' : ''} Listed
                                 </span>
                               </div>
                             ) : (
@@ -431,7 +479,9 @@ export default function AdminUsersPage() {
             {/* PAGINATION CONTROLS */}
             <div className="p-5 bg-[#FFF0F3]/60 border-t border-[#FFCCE1] flex items-center justify-between">
               <span className="text-xs font-black text-[#684E67]">
-                Showing {filteredUsers.length === 0 ? 0 : (userPage - 1) * usersPerPage + 1} - {Math.min(userPage * usersPerPage, filteredUsers.length)} of {filteredUsers.length} Members
+                Showing {filteredUsers.length === 0 ? 0 : (userPage - 1) * usersPerPage + 1} -{' '}
+                {Math.min(userPage * usersPerPage, filteredUsers.length)} of {filteredUsers.length}{' '}
+                Members
               </span>
 
               <div className="flex items-center space-x-2">
@@ -459,7 +509,6 @@ export default function AdminUsersPage() {
               </div>
             </div>
           </div>
-
         </div>
 
         {/* MODAL 0: CREATE NEW USER MODAL */}
@@ -473,7 +522,9 @@ export default function AdminUsersPage() {
                   </div>
                   <div>
                     <h3 className="font-black text-lg text-[#2A0826]">Add New Account</h3>
-                    <p className="text-xs text-[#684E67] font-bold">Register a new Sakhi member or SuperAdmin account</p>
+                    <p className="text-xs text-[#684E67] font-bold">
+                      Register a new Sakhi member or SuperAdmin account
+                    </p>
                   </div>
                 </div>
 
@@ -489,12 +540,22 @@ export default function AdminUsersPage() {
               <form onSubmit={handleCreateUserSubmit} className="space-y-4 text-left">
                 <div>
                   <label className="block text-xs font-black text-[#2A0826] mb-1">
-                    {newRole === 'ORGANIZATION' ? 'Organization / Institution Name *' : newRole === 'PARENT' ? 'Parent / Guardian Name *' : 'Full Legal Name *'}
+                    {newRole === 'ORGANIZATION'
+                      ? 'Organization / Institution Name *'
+                      : newRole === 'PARENT'
+                        ? 'Parent / Guardian Name *'
+                        : 'Full Legal Name *'}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder={newRole === 'ORGANIZATION' ? 'e.g. Pune Women College' : newRole === 'PARENT' ? 'e.g. Rajesh Sharma (Parent)' : 'e.g. Kaveri Sharma'}
+                    placeholder={
+                      newRole === 'ORGANIZATION'
+                        ? 'e.g. Pune Women College'
+                        : newRole === 'PARENT'
+                          ? 'e.g. Rajesh Sharma (Parent)'
+                          : 'e.g. Kaveri Sharma'
+                    }
                     value={newFullName}
                     onChange={(e) => setNewFullName(e.target.value)}
                     className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none focus:border-[#FF2A6D]"
@@ -553,7 +614,9 @@ export default function AdminUsersPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-black text-[#2A0826] mb-1">Account Role *</label>
+                    <label className="block text-xs font-black text-[#2A0826] mb-1">
+                      Account Role *
+                    </label>
                     <select
                       value={newRole}
                       onChange={(e) => setNewRole(e.target.value)}
@@ -567,7 +630,9 @@ export default function AdminUsersPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-black text-[#2A0826] mb-1">City / Location</label>
+                    <label className="block text-xs font-black text-[#2A0826] mb-1">
+                      City / Location
+                    </label>
                     <input
                       type="text"
                       placeholder="e.g. Pune"
@@ -581,7 +646,9 @@ export default function AdminUsersPage() {
                 {/* ROLE SPECIFIC EXTRA FIELDS */}
                 {newRole === 'ORGANIZATION' && (
                   <div>
-                    <label className="block text-xs font-black text-[#2A0826] mb-1">Organization HQ Address</label>
+                    <label className="block text-xs font-black text-[#2A0826] mb-1">
+                      Organization HQ Address
+                    </label>
                     <input
                       type="text"
                       placeholder="Campus / Office Address"
@@ -594,7 +661,9 @@ export default function AdminUsersPage() {
 
                 {newRole === 'PARENT' && (
                   <div>
-                    <label className="block text-xs font-black text-[#2A0826] mb-1">Link Child Account (Mobile or Email)</label>
+                    <label className="block text-xs font-black text-[#2A0826] mb-1">
+                      Link Child Account (Mobile or Email)
+                    </label>
                     <input
                       type="text"
                       placeholder="Child's 10-digit mobile or email address"
@@ -608,7 +677,9 @@ export default function AdminUsersPage() {
                 {newRole === 'USER' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-black text-[#2A0826] mb-1">Emergency Contact Name</label>
+                      <label className="block text-xs font-black text-[#2A0826] mb-1">
+                        Emergency Contact Name
+                      </label>
                       <input
                         type="text"
                         placeholder="Guardian Name"
@@ -619,7 +690,9 @@ export default function AdminUsersPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-black text-[#2A0826] mb-1">Emergency Contact Phone</label>
+                      <label className="block text-xs font-black text-[#2A0826] mb-1">
+                        Emergency Contact Phone
+                      </label>
                       <input
                         type="tel"
                         placeholder="Guardian Phone"
@@ -639,7 +712,10 @@ export default function AdminUsersPage() {
                     onChange={(e) => setGrantFreePlanOnCreate(e.target.checked)}
                     className="w-4 h-4 accent-[#FF2A6D] cursor-pointer"
                   />
-                  <label htmlFor="grantFreePlan" className="text-xs font-black text-[#2A0826] cursor-pointer">
+                  <label
+                    htmlFor="grantFreePlan"
+                    className="text-xs font-black text-[#2A0826] cursor-pointer"
+                  >
                     Grant 1-Year Free Active Protection Plan immediately
                   </label>
                 </div>
@@ -670,7 +746,6 @@ export default function AdminUsersPage() {
         {editingUser && (
           <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white rounded-[36px] max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl border-2 border-[#FF2A6D] relative animate-scale-up">
-              
               <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
                 <h3 className="font-black text-lg text-[#2A0826]">Edit Member Details</h3>
                 <button
@@ -684,7 +759,9 @@ export default function AdminUsersPage() {
 
               <form onSubmit={handleSaveUserEdit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black text-[#684E67] mb-1">Full Name *</label>
+                  <label className="block text-xs font-black text-[#684E67] mb-1">
+                    Full Name *
+                  </label>
                   <input
                     type="text"
                     required
@@ -695,7 +772,9 @@ export default function AdminUsersPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black text-[#684E67] mb-1">Email Address *</label>
+                  <label className="block text-xs font-black text-[#684E67] mb-1">
+                    Email Address *
+                  </label>
                   <input
                     type="email"
                     required
@@ -706,7 +785,9 @@ export default function AdminUsersPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black text-[#684E67] mb-1">Phone Number *</label>
+                  <label className="block text-xs font-black text-[#684E67] mb-1">
+                    Phone Number *
+                  </label>
                   <input
                     type="text"
                     required
@@ -717,7 +798,9 @@ export default function AdminUsersPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black text-[#684E67] mb-1">Account Role</label>
+                  <label className="block text-xs font-black text-[#684E67] mb-1">
+                    Account Role
+                  </label>
                   <CustomSelect
                     options={[
                       { value: 'USER', label: 'Standard Sakhi Member' },
@@ -731,7 +814,9 @@ export default function AdminUsersPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black text-[#684E67] mb-1">Reset Password (Optional)</label>
+                  <label className="block text-xs font-black text-[#684E67] mb-1">
+                    Reset Password (Optional)
+                  </label>
                   <input
                     type="password"
                     placeholder="Leave blank to keep current password"
@@ -759,7 +844,6 @@ export default function AdminUsersPage() {
                   </button>
                 </div>
               </form>
-
             </div>
           </div>
         )}
@@ -768,10 +852,11 @@ export default function AdminUsersPage() {
         {grantingUser && (
           <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white rounded-[36px] max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl border-2 border-emerald-500 relative animate-scale-up">
-              
               <div className="flex items-center justify-between border-b-2 border-emerald-200 pb-4">
                 <div>
-                  <h3 className="font-black text-lg text-[#2A0826]">Grant Free Subscription Pass</h3>
+                  <h3 className="font-black text-lg text-[#2A0826]">
+                    Grant Free Subscription Pass
+                  </h3>
                   <p className="text-xs text-gray-500 font-bold">For: {grantingUser.fullName}</p>
                 </div>
                 <button
@@ -785,7 +870,9 @@ export default function AdminUsersPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black text-[#684E67] mb-1">Select Free Plan Duration *</label>
+                  <label className="block text-xs font-black text-[#684E67] mb-1">
+                    Select Free Plan Duration *
+                  </label>
                   <select
                     value={freePlanDuration}
                     onChange={(e) => setFreePlanDuration(e.target.value)}
@@ -816,11 +903,9 @@ export default function AdminUsersPage() {
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
         )}
-
       </div>
     </AppLayout>
   );

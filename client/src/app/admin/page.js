@@ -6,8 +6,18 @@ import { AdminHeaderNav } from '../../components/admin/AdminHeaderNav.js';
 import { LiveLocationMap } from '../../components/location/DynamicLiveLocationMap.js';
 import { api } from '../../utils/api.js';
 import {
-  AlertOctagon, Users, ShieldCheck, TrendingUp, CheckCircle2,
-  MapPin, Eye, PhoneCall, Mail, X, Clock, ExternalLink
+  AlertOctagon,
+  Users,
+  ShieldCheck,
+  TrendingUp,
+  CheckCircle2,
+  MapPin,
+  Eye,
+  PhoneCall,
+  Mail,
+  X,
+  Clock,
+  ExternalLink,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -17,7 +27,7 @@ export default function SuperAdminOverviewPage() {
   const [overview, setOverview] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null);
-  
+
   // LIVE GPS TRACKING MODAL STATE
   const [trackingSos, setTrackingSos] = useState(null);
 
@@ -53,7 +63,10 @@ export default function SuperAdminOverviewPage() {
         });
 
         socket.on('SOS_ALARM_BROADCAST', (data) => {
-          showToast('error', `🚨 CRITICAL EMERGENCY SOS: ${data?.victimName || 'Sakhi Member'} triggered an emergency broadcast!`);
+          showToast(
+            'error',
+            `🚨 CRITICAL EMERGENCY SOS: ${data?.victimName || 'Sakhi Member'} triggered an emergency broadcast!`
+          );
           fetchOverviewData();
         });
 
@@ -99,7 +112,6 @@ export default function SuperAdminOverviewPage() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
-        
         {/* HEADER NAVIGATION */}
         <AdminHeaderNav
           metrics={metrics}
@@ -110,12 +122,13 @@ export default function SuperAdminOverviewPage() {
 
         {/* OVERVIEW CONTENT */}
         <div className="space-y-8 animate-fade-up">
-          
           {/* TOP KPI CARDS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-[#684E67] uppercase tracking-wider">Active SOS Alerts</span>
+                <span className="text-xs font-black text-[#684E67] uppercase tracking-wider">
+                  Active SOS Alerts
+                </span>
                 <div className="w-10 h-10 rounded-2xl bg-rose-50 text-[#FF2A6D] flex items-center justify-center border border-rose-200">
                   <AlertOctagon className="w-5 h-5 animate-pulse" />
                 </div>
@@ -126,7 +139,9 @@ export default function SuperAdminOverviewPage() {
 
             <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-[#684E67] uppercase tracking-wider">Total Members</span>
+                <span className="text-xs font-black text-[#684E67] uppercase tracking-wider">
+                  Total Members
+                </span>
                 <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200">
                   <Users className="w-5 h-5" />
                 </div>
@@ -137,7 +152,9 @@ export default function SuperAdminOverviewPage() {
 
             <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-[#684E67] uppercase tracking-wider">Active Paid Plans</span>
+                <span className="text-xs font-black text-[#684E67] uppercase tracking-wider">
+                  Active Paid Plans
+                </span>
                 <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
@@ -148,12 +165,16 @@ export default function SuperAdminOverviewPage() {
 
             <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-[#684E67] uppercase tracking-wider">Total Revenue</span>
+                <span className="text-xs font-black text-[#684E67] uppercase tracking-wider">
+                  Total Revenue
+                </span>
                 <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
                   <TrendingUp className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-3xl font-black text-[#2A0826]">₹{overview?.metrics?.totalRevenue?.toFixed(2) || '0.00'}</p>
+              <p className="text-3xl font-black text-[#2A0826]">
+                ₹{overview?.metrics?.totalRevenue?.toFixed(2) || '0.00'}
+              </p>
               <p className="text-[11px] font-bold text-amber-600">Incl. 18% Global GST</p>
             </div>
           </div>
@@ -180,13 +201,18 @@ export default function SuperAdminOverviewPage() {
                   const lng = latestLoc?.longitude || sos.longitude || 73.8567;
 
                   return (
-                    <div key={sos.id} className="p-5 rounded-3xl bg-rose-50/60 border-2 border-rose-300 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div
+                      key={sos.id}
+                      className="p-5 rounded-3xl bg-rose-50/60 border-2 border-rose-300 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    >
                       <div className="space-y-1.5">
                         <div className="flex items-center space-x-2">
                           <span className="text-xs font-black text-rose-600 bg-white px-2.5 py-0.5 rounded-full border border-rose-300 uppercase">
                             SOS #{sos.id}
                           </span>
-                          <h4 className="font-black text-base text-[#2A0826]">{sos.user?.fullName || 'Anonymous Sakhi'}</h4>
+                          <h4 className="font-black text-base text-[#2A0826]">
+                            {sos.user?.fullName || 'Anonymous Sakhi'}
+                          </h4>
                         </div>
                         <p className="text-xs font-bold text-[#684E67] flex items-center space-x-2">
                           <PhoneCall className="w-3.5 h-3.5 text-[#FF2A6D]" />
@@ -228,19 +254,28 @@ export default function SuperAdminOverviewPage() {
             ) : (
               <div className="p-8 text-center bg-[#FFF0F3]/40 rounded-3xl border border-dashed border-[#FFCCE1] space-y-2">
                 <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
-                <p className="font-black text-sm text-[#2A0826]">All Clear — No Active Emergency SOS Incidents</p>
-                <p className="text-xs text-[#684E67] font-extrabold">All Sakhi members are safe and monitored 24/7 by command dispatch.</p>
+                <p className="font-black text-sm text-[#2A0826]">
+                  All Clear — No Active Emergency SOS Incidents
+                </p>
+                <p className="text-xs text-[#684E67] font-extrabold">
+                  All Sakhi members are safe and monitored 24/7 by command dispatch.
+                </p>
               </div>
             )}
           </div>
 
           {/* RECENT ACTIVITY & DISPATCH LOGS */}
           <div className="bg-white p-6 sm:p-8 rounded-[36px] border-2 border-[#FFCCE1] shadow-md space-y-4">
-            <h3 className="font-black text-lg text-[#2A0826] border-b border-[#FFCCE1] pb-3">Recent System Activity & Dispatch Logs</h3>
+            <h3 className="font-black text-lg text-[#2A0826] border-b border-[#FFCCE1] pb-3">
+              Recent System Activity & Dispatch Logs
+            </h3>
             {recentSosList.length > 0 ? (
               <div className="space-y-3">
                 {recentSosList.map((sos) => (
-                  <div key={sos.id} className="p-4 rounded-2xl bg-[#FFF0F3]/60 border border-[#FFCCE1] flex items-center justify-between text-xs">
+                  <div
+                    key={sos.id}
+                    className="p-4 rounded-2xl bg-[#FFF0F3]/60 border border-[#FFCCE1] flex items-center justify-between text-xs"
+                  >
                     <div>
                       <span className="font-black text-[#2A0826]">
                         Emergency SOS #{sos.id} ({sos.status}) — {sos.user?.fullName || 'Member'}
@@ -249,28 +284,30 @@ export default function SuperAdminOverviewPage() {
                         Triggered on {new Date(sos.startedAt).toLocaleString('en-IN')}
                       </p>
                     </div>
-                    <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase border ${
-                      sos.status === 'ACTIVE'
-                        ? 'bg-rose-100 text-rose-700 border-rose-300'
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                    }`}>
+                    <span
+                      className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase border ${
+                        sos.status === 'ACTIVE'
+                          ? 'bg-rose-100 text-rose-700 border-rose-300'
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                      }`}
+                    >
                       {sos.status}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-gray-500 font-bold text-center py-4">No recent activity logs.</p>
+              <p className="text-xs text-gray-500 font-bold text-center py-4">
+                No recent activity logs.
+              </p>
             )}
           </div>
-
         </div>
 
         {/* MODAL: SUPERADMIN LIVE GPS TRACKING MODAL */}
         {trackingSos && (
           <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white rounded-[36px] max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border-2 border-[#FF2A6D] relative animate-scale-up max-h-[90vh] overflow-y-auto">
-              
               {/* MODAL HEADER */}
               <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
                 <div className="flex items-center space-x-3">
@@ -281,7 +318,9 @@ export default function SuperAdminOverviewPage() {
                     <h3 className="font-black text-lg text-[#2A0826]">
                       🚨 Live Emergency GPS Stream — Incident #{trackingSos.id}
                     </h3>
-                    <p className="text-xs text-rose-600 font-bold">Real-time GPS Map Tracking & Victim Details</p>
+                    <p className="text-xs text-rose-600 font-bold">
+                      Real-time GPS Map Tracking & Victim Details
+                    </p>
                   </div>
                 </div>
 
@@ -297,15 +336,25 @@ export default function SuperAdminOverviewPage() {
               {/* VICTIM DETAILS CARD */}
               <div className="bg-[#FFF0F3] p-4 rounded-2xl border border-[#FFCCE1] grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 <div>
-                  <span className="text-[10px] font-black text-[#684E67] uppercase block">Victim Member</span>
-                  <p className="font-black text-[#2A0826] text-sm">{trackingSos.user?.fullName || 'Anonymous'}</p>
+                  <span className="text-[10px] font-black text-[#684E67] uppercase block">
+                    Victim Member
+                  </span>
+                  <p className="font-black text-[#2A0826] text-sm">
+                    {trackingSos.user?.fullName || 'Anonymous'}
+                  </p>
                 </div>
                 <div>
-                  <span className="text-[10px] font-black text-[#684E67] uppercase block">Phone / Contact</span>
-                  <p className="font-bold text-[#FF2A6D] text-sm">{trackingSos.user?.phone || 'N/A'}</p>
+                  <span className="text-[10px] font-black text-[#684E67] uppercase block">
+                    Phone / Contact
+                  </span>
+                  <p className="font-bold text-[#FF2A6D] text-sm">
+                    {trackingSos.user?.phone || 'N/A'}
+                  </p>
                 </div>
                 <div>
-                  <span className="text-[10px] font-black text-[#684E67] uppercase block">Email Address</span>
+                  <span className="text-[10px] font-black text-[#684E67] uppercase block">
+                    Email Address
+                  </span>
                   <p className="font-bold text-[#2A0826]">{trackingSos.user?.email || 'N/A'}</p>
                 </div>
               </div>
@@ -324,7 +373,8 @@ export default function SuperAdminOverviewPage() {
                 <div className="flex items-center space-x-2 text-xs font-bold text-[#684E67]">
                   <MapPin className="w-4 h-4 text-[#FF2A6D]" />
                   <span>
-                    GPS: {trackingSos.locations?.[0]?.latitude || trackingSos.latitude || 18.5204}, {trackingSos.locations?.[0]?.longitude || trackingSos.longitude || 73.8567}
+                    GPS: {trackingSos.locations?.[0]?.latitude || trackingSos.latitude || 18.5204},{' '}
+                    {trackingSos.locations?.[0]?.longitude || trackingSos.longitude || 73.8567}
                   </span>
                 </div>
 
@@ -347,11 +397,9 @@ export default function SuperAdminOverviewPage() {
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
         )}
-
       </div>
     </AppLayout>
   );

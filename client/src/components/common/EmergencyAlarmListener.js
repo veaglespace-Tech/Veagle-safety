@@ -2,7 +2,17 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { ShieldAlert, Volume2, VolumeX, MapPin, ExternalLink, PhoneCall, X, BellRing, MessageSquare } from 'lucide-react';
+import {
+  ShieldAlert,
+  Volume2,
+  VolumeX,
+  MapPin,
+  ExternalLink,
+  PhoneCall,
+  X,
+  BellRing,
+  MessageSquare,
+} from 'lucide-react';
 import { startEmergencySiren, stopEmergencySiren } from '../../utils/sirenAudio.js';
 
 export const EmergencyAlarmListener = () => {
@@ -128,7 +138,6 @@ export const EmergencyAlarmListener = () => {
   return (
     <div className="fixed inset-0 z-[9999] bg-[#2A0826]/85 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
       <div className="w-full max-w-lg bg-white/95 backdrop-blur-2xl rounded-[40px] p-6 sm:p-8 space-y-6 shadow-[0_30px_90px_rgba(255,42,109,0.35)] border-3 border-[#FF2A6D] relative text-[#2A0826] overflow-hidden my-auto animate-scale-up">
-        
         {/* GLOWING AMBIENT ACCENT BAR */}
         <div className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] h-3 w-full absolute top-0 left-0 right-0 animate-pulse pointer-events-none" />
 
@@ -163,7 +172,8 @@ export const EmergencyAlarmListener = () => {
             </h2>
 
             <p className="text-xs font-bold text-[#684E67] max-w-sm mx-auto leading-relaxed">
-              <strong className="text-[#2A0826] font-black">{alarmData.victimName}</strong> has triggered an emergency SOS broadcast alert!
+              <strong className="text-[#2A0826] font-black">{alarmData.victimName}</strong> has
+              triggered an emergency SOS broadcast alert!
             </p>
           </div>
         </div>
@@ -178,13 +188,20 @@ export const EmergencyAlarmListener = () => {
               : 'bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white border-[#FF2A6D] shadow-[#FF2A6D]/30 hover:scale-[1.02]'
           }`}
         >
-          {isSirenActive ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5 animate-bounce" />}
-          <span>{isSirenActive ? 'MUTE SIREN SOUND' : '🔊 TAP HERE TO PLAY EMERGENCY SIREN ON YOUR DEVICE'}</span>
+          {isSirenActive ? (
+            <VolumeX className="w-5 h-5" />
+          ) : (
+            <Volume2 className="w-5 h-5 animate-bounce" />
+          )}
+          <span>
+            {isSirenActive
+              ? 'MUTE SIREN SOUND'
+              : '🔊 TAP HERE TO PLAY EMERGENCY SIREN ON YOUR DEVICE'}
+          </span>
         </button>
 
         {/* DETAILS GLASS CARD */}
         <div className="bg-gradient-to-br from-[#FFF0F3]/80 via-white to-[#FFF0F3]/80 p-5 rounded-3xl border-2 border-[#FFCCE1] space-y-3.5 text-xs font-bold shadow-xs">
-          
           <div className="flex items-center justify-between border-b border-[#FFCCE1] pb-3">
             <span className="text-[#684E67]">Victim Name:</span>
             <div className="flex items-center space-x-2">
@@ -248,7 +265,6 @@ export const EmergencyAlarmListener = () => {
             </a>
           )}
         </div>
-
       </div>
     </div>
   );

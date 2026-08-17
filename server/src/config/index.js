@@ -6,7 +6,11 @@ const getEnv = (key, defaultValue = '') => {
   return process.env[key] || process.env[key.trim()] || defaultValue;
 };
 
-const jwtSecretValue = process.env.JWT_KEY || process.env.JWT_SECRET || 'tichi_suraksha_super_secret_jwt_key_2026';
+const jwtSecretValue = process.env.JWT_KEY || process.env.JWT_SECRET || (process.env.NODE_ENV !== 'production' ? 'tichi_suraksha_super_secret_jwt_key_2026' : undefined);
+
+if (process.env.NODE_ENV === 'production' && !jwtSecretValue) {
+  throw new Error('FATAL ERROR: JWT_SECRET or JWT_KEY is not defined in the environment variables.');
+}
 
 export const config = {
   port: process.env.PORT || (process.env.NODE_ENV === 'production' ? 5002 : 5000),

@@ -1,41 +1,53 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { adminApi } from '../api/adminApi.js';
 
-export const fetchAdminOverview = createAsyncThunk('admin/fetchAdminOverview', async (_, { rejectWithValue }) => {
-  try {
-    const data = await adminApi.fetchOverview();
-    return data;
-  } catch (err) {
-    return rejectWithValue(err.response?.data?.error || 'Failed to fetch admin overview');
+export const fetchAdminOverview = createAsyncThunk(
+  'admin/fetchAdminOverview',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await adminApi.fetchOverview();
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || 'Failed to fetch admin overview');
+    }
   }
-});
+);
 
-export const fetchAdminUsers = createAsyncThunk('admin/fetchAdminUsers', async (_, { rejectWithValue }) => {
-  try {
-    const data = await adminApi.fetchUsers();
-    return data.users || [];
-  } catch (err) {
-    return rejectWithValue(err.response?.data?.error || 'Failed to fetch users list');
+export const fetchAdminUsers = createAsyncThunk(
+  'admin/fetchAdminUsers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await adminApi.fetchUsers();
+      return data.users || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || 'Failed to fetch users list');
+    }
   }
-});
+);
 
-export const updateGstRate = createAsyncThunk('admin/updateGstRate', async (gstPercentage, { rejectWithValue }) => {
-  try {
-    const data = await adminApi.updateGstSettings(gstPercentage);
-    return data.gstPercentage;
-  } catch (err) {
-    return rejectWithValue(err.response?.data?.error || 'Failed to update GST percentage');
+export const updateGstRate = createAsyncThunk(
+  'admin/updateGstRate',
+  async (gstPercentage, { rejectWithValue }) => {
+    try {
+      const data = await adminApi.updateGstSettings(gstPercentage);
+      return data.gstPercentage;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || 'Failed to update GST percentage');
+    }
   }
-});
+);
 
-export const fetchAdminPayments = createAsyncThunk('admin/fetchAdminPayments', async (_, { rejectWithValue }) => {
-  try {
-    const data = await adminApi.fetchPaymentHistory();
-    return data;
-  } catch (err) {
-    return rejectWithValue(err.response?.data?.error || 'Failed to fetch payments');
+export const fetchAdminPayments = createAsyncThunk(
+  'admin/fetchAdminPayments',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await adminApi.fetchPaymentHistory();
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || 'Failed to fetch payments');
+    }
   }
-});
+);
 
 const adminSlice = createSlice({
   name: 'admin',

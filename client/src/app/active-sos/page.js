@@ -25,7 +25,11 @@ import {
 export default function ActiveSOSLivePage() {
   const dispatch = useDispatch();
   const { activeSession, isAlarmPlaying } = useSelector((state) => state?.sos || {});
-  const { latitude = 18.5204, longitude = 73.8567, accuracy = 10 } = useSelector((state) => state?.location || {});
+  const {
+    latitude = 18.5204,
+    longitude = 73.8567,
+    accuracy = 10,
+  } = useSelector((state) => state?.location || {});
   const { user } = useSelector((state) => state?.auth || {});
   const [showConfirmSafeModal, setShowConfirmSafeModal] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -61,7 +65,9 @@ export default function ActiveSOSLivePage() {
   }, [activeSession, router, user]);
 
   const formatElapsed = (secs) => {
-    const m = Math.floor(secs / 60).toString().padStart(2, '0');
+    const m = Math.floor(secs / 60)
+      .toString()
+      .padStart(2, '0');
     const s = (secs % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   };
@@ -94,11 +100,14 @@ export default function ActiveSOSLivePage() {
   };
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!activeSession) return null;
 
-  const firstName = mounted && (user?.fullName || user?.name) ? (user.fullName || user.name).split(' ')[0] : 'User';
+  const firstName =
+    mounted && (user?.fullName || user?.name) ? (user.fullName || user.name).split(' ')[0] : 'User';
 
   return (
     <div className="min-h-screen bg-tichi-emergency/5">
@@ -129,7 +138,7 @@ export default function ActiveSOSLivePage() {
         <div className="rounded-2xl overflow-hidden shadow-plum-lg border-2 border-tichi-emergency/30 h-64">
           <LiveLocationMap
             lat={latitude || 28.6139}
-            lng={longitude || 77.2090}
+            lng={longitude || 77.209}
             accuracy={accuracy || 12}
             userName={`${firstName} (EMERGENCY)`}
             isEmergency={true}
@@ -144,7 +153,10 @@ export default function ActiveSOSLivePage() {
           ].map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.label} className="bg-white border border-blush-border rounded-card p-3 text-center shadow-card">
+              <div
+                key={stat.label}
+                className="bg-white border border-blush-border rounded-card p-3 text-center shadow-card"
+              >
                 <Icon className="w-4 h-4 text-plum mx-auto mb-1" />
                 <p className="text-xs font-extrabold text-tichi-text">{stat.value}</p>
                 <p className="text-[10px] text-tichi-muted">{stat.label}</p>
@@ -157,7 +169,9 @@ export default function ActiveSOSLivePage() {
           <p className="text-xs font-bold text-tichi-text mb-1.5">Live Tracking Link</p>
           <div className="flex items-center space-x-2 mb-3">
             <div className="flex-1 bg-blush-subtle border border-blush-border rounded-xl px-3 py-2 min-w-0">
-              <p className="text-[11px] text-tichi-muted font-mono truncate">{activeSession.trackingUrl}</p>
+              <p className="text-[11px] text-tichi-muted font-mono truncate">
+                {activeSession.trackingUrl}
+              </p>
             </div>
             <button
               onClick={copyTrackingLink}
@@ -176,7 +190,9 @@ export default function ActiveSOSLivePage() {
             const victimPhone = user?.phone || '';
             const gmapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
             const messageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${victimName}\nPhone: ${victimPhone}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Tracking:\n${activeSession?.trackingUrl || ''}\n\n🌐 Google Maps:\n${gmapUrl}`;
-            const generalWhatsappUrl = activeSession?.whatsappShareUrl || `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`;
+            const generalWhatsappUrl =
+              activeSession?.whatsappShareUrl ||
+              `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`;
 
             return (
               <div className="space-y-3">
@@ -276,7 +292,10 @@ export default function ActiveSOSLivePage() {
           <div className="bg-white rounded-2xl max-w-sm w-full shadow-modal overflow-hidden animate-scale-in">
             <div className="flex items-center justify-between px-5 py-4 border-b border-blush-border">
               <h3 className="font-extrabold text-base text-tichi-text">Confirm You're Safe</h3>
-              <button onClick={() => setShowConfirmSafeModal(false)} className="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-blush-subtle text-tichi-muted hover:text-plum transition-colors">
+              <button
+                onClick={() => setShowConfirmSafeModal(false)}
+                className="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-blush-subtle text-tichi-muted hover:text-plum transition-colors"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -289,7 +308,8 @@ export default function ActiveSOSLivePage() {
               <div className="text-center">
                 <p className="font-bold text-sm text-tichi-text">Are you completely safe?</p>
                 <p className="text-xs text-tichi-muted mt-2 leading-relaxed">
-                  This will stop live location tracking, deactivate the emergency link, and send a "safe" notification to all your trusted contacts.
+                  This will stop live location tracking, deactivate the emergency link, and send a
+                  "safe" notification to all your trusted contacts.
                 </p>
               </div>
 

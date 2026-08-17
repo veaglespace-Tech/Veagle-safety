@@ -36,7 +36,9 @@ export const AppLayout = ({ children, fullScreen = false }) => {
       '/parent',
     ];
 
-    const isProtected = protectedPaths.some((path) => pathname === path || pathname.startsWith(path + '/'));
+    const isProtected = protectedPaths.some(
+      (path) => pathname === path || pathname.startsWith(path + '/')
+    );
 
     const hasAuthToken =
       Boolean(token) ||
@@ -61,18 +63,27 @@ export const AppLayout = ({ children, fullScreen = false }) => {
         if (storedUser?.role === 'SUPER_ADMIN') {
           isSuperAdmin = true;
         }
-      } catch (e) { }
+      } catch (e) {}
     }
 
     // Non-admin trying to access /admin -> redirect to /admin/login
-    if (hasAuthToken && pathname.startsWith('/admin') && pathname !== '/admin/login' && !isSuperAdmin) {
+    if (
+      hasAuthToken &&
+      pathname.startsWith('/admin') &&
+      pathname !== '/admin/login' &&
+      !isSuperAdmin
+    ) {
       router.push('/admin/login');
       return;
     }
 
     // SuperAdmin trying to access member-only pages -> redirect to /admin
     const memberOnlyPaths = ['/dashboard', '/subscription'];
-    if (hasAuthToken && isSuperAdmin && memberOnlyPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+    if (
+      hasAuthToken &&
+      isSuperAdmin &&
+      memberOnlyPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))
+    ) {
       router.push('/admin');
       return;
     }
@@ -90,11 +101,13 @@ export const AppLayout = ({ children, fullScreen = false }) => {
       <div className="lg:ml-72 flex-1 flex flex-col min-w-0">
         {!fullScreen && <Header />}
 
-        <main className={`flex-1 ${!fullScreen ? 'pb-24 lg:pb-6' : ''}`}>
-          {children}
-        </main>
+        <main className={`flex-1 ${!fullScreen ? 'pb-24 lg:pb-6' : ''}`}>{children}</main>
 
-        {!fullScreen && <Suspense fallback={null}><BottomNavigation /></Suspense>}
+        {!fullScreen && (
+          <Suspense fallback={null}>
+            <BottomNavigation />
+          </Suspense>
+        )}
       </div>
     </div>
   );

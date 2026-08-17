@@ -42,13 +42,10 @@ export const HeroBannerCarousel = () => {
             src={banner.src}
             alt={banner.alt}
             className={`absolute inset-0 w-full h-full object-contain object-center transition-all duration-700 ease-in-out ${
-              index === currentIndex
-                ? 'opacity-100 scale-100 z-10'
-                : 'opacity-0 scale-95 z-0'
+              index === currentIndex ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 z-0'
             }`}
           />
         ))}
-
       </div>
     </div>
   );

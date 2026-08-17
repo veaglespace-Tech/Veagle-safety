@@ -8,9 +8,18 @@ import { Footer } from '../../../components/layout/Footer.js';
 import { Logo3DFlip } from '../../../components/ui/Logo3DFlip.js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { 
-  Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, 
-  Zap, Sparkles, KeyRound, ShieldAlert, ArrowLeft
+import {
+  Lock,
+  Mail,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  ArrowRight,
+  Zap,
+  Sparkles,
+  KeyRound,
+  ShieldAlert,
+  ArrowLeft,
 } from 'lucide-react';
 import { AnimatedHeading } from '../../../components/common/AnimatedHeading.jsx';
 
@@ -33,7 +42,9 @@ export default function SuperAdminLoginPage() {
     }
 
     try {
-      const res = await dispatch(loginUser({ email: email.trim(), password, isAdminLogin: true })).unwrap();
+      const res = await dispatch(
+        loginUser({ email: email.trim(), password, isAdminLogin: true })
+      ).unwrap();
       if (res.user?.role === 'SUPER_ADMIN') {
         router.push('/admin');
       } else {
@@ -55,10 +66,8 @@ export default function SuperAdminLoginPage() {
       {/* MAIN CENTER CONTENT AREA */}
       <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-10 sm:py-16 relative z-10">
         <div className="w-full max-w-md space-y-6">
-
           {/* TOP EMBLEM & HEADER */}
           <div className="flex flex-col items-center justify-center text-center space-y-3">
-            
             {/* ROTATING 3D EMBLEM */}
             <div className="relative flex items-center justify-center mb-1">
               <div className="absolute -inset-3 rounded-2xl bg-[#FF5C8A]/20 animate-pulse blur-lg" />
@@ -72,7 +81,11 @@ export default function SuperAdminLoginPage() {
               <span>Operations Clearance Required</span>
             </div>
 
-            <AnimatedHeading as="h1" variant="shimmer" className="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
+            <AnimatedHeading
+              as="h1"
+              variant="shimmer"
+              className="text-2xl sm:text-4xl font-black tracking-tight leading-tight"
+            >
               <span className="heading-gradient-hero">Super Admin </span>
               <span className="heading-highlight-pill">Portal</span>
             </AnimatedHeading>
@@ -84,7 +97,6 @@ export default function SuperAdminLoginPage() {
 
           {/* ANTIQUE GLASSMORPHIC LOGIN FORM CARD */}
           <div className="bg-white/95 backdrop-blur-2xl border-2 border-[#FFCCE1] rounded-3xl p-6 sm:p-8 space-y-6 shadow-[0_20px_60px_rgba(255,92,138,0.18)] hover:shadow-[0_25px_70px_rgba(255,42,109,0.25)] transition-all duration-500 relative overflow-hidden">
-            
             {/* TOP DECORATIVE ACCENT GRADIENT STRIP */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
 
@@ -96,19 +108,18 @@ export default function SuperAdminLoginPage() {
             )}
 
             <form onSubmit={handleAdminSubmit} className="space-y-5">
-              
               {/* EMAIL FIELD */}
               <div className="space-y-1.5">
                 <label className="text-[11px] font-black uppercase tracking-wider text-[#2A0826] flex items-center justify-between">
                   <span>SUPER ADMIN EMAIL</span>
                   <Mail className="w-3.5 h-3.5 text-[#FF2A6D]" />
                 </label>
-                
+
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#FF2A6D]">
                     <Mail className="w-4 h-4" />
                   </div>
-                  
+
                   <input
                     type="email"
                     value={email}
@@ -126,12 +137,12 @@ export default function SuperAdminLoginPage() {
                   <span>SECRET ACCESS KEY</span>
                   <KeyRound className="w-3.5 h-3.5 text-[#FF2A6D]" />
                 </label>
-                
+
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#FF2A6D]">
                     <Lock className="w-4 h-4" />
                   </div>
-                  
+
                   <input
                     type={showPass ? 'text' : 'password'}
                     value={password}
@@ -140,7 +151,7 @@ export default function SuperAdminLoginPage() {
                     required
                     className="w-full bg-[#FFF0F3]/60 focus:bg-white border-1.5 border-[#FFCCE1] rounded-2xl py-3 pl-10 pr-10 text-xs font-bold text-[#2A0826] placeholder-[#684E67]/60 focus:outline-none focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF5C8A]/15 transition-all shadow-sm font-mono"
                   />
-                  
+
                   <button
                     type="button"
                     onClick={() => setShowPass(!showPass)}
@@ -182,9 +193,7 @@ export default function SuperAdminLoginPage() {
                 <span>Return to Public Website</span>
               </Link>
             </div>
-
           </div>
-
         </div>
       </main>
 

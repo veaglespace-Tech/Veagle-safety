@@ -7,7 +7,19 @@ import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { Footer } from '../../components/layout/Footer.js';
 import { fetchPlans } from '../../redux/slices/planSlice.js';
 import { fetchUser } from '../../redux/slices/authSlice.js';
-import { Shield, Lock, CreditCard, ArrowRight, AlertCircle, User, Phone, Mail, ExternalLink, Sparkles, CheckCircle2 } from 'lucide-react';
+import {
+  Shield,
+  Lock,
+  CreditCard,
+  ArrowRight,
+  AlertCircle,
+  User,
+  Phone,
+  Mail,
+  ExternalLink,
+  Sparkles,
+  CheckCircle2,
+} from 'lucide-react';
 import { apiClient } from '../../redux/api/apiClient.js';
 
 function CheckoutContent() {
@@ -29,14 +41,15 @@ function CheckoutContent() {
     }
   }, [dispatch, token, user]);
 
-  const selectedPlan = plans.find((p) => String(p.id) === String(planIdParam)) || plans[0] || {
-    id: 2,
-    name: 'Sakhi Suraksha 365 Yearly Protection Plan',
-    basePrice: 24.0,
-    gstPercentage: 18.0,
-    totalPrice: 28.32,
-    durationDays: 365,
-  };
+  const selectedPlan = plans.find((p) => String(p.id) === String(planIdParam)) ||
+    plans[0] || {
+      id: 2,
+      name: 'Sakhi Suraksha 365 Yearly Protection Plan',
+      basePrice: 24.0,
+      gstPercentage: 18.0,
+      totalPrice: 28.32,
+      durationDays: 365,
+    };
 
   const basePrice = Number(selectedPlan.basePrice || 0);
   const isFreePlan = basePrice === 0;
@@ -44,7 +57,9 @@ function CheckoutContent() {
   const gstAmount = isFreePlan ? 0 : Number(((basePrice * gstRate) / 100).toFixed(2));
   const totalPrice = isFreePlan ? 0 : Number((basePrice + gstAmount).toFixed(2));
 
-  const currentRegToken = registrationToken || (typeof window !== 'undefined' ? localStorage.getItem('tichi_reg_token') : null);
+  const currentRegToken =
+    registrationToken ||
+    (typeof window !== 'undefined' ? localStorage.getItem('tichi_reg_token') : null);
 
   // Decode subscriber details from registration token if not logged in
   let subscriberInfo = user || {};
@@ -125,11 +140,12 @@ function CheckoutContent() {
       form.submit();
     } catch (err) {
       console.error('PayU Initiate Error:', err);
-      setError(err.response?.data?.error || err.message || 'Payment processing failed. Please try again.');
+      setError(
+        err.response?.data?.error || err.message || 'Payment processing failed. Please try again.'
+      );
       setIsProcessing(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden flex flex-col">
@@ -140,7 +156,6 @@ function CheckoutContent() {
       <div className="absolute w-[750px] h-[750px] rounded-full bg-[#FFCCE1]/25 blur-[160px] bottom-[50px] right-[-250px] pointer-events-none animate-pulse" />
 
       <div className="flex-1 max-w-5xl mx-auto px-4 py-12 sm:py-16 w-full relative z-10 space-y-10">
-        
         {/* PREMIUM 3D HEADER */}
         <div className="text-center space-y-4 max-w-2xl mx-auto">
           <div className="inline-flex items-center space-x-2 bg-white text-[#FF2A6D] border-2 border-[#FFCCE1] px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(255,92,138,0.12)]">
@@ -164,7 +179,6 @@ function CheckoutContent() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start max-w-4xl mx-auto">
-          
           {/* USER & GUARDIAN SUMMARY (2 COLS) */}
           <div className="lg:col-span-2 bg-white/75 backdrop-blur-xl border-2 border-[#FFCCE1] rounded-3xl p-6 space-y-6 shadow-[0_15px_40px_rgba(255,92,138,0.06)] animate-fade-up">
             <div className="flex items-center space-x-2.5 border-b border-[#FFCCE1] pb-4">
@@ -178,18 +192,30 @@ function CheckoutContent() {
 
             <div className="space-y-4">
               <div className="p-3.5 bg-[#FFF0F3]/50 rounded-2xl border border-[#FFCCE1]/50 space-y-1 hover:border-[#FF5C8A]/40 transition-colors">
-                <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider">Full Name</span>
-                <span className="font-black text-xs text-[#2A0826]">{subscriberInfo?.fullName || 'Sakhi Member'}</span>
+                <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider">
+                  Full Name
+                </span>
+                <span className="font-black text-xs text-[#2A0826]">
+                  {subscriberInfo?.fullName || 'Sakhi Member'}
+                </span>
               </div>
 
               <div className="p-3.5 bg-[#FFF0F3]/50 rounded-2xl border border-[#FFCCE1]/50 space-y-1 hover:border-[#FF5C8A]/40 transition-colors">
-                <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider">Email Address</span>
-                <span className="font-mono text-xs font-bold text-[#2A0826] break-all">{subscriberInfo?.email || 'Registered Email'}</span>
+                <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider">
+                  Email Address
+                </span>
+                <span className="font-mono text-xs font-bold text-[#2A0826] break-all">
+                  {subscriberInfo?.email || 'Registered Email'}
+                </span>
               </div>
 
               <div className="p-3.5 bg-[#FFF0F3]/50 rounded-2xl border border-[#FFCCE1]/50 space-y-1 hover:border-[#FF5C8A]/40 transition-colors">
-                <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider">Mobile Number</span>
-                <span className="font-mono text-xs font-bold text-[#2A0826]">{subscriberInfo?.phone || '+91 Mobile Number'}</span>
+                <span className="text-[#684E67] block text-[9.5px] uppercase font-black tracking-wider">
+                  Mobile Number
+                </span>
+                <span className="font-mono text-xs font-bold text-[#2A0826]">
+                  {subscriberInfo?.phone || '+91 Mobile Number'}
+                </span>
               </div>
 
               {subscriberInfo?.emergencyContactName && (
@@ -211,7 +237,6 @@ function CheckoutContent() {
 
           {/* ITEMIZED BILLING SUMMARY (3 COLS) */}
           <div className="lg:col-span-3 bg-gradient-to-br from-white via-[#FFF0F3] to-white border-2 border-[#FF2A6D] shadow-[0_20px_60px_rgba(255,42,109,0.14)] rounded-3xl p-6 sm:p-8 space-y-6 relative overflow-hidden animate-fade-up">
-            
             {/* GLOWING ACCENT TOP BAR */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F]" />
 
@@ -220,7 +245,9 @@ function CheckoutContent() {
                 <Shield className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-black text-[#2A0826] tracking-tight">{selectedPlan.name}</h3>
+                <h3 className="text-base sm:text-lg font-black text-[#2A0826] tracking-tight">
+                  {selectedPlan.name}
+                </h3>
                 <span className="inline-block text-[10px] bg-[#FF2A6D]/10 text-[#FF2A6D] font-black px-2.5 py-0.5 rounded-full border border-[#FF2A6D]/20 uppercase tracking-widest mt-0.5">
                   {selectedPlan.durationDays || 365} Days Active Protection
                 </span>
@@ -244,7 +271,9 @@ function CheckoutContent() {
               </div>
 
               <div className="pt-2 flex justify-between items-center">
-                <span className="font-black text-xs uppercase text-[#FF2A6D] tracking-wider">Total Payable Amount:</span>
+                <span className="font-black text-xs uppercase text-[#FF2A6D] tracking-wider">
+                  Total Payable Amount:
+                </span>
                 <span className="font-mono text-2xl font-black text-[#FF2A6D] drop-shadow-xs">
                   {isFreePlan ? '₹0.00 (FREE TRIAL)' : `₹${totalPrice.toFixed(2)}`}
                 </span>
@@ -261,7 +290,9 @@ function CheckoutContent() {
               >
                 <span>
                   {isProcessing
-                    ? isFreePlan ? 'ACTIVATING FREE TRIAL...' : 'REDIRECTING TO SECURE PAYU...'
+                    ? isFreePlan
+                      ? 'ACTIVATING FREE TRIAL...'
+                      : 'REDIRECTING TO SECURE PAYU...'
                     : isFreePlan
                       ? 'ACTIVATE 100% FREE TRIAL NOW'
                       : `PROCEED TO PAYU CHECKOUT (₹${totalPrice.toFixed(2)})`}
@@ -269,17 +300,13 @@ function CheckoutContent() {
                 <ExternalLink className="w-4 h-4" />
               </button>
 
-
               <div className="flex items-center justify-center space-x-2 text-[10px] text-[#684E67] font-black pt-1">
                 <Lock className="w-3.5 h-3.5 text-emerald-500" />
                 <span>256-Bit SSL Secured Official PayU Integration</span>
               </div>
             </div>
-
           </div>
-
         </div>
-
       </div>
 
       <Footer />
@@ -289,7 +316,13 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FFF0F3] flex items-center justify-center font-bold text-rose">Loading Checkout...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FFF0F3] flex items-center justify-center font-bold text-rose">
+          Loading Checkout...
+        </div>
+      }
+    >
       <CheckoutContent />
     </Suspense>
   );

@@ -19,7 +19,7 @@ import {
   Heart,
   Activity,
   ArrowUpRight,
-  Shield
+  Shield,
 } from 'lucide-react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { api } from '../../utils/api.js';
@@ -122,14 +122,17 @@ export default function ParentDashboard() {
         }, 1500);
       }
     } catch (err) {
-      setModalError(err?.response?.data?.error || 'Failed to link child. Please verify child mobile/email.');
+      setModalError(
+        err?.response?.data?.error || 'Failed to link child. Please verify child mobile/email.'
+      );
     } finally {
       setLinkLoading(false);
     }
   };
 
   const handleUnlinkChild = async (linkId, childName) => {
-    if (!window.confirm(`Are you sure you want to unlink ${childName} from your Parent Portal?`)) return;
+    if (!window.confirm(`Are you sure you want to unlink ${childName} from your Parent Portal?`))
+      return;
     try {
       const res = await api.delete(`/parent/children/${linkId}`);
       if (res.data && res.data.success) {
@@ -145,7 +148,6 @@ export default function ParentDashboard() {
   return (
     <AppLayout>
       <div className="max-w-5xl mx-auto px-4 py-6 sm:py-8 space-y-6">
-        
         {/* PARENTAL HEADER BAR */}
         <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white p-4 sm:p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center space-x-3.5 sm:space-x-4 min-w-0 w-full sm:w-auto">
@@ -216,7 +218,6 @@ export default function ParentDashboard() {
         {/* TAB 1: CHILD SAFETY COMMAND */}
         {activeTab === 'safety' && (
           <div className="space-y-6">
-            
             {/* ACTIVE SOS BANNER IF ANY CHILD TRIGGERED SOS */}
             {stats.activeSosCount > 0 && (
               <div className="bg-gradient-to-r from-[#FF2A6D] via-[#FF5C8A] to-[#FF2A6D] text-white p-5 rounded-3xl shadow-xl flex items-center justify-between gap-4 animate-pulse">
@@ -225,9 +226,12 @@ export default function ParentDashboard() {
                     <AlertTriangle className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-black text-base uppercase tracking-wider">EMERGENCY SOS ALERT ACTIVATED!</h3>
+                    <h3 className="font-black text-base uppercase tracking-wider">
+                      EMERGENCY SOS ALERT ACTIVATED!
+                    </h3>
                     <p className="text-xs font-bold text-white/90">
-                      One or more of your linked children have triggered an Emergency SOS Alert. Live GPS tracking is broadcasting now.
+                      One or more of your linked children have triggered an Emergency SOS Alert.
+                      Live GPS tracking is broadcasting now.
                     </p>
                   </div>
                 </div>
@@ -240,7 +244,8 @@ export default function ParentDashboard() {
                 <Heart className="w-12 h-12 text-[#FF5C8A] mx-auto" />
                 <h3 className="text-base font-black text-[#2A0826]">No Children Linked Yet</h3>
                 <p className="text-xs font-bold text-[#684E67] max-w-sm mx-auto">
-                  Link your daughter's or child's account to view real-time GPS safety status and receive instant SOS alerts.
+                  Link your daughter's or child's account to view real-time GPS safety status and
+                  receive instant SOS alerts.
                 </p>
                 <button
                   type="button"
@@ -270,9 +275,15 @@ export default function ParentDashboard() {
                     >
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#FFCCE1]/60 pb-4">
                         <div className="flex items-center space-x-3.5">
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm text-white shadow-sm shrink-0 ${
-                            isSos ? 'bg-[#FF2A6D] animate-pulse' : isTrip ? 'bg-emerald-500' : 'bg-gradient-to-tr from-[#FF5C8A] to-[#FF2A6D]'
-                          }`}>
+                          <div
+                            className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm text-white shadow-sm shrink-0 ${
+                              isSos
+                                ? 'bg-[#FF2A6D] animate-pulse'
+                                : isTrip
+                                  ? 'bg-emerald-500'
+                                  : 'bg-gradient-to-tr from-[#FF5C8A] to-[#FF2A6D]'
+                            }`}
+                          >
                             {c.fullName?.charAt(0) || 'C'}
                           </div>
 
@@ -283,7 +294,9 @@ export default function ParentDashboard() {
                                 {item.relationship}
                               </span>
                             </div>
-                            <p className="text-xs font-bold text-[#684E67]">{c.phone} • {c.email}</p>
+                            <p className="text-xs font-bold text-[#684E67]">
+                              {c.phone} • {c.email}
+                            </p>
                           </div>
                         </div>
 
@@ -313,7 +326,9 @@ export default function ParentDashboard() {
                         <div className="bg-white/80 p-3.5 rounded-2xl border border-[#FFCCE1] flex items-center space-x-3">
                           <MapPin className="w-5 h-5 text-[#FF2A6D] shrink-0" />
                           <div>
-                            <span className="block text-[10px] font-black uppercase text-[#FF2A6D]">GPS Tracking Status</span>
+                            <span className="block text-[10px] font-black uppercase text-[#FF2A6D]">
+                              GPS Tracking Status
+                            </span>
                             <span className="text-[#2A0826]">Real-Time Geo Sync Active</span>
                           </div>
                         </div>
@@ -322,15 +337,21 @@ export default function ParentDashboard() {
                           <div className="bg-white/80 p-3.5 rounded-2xl border border-[#FFCCE1] flex items-center space-x-3">
                             <Navigation className="w-5 h-5 text-emerald-500 shrink-0" />
                             <div>
-                              <span className="block text-[10px] font-black uppercase text-emerald-600">Active Destination</span>
-                              <span className="text-[#2A0826] truncate block">{item.activeJourney.destinationName}</span>
+                              <span className="block text-[10px] font-black uppercase text-emerald-600">
+                                Active Destination
+                              </span>
+                              <span className="text-[#2A0826] truncate block">
+                                {item.activeJourney.destinationName}
+                              </span>
                             </div>
                           </div>
                         ) : (
                           <div className="bg-white/80 p-3.5 rounded-2xl border border-[#FFCCE1] flex items-center space-x-3">
                             <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0" />
                             <div>
-                              <span className="block text-[10px] font-black uppercase text-[#684E67]">Trip Monitor</span>
+                              <span className="block text-[10px] font-black uppercase text-[#684E67]">
+                                Trip Monitor
+                              </span>
                               <span className="text-[#2A0826]">No active trip in progress</span>
                             </div>
                           </div>
@@ -346,7 +367,9 @@ export default function ParentDashboard() {
                             rel="noreferrer"
                             className="w-full btn-3d-rose-pop py-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2"
                           >
-                            <span>🚨 OPEN EMERGENCY SOS LIVE GPS STREAM FOR {c.fullName.toUpperCase()}</span>
+                            <span>
+                              🚨 OPEN EMERGENCY SOS LIVE GPS STREAM FOR {c.fullName.toUpperCase()}
+                            </span>
                             <ArrowUpRight className="w-4 h-4" />
                           </a>
                         )}
@@ -359,7 +382,10 @@ export default function ParentDashboard() {
                             className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 shadow-md shadow-emerald-500/20"
                           >
                             <Navigation className="w-4 h-4" />
-                            <span>OPEN LIVE JOURNEY MAP FOR {c.fullName.toUpperCase()} ({item.activeJourney.destinationName})</span>
+                            <span>
+                              OPEN LIVE JOURNEY MAP FOR {c.fullName.toUpperCase()} (
+                              {item.activeJourney.destinationName})
+                            </span>
                             <ArrowUpRight className="w-4 h-4" />
                           </a>
                         )}
@@ -375,11 +401,12 @@ export default function ParentDashboard() {
         {/* TAB 2: LINKED CHILDREN */}
         {activeTab === 'children' && (
           <div className="bg-white rounded-3xl border-2 border-[#FFCCE1] shadow-md p-6 space-y-6">
-            
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-lg font-black text-[#2A0826]">Linked Child Accounts</h3>
-                <p className="text-xs font-bold text-[#684E67]">Manage accounts linked to your Parent Safety Portal</p>
+                <p className="text-xs font-bold text-[#684E67]">
+                  Manage accounts linked to your Parent Safety Portal
+                </p>
               </div>
 
               <button
@@ -396,7 +423,9 @@ export default function ParentDashboard() {
               <div className="text-center py-12 bg-[#FFF0F3] rounded-2xl border-1.5 border-dashed border-[#FFCCE1] space-y-2">
                 <Heart className="w-10 h-10 text-[#FF5C8A] mx-auto" />
                 <h4 className="font-black text-sm text-[#2A0826]">No linked child accounts</h4>
-                <p className="text-xs font-bold text-[#684E67]">Click the button above to link your child using their phone number or email.</p>
+                <p className="text-xs font-bold text-[#684E67]">
+                  Click the button above to link your child using their phone number or email.
+                </p>
               </div>
             ) : (
               <div className="divide-y divide-[#FFCCE1]/60">
@@ -408,12 +437,16 @@ export default function ParentDashboard() {
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h4 className="font-black text-sm text-[#2A0826]">{item.child.fullName}</h4>
+                          <h4 className="font-black text-sm text-[#2A0826]">
+                            {item.child.fullName}
+                          </h4>
                           <span className="bg-[#FFF0F3] text-[#FF2A6D] text-[10px] font-black px-2 py-0.5 rounded-full border border-[#FFCCE1]">
                             {item.relationship}
                           </span>
                         </div>
-                        <p className="text-xs font-bold text-[#684E67]">{item.child.phone} • {item.child.email}</p>
+                        <p className="text-xs font-bold text-[#684E67]">
+                          {item.child.phone} • {item.child.email}
+                        </p>
                       </div>
                     </div>
 
@@ -431,7 +464,6 @@ export default function ParentDashboard() {
             )}
           </div>
         )}
-
       </div>
 
       {/* LINK CHILD MODAL */}

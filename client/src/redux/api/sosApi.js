@@ -7,7 +7,12 @@ export const sosApi = {
   },
 
   updateSosLocation: async ({ sosSessionId, latitude, longitude, accuracy }) => {
-    const response = await apiClient.post('/sos/location', { sosSessionId, latitude, longitude, accuracy });
+    const response = await apiClient.post('/sos/location', {
+      sosSessionId,
+      latitude,
+      longitude,
+      accuracy,
+    });
     return response.data;
   },
 

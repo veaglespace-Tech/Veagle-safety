@@ -14,7 +14,8 @@ L.Icon.Default.mergeOptions({
 
 // Custom Emergency SOS Red Pulsing Marker
 const emergencyIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  iconUrl:
+    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   iconSize: [28, 45],
   iconAnchor: [14, 45],
@@ -24,7 +25,8 @@ const emergencyIcon = new L.Icon({
 
 // Custom Live User Violet Marker
 const liveUserIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+  iconUrl:
+    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   iconSize: [28, 45],
   iconAnchor: [14, 45],
@@ -69,7 +71,7 @@ export const LiveLocationMap = ({
     }
   }, [lat, lng]);
 
-  const currentPosition = [lat || 28.6139, lng || 77.2090];
+  const currentPosition = [lat || 28.6139, lng || 77.209];
 
   return (
     <div className="w-full h-full relative rounded-card overflow-hidden shadow-plum-subtle group">
@@ -117,7 +119,9 @@ export const LiveLocationMap = ({
           <Popup>
             <div className="text-xs space-y-1.5 p-1 min-w-[160px]">
               <div className="flex items-center space-x-1.5">
-                <Radio className={`w-3.5 h-3.5 ${isEmergency ? 'text-red-500 animate-pulse' : 'text-indigo-600'}`} />
+                <Radio
+                  className={`w-3.5 h-3.5 ${isEmergency ? 'text-red-500 animate-pulse' : 'text-indigo-600'}`}
+                />
                 <p className="font-extrabold text-gray-900">{userName}</p>
               </div>
               <p className="text-gray-500 font-mono text-[11px]">
@@ -128,7 +132,8 @@ export const LiveLocationMap = ({
               </p>
               {speed !== null && (
                 <p className="text-gray-600 text-[11px]">
-                  Speed: <span className="font-bold text-gray-800">{Math.round(speed * 3.6)} km/h</span>
+                  Speed:{' '}
+                  <span className="font-bold text-gray-800">{Math.round(speed * 3.6)} km/h</span>
                 </p>
               )}
               {isEmergency && (
@@ -144,7 +149,9 @@ export const LiveLocationMap = ({
 
       {/* Leaflet Live Overlay Badge */}
       <div className="absolute top-3 left-3 z-[400] bg-white/95 backdrop-blur-md border border-gray-200 shadow-md px-3 py-1.5 rounded-full flex items-center space-x-2">
-        <span className={`w-2 h-2 rounded-full ${isEmergency ? 'bg-red-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`} />
+        <span
+          className={`w-2 h-2 rounded-full ${isEmergency ? 'bg-red-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`}
+        />
         <span className="text-[11px] font-black text-gray-800 tracking-wide uppercase">
           Leaflet Live GPS
         </span>

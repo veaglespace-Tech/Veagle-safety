@@ -5,8 +5,18 @@ import { AppLayout } from '../../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../../components/admin/AdminHeaderNav.js';
 import { api } from '../../../utils/api.js';
 import {
-  CreditCard, Search, Download, FileText, CheckCircle2,
-  Clock, XCircle, ChevronLeft, ChevronRight, Eye, Printer, X
+  CreditCard,
+  Search,
+  Download,
+  FileText,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Printer,
+  X,
 } from 'lucide-react';
 import { CustomSelect } from '../../../components/ui/CustomSelect.js';
 
@@ -64,7 +74,10 @@ export default function AdminPaymentsPage() {
   });
 
   const totalPaymentPages = Math.ceil(filteredPayments.length / paymentsPerPage) || 1;
-  const paginatedPayments = filteredPayments.slice((paymentPage - 1) * paymentsPerPage, paymentPage * paymentsPerPage);
+  const paginatedPayments = filteredPayments.slice(
+    (paymentPage - 1) * paymentsPerPage,
+    paymentPage * paymentsPerPage
+  );
 
   const metrics = {
     paymentsCount: payments.length,
@@ -74,7 +87,6 @@ export default function AdminPaymentsPage() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
-        
         {/* HEADER NAVIGATION */}
         <AdminHeaderNav
           metrics={metrics}
@@ -85,24 +97,31 @@ export default function AdminPaymentsPage() {
 
         {/* PAYMENTS CONTENT */}
         <div className="space-y-6 animate-fade-up">
-          
           {/* SUMMARY STATS BAR */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-1">
               <span className="text-xs font-black text-[#684E67] uppercase">Total Revenue</span>
-              <p className="text-3xl font-black text-emerald-600">₹{paymentSummary?.totalRevenue?.toFixed(2) || '0.00'}</p>
+              <p className="text-3xl font-black text-emerald-600">
+                ₹{paymentSummary?.totalRevenue?.toFixed(2) || '0.00'}
+              </p>
               <p className="text-[11px] font-bold text-gray-500">Gross total revenue collected</p>
             </div>
 
             <div className="bg-white p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-1">
-              <span className="text-xs font-black text-[#684E67] uppercase">Successful Transactions</span>
-              <p className="text-3xl font-black text-[#2A0826]">{paymentSummary?.successCount || 0}</p>
+              <span className="text-xs font-black text-[#684E67] uppercase">
+                Successful Transactions
+              </span>
+              <p className="text-3xl font-black text-[#2A0826]">
+                {paymentSummary?.successCount || 0}
+              </p>
               <p className="text-[11px] font-bold text-emerald-600">Completed payments</p>
             </div>
 
             <div className="bg-white p-6 rounded-[32px] border-2 border-[#FFCCE1] shadow-sm space-y-1">
               <span className="text-xs font-black text-[#684E67] uppercase">GST Tax Collected</span>
-              <p className="text-3xl font-black text-purple-600">₹{paymentSummary?.totalGstCollected?.toFixed(2) || '0.00'}</p>
+              <p className="text-3xl font-black text-purple-600">
+                ₹{paymentSummary?.totalGstCollected?.toFixed(2) || '0.00'}
+              </p>
               <p className="text-[11px] font-bold text-purple-600">18% GST audit ledger</p>
             </div>
           </div>
@@ -115,7 +134,10 @@ export default function AdminPaymentsPage() {
                 type="text"
                 placeholder="Search Txn ID, member name, email, plan..."
                 value={paymentSearch}
-                onChange={(e) => { setPaymentSearch(e.target.value); setPaymentPage(1); }}
+                onChange={(e) => {
+                  setPaymentSearch(e.target.value);
+                  setPaymentPage(1);
+                }}
                 className="w-full pl-11 pr-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-bold text-[#2A0826] outline-none"
               />
             </div>
@@ -129,7 +151,10 @@ export default function AdminPaymentsPage() {
                   { value: 'FAILED', label: 'FAILED' },
                 ]}
                 value={paymentStatusFilter}
-                onChange={(e) => { setPaymentStatusFilter(e.target.value); setPaymentPage(1); }}
+                onChange={(e) => {
+                  setPaymentStatusFilter(e.target.value);
+                  setPaymentPage(1);
+                }}
                 alignRight={true}
               />
             </div>
@@ -156,12 +181,18 @@ export default function AdminPaymentsPage() {
                       <tr key={p.id} className="hover:bg-[#FFF0F3]/40 transition-colors">
                         <td className="py-4 px-6">
                           <p className="font-mono text-xs font-black text-[#FF2A6D]">{p.txnid}</p>
-                          <p className="text-[10px] text-gray-500 font-bold">{new Date(p.createdAt).toLocaleString()}</p>
+                          <p className="text-[10px] text-gray-500 font-bold">
+                            {new Date(p.createdAt).toLocaleString()}
+                          </p>
                         </td>
 
                         <td className="py-4 px-6">
-                          <p className="font-black text-[#2A0826]">{p.user?.fullName || 'Anonymous Member'}</p>
-                          <p className="text-[11px] text-[#684E67] font-bold">{p.user?.email || 'N/A'}</p>
+                          <p className="font-black text-[#2A0826]">
+                            {p.user?.fullName || 'Anonymous Member'}
+                          </p>
+                          <p className="text-[11px] text-[#684E67] font-bold">
+                            {p.user?.email || 'N/A'}
+                          </p>
                         </td>
 
                         <td className="py-4 px-6 font-bold text-[#2A0826]">
@@ -169,18 +200,24 @@ export default function AdminPaymentsPage() {
                         </td>
 
                         <td className="py-4 px-6">
-                          <p className="font-mono text-sm font-black text-[#2A0826]">₹{p.amount?.toFixed(2)}</p>
-                          <p className="text-[10px] text-gray-500 font-bold">Base: ₹{p.baseAmount} + {p.gstPercentage}% GST</p>
+                          <p className="font-mono text-sm font-black text-[#2A0826]">
+                            ₹{p.amount?.toFixed(2)}
+                          </p>
+                          <p className="text-[10px] text-gray-500 font-bold">
+                            Base: ₹{p.baseAmount} + {p.gstPercentage}% GST
+                          </p>
                         </td>
 
                         <td className="py-4 px-6">
-                          <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
-                            p.status === 'SUCCESS'
-                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-300'
-                              : p.status === 'PENDING'
-                              ? 'bg-amber-50 text-amber-600 border border-amber-300'
-                              : 'bg-rose-50 text-rose-600 border border-rose-300'
-                          }`}>
+                          <span
+                            className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
+                              p.status === 'SUCCESS'
+                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-300'
+                                : p.status === 'PENDING'
+                                  ? 'bg-amber-50 text-amber-600 border border-amber-300'
+                                  : 'bg-rose-50 text-rose-600 border border-rose-300'
+                            }`}
+                          >
                             {p.status}
                           </span>
                         </td>
@@ -211,7 +248,10 @@ export default function AdminPaymentsPage() {
             {/* PAGINATION CONTROLS */}
             <div className="p-5 bg-[#FFF0F3]/60 border-t border-[#FFCCE1] flex items-center justify-between">
               <span className="text-xs font-black text-[#684E67]">
-                Showing {filteredPayments.length === 0 ? 0 : (paymentPage - 1) * paymentsPerPage + 1} - {Math.min(paymentPage * paymentsPerPage, filteredPayments.length)} of {filteredPayments.length} Transactions
+                Showing{' '}
+                {filteredPayments.length === 0 ? 0 : (paymentPage - 1) * paymentsPerPage + 1} -{' '}
+                {Math.min(paymentPage * paymentsPerPage, filteredPayments.length)} of{' '}
+                {filteredPayments.length} Transactions
               </span>
 
               <div className="flex items-center space-x-2">
@@ -239,32 +279,40 @@ export default function AdminPaymentsPage() {
               </div>
             </div>
           </div>
-
         </div>
 
         {/* MODAL 4: ITEMIZED OFFICIAL GST RECEIPT VIEWER */}
         {selectedReceipt && (
           <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white max-w-sm w-full p-0 shadow-2xl relative animate-scale-up font-mono text-sm text-gray-800 rounded-lg overflow-hidden flex flex-col">
-              
               {/* Receipt Content - Scrollable if needed */}
-              <div className="p-6 pb-2 sm:p-8 sm:pb-4 space-y-6 flex-1 overflow-y-auto bg-white" id="printable-receipt">
-                
+              <div
+                className="p-6 pb-2 sm:p-8 sm:pb-4 space-y-6 flex-1 overflow-y-auto bg-white"
+                id="printable-receipt"
+              >
                 {/* Header */}
                 <div className="text-center space-y-1">
                   <h2 className="text-xl font-black tracking-widest text-black">SAKHI SURAKSHA</h2>
-                  <p className="text-xs text-gray-500 font-bold uppercase">Official Payment Receipt</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase">
+                    Official Payment Receipt
+                  </p>
                   <p className="text-xs text-gray-400 mt-2">123 Safety Drive, Pune, MH, IN</p>
                   <p className="text-xs text-gray-400">support@veagle-safety.com</p>
                 </div>
-                
+
                 <div className="border-b-2 border-dashed border-gray-300 w-full my-4"></div>
 
                 {/* Details */}
                 <div className="space-y-1.5 text-xs font-bold uppercase tracking-tight">
                   <div className="flex justify-between">
                     <span>DATE:</span>
-                    <span>{new Date(selectedReceipt.createdAt).toLocaleDateString()} {new Date(selectedReceipt.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    <span>
+                      {new Date(selectedReceipt.createdAt).toLocaleDateString()}{' '}
+                      {new Date(selectedReceipt.createdAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>TXN ID:</span>
@@ -281,7 +329,9 @@ export default function AdminPaymentsPage() {
                 {/* Customer Info */}
                 <div className="space-y-1.5 text-xs font-bold uppercase tracking-tight">
                   <p className="text-gray-500 mb-2">Billed To:</p>
-                  <p className="font-black text-black">{selectedReceipt.user?.fullName || 'Sakhi Member'}</p>
+                  <p className="font-black text-black">
+                    {selectedReceipt.user?.fullName || 'Sakhi Member'}
+                  </p>
                   <p className="lowercase normal-case">{selectedReceipt.user?.email || 'N/A'}</p>
                 </div>
 
@@ -298,12 +348,20 @@ export default function AdminPaymentsPage() {
                     </thead>
                     <tbody>
                       <tr>
-                        <td className="pt-3 pb-1">{selectedReceipt.plan?.name || 'Protection Plan'}</td>
-                        <td className="pt-3 pb-1 text-right">₹{selectedReceipt.baseAmount?.toFixed(2)}</td>
+                        <td className="pt-3 pb-1">
+                          {selectedReceipt.plan?.name || 'Protection Plan'}
+                        </td>
+                        <td className="pt-3 pb-1 text-right">
+                          ₹{selectedReceipt.baseAmount?.toFixed(2)}
+                        </td>
                       </tr>
                       <tr>
-                        <td className="pb-1 text-gray-500">GST ({selectedReceipt.gstPercentage}%)</td>
-                        <td className="pb-1 text-right text-gray-500">₹{selectedReceipt.gstAmount?.toFixed(2)}</td>
+                        <td className="pb-1 text-gray-500">
+                          GST ({selectedReceipt.gstPercentage}%)
+                        </td>
+                        <td className="pb-1 text-right text-gray-500">
+                          ₹{selectedReceipt.gstAmount?.toFixed(2)}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -318,9 +376,9 @@ export default function AdminPaymentsPage() {
                     <span>₹{selectedReceipt.amount?.toFixed(2)}</span>
                   </div>
                 </div>
-                
+
                 <div className="border-b-2 border-dashed border-gray-300 w-full my-4"></div>
-                
+
                 {/* Footer */}
                 <div className="text-center space-y-2 pt-2">
                   <p className="text-xs font-bold uppercase">Thank you for subscribing!</p>
@@ -347,11 +405,9 @@ export default function AdminPaymentsPage() {
                   Close
                 </button>
               </div>
-
             </div>
           </div>
         )}
-
       </div>
     </AppLayout>
   );

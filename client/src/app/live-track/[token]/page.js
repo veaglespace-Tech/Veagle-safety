@@ -4,7 +4,17 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { api, SERVER_URL } from '../../../utils/api.js';
 import { LiveLocationMap } from '../../../components/location/DynamicLiveLocationMap.js';
-import { ShieldAlert, MapPin, PhoneCall, Clock, CheckCircle, Volume2, VolumeX, AlertTriangle, User } from 'lucide-react';
+import {
+  ShieldAlert,
+  MapPin,
+  PhoneCall,
+  Clock,
+  CheckCircle,
+  Volume2,
+  VolumeX,
+  AlertTriangle,
+  User,
+} from 'lucide-react';
 import { io } from 'socket.io-client';
 import { startEmergencySiren, stopEmergencySiren } from '../../../utils/sirenAudio.js';
 
@@ -86,7 +96,8 @@ export default function LivePublicTrackingPage() {
           <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto" />
           <h2 className="font-black text-xl text-[#2A0826]">Tracking Link Resolved</h2>
           <p className="text-xs text-[#684E67] font-bold leading-relaxed">
-            {error || 'This emergency live tracking session is no longer active or the user has confirmed safety.'}
+            {error ||
+              'This emergency live tracking session is no longer active or the user has confirmed safety.'}
           </p>
         </div>
       </div>
@@ -96,16 +107,22 @@ export default function LivePublicTrackingPage() {
   const isEmergency = session.status === 'ACTIVE';
   const victimName = session.user?.fullName || 'Sakhi Member';
   const victimPhoto = session.user?.profilePhoto;
-  const userInitials = victimName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase();
+  const userInitials = victimName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
 
   const lat = location?.latitude || session?.latitude || 18.5204;
   const lng = location?.longitude || session?.longitude || 73.8567;
 
   return (
     <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans p-4 max-w-2xl mx-auto space-y-4 pb-12">
-      
       {/* HEADER BANNER */}
-      <div className={`p-5 rounded-3xl text-white flex items-center justify-between shadow-xl ${isEmergency ? 'bg-gradient-to-r from-[#FF2A6D] via-rose-500 to-[#FF2A6D] animate-pulse border-2 border-white' : 'bg-[#2A0826]'}`}>
+      <div
+        className={`p-5 rounded-3xl text-white flex items-center justify-between shadow-xl ${isEmergency ? 'bg-gradient-to-r from-[#FF2A6D] via-rose-500 to-[#FF2A6D] animate-pulse border-2 border-white' : 'bg-[#2A0826]'}`}
+      >
         <div className="flex items-center space-x-3">
           {/* PROFILE PHOTO OR INITIALS AVATAR */}
           {victimPhoto ? (
@@ -122,7 +139,9 @@ export default function LivePublicTrackingPage() {
 
           <div>
             <h1 className="font-black text-lg">{victimName} — Live GPS Stream</h1>
-            <p className="text-xs text-white/90 font-bold">24/7 Live Encrypted Guardian Location Map</p>
+            <p className="text-xs text-white/90 font-bold">
+              24/7 Live Encrypted Guardian Location Map
+            </p>
           </div>
         </div>
 
@@ -140,7 +159,9 @@ export default function LivePublicTrackingPage() {
             </div>
             <div>
               <p className="text-xs font-black text-[#FF2A6D]">GUARDIAN EMERGENCY ALARM</p>
-              <p className="text-[11px] font-bold text-[#684E67]">Tap button to play high-decibel siren on your device</p>
+              <p className="text-[11px] font-bold text-[#684E67]">
+                Tap button to play high-decibel siren on your device
+              </p>
             </div>
           </div>
 
@@ -153,8 +174,14 @@ export default function LivePublicTrackingPage() {
                 : 'bg-[#FF2A6D] text-white border-[#FF2A6D] shadow-md hover:brightness-110'
             }`}
           >
-            {isSirenPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 animate-bounce" />}
-            <span>{isSirenPlaying ? 'MUTE SIREN SOUND' : '🔊 PLAY EMERGENCY SIREN ON MY DEVICE'}</span>
+            {isSirenPlaying ? (
+              <VolumeX className="w-4 h-4" />
+            ) : (
+              <Volume2 className="w-4 h-4 animate-bounce" />
+            )}
+            <span>
+              {isSirenPlaying ? 'MUTE SIREN SOUND' : '🔊 PLAY EMERGENCY SIREN ON MY DEVICE'}
+            </span>
           </button>
         </div>
       )}
@@ -175,7 +202,10 @@ export default function LivePublicTrackingPage() {
         <div className="flex items-center justify-between text-xs border-b border-[#FFCCE1] pb-3 font-bold">
           <span className="text-[#684E67]">Emergency User Phone:</span>
           {session.user?.phone ? (
-            <a href={`tel:${session.user?.phone}`} className="font-black text-[#FF2A6D] hover:underline text-sm font-mono flex items-center space-x-1">
+            <a
+              href={`tel:${session.user?.phone}`}
+              className="font-black text-[#FF2A6D] hover:underline text-sm font-mono flex items-center space-x-1"
+            >
               <PhoneCall className="w-4 h-4" />
               <span>{session.user?.phone}</span>
             </a>

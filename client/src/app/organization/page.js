@@ -20,7 +20,7 @@ import {
   RefreshCw,
   Crown,
   Activity,
-  ArrowUpRight
+  ArrowUpRight,
 } from 'lucide-react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { api } from '../../utils/api.js';
@@ -32,7 +32,12 @@ export default function OrganizationDashboard() {
   const [activeTab, setActiveTab] = useState('monitor'); // 'monitor' | 'members'
 
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ totalMembers: 0, activeSosCount: 0, inTripCount: 0, safeCount: 0 });
+  const [stats, setStats] = useState({
+    totalMembers: 0,
+    activeSosCount: 0,
+    inTripCount: 0,
+    safeCount: 0,
+  });
   const [members, setMembers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -54,7 +59,9 @@ export default function OrganizationDashboard() {
       setLoading(true);
       const res = await api.get('/organization/overview');
       if (res.data && res.data.success) {
-        setStats(res.data.stats || { totalMembers: 0, activeSosCount: 0, inTripCount: 0, safeCount: 0 });
+        setStats(
+          res.data.stats || { totalMembers: 0, activeSosCount: 0, inTripCount: 0, safeCount: 0 }
+        );
         setMembers(res.data.members || []);
       }
     } catch (err) {
@@ -71,7 +78,10 @@ export default function OrganizationDashboard() {
   }, [mounted, token]);
 
   // Auth Protection
-  if (mounted && (!token || (user && user.role !== 'ORGANIZATION' && user.role !== 'SUPER_ADMIN'))) {
+  if (
+    mounted &&
+    (!token || (user && user.role !== 'ORGANIZATION' && user.role !== 'SUPER_ADMIN'))
+  ) {
     if (user && user.role === 'PARENT') {
       router.push('/parent');
       return null;
@@ -111,14 +121,17 @@ export default function OrganizationDashboard() {
         }, 1500);
       }
     } catch (err) {
-      setModalError(err?.response?.data?.error || 'Failed to add member. Please verify phone/email.');
+      setModalError(
+        err?.response?.data?.error || 'Failed to add member. Please verify phone/email.'
+      );
     } finally {
       setAddLoading(false);
     }
   };
 
   const handleRemoveMember = async (membershipId, memberName) => {
-    if (!window.confirm(`Are you sure you want to remove ${memberName} from your Organization?`)) return;
+    if (!window.confirm(`Are you sure you want to remove ${memberName} from your Organization?`))
+      return;
     try {
       const res = await api.delete(`/organization/members/${membershipId}`);
       if (res.data && res.data.success) {
@@ -145,7 +158,6 @@ export default function OrganizationDashboard() {
   return (
     <AppLayout>
       <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6">
-        
         {/* ORGANIZATION HEADER BAR */}
         <div className="bg-gradient-to-br from-white via-[#FFF0F3] to-white p-4 sm:p-6 rounded-3xl border-2 border-[#FFCCE1] shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center space-x-3.5 sm:space-x-4 min-w-0 w-full sm:w-auto">
@@ -216,21 +228,26 @@ export default function OrganizationDashboard() {
         {/* TAB 1: LIVE SAFETY MONITOR */}
         {activeTab === 'monitor' && (
           <div className="space-y-6">
-            
             {/* STATS OVERVIEW CARDS */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="bg-white p-5 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-black uppercase text-[#684E67] tracking-wider">Total Members</span>
+                  <span className="text-[11px] font-black uppercase text-[#684E67] tracking-wider">
+                    Total Members
+                  </span>
                   <Users className="w-4 h-4 text-[#FF5C8A]" />
                 </div>
                 <p className="text-3xl font-black text-[#2A0826]">{stats.totalMembers}</p>
                 <p className="text-[10px] font-extrabold text-[#684E67]">Enrolled Students/Staff</p>
               </div>
 
-              <div className={`p-5 rounded-3xl border-2 shadow-sm space-y-1 ${stats.activeSosCount > 0 ? 'bg-[#FFF0F3] border-[#FF2A6D] animate-pulse' : 'bg-white border-[#FFCCE1]'}`}>
+              <div
+                className={`p-5 rounded-3xl border-2 shadow-sm space-y-1 ${stats.activeSosCount > 0 ? 'bg-[#FFF0F3] border-[#FF2A6D] animate-pulse' : 'bg-white border-[#FFCCE1]'}`}
+              >
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-black uppercase text-[#FF2A6D] tracking-wider">Active SOS</span>
+                  <span className="text-[11px] font-black uppercase text-[#FF2A6D] tracking-wider">
+                    Active SOS
+                  </span>
                   <AlertTriangle className="w-4 h-4 text-[#FF2A6D]" />
                 </div>
                 <p className="text-3xl font-black text-[#FF2A6D]">{stats.activeSosCount}</p>
@@ -239,7 +256,9 @@ export default function OrganizationDashboard() {
 
               <div className="bg-white p-5 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-black uppercase text-[#684E67] tracking-wider">Active Trips</span>
+                  <span className="text-[11px] font-black uppercase text-[#684E67] tracking-wider">
+                    Active Trips
+                  </span>
                   <Navigation className="w-4 h-4 text-emerald-500" />
                 </div>
                 <p className="text-3xl font-black text-[#2A0826]">{stats.inTripCount}</p>
@@ -248,7 +267,9 @@ export default function OrganizationDashboard() {
 
               <div className="bg-white p-5 rounded-3xl border-2 border-[#FFCCE1] shadow-sm space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-black uppercase text-emerald-600 tracking-wider">Safe Members</span>
+                  <span className="text-[11px] font-black uppercase text-emerald-600 tracking-wider">
+                    Safe Members
+                  </span>
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
                 </div>
                 <p className="text-3xl font-black text-emerald-600">{stats.safeCount}</p>
@@ -259,7 +280,9 @@ export default function OrganizationDashboard() {
             {/* LIVE SAFETY STATUS LIST */}
             <div className="bg-white rounded-3xl border-2 border-[#FFCCE1] shadow-md p-6 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-black text-[#2A0826]">Organization Member Live Dispatch Monitor</h3>
+                <h3 className="text-lg font-black text-[#2A0826]">
+                  Organization Member Live Dispatch Monitor
+                </h3>
                 <span className="text-xs font-bold text-[#684E67]">Updated Real-Time</span>
               </div>
 
@@ -268,7 +291,8 @@ export default function OrganizationDashboard() {
                   <Users className="w-12 h-12 text-[#FF5C8A] mx-auto" />
                   <h4 className="text-base font-black text-[#2A0826]">No Members Enrolled Yet</h4>
                   <p className="text-xs font-bold text-[#684E67] max-w-sm mx-auto">
-                    Switch to the Member Directory tab to add your students or employees using their email/mobile number.
+                    Switch to the Member Directory tab to add your students or employees using their
+                    email/mobile number.
                   </p>
                   <button
                     type="button"
@@ -292,9 +316,15 @@ export default function OrganizationDashboard() {
                       }`}
                     >
                       <div className="flex items-center space-x-3.5">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs text-white shrink-0 ${
-                          m.activeSos ? 'bg-[#FF2A6D] animate-pulse' : m.activeJourney ? 'bg-emerald-500' : 'bg-[#FF5C8A]'
-                        }`}>
+                        <div
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs text-white shrink-0 ${
+                            m.activeSos
+                              ? 'bg-[#FF2A6D] animate-pulse'
+                              : m.activeJourney
+                                ? 'bg-emerald-500'
+                                : 'bg-[#FF5C8A]'
+                          }`}
+                        >
                           {m.user.fullName?.charAt(0) || 'M'}
                         </div>
 
@@ -307,10 +337,14 @@ export default function OrganizationDashboard() {
                               </span>
                             )}
                             {m.department && (
-                              <span className="text-[10px] font-bold text-[#684E67]">({m.department})</span>
+                              <span className="text-[10px] font-bold text-[#684E67]">
+                                ({m.department})
+                              </span>
                             )}
                           </div>
-                          <p className="text-xs font-bold text-[#684E67]">{m.user.email} • {m.user.phone}</p>
+                          <p className="text-xs font-bold text-[#684E67]">
+                            {m.user.email} • {m.user.phone}
+                          </p>
                         </div>
                       </div>
 
@@ -356,7 +390,6 @@ export default function OrganizationDashboard() {
         {/* TAB 2: MEMBER DIRECTORY */}
         {activeTab === 'members' && (
           <div className="bg-white rounded-3xl border-2 border-[#FFCCE1] shadow-md p-6 space-y-6">
-            
             {/* DIRECTORY HEADER & ACTIONS */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
               <div className="relative flex-1">
@@ -385,12 +418,17 @@ export default function OrganizationDashboard() {
               <div className="text-center py-12 bg-[#FFF0F3] rounded-2xl border-1.5 border-dashed border-[#FFCCE1] space-y-2">
                 <Users className="w-10 h-10 text-[#FF5C8A] mx-auto" />
                 <h4 className="font-black text-sm text-[#2A0826]">No matching members found</h4>
-                <p className="text-xs font-bold text-[#684E67]">Try adjusting your search query or enroll new members.</p>
+                <p className="text-xs font-bold text-[#684E67]">
+                  Try adjusting your search query or enroll new members.
+                </p>
               </div>
             ) : (
               <div className="divide-y divide-[#FFCCE1]/60">
                 {filteredMembers.map((m) => (
-                  <div key={m.membershipId} className="py-4 flex items-center justify-between gap-4">
+                  <div
+                    key={m.membershipId}
+                    className="py-4 flex items-center justify-between gap-4"
+                  >
                     <div className="flex items-center space-x-3.5">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center font-black text-xs shrink-0">
                         {m.user.fullName?.charAt(0) || 'M'}
@@ -404,8 +442,14 @@ export default function OrganizationDashboard() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs font-bold text-[#684E67]">{m.user.email} • {m.user.phone}</p>
-                        {m.department && <p className="text-[10px] font-extrabold text-[#FF5C8A]">Dept: {m.department}</p>}
+                        <p className="text-xs font-bold text-[#684E67]">
+                          {m.user.email} • {m.user.phone}
+                        </p>
+                        {m.department && (
+                          <p className="text-[10px] font-extrabold text-[#FF5C8A]">
+                            Dept: {m.department}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -423,7 +467,6 @@ export default function OrganizationDashboard() {
             )}
           </div>
         )}
-
       </div>
 
       {/* ENROLL MEMBER MODAL */}
@@ -473,7 +516,9 @@ export default function OrganizationDashboard() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[#684E67] font-extrabold mb-1">Roll / Member Code</label>
+                  <label className="block text-[#684E67] font-extrabold mb-1">
+                    Roll / Member Code
+                  </label>
                   <input
                     type="text"
                     placeholder="e.g. STU-102"
@@ -484,7 +529,9 @@ export default function OrganizationDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-[#684E67] font-extrabold mb-1">Department / Branch</label>
+                  <label className="block text-[#684E67] font-extrabold mb-1">
+                    Department / Branch
+                  </label>
                   <input
                     type="text"
                     placeholder="e.g. Computer Science"

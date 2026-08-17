@@ -5,7 +5,7 @@ export const referralApi = {
     const response = await apiClient.post('/partners', data);
     return response.data;
   },
-  
+
   getAllPartners: async () => {
     const response = await apiClient.get('/partners');
     return response.data;
@@ -29,5 +29,5 @@ export const referralApi = {
   getPartnerStats: async (email, code) => {
     const response = await apiClient.post('/partners/stats', { email, code });
     return response.data;
-  }
+  },
 };

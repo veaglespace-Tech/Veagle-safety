@@ -90,7 +90,9 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
           isSilent,
           latitude: latitude || 18.5204,
           longitude: longitude || 73.8567,
-          emergencyMessage: isSilent ? 'Discreet Emergency SOS Triggered' : 'EMERGENCY SOS! I NEED HELP IMMEDIATELY!',
+          emergencyMessage: isSilent
+            ? 'Discreet Emergency SOS Triggered'
+            : 'EMERGENCY SOS! I NEED HELP IMMEDIATELY!',
         })
       ).unwrap();
 
@@ -112,18 +114,16 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
 
   return (
     <div className="flex flex-col items-center justify-center my-6 relative select-none">
-      
       {/* 3D EMBLEM DYNAMIC CONTAINER */}
       <div className="relative w-84 h-84 flex items-center justify-center">
-        
         {/* MULTI-LAYER DYNAMIC PULSING RADAR WAVES */}
         <div
           className={`absolute inset-0 rounded-full transition-all duration-700 ${
             holding
               ? 'bg-gradient-to-r from-[#FF2A6D] via-[#FF5C8A] to-[#FFD700] opacity-80 scale-125 blur-2xl animate-pulse'
               : activeSession
-              ? 'bg-gradient-to-r from-[#FF2A6D] to-[#E01A4F] opacity-70 blur-2xl animate-ping'
-              : 'bg-gradient-to-r from-[#FF5C8A]/25 via-[#FF2A6D]/20 to-[#FFD166]/25 blur-2xl animate-pulse'
+                ? 'bg-gradient-to-r from-[#FF2A6D] to-[#E01A4F] opacity-70 blur-2xl animate-ping'
+                : 'bg-gradient-to-r from-[#FF5C8A]/25 via-[#FF2A6D]/20 to-[#FFD166]/25 blur-2xl animate-pulse'
           }`}
         />
 
@@ -176,20 +176,21 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
             holding
               ? 'bg-gradient-to-tr from-[#E01A4F] via-[#FF2A6D] to-[#FFD700] text-white scale-110 shadow-[0_0_80px_rgba(255,42,109,0.8)] animate-pulse'
               : activeSession
-              ? 'bg-gradient-to-tr from-[#FF2A6D] via-[#E01A4F] to-[#2A0826] text-white animate-pulse shadow-coral-glow'
-              : 'bg-gradient-to-br from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white hover:scale-105 hover:shadow-[0_25px_65px_rgba(255,42,109,0.55)]'
+                ? 'bg-gradient-to-tr from-[#FF2A6D] via-[#E01A4F] to-[#2A0826] text-white animate-pulse shadow-coral-glow'
+                : 'bg-gradient-to-br from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white hover:scale-105 hover:shadow-[0_25px_65px_rgba(255,42,109,0.55)]'
           }`}
         >
           {/* INNER GLASS & NEON SHADOW */}
           <div className="absolute inset-2.5 rounded-full bg-gradient-to-tr from-white/20 via-transparent to-black/10 pointer-events-none" />
 
           <div className="relative z-10 flex flex-col items-center justify-center space-y-1.5 text-center">
-            
             {/* 3D ICON WITH DYNAMIC ANIMATION */}
             <div className="relative">
-              <ShieldAlert className={`w-10 h-10 text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-transform ${
-                holding ? 'scale-125 animate-bounce text-[#FFD700]' : 'animate-pulse'
-              }`} />
+              <ShieldAlert
+                className={`w-10 h-10 text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-transform ${
+                  holding ? 'scale-125 animate-bounce text-[#FFD700]' : 'animate-pulse'
+                }`}
+              />
               <Siren className="w-5 h-5 text-[#FFD700] absolute -top-2 -right-3 animate-pulse filter drop-shadow-[0_0_10px_rgba(255,215,0,0.95)]" />
             </div>
 
@@ -199,18 +200,22 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
             </span>
 
             {/* GLASSMORPHISM HOLD INSTRUCTION BADGE */}
-            <span className={`text-[10px] font-black uppercase tracking-widest text-white px-4 py-1 rounded-full border backdrop-blur-md shadow-md transition-all flex items-center space-x-1.5 ${
-              holding
-                ? 'bg-[#FF2A6D] border-white text-white animate-ping'
-                : 'bg-black/30 border-white/30 text-white/95'
-            }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${holding ? 'bg-gold animate-ping' : 'bg-emerald-400 animate-pulse'}`} />
-              <span>{holding ? 'DISPATCHING...' : activeSession ? 'VIEW STATUS' : 'HOLD 2 SECONDS'}</span>
+            <span
+              className={`text-[10px] font-black uppercase tracking-widest text-white px-4 py-1 rounded-full border backdrop-blur-md shadow-md transition-all flex items-center space-x-1.5 ${
+                holding
+                  ? 'bg-[#FF2A6D] border-white text-white animate-ping'
+                  : 'bg-black/30 border-white/30 text-white/95'
+              }`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${holding ? 'bg-gold animate-ping' : 'bg-emerald-400 animate-pulse'}`}
+              />
+              <span>
+                {holding ? 'DISPATCHING...' : activeSession ? 'VIEW STATUS' : 'HOLD 2 SECONDS'}
+              </span>
             </span>
-
           </div>
         </button>
-
       </div>
 
       {/* FOOTER SILENT MODE SWITCH */}
@@ -229,12 +234,19 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
               : 'bg-white text-[#2A0826] border-[#FFCCE1] hover:border-[#FF2A6D]'
           }`}
         >
-          {isSilent ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-[#FF2A6D]" />}
-          <span>Silent Emergency Mode: {isSilent ? 'ON (Discreet Alert)' : 'OFF (Loud Siren)'}</span>
-          <span className={`w-2 h-2 rounded-full ${isSilent ? 'bg-white animate-ping' : 'bg-emerald-500'}`} />
+          {isSilent ? (
+            <VolumeX className="w-4 h-4 text-white" />
+          ) : (
+            <Volume2 className="w-4 h-4 text-[#FF2A6D]" />
+          )}
+          <span>
+            Silent Emergency Mode: {isSilent ? 'ON (Discreet Alert)' : 'OFF (Loud Siren)'}
+          </span>
+          <span
+            className={`w-2 h-2 rounded-full ${isSilent ? 'bg-white animate-ping' : 'bg-emerald-500'}`}
+          />
         </button>
       </div>
-
     </div>
   );
 };

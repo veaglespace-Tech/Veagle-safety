@@ -17,12 +17,16 @@ export default function PlatformGalleryPage() {
   const [galleryItems, setGalleryItems] = useState([]);
   const [galleryMeta, setGalleryMeta] = useState({
     title: 'Visual Gallery & Feature Showcase',
-    subtitle: "Explore images and videos of Sakhi Suraksha SOS's emergency response interfaces, GPS tracking, and safety tools.",
-    categories: 'ALL, EMERGENCY, TRACKING, NETWORK, AUTOMATION, COMMAND'
+    subtitle:
+      "Explore images and videos of Sakhi Suraksha SOS's emergency response interfaces, GPS tracking, and safety tools.",
+    categories: 'ALL, EMERGENCY, TRACKING, NETWORK, AUTOMATION, COMMAND',
   });
   const [loading, setLoading] = useState(true);
 
-  const categories = galleryMeta.categories.split(',').map(c => c.trim()).filter(Boolean);
+  const categories = galleryMeta.categories
+    .split(',')
+    .map((c) => c.trim())
+    .filter(Boolean);
 
   useEffect(() => {
     fetchGalleryData();
@@ -46,43 +50,29 @@ export default function PlatformGalleryPage() {
     }
   };
 
-  const filteredItems = activeTab === 'ALL'
-    ? galleryItems
-    : galleryItems.filter(item => item.category === activeTab);
+  const filteredItems =
+    activeTab === 'ALL' ? galleryItems : galleryItems.filter((item) => item.category === activeTab);
 
   const renderMedia = (item, isModal = false) => {
-    const className = isModal 
-      ? "w-full h-auto max-h-[60vh] object-contain rounded-2xl" 
-      : "w-full h-full object-contain transition-transform duration-500 group-hover:scale-105";
+    const className = isModal
+      ? 'w-full h-auto max-h-[60vh] object-contain rounded-2xl'
+      : 'w-full h-full object-contain transition-transform duration-500 group-hover:scale-105';
 
     if (!item.mediaUrl) {
       return (
-        <div className={`flex items-center justify-center bg-gray-100 text-gray-400 font-bold ${isModal ? 'h-64 rounded-2xl' : 'w-full h-full'}`}>
+        <div
+          className={`flex items-center justify-center bg-gray-100 text-gray-400 font-bold ${isModal ? 'h-64 rounded-2xl' : 'w-full h-full'}`}
+        >
           No Media Available
         </div>
       );
     }
 
     if (item.mediaType === 'video') {
-      return (
-        <video 
-          src={item.mediaUrl} 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          className={className}
-        />
-      );
+      return <video src={item.mediaUrl} autoPlay loop muted playsInline className={className} />;
     }
-    
-    return (
-      <img 
-        src={item.mediaUrl} 
-        alt={item.title} 
-        className={className} 
-      />
-    );
+
+    return <img src={item.mediaUrl} alt={item.title} className={className} />;
   };
 
   return (
@@ -94,11 +84,13 @@ export default function PlatformGalleryPage() {
       <div className="absolute w-[750px] h-[750px] rounded-full bg-[#FFCCE1]/25 blur-[160px] bottom-[60px] right-[-220px] pointer-events-none" />
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-14 relative z-10">
-        
         {/* TOP HERO HEADER */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-
-          <AnimatedHeading as="h1" variant="shimmer" className="text-4xl sm:text-6xl font-black tracking-tight leading-normal pb-2">
+          <AnimatedHeading
+            as="h1"
+            variant="shimmer"
+            className="text-4xl sm:text-6xl font-black tracking-tight leading-normal pb-2"
+          >
             <span className="heading-gradient-hero">{galleryMeta.title}</span>
           </AnimatedHeading>
 
@@ -134,15 +126,14 @@ export default function PlatformGalleryPage() {
         ) : galleryItems.length === 0 ? (
           <div className="text-center py-20 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-[#FFCCE1]">
             <h3 className="text-xl font-black text-[#684E67]">Gallery is empty</h3>
-            <p className="text-sm font-bold text-[#FF5C8A] mt-2">The SuperAdmin has not uploaded any gallery media yet.</p>
+            <p className="text-sm font-bold text-[#FF5C8A] mt-2">
+              The SuperAdmin has not uploaded any gallery media yet.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                className="space-y-3 flex flex-col group cursor-pointer"
-              >
+              <div key={item.id} className="space-y-3 flex flex-col group cursor-pointer">
                 {/* CARD MEDIA PREVIEW WITH LIGHTBOX HOVER ICON */}
                 <div className="relative w-full h-64 sm:h-72 lg:h-80 rounded-[2rem] overflow-hidden shadow-sm transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1 flex items-center justify-center">
                   {renderMedia(item, false)}
@@ -159,9 +150,7 @@ export default function PlatformGalleryPage() {
                     {item.title}
                   </h3>
                   {item.subtitle && (
-                    <p className="text-sm font-bold text-[#684E67] line-clamp-1">
-                      {item.subtitle}
-                    </p>
+                    <p className="text-sm font-bold text-[#684E67] line-clamp-1">{item.subtitle}</p>
                   )}
                 </div>
               </div>
@@ -182,7 +171,8 @@ export default function PlatformGalleryPage() {
               Ready to Protect Yourself & Your Loved Ones?
             </h2>
             <p className="text-xs text-[#684E67] font-bold max-w-lg mx-auto leading-relaxed">
-              Get complete 365-day emergency SOS protection for just ₹24/year (only ₹2/month). Setup in under 2 minutes.
+              Get complete 365-day emergency SOS protection for just ₹24/year (only ₹2/month). Setup
+              in under 2 minutes.
             </p>
           </div>
 
@@ -198,12 +188,10 @@ export default function PlatformGalleryPage() {
             </MagneticButton>
           </div>
         </div>
-
       </section>
 
       {/* FOOTER */}
       <Footer />
-
     </div>
   );
 }

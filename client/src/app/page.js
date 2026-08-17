@@ -3,8 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Shield, Zap, Users, ArrowRight, ShieldCheck, Heart, MapPin, Bell,
-  PhoneCall, LayoutDashboard, Crown, Sparkles, CheckCircle2, Star, Award
+  Shield,
+  Zap,
+  Users,
+  ArrowRight,
+  ShieldCheck,
+  Heart,
+  MapPin,
+  Bell,
+  PhoneCall,
+  LayoutDashboard,
+  Crown,
+  Sparkles,
+  CheckCircle2,
+  Star,
+  Award,
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { PublicNavbar } from '../components/layout/PublicNavbar.js';
@@ -21,9 +34,11 @@ export default function LandingPage() {
     setMounted(true);
   }, []);
 
-  const isLoggedIn = mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
+  const isLoggedIn =
+    mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
   const isSuperAdmin = mounted && user?.role === 'SUPER_ADMIN';
-  const displayName = mounted && (user?.fullName || user?.name) ? (user.fullName || user.name) : 'Sakhi Member';
+  const displayName =
+    mounted && (user?.fullName || user?.name) ? user.fullName || user.name : 'Sakhi Member';
 
   return (
     <div className="min-h-screen bg-[#FFF0F3] text-[#2A0826] font-sans relative overflow-hidden">
@@ -39,7 +54,10 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 flex-wrap text-xs font-black">
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-white animate-pulse" />
-              <span>Welcome Back, <strong className="text-[#FFE600] font-black">{displayName}</strong>! Active Protection Enabled.</span>
+              <span>
+                Welcome Back, <strong className="text-[#FFE600] font-black">{displayName}</strong>!
+                Active Protection Enabled.
+              </span>
             </div>
             <Link
               href={isSuperAdmin ? '/admin' : '/dashboard'}
@@ -55,7 +73,6 @@ export default function LandingPage() {
 
       {/* HERO SECTION WITH DIRECT AUTO-SCROLLING HERO BANNER */}
       <section className="relative z-10 pt-6 sm:pt-10 pb-6 px-4 sm:px-6 lg:px-8 text-center space-y-8">
-
         {/* DIRECT 4K AUTO-SCROLL HERO BANNER */}
         <HeroBannerCarousel />
 
@@ -65,22 +82,31 @@ export default function LandingPage() {
         </h1>
 
         <p className="text-[#684E67] text-base sm:text-xl font-bold max-w-xl mx-auto leading-relaxed">
-          A modern personal safety companion for girls & women — instant emergency alerts,
-          live GPS tracking, and 24/7 command dispatch.
+          A modern personal safety companion for girls & women — instant emergency alerts, live GPS
+          tracking, and 24/7 command dispatch.
         </p>
 
         {/* MARQUEE STRIP (FULL SCREEN WIDTH & LIVE CONTINUOUS SCROLLING) */}
         <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-white/95 border-y-1.5 border-[#FFCCE1] py-3.5 overflow-hidden my-8 shadow-sm">
           <div className="animate-marquee-scroll">
             {[
-              '⚡ INSTANT 3-SECOND SOS DISPATCH', '📍 24/7 LIVE GPS TRACKING',
-              '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY',
-              '⚡ INSTANT 3-SECOND SOS DISPATCH', '📍 24/7 LIVE GPS TRACKING',
-              '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY',
-              '⚡ INSTANT 3-SECOND SOS DISPATCH', '📍 24/7 LIVE GPS TRACKING',
-              '🔔 GUARDIAN SIREN BROADCAST', '🛡️ 365-DAY WOMEN SAFETY',
+              '⚡ INSTANT 3-SECOND SOS DISPATCH',
+              '📍 24/7 LIVE GPS TRACKING',
+              '🔔 GUARDIAN SIREN BROADCAST',
+              '🛡️ 365-DAY WOMEN SAFETY',
+              '⚡ INSTANT 3-SECOND SOS DISPATCH',
+              '📍 24/7 LIVE GPS TRACKING',
+              '🔔 GUARDIAN SIREN BROADCAST',
+              '🛡️ 365-DAY WOMEN SAFETY',
+              '⚡ INSTANT 3-SECOND SOS DISPATCH',
+              '📍 24/7 LIVE GPS TRACKING',
+              '🔔 GUARDIAN SIREN BROADCAST',
+              '🛡️ 365-DAY WOMEN SAFETY',
             ].map((item, i) => (
-              <span key={i} className="text-xs sm:text-sm font-black text-[#FF2A6D] uppercase tracking-widest flex items-center gap-3">
+              <span
+                key={i}
+                className="text-xs sm:text-sm font-black text-[#FF2A6D] uppercase tracking-widest flex items-center gap-3"
+              >
                 <span>{item}</span>
                 <span className="text-[#FF5C8A] font-light">·</span>
               </span>
@@ -96,7 +122,11 @@ export default function LandingPage() {
                 href={isSuperAdmin ? '/admin' : '/dashboard'}
                 className="btn-3d-rose-pop w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-3 whitespace-nowrap"
               >
-                {isSuperAdmin ? <Crown size={18} className="shrink-0" /> : <LayoutDashboard size={18} className="shrink-0" />}
+                {isSuperAdmin ? (
+                  <Crown size={18} className="shrink-0" />
+                ) : (
+                  <LayoutDashboard size={18} className="shrink-0" />
+                )}
                 <span>{isSuperAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}</span>
                 <ArrowRight size={16} className="shrink-0" />
               </Link>
@@ -174,13 +204,9 @@ export default function LandingPage() {
             ]}
           />
         </div>
-
-
       </section>
 
-
       <Footer />
-
     </div>
   );
 }

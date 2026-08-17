@@ -56,17 +56,31 @@ export default function AdminCouponsPage() {
       } else {
         res = await couponApi.createCoupon(form);
       }
-      
+
       if (res.success) {
-        showToast('success', isEditMode ? 'Coupon updated successfully!' : 'Coupon created successfully!');
+        showToast(
+          'success',
+          isEditMode ? 'Coupon updated successfully!' : 'Coupon created successfully!'
+        );
         setIsModalOpen(false);
         setIsEditMode(false);
         setEditingCouponId(null);
-        setForm({ code: '', discountType: 'PERCENTAGE', discountValue: '', maxUses: '', validFrom: '', validUntil: '' });
+        setForm({
+          code: '',
+          discountType: 'PERCENTAGE',
+          discountValue: '',
+          maxUses: '',
+          validFrom: '',
+          validUntil: '',
+        });
         fetchCoupons();
       }
     } catch (err) {
-      showToast('error', err.response?.data?.message || (isEditMode ? 'Failed to update coupon' : 'Failed to create coupon'));
+      showToast(
+        'error',
+        err.response?.data?.message ||
+          (isEditMode ? 'Failed to update coupon' : 'Failed to create coupon')
+      );
     }
   };
 
@@ -85,7 +99,14 @@ export default function AdminCouponsPage() {
   };
 
   const openCreateModal = () => {
-    setForm({ code: '', discountType: 'PERCENTAGE', discountValue: '', maxUses: '', validFrom: '', validUntil: '' });
+    setForm({
+      code: '',
+      discountType: 'PERCENTAGE',
+      discountValue: '',
+      maxUses: '',
+      validFrom: '',
+      validUntil: '',
+    });
     setIsEditMode(false);
     setEditingCouponId(null);
     setIsModalOpen(true);
@@ -132,7 +153,9 @@ export default function AdminCouponsPage() {
               </div>
               <div>
                 <h2 className="font-black text-2xl text-[#2A0826]">Discount Coupons</h2>
-                <p className="text-xs font-bold text-[#684E67]">Manage promotional codes for first-time subscription upgrades.</p>
+                <p className="text-xs font-bold text-[#684E67]">
+                  Manage promotional codes for first-time subscription upgrades.
+                </p>
               </div>
             </div>
             <button
@@ -150,25 +173,41 @@ export default function AdminCouponsPage() {
               <table className="w-full text-left border-collapse min-w-[900px]">
                 <thead>
                   <tr className="bg-[#FFF0F3]/60 border-b-2 border-[#FFCCE1]">
-                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest">Code</th>
-                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-center">Discount</th>
-                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-center">Usage</th>
-                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-center">Validity</th>
-                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-center">Status</th>
-                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-right">Actions</th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest">
+                      Code
+                    </th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-center">
+                      Discount
+                    </th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-center">
+                      Usage
+                    </th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-center">
+                      Validity
+                    </th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-center">
+                      Status
+                    </th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-right">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#FFCCE1]/50">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={6} className="p-8 text-center text-sm font-bold text-[#684E67]">Loading coupons...</td>
+                      <td colSpan={6} className="p-8 text-center text-sm font-bold text-[#684E67]">
+                        Loading coupons...
+                      </td>
                     </tr>
                   ) : coupons.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="p-8 text-center text-sm font-bold text-[#684E67]">No coupons found.</td>
+                      <td colSpan={6} className="p-8 text-center text-sm font-bold text-[#684E67]">
+                        No coupons found.
+                      </td>
                     </tr>
                   ) : (
-                    coupons.map(coupon => (
+                    coupons.map((coupon) => (
                       <tr key={coupon.id} className="hover:bg-[#FFF0F3]/30 transition-colors">
                         <td className="p-5">
                           <span className="bg-[#2A0826] text-white text-sm font-black px-4 py-2 rounded-xl uppercase border border-[#684E67] tracking-widest shadow-sm">
@@ -177,20 +216,33 @@ export default function AdminCouponsPage() {
                         </td>
                         <td className="p-5 text-center">
                           <div className="inline-flex items-center space-x-1.5 bg-rose-50 text-[#FF2A6D] font-black px-3 py-1.5 rounded-xl border border-rose-200 text-sm">
-                            {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue} OFF`}
+                            {coupon.discountType === 'PERCENTAGE'
+                              ? `${coupon.discountValue}% OFF`
+                              : `₹${coupon.discountValue} OFF`}
                           </div>
                         </td>
                         <td className="p-5 text-center">
-                          <p className="text-sm font-black text-[#2A0826]">{coupon.usesCount} <span className="text-[#684E67] font-bold text-xs">/ {coupon.maxUses || '∞'}</span></p>
+                          <p className="text-sm font-black text-[#2A0826]">
+                            {coupon.usesCount}{' '}
+                            <span className="text-[#684E67] font-bold text-xs">
+                              / {coupon.maxUses || '∞'}
+                            </span>
+                          </p>
                         </td>
                         <td className="p-5 text-center text-xs font-bold text-[#684E67]">
-                          {coupon.validUntil ? new Date(coupon.validUntil).toLocaleDateString() : 'Lifetime'}
+                          {coupon.validUntil
+                            ? new Date(coupon.validUntil).toLocaleDateString()
+                            : 'Lifetime'}
                         </td>
                         <td className="p-5 text-center">
                           {coupon.isActive ? (
-                            <span className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full uppercase">Active</span>
+                            <span className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full uppercase">
+                              Active
+                            </span>
                           ) : (
-                            <span className="text-[10px] font-black text-gray-500 bg-gray-100 px-3 py-1 rounded-full uppercase">Disabled</span>
+                            <span className="text-[10px] font-black text-gray-500 bg-gray-100 px-3 py-1 rounded-full uppercase">
+                              Disabled
+                            </span>
                           )}
                         </td>
                         <td className="p-5 text-right">
@@ -205,9 +257,13 @@ export default function AdminCouponsPage() {
                             <button
                               onClick={() => handleToggleStatus(coupon)}
                               className={`p-2 rounded-xl transition-colors ${coupon.isActive ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
-                              title={coupon.isActive ? "Disable Coupon" : "Enable Coupon"}
+                              title={coupon.isActive ? 'Disable Coupon' : 'Enable Coupon'}
                             >
-                              {coupon.isActive ? <PowerOff className="w-4 h-4" /> : <Power className="w-4 h-4" />}
+                              {coupon.isActive ? (
+                                <PowerOff className="w-4 h-4" />
+                              ) : (
+                                <Power className="w-4 h-4" />
+                              )}
                             </button>
                             <button
                               onClick={() => handleDeleteCoupon(coupon.id)}
@@ -237,49 +293,104 @@ export default function AdminCouponsPage() {
                 <Ticket className="w-5 h-5 text-[#FF2A6D] transform -rotate-45" />
                 <span>{isEditMode ? 'Edit Coupon' : 'Create New Coupon'}</span>
               </h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-[#FFCCE1] rounded-full text-[#684E67] transition-colors">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 hover:bg-[#FFCCE1] rounded-full text-[#684E67] transition-colors"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Coupon Code *</label>
-                <input required type="text" value={form.code} onChange={e => setForm({...form, code: e.target.value.toUpperCase()})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-black text-[#FF2A6D] tracking-widest outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all uppercase" placeholder="e.g. SUMMER50" />
+                <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                  Coupon Code *
+                </label>
+                <input
+                  required
+                  type="text"
+                  value={form.code}
+                  onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+                  className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-black text-[#FF2A6D] tracking-widest outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all uppercase"
+                  placeholder="e.g. SUMMER50"
+                />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Type *</label>
-                  <select value={form.discountType} onChange={e => setForm({...form, discountType: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D]">
+                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                    Type *
+                  </label>
+                  <select
+                    value={form.discountType}
+                    onChange={(e) => setForm({ ...form, discountType: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D]"
+                  >
                     <option value="PERCENTAGE">Percentage (%)</option>
                     <option value="FLAT_AMOUNT">Flat Amount (₹)</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Value *</label>
-                  <input required type="number" step="0.01" min="0" value={form.discountValue} onChange={e => setForm({...form, discountValue: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D]" placeholder="e.g. 50" />
+                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                    Value *
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={form.discountValue}
+                    onChange={(e) => setForm({ ...form, discountValue: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D]"
+                    placeholder="e.g. 50"
+                  />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Max Uses (Optional)</label>
-                <input type="number" min="1" value={form.maxUses} onChange={e => setForm({...form, maxUses: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D]" placeholder="Leave blank for unlimited" />
+                <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                  Max Uses (Optional)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={form.maxUses}
+                  onChange={(e) => setForm({ ...form, maxUses: e.target.value })}
+                  className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D]"
+                  placeholder="Leave blank for unlimited"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Valid From</label>
-                  <input type="date" value={form.validFrom} onChange={e => setForm({...form, validFrom: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-xs font-bold outline-none focus:border-[#FF2A6D]" />
+                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                    Valid From
+                  </label>
+                  <input
+                    type="date"
+                    value={form.validFrom}
+                    onChange={(e) => setForm({ ...form, validFrom: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-xs font-bold outline-none focus:border-[#FF2A6D]"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">Valid Until</label>
-                  <input type="date" value={form.validUntil} onChange={e => setForm({...form, validUntil: e.target.value})} className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-xs font-bold outline-none focus:border-[#FF2A6D]" />
+                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                    Valid Until
+                  </label>
+                  <input
+                    type="date"
+                    value={form.validUntil}
+                    onChange={(e) => setForm({ ...form, validUntil: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-xs font-bold outline-none focus:border-[#FF2A6D]"
+                  />
                 </div>
               </div>
 
               <div className="pt-4">
-                <button type="submit" className="w-full py-4 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer uppercase tracking-wider">
+                <button
+                  type="submit"
+                  className="w-full py-4 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer uppercase tracking-wider"
+                >
                   {isEditMode ? 'Update Coupon' : 'Create Coupon'}
                 </button>
               </div>

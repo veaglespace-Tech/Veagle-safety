@@ -27,7 +27,10 @@ export const CustomSelect = ({
   }, []);
 
   return (
-    <div ref={containerRef} className={`relative inline-block w-full text-left font-sans ${className}`}>
+    <div
+      ref={containerRef}
+      className={`relative inline-block w-full text-left font-sans ${className}`}
+    >
       {/* TRIGGER BUTTON */}
       <button
         type="button"
@@ -35,7 +38,9 @@ export const CustomSelect = ({
         className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-2xl text-xs font-black text-[#2A0826] hover:border-[#FF2A6D] transition-all cursor-pointer shadow-xs active:scale-[0.99]"
       >
         <span className="truncate">{selectedOption?.label || placeholder}</span>
-        <ChevronDown className={`w-4 h-4 text-[#FF2A6D] shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`w-4 h-4 text-[#FF2A6D] shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {/* CUSTOM FLOATING DROPDOWN MENU */}
@@ -70,7 +75,9 @@ export const CustomSelect = ({
                     }`}
                   >
                     <span className="truncate pr-2">{opt.label}</span>
-                    {isSelected && <Check className="w-4 h-4 text-[#FF2A6D] shrink-0 stroke-[2.5]" />}
+                    {isSelected && (
+                      <Check className="w-4 h-4 text-[#FF2A6D] shrink-0 stroke-[2.5]" />
+                    )}
                   </button>
                 );
               })}
