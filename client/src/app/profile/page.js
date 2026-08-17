@@ -540,6 +540,35 @@ export default function UserProfileSettingsPage() {
               </div>
             )}
 
+            {/* MASTER STICKY SUBMIT ACTION BAR (VISIBLE IN EDIT MODE) */}
+            {isEditing && (
+              <div className="sticky top-4 z-50 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-3xl border-2 border-[#FF2A6D] shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 animate-slide-down mb-6">
+                <div className="min-w-0">
+                  <p className="font-black text-xs sm:text-sm text-[#2A0826] whitespace-nowrap">Edit Mode Unlocked</p>
+                  <p className="text-[11px] font-bold text-[#684E67] truncate">Click Save Changes to commit all details to database</p>
+                </div>
+
+                <div className="flex items-center justify-end space-x-2.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleToggleEdit}
+                    className="px-4.5 py-2.5 bg-gray-100 text-gray-700 hover:bg-gray-200 font-black text-xs rounded-2xl transition-all cursor-pointer shrink-0 whitespace-nowrap"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-6 py-2.5 rounded-2xl text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap border border-white/20"
+                  >
+                    <Save className="w-4 h-4 shrink-0" />
+                    <span>{isSubmitting ? 'SAVING...' : 'SAVE ALL CHANGES'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* UNIFIED MASTER GLASS PANEL (REPLACES SCATTERED CARDS) */}
             <div className={`bg-white/95 backdrop-blur-2xl border-2 rounded-[40px] p-6 sm:p-10 shadow-[0_20px_60px_rgba(42,8,38,0.08)] space-y-10 transition-all ${isEditing ? 'border-[#FF2A6D] ring-4 ring-[#FF2A6D]/10' : 'border-[#FFCCE1]'}`}>
               
@@ -1062,34 +1091,6 @@ export default function UserProfileSettingsPage() {
                 </>
               )}
 
-              {/* MASTER STICKY SUBMIT ACTION BAR (VISIBLE IN EDIT MODE) */}
-              {isEditing && (
-                <div className="sticky bottom-4 z-40 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-3xl border-2 border-[#FF2A6D] shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 animate-slide-up">
-                  <div className="min-w-0">
-                    <p className="font-black text-xs sm:text-sm text-[#2A0826] whitespace-nowrap">Edit Mode Unlocked</p>
-                    <p className="text-[11px] font-bold text-[#684E67] truncate">Click Save Changes to commit all details to database</p>
-                  </div>
-
-                  <div className="flex items-center justify-end space-x-2.5 shrink-0">
-                    <button
-                      type="button"
-                      onClick={handleToggleEdit}
-                      className="px-4.5 py-2.5 bg-gray-100 text-gray-700 hover:bg-gray-200 font-black text-xs rounded-2xl transition-all cursor-pointer shrink-0 whitespace-nowrap"
-                    >
-                      Cancel
-                    </button>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-6 py-2.5 rounded-2xl text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap border border-white/20"
-                    >
-                      <Save className="w-4 h-4 shrink-0" />
-                      <span>{isSubmitting ? 'SAVING...' : 'SAVE ALL CHANGES'}</span>
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {!isParent && (
                 <>

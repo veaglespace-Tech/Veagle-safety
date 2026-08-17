@@ -27,9 +27,6 @@ async function main() {
   const journeys = await prisma.journey.deleteMany({});
   console.log(`- Deleted ${journeys.count} Journey records`);
 
-  const liveShares = await prisma.liveShareSession.deleteMany({});
-  console.log(`- Deleted ${liveShares.count} LiveShareSession records`);
-
   const safetyCheckins = await prisma.safetyCheckin.deleteMany({});
   console.log(`- Deleted ${safetyCheckins.count} SafetyCheckin records`);
 
@@ -38,9 +35,6 @@ async function main() {
 
   const paymentHistories = await prisma.paymentHistory.deleteMany({});
   console.log(`- Deleted ${paymentHistories.count} PaymentHistory records`);
-
-  const auditLogs = await prisma.auditLog.deleteMany({});
-  console.log(`- Deleted ${auditLogs.count} AuditLog records`);
 
   const pushSubs = await prisma.pushSubscription.deleteMany({});
   console.log(`- Deleted ${pushSubs.count} PushSubscription records`);
