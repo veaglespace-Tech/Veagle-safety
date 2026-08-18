@@ -75,6 +75,38 @@ export default function SuperAdminOverviewPage() {
           fetchOverviewData();
           setTrackingSos(null);
         });
+
+        socket.on('SOS_LOCATION_UPDATE', (data) => {
+          setTrackingSos((prev) => {
+            if (prev && prev.id === data.sosSessionId) {
+              return {
+                ...prev,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                locations: [{ latitude: data.latitude, longitude: data.longitude }],
+              };
+            }
+            return prev;
+          });
+
+          setOverview((prev) => {
+            if (!prev || !prev.activeSos) return prev;
+            return {
+              ...prev,
+              activeSos: prev.activeSos.map((sos) => {
+                if (sos.id === data.sosSessionId) {
+                  return {
+                    ...sos,
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    locations: [{ latitude: data.latitude, longitude: data.longitude }],
+                  };
+                }
+                return sos;
+              }),
+            };
+          });
+        });
       } catch (e) {}
     };
 

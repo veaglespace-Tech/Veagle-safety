@@ -71,7 +71,9 @@ export const LiveLocationMap = ({
     }
   }, [lat, lng]);
 
-  const currentPosition = [lat || 28.6139, lng || 77.209];
+  const numLat = parseFloat(lat) || 28.6139;
+  const numLng = parseFloat(lng) || 77.209;
+  const currentPosition = [numLat, numLng];
 
   return (
     <div className="w-full h-full relative rounded-card overflow-hidden shadow-plum-subtle group">

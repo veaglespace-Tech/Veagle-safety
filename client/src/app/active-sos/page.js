@@ -64,6 +64,20 @@ export default function ActiveSOSLivePage() {
     };
   }, [activeSession, router, user]);
 
+  // Sync real-time location to backend
+  useEffect(() => {
+    if (activeSession && latitude && longitude) {
+      import('../../redux/api/sosApi.js').then(({ sosApi }) => {
+        sosApi.updateSosLocation({
+          sosSessionId: activeSession.id,
+          latitude,
+          longitude,
+          accuracy,
+        }).catch(() => {});
+      });
+    }
+  }, [activeSession, latitude, longitude, accuracy]);
+
   const formatElapsed = (secs) => {
     const m = Math.floor(secs / 60)
       .toString()

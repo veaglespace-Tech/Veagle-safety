@@ -254,16 +254,31 @@ export const updateSosLocation = async (req, res) => {
       },
     });
 
+    const session = await prisma.sosSession.findUnique({
+      where: { id: sosSessionId }
+    });
+
     // Emit live location update to connected sockets
     const io = getIO();
     if (io) {
-      io.emit('SOS_LOCATION_UPDATE', {
+      const payload = {
         sosSessionId,
         latitude,
         longitude,
         accuracy: accuracy || 10,
         recordedAt: location.recordedAt,
-      });
+        timestamp: location.recordedAt, // Required for live-track page
+      };
+
+      // 1. Emit to admin ops (super admin panel map)
+      io.to('admin-ops').emit('SOS_LOCATION_UPDATE', payload);
+      
+      // 2. Emit to public link trackers and parent dashboard
+      if (session?.shareToken) {
+        io.to(`track:${session.shareToken}`).emit('location-updated', payload);
+        // Also emit globally for parents listening without specific room (or they use location-updated globally)
+        io.emit('location-updated', { ...payload, sosId: sosSessionId }); 
+      }
     }
 
     return res.json({ message: 'Location updated', location });
