@@ -8,7 +8,7 @@ import { generatePayUHash, verifyPayUResponseHash } from '../utils/payu.js';
  * Initiate PayU Payment for User Subscription
  */
 export const initiatePayUPayment = asyncHandler(async (req, res) => {
-  const { planId, registrationToken, pendingToken } = req.body;
+  const { planId, registrationToken, pendingToken, couponCode } = req.body;
   const tokenFromHeader = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
   const regTokenToUse = registrationToken || pendingToken || tokenFromHeader;
 
@@ -61,8 +61,23 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
     }
   }
 
-  const gstAmount = baseAmount === 0 ? 0 : parseFloat(((baseAmount * gstPercentage) / 100).toFixed(2));
-  const totalAmount = baseAmount === 0 ? 0 : parseFloat((baseAmount + gstAmount).toFixed(2));
+  let discountedBaseAmount = baseAmount;
+  let coupon = null;
+
+  if (couponCode) {
+    coupon = await prisma.coupon.findUnique({ where: { code: couponCode.toUpperCase() } });
+    if (coupon && coupon.isActive) {
+      if (coupon.discountType === 'PERCENTAGE') {
+        discountedBaseAmount = baseAmount - (baseAmount * coupon.discountValue / 100);
+      } else if (coupon.discountType === 'FLAT_AMOUNT') {
+        discountedBaseAmount = baseAmount - coupon.discountValue;
+      }
+      if (discountedBaseAmount < 0) discountedBaseAmount = 0;
+    }
+  }
+
+  const gstAmount = discountedBaseAmount === 0 ? 0 : parseFloat(((discountedBaseAmount * gstPercentage) / 100).toFixed(2));
+  const totalAmount = discountedBaseAmount === 0 ? 0 : parseFloat((discountedBaseAmount + gstAmount).toFixed(2));
 
   // IF PLAN IS 100% FREE (0 INR): Activate subscription directly without PayU!
   if (baseAmount === 0 || totalAmount === 0) {
@@ -196,11 +211,12 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
           planId: plan ? plan.id : null,
           txnid,
           amount: totalAmount,
-          baseAmount,
+          baseAmount: discountedBaseAmount,
           gstAmount,
           gstPercentage,
           status: 'PENDING',
           hash,
+          couponId: coupon ? coupon.id : null,
         },
       });
     } catch (payHistErr) {
@@ -218,7 +234,7 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
       key: config.payu.key,
       txnid,
       amount: totalAmount,
-      baseAmount,
+      baseAmount: discountedBaseAmount,
       gstAmount,
       gstPercentage,
       productinfo,

@@ -160,6 +160,6 @@ router.put('/coupons/:id', authenticateToken, requireSuperAdmin, couponControlle
 router.delete('/coupons/:id', authenticateToken, requireSuperAdmin, couponController.deleteCoupon);
 router.get('/coupons/assignable-users', authenticateToken, requireSuperAdmin, couponController.getAssignableUsers);
 router.get('/coupons/my-coupons', authenticateToken, couponController.getMyCoupons);
-router.post('/coupons/validate', authenticateToken, couponController.validateCoupon);
+router.post('/coupons/validate', optionalAuthToken, couponController.validateCoupon);
 
 export default router;
