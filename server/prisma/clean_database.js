@@ -42,6 +42,12 @@ async function main() {
   const enquiries = await prisma.contactEnquiry.deleteMany({});
   console.log(`- Deleted ${enquiries.count} ContactEnquiry records`);
 
+  const coupons = await prisma.coupon.deleteMany({});
+  console.log(`- Deleted ${coupons.count} Coupon records`);
+
+  const referralPartners = await prisma.referralPartner.deleteMany({});
+  console.log(`- Deleted ${referralPartners.count} ReferralPartner records`);
+
   // 2. Delete all non-SUPER_ADMIN users
   const nonAdminUsers = await prisma.user.deleteMany({
     where: {

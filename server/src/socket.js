@@ -37,6 +37,9 @@ export function initSocketIO(httpServer) {
         if (cleanPhone) {
           const phoneRoom = `user:${cleanPhone}`;
           socket.join(phoneRoom);
+          if (cleanPhone.length >= 10) {
+            socket.join(`user:${cleanPhone.slice(-10)}`);
+          }
           console.log(`[Socket.IO] ${socket.id} joined phone room: ${phoneRoom}`);
         }
       }

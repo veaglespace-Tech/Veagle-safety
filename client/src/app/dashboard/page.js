@@ -152,7 +152,7 @@ export default function DashboardAppPage() {
           )}
 
           {/* INACTIVE SUBSCRIPTION BANNER */}
-          {mounted && user?.subscriptionStatus !== 'ACTIVE' && (
+          {mounted && Boolean(user) && user?.subscriptionStatus !== 'ACTIVE' && (
             <div className="bg-gradient-to-r from-amber-500 via-rose-500 to-[#FF2A6D] text-white p-5 rounded-3xl shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 border-2 border-white">
               <div className="flex items-center space-x-3 text-center sm:text-left">
                 <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-md shrink-0">

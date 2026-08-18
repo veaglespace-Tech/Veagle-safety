@@ -53,7 +53,13 @@ export const PublicNavbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    router.push('/auth?mode=login');
+    if (typeof window !== 'undefined') {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.replace('/auth?mode=login');
+    } else {
+      router.push('/auth?mode=login');
+    }
   };
 
   const isActive = (path) => pathname === path;

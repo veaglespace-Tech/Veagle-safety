@@ -51,7 +51,9 @@ export const Header = () => {
   const handleLogout = () => {
     dispatch(logout());
     if (typeof window !== 'undefined') {
-      window.location.href = '/auth?mode=login';
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.replace('/auth?mode=login');
     } else {
       router.push('/auth?mode=login');
     }

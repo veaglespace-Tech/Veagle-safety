@@ -46,9 +46,9 @@ export default function ParentDashboard() {
     setMounted(true);
   }, []);
 
-  const fetchOverview = async () => {
+  const fetchOverview = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const res = await api.get('/parent/overview');
       if (res.data && res.data.success) {
         setStats(res.data.stats || { totalChildren: 0, activeSosCount: 0, inTripCount: 0 });
@@ -57,15 +57,60 @@ export default function ParentDashboard() {
     } catch (err) {
       console.error('Failed to fetch parent overview:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
     if (mounted && token) {
-      fetchOverview();
+      fetchOverview(true);
+
+      // Auto-refresh interval every 8 seconds for safety live updates
+      const interval = setInterval(() => {
+        fetchOverview(false);
+      }, 8000);
+
+      // Connect Socket.IO for instant zero-latency SOS triggers
+      let socket = null;
+      (async () => {
+        try {
+          const { io } = await import('socket.io-client');
+          const { SERVER_URL } = await import('../../utils/api.js');
+          socket = io(SERVER_URL, {
+            transports: ['websocket', 'polling'],
+          });
+
+          socket.on('connect', () => {
+            if (user) {
+              const cleanPhone = user.phone ? user.phone.replace(/\D/g, '') : null;
+              socket.emit('register-user', {
+                email: user.email?.trim().toLowerCase(),
+                phone: cleanPhone,
+                role: user.role,
+              });
+            }
+          });
+
+          const handleLiveEvent = () => {
+            fetchOverview(false);
+          };
+
+          socket.on('SOS_ALARM_BROADCAST', handleLiveEvent);
+          socket.on('SOS_ALARM_STOP', handleLiveEvent);
+          socket.on('SOS_PERIODIC_5MIN_UPDATE', handleLiveEvent);
+          socket.on('location-updated', handleLiveEvent);
+          socket.on('JOURNEY_STATUS_UPDATE', handleLiveEvent);
+        } catch (e) {
+          console.warn('[Parent Socket Init Warning]:', e.message);
+        }
+      })();
+
+      return () => {
+        clearInterval(interval);
+        if (socket) socket.disconnect();
+      };
     }
-  }, [mounted, token]);
+  }, [mounted, token, user]);
 
   // Auth Protection
   if (mounted && (!token || (user && user.role !== 'PARENT' && user.role !== 'SUPER_ADMIN'))) {

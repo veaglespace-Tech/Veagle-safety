@@ -67,7 +67,9 @@ export const DesktopSidebar = () => {
   const handleLogout = () => {
     dispatch(reduxLogout());
     if (typeof window !== 'undefined') {
-      window.location.href = '/auth?mode=login';
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.replace('/auth?mode=login');
     } else {
       router.push('/auth?mode=login');
     }
