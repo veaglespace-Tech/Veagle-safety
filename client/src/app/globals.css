@@ -19,6 +19,12 @@ body {
   overflow-x: hidden;
 }
 
+/* SMOOTH LIVE TRACKING MAP MARKER ANIMATION */
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  transition: transform 1.2s linear !important;
+}
+
 /* SLEEK DROPDOWN SCROLLBAR */
 .custom-select-scrollbar::-webkit-scrollbar {
   width: 5px;

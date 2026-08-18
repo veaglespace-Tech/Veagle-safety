@@ -37,14 +37,17 @@ const liveUserIcon = new L.Icon({
 // Map View Smooth Recenter Controller
 const RecenterController = ({ center }) => {
   const map = useMap();
+  const lat = center?.[0];
+  const lng = center?.[1];
+
   useEffect(() => {
-    if (center && center[0] && center[1]) {
-      map.flyTo(center, map.getZoom() || 16, {
+    if (lat && lng) {
+      map.flyTo([lat, lng], map.getZoom() || 16, {
         animate: true,
         duration: 1.2,
       });
     }
-  }, [center, map]);
+  }, [lat, lng, map]);
   return null;
 };
 
