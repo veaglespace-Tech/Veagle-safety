@@ -64,19 +64,41 @@ export default function ActiveSOSLivePage() {
     };
   }, [activeSession, router, user]);
 
-  // Sync real-time location to backend
-  useEffect(() => {
-    if (activeSession && latitude && longitude) {
-      import('../../redux/api/sosApi.js').then(({ sosApi }) => {
-        sosApi.updateSosLocation({
-          sosSessionId: activeSession.id,
-          latitude,
-          longitude,
-          accuracy,
-        }).catch(() => {});
-      });
-    }
-  }, [activeSession, latitude, longitude, accuracy]);
+  // Robust Location Sync
+  const locationRef = React.useRef({ latitude: null, longitude: null, accuracy: null });
+  React.useEffect(() => {
+    locationRef.current = { latitude, longitude, accuracy };
+  }, [latitude, longitude, accuracy]);
+
+  React.useEffect(() => {
+    if (!activeSession) return;
+    
+    let lastSyncedLat = null;
+    let lastSyncedLng = null;
+
+    const syncInterval = setInterval(() => {
+      const { latitude: curLat, longitude: curLng, accuracy: curAcc } = locationRef.current;
+      
+      if (!curLat || !curLng) return;
+      
+      // Only sync if location changed to prevent API spam
+      if (curLat !== lastSyncedLat || curLng !== lastSyncedLng) {
+        import('../../redux/api/sosApi.js').then(({ sosApi }) => {
+          sosApi.updateSosLocation({
+            sosSessionId: activeSession.id,
+            latitude: curLat,
+            longitude: curLng,
+            accuracy: curAcc || 10,
+          }).then(() => {
+             lastSyncedLat = curLat;
+             lastSyncedLng = curLng;
+          }).catch(err => console.error("[SOS Sync Error]:", err));
+        });
+      }
+    }, 3000); // Check every 3 seconds
+
+    return () => clearInterval(syncInterval);
+  }, [activeSession]);
 
   const formatElapsed = (secs) => {
     const m = Math.floor(secs / 60)
