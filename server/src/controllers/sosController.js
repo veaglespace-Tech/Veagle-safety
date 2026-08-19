@@ -137,8 +137,10 @@ export const startSos = async (req, res) => {
     if (io) {
       const sosAlarmPayload = {
         sosId: session.id,
+        victimId: userId,
         victimName: currentUser?.fullName || 'Sakhi Suraksha User',
         victimPhone: currentUser?.phone || '',
+        victimEmail: currentUser?.email || '',
         victimPhoto: currentUser?.profilePhoto || null,
         shareToken: session.shareToken,
         trackingUrl,
@@ -245,17 +247,50 @@ export const updateSosLocation = async (req, res) => {
   try {
     const { sosSessionId, latitude, longitude, accuracy } = req.body;
 
-    const location = await prisma.sosLocation.create({
-      data: {
-        sosSessionId,
-        latitude,
-        longitude,
-        accuracy: accuracy || 10,
+    // 1. Validate coordinates
+    if (
+      latitude === undefined || latitude === null || 
+      longitude === undefined || longitude === null ||
+      isNaN(latitude) || isNaN(longitude) ||
+      latitude < -90 || latitude > 90 ||
+      longitude < -180 || longitude > 180
+    ) {
+      return res.status(400).json({ error: 'Invalid GPS coordinates provided' });
+    }
+
+    // 2. Fetch session and ensure it belongs to the authenticated user AND is ACTIVE
+    const session = await prisma.sosSession.findFirst({
+      where: {
+        id: sosSessionId,
+        userId: req.user.id,
+        status: 'ACTIVE'
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            phone: true,
+            parentEmail: true,
+            emergencyContactPhone: true,
+            trustedContacts: { select: { email: true, phone: true } },
+          },
+        },
       },
     });
 
-    const session = await prisma.sosSession.findUnique({
-      where: { id: sosSessionId }
+    if (!session) {
+      return res.status(403).json({ error: 'Invalid or unauthorized SOS session' });
+    }
+
+    // 3. Save to database
+    const location = await prisma.sosLocation.create({
+      data: {
+        sosSessionId,
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        accuracy: accuracy ? parseFloat(accuracy) : 10,
+      },
     });
 
     // Emit live location update to connected sockets
@@ -272,13 +307,66 @@ export const updateSosLocation = async (req, res) => {
 
       // 1. Emit to admin ops (super admin panel map)
       io.to('admin-ops').emit('SOS_LOCATION_UPDATE', payload);
-      
-      // 2. Emit to public link trackers and parent dashboard
+
+      // 2. Emit to public link trackers via shareToken room
       if (session?.shareToken) {
         io.to(`track:${session.shareToken}`).emit('location-updated', payload);
-        // Also emit globally for parents listening without specific room (or they use location-updated globally)
-        io.emit('location-updated', { ...payload, sosId: sosSessionId }); 
       }
+
+      // 3. Emit SOS_LOCATION_UPDATE to all parent & guardian rooms
+      const targetRooms = new Set();
+
+      // Add linked parent rooms
+      if (session?.user?.id) {
+        const parentLinks = await prisma.parentChildLink.findMany({
+          where: { childId: session.user.id, status: 'ACTIVE' },
+          include: { parent: { select: { email: true, phone: true } } },
+        }).catch(() => []);
+
+        parentLinks.forEach((link) => {
+          if (link.parent?.email) targetRooms.add(`user:${link.parent.email.trim().toLowerCase()}`);
+          if (link.parent?.phone) {
+            const cleanP = link.parent.phone.replace(/\D/g, '');
+            if (cleanP) {
+              targetRooms.add(`user:${cleanP}`);
+              if (cleanP.length >= 10) targetRooms.add(`user:${cleanP.slice(-10)}`);
+            }
+          }
+        });
+      }
+
+      // Add parentEmail room
+      if (session?.user?.parentEmail) {
+        targetRooms.add(`user:${session.user.parentEmail.trim().toLowerCase()}`);
+      }
+
+      // Add emergencyContactPhone room
+      if (session?.user?.emergencyContactPhone) {
+        const cleanEmPhone = session.user.emergencyContactPhone.replace(/\D/g, '');
+        if (cleanEmPhone) {
+          targetRooms.add(`user:${cleanEmPhone}`);
+          if (cleanEmPhone.length >= 10) targetRooms.add(`user:${cleanEmPhone.slice(-10)}`);
+        }
+      }
+
+      // Add trusted contact rooms
+      if (session?.user?.trustedContacts) {
+        session.user.trustedContacts.forEach((c) => {
+          if (c.email) targetRooms.add(`user:${c.email.trim().toLowerCase()}`);
+          if (c.phone) {
+            const cleanP = c.phone.replace(/\D/g, '');
+            if (cleanP) {
+              targetRooms.add(`user:${cleanP}`);
+              if (cleanP.length >= 10) targetRooms.add(`user:${cleanP.slice(-10)}`);
+            }
+          }
+        });
+      }
+
+      // Emit to each parent/guardian room
+      targetRooms.forEach((roomName) => {
+        io.to(roomName).emit('SOS_LOCATION_UPDATE', payload);
+      });
     }
 
     return res.json({ message: 'Location updated', location });
@@ -304,6 +392,23 @@ export const resolveSos = async (req, res) => {
 
     if (!targetId || isNaN(targetId)) {
       return res.status(404).json({ error: 'No active SOS session found to resolve' });
+    }
+
+    // IDOR FIX: Check ownership and roles before allowing resolution
+    const existingSession = await prisma.sosSession.findUnique({
+      where: { id: targetId },
+      include: { user: true }
+    });
+
+    if (!existingSession) {
+      return res.status(404).json({ error: 'No active SOS session found to resolve' });
+    }
+
+    const isOwner = existingSession.userId === userId;
+    const isAdmin = req.user?.role === 'SUPER_ADMIN' || req.user?.role === 'ADMIN';
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ error: 'Unauthorized to resolve this SOS session' });
     }
 
     const session = await prisma.sosSession.update({

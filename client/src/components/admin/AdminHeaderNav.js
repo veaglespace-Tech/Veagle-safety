@@ -12,7 +12,8 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
   const router = useRouter();
 
   const { activeSession } = useSelector((state) => state?.sos || {});
-  const { latitude = 18.5204, longitude = 73.8567 } = useSelector((state) => state?.location || {});
+  const { user } = useSelector((state) => state?.auth || {});
+  const { latitude, longitude } = useSelector((state) => state?.location || {});
 
   const handleAdminTriggerSos = async () => {
     if (activeSession) {

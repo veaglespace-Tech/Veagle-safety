@@ -62,6 +62,11 @@ export default function SuperAdminOverviewPage() {
           reconnectionAttempts: 5,
         });
 
+        // Register as admin to join admin-ops room for real-time SOS updates
+        socket.on('connect', () => {
+          socket.emit('register-user', { role: 'SUPER_ADMIN' });
+        });
+
         socket.on('SOS_ALARM_BROADCAST', (data) => {
           showToast(
             'error',
@@ -229,8 +234,8 @@ export default function SuperAdminOverviewPage() {
               <div className="space-y-4">
                 {activeSosList.map((sos) => {
                   const latestLoc = sos.locations?.[0];
-                  const lat = latestLoc?.latitude || sos.latitude || 18.5204;
-                  const lng = latestLoc?.longitude || sos.longitude || 73.8567;
+                  const lat = latestLoc?.latitude || sos.latitude;
+                  const lng = latestLoc?.longitude || sos.longitude;
 
                   return (
                     <div
@@ -394,8 +399,8 @@ export default function SuperAdminOverviewPage() {
               {/* INTERACTIVE LEAFLET GPS MAP CONTAINER */}
               <div className="rounded-3xl border-2 border-[#FFCCE1] overflow-hidden h-72 shadow-md relative">
                 <LiveLocationMap
-                  lat={trackingSos.locations?.[0]?.latitude || trackingSos.latitude || 18.5204}
-                  lng={trackingSos.locations?.[0]?.longitude || trackingSos.longitude || 73.8567}
+                  lat={trackingSos.locations?.[0]?.latitude || trackingSos.latitude}
+                  lng={trackingSos.locations?.[0]?.longitude || trackingSos.longitude}
                   isEmergency={true}
                 />
               </div>
@@ -405,8 +410,8 @@ export default function SuperAdminOverviewPage() {
                 <div className="flex items-center space-x-2 text-xs font-bold text-[#684E67]">
                   <MapPin className="w-4 h-4 text-[#FF2A6D]" />
                   <span>
-                    GPS: {trackingSos.locations?.[0]?.latitude || trackingSos.latitude || 18.5204},{' '}
-                    {trackingSos.locations?.[0]?.longitude || trackingSos.longitude || 73.8567}
+                    GPS: {trackingSos.locations?.[0]?.latitude || trackingSos.latitude},{' '}
+                    {trackingSos.locations?.[0]?.longitude || trackingSos.longitude}
                   </span>
                 </div>
 

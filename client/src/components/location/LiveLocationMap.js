@@ -34,18 +34,31 @@ const liveUserIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Map View Smooth Recenter Controller
+// Map View Smooth Recenter Controller (debounced to prevent jitter)
 const RecenterController = ({ center }) => {
   const map = useMap();
   const lat = center?.[0];
   const lng = center?.[1];
+  const lastCenter = React.useRef([null, null]);
 
   useEffect(() => {
     if (lat && lng) {
-      map.flyTo([lat, lng], map.getZoom() || 16, {
-        animate: true,
-        duration: 1.2,
-      });
+      const [prevLat, prevLng] = lastCenter.current;
+      // Only flyTo if location changed by more than ~11m (0.0001 degrees)
+      // This prevents jittery map animations from GPS micro-drift
+      const hasMoved =
+        prevLat === null ||
+        prevLng === null ||
+        Math.abs(lat - prevLat) > 0.0001 ||
+        Math.abs(lng - prevLng) > 0.0001;
+
+      if (hasMoved) {
+        lastCenter.current = [lat, lng];
+        map.flyTo([lat, lng], map.getZoom() || 16, {
+          animate: true,
+          duration: 1.2,
+        });
+      }
     }
   }, [lat, lng, map]);
   return null;
@@ -74,9 +87,18 @@ export const LiveLocationMap = ({
     }
   }, [lat, lng]);
 
-  const numLat = parseFloat(lat) || 28.6139;
-  const numLng = parseFloat(lng) || 77.209;
-  const currentPosition = [numLat, numLng];
+  const isValidLocation = lat !== undefined && lat !== null && lng !== undefined && lng !== null && !isNaN(lat) && !isNaN(lng);
+
+  if (!isValidLocation) {
+    return (
+      <div className="w-full h-full relative rounded-card overflow-hidden shadow-plum-subtle bg-slate-100 flex flex-col items-center justify-center">
+        <div className="w-10 h-10 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p className="text-sm font-bold text-slate-500">Waiting for GPS location...</p>
+      </div>
+    );
+  }
+
+  const currentPosition = [parseFloat(lat), parseFloat(lng)];
 
   return (
     <div className="w-full h-full relative rounded-card overflow-hidden shadow-plum-subtle group">

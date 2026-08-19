@@ -69,27 +69,51 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
       navigator.vibrate([300, 100, 300, 100, 400]);
     }
 
-    // Play loud siren immediately on trigger unless silent mode is on
-    if (!isSilent) {
-      try {
-        startEmergencySiren();
-      } catch (err) {
-        console.warn('[Siren Audio Trigger Error]:', err);
+    if (!('geolocation' in navigator)) {
+      alert('Your browser does not support Geolocation. Cannot trigger live tracking SOS.');
+      return;
+    }
+
+    let realLat = latitude;
+    let realLng = longitude;
+    let realAcc = 15;
+
+    try {
+      // 1. Force fresh GPS fetch before SOS starts
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        });
+      });
+
+      realLat = position.coords.latitude;
+      realLng = position.coords.longitude;
+      realAcc = position.coords.accuracy;
+    } catch (e) {
+      console.error('[GPS Fetch Error]:', e);
+      if (e.code === 1) {
+        alert('Location permission denied. SOS will trigger WITHOUT live GPS tracking.');
+      } else {
+        alert('Unable to fetch GPS location. SOS will trigger WITHOUT live GPS tracking.');
       }
     }
 
-    // Open WhatsApp immediately on user trigger (opens WhatsApp while web app tab continues playing siren)
-    openWhatsAppSosEmergency({
-      latitude: latitude || 18.5204,
-      longitude: longitude || 73.8567,
-    });
-
     try {
+      // 2. Open WhatsApp immediately
+      openWhatsAppSosEmergency({
+        latitude: realLat,
+        longitude: realLng,
+      });
+
+      // 3. Dispatch SOS to backend
       const res = await dispatch(
         startEmergencySos({
           isSilent,
-          latitude: latitude || 18.5204,
-          longitude: longitude || 73.8567,
+          latitude: realLat,
+          longitude: realLng,
+          accuracy: realAcc,
           emergencyMessage: isSilent
             ? 'Discreet Emergency SOS Triggered'
             : 'EMERGENCY SOS! I NEED HELP IMMEDIATELY!',
@@ -100,6 +124,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
       router.push('/active-sos');
     } catch (e) {
       console.error('[SOS Trigger Error]:', e);
+      alert('Failed to trigger SOS. Please check your connection.');
     }
   };
 

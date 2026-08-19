@@ -20,8 +20,10 @@ import {
   Activity,
   ArrowUpRight,
   Shield,
+  Eye,
 } from 'lucide-react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
+import { LiveLocationMap } from '../../components/location/DynamicLiveLocationMap.js';
 import { api } from '../../utils/api.js';
 
 export default function ParentDashboard() {
@@ -41,6 +43,9 @@ export default function ParentDashboard() {
   const [linkLoading, setLinkLoading] = useState(false);
   const [modalError, setModalError] = useState('');
   const [modalSuccess, setModalSuccess] = useState('');
+
+  // Live GPS Tracking Modal State
+  const [trackingChild, setTrackingChild] = useState(null);
 
   useEffect(() => {
     setMounted(true);
@@ -96,10 +101,55 @@ export default function ParentDashboard() {
           };
 
           socket.on('SOS_ALARM_BROADCAST', handleLiveEvent);
-          socket.on('SOS_ALARM_STOP', handleLiveEvent);
+          socket.on('SOS_ALARM_STOP', (data) => {
+            handleLiveEvent();
+            setTrackingChild(null);
+          });
           socket.on('SOS_PERIODIC_5MIN_UPDATE', handleLiveEvent);
-          socket.on('location-updated', handleLiveEvent);
           socket.on('JOURNEY_STATUS_UPDATE', handleLiveEvent);
+
+          // Real-time SOS location updates from server (targeted to parent rooms)
+          socket.on('SOS_LOCATION_UPDATE', (data) => {
+            if (!data?.sosSessionId || !data?.latitude || !data?.longitude) return;
+
+            // Update childrenList state with real-time lat/lng
+            setChildrenList((prevList) =>
+              prevList.map((item) => {
+                if (item.activeSos && item.activeSos.id === data.sosSessionId) {
+                  return {
+                    ...item,
+                    activeSos: {
+                      ...item.activeSos,
+                      latestLocation: {
+                        latitude: data.latitude,
+                        longitude: data.longitude,
+                        accuracy: data.accuracy || 10,
+                      },
+                    },
+                  };
+                }
+                return item;
+              })
+            );
+
+            // Update tracking modal if open for this SOS session
+            setTrackingChild((prev) => {
+              if (prev && prev.activeSos && prev.activeSos.id === data.sosSessionId) {
+                return {
+                  ...prev,
+                  activeSos: {
+                    ...prev.activeSos,
+                    latestLocation: {
+                      latitude: data.latitude,
+                      longitude: data.longitude,
+                      accuracy: data.accuracy || 10,
+                    },
+                  },
+                };
+              }
+              return prev;
+            });
+          });
         } catch (e) {
           console.warn('[Parent Socket Init Warning]:', e.message);
         }
@@ -405,18 +455,28 @@ export default function ParentDashboard() {
 
                       {/* LIVE TRACK BUTTON IF SOS OR JOURNEY */}
                       <div className="pt-1 space-y-2">
-                        {item.activeSos && item.activeSos.shareToken && (
-                          <a
-                            href={`/live-track/${item.activeSos.shareToken}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="w-full btn-3d-rose-pop py-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2"
-                          >
-                            <span>
-                              🚨 OPEN EMERGENCY SOS LIVE GPS STREAM FOR {c.fullName.toUpperCase()}
-                            </span>
-                            <ArrowUpRight className="w-4 h-4" />
-                          </a>
+                        {item.activeSos && (
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setTrackingChild(item)}
+                              className="flex-1 bg-[#FF2A6D] hover:bg-[#E01A4F] text-white py-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 shadow-md cursor-pointer transition-all"
+                            >
+                              <Eye className="w-4 h-4" />
+                              <span>TRACK LIVE GPS — {c.fullName.toUpperCase()}</span>
+                            </button>
+                            {item.activeSos.shareToken && (
+                              <a
+                                href={`/live-track/${item.activeSos.shareToken}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex-shrink-0 bg-white border-2 border-[#FF2A6D] text-[#FF2A6D] py-3 px-5 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1.5 hover:bg-[#FFF0F3] transition-all"
+                              >
+                                <ArrowUpRight className="w-4 h-4" />
+                                <span>FULL PAGE</span>
+                              </a>
+                            )}
+                          </div>
                         )}
 
                         {item.activeJourney && item.activeJourney.shareToken && !item.activeSos && (
@@ -587,6 +647,97 @@ export default function ParentDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* LIVE GPS TRACKING MODAL — Inline Leaflet Map for Parent */}
+      {trackingChild && (
+        <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-[36px] max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border-2 border-[#FF2A6D] relative animate-scale-up max-h-[90vh] overflow-y-auto">
+            {/* MODAL HEADER */}
+            <div className="flex items-center justify-between border-b-2 border-[#FFCCE1] pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-rose-50 text-[#FF2A6D] border border-rose-200 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-[#2A0826]">
+                    🚨 Live GPS Stream — {trackingChild.child?.fullName}
+                  </h3>
+                  <p className="text-xs text-rose-600 font-bold">
+                    Real-time GPS Map • SOS Session #{trackingChild.activeSos?.id}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTrackingChild(null)}
+                className="p-2 text-[#684E67] hover:text-[#FF2A6D] cursor-pointer"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* CHILD DETAILS CARD */}
+            <div className="bg-[#FFF0F3] p-4 rounded-2xl border border-[#FFCCE1] grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div>
+                <span className="text-[10px] font-black text-[#684E67] uppercase block">Child Name</span>
+                <p className="font-black text-[#2A0826] text-sm">{trackingChild.child?.fullName || 'Unknown'}</p>
+              </div>
+              <div>
+                <span className="text-[10px] font-black text-[#684E67] uppercase block">Phone</span>
+                <p className="font-bold text-[#FF2A6D] text-sm">{trackingChild.child?.phone || 'N/A'}</p>
+              </div>
+              <div>
+                <span className="text-[10px] font-black text-[#684E67] uppercase block">Email</span>
+                <p className="font-bold text-[#2A0826]">{trackingChild.child?.email || 'N/A'}</p>
+              </div>
+            </div>
+
+            {/* INTERACTIVE LEAFLET GPS MAP */}
+            <div className="rounded-3xl border-2 border-[#FFCCE1] overflow-hidden h-72 shadow-md relative">
+              <LiveLocationMap
+                lat={trackingChild.activeSos?.latestLocation?.latitude}
+                lng={trackingChild.activeSos?.latestLocation?.longitude}
+                accuracy={trackingChild.activeSos?.latestLocation?.accuracy || 15}
+                userName={`${trackingChild.child?.fullName || 'Child'} (EMERGENCY)`}
+                isEmergency={true}
+              />
+            </div>
+
+            {/* FOOTER ACTIONS */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#FFCCE1]">
+              <div className="flex items-center space-x-2 text-xs font-bold text-[#684E67]">
+                <MapPin className="w-4 h-4 text-[#FF2A6D]" />
+                <span>
+                  GPS: {trackingChild.activeSos?.latestLocation?.latitude?.toFixed(5) || '—'},{' '}
+                  {trackingChild.activeSos?.latestLocation?.longitude?.toFixed(5) || '—'}
+                </span>
+              </div>
+
+              <div className="flex items-center space-x-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setTrackingChild(null)}
+                  className="px-5 py-3 rounded-full text-xs font-black text-gray-600 bg-gray-100 hover:bg-gray-200 cursor-pointer"
+                >
+                  Close Map
+                </button>
+
+                {trackingChild.activeSos?.shareToken && (
+                  <a
+                    href={`/live-track/${trackingChild.activeSos.shareToken}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-6 py-3 rounded-full text-xs font-black text-white bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] uppercase tracking-wider shadow cursor-pointer flex items-center justify-center space-x-1.5"
+                  >
+                    <ArrowUpRight className="w-4 h-4" />
+                    <span>OPEN FULL TRACKING PAGE</span>
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}

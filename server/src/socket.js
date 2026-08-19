@@ -49,14 +49,18 @@ export function initSocketIO(httpServer) {
       }
     });
 
-    socket.on('sos:location-update', (data) => {
-      ioInstance.to(`track:${data.token}`).emit('location-updated', {
-        latitude: data.lat,
-        longitude: data.lng,
-        accuracy: data.accuracy || 10,
-        timestamp: new Date().toISOString(),
-      });
-      ioInstance.to('admin-ops').emit('admin:sos-location', data);
+    socket.on('join-track', ({ token }) => {
+      if (!token) return;
+      const room = `track:${token}`;
+      socket.join(room);
+      console.log(`[Socket.IO] ${socket.id} joined tracking room: ${room}`);
+    });
+
+    socket.on('leave-track', ({ token }) => {
+      if (!token) return;
+      const room = `track:${token}`;
+      socket.leave(room);
+      console.log(`[Socket.IO] ${socket.id} left tracking room: ${room}`);
     });
 
     socket.on('disconnect', () => {

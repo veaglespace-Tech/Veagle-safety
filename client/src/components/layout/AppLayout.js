@@ -8,7 +8,7 @@ import { BottomNavigation } from './BottomNavigation.js';
 import { DesktopSidebar } from './DesktopSidebar.js';
 
 import { GeoLocationTracker } from '../common/GeoLocationTracker.js';
-import { EmergencyAlarmListener } from '../common/EmergencyAlarmListener.js';
+
 
 export const AppLayout = ({ children, fullScreen = false }) => {
   const pathname = usePathname();
@@ -108,7 +108,6 @@ export const AppLayout = ({ children, fullScreen = false }) => {
   return (
     <div className="min-h-screen bg-blush flex flex-col relative overflow-x-hidden">
       <GeoLocationTracker />
-      <EmergencyAlarmListener />
       {/* Desktop sidebar (hidden on mobile) */}
       <Suspense fallback={null}>
         <DesktopSidebar />
