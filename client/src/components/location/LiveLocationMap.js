@@ -110,10 +110,10 @@ export const LiveLocationMap = ({
       >
         <RecenterController center={currentPosition} />
 
-        {/* Leaflet OpenStreetMap Tile Layer */}
+        {/* Google Maps Tile Layer */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; Google Maps'
+          url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
         />
 
         {/* Live Breadcrumb Trajectory Trail */}
@@ -180,7 +180,7 @@ export const LiveLocationMap = ({
           className={`w-2 h-2 rounded-full ${isEmergency ? 'bg-red-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`}
         />
         <span className="text-[11px] font-black text-gray-800 tracking-wide uppercase">
-          Leaflet Live GPS
+          Live GPS Tracking
         </span>
       </div>
     </div>

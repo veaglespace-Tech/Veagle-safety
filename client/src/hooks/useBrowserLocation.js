@@ -63,17 +63,22 @@ export const useBrowserLocation = (activeSosId = null) => {
       if (activeSosId) {
         const { lat: lastLat, lng: lastLng } = lastSentCoordRef.current;
         const distance = getDistanceInMeters(lastLat, lastLng, lat, lng);
+        const timeSinceLastSync = Date.now() - (lastSentCoordRef.current.time || 0);
 
-        // Throttle updates: only send if moved at least 5 meters or haven't sent yet
-        if (distance > 5 || lastLat === null) {
+        console.log(`[useBrowserLocation] GPS Update - Lat: ${lat}, Lng: ${lng}, Distance: ${distance}m, Time: ${timeSinceLastSync}ms`);
+
+        // Throttle updates: send if moved at least 1 meter OR 3 seconds have passed OR haven't sent yet
+        if (distance > 1 || timeSinceLastSync > 3000 || lastLat === null) {
           try {
+            console.log('[useBrowserLocation] Syncing to backend...');
             await sosApi.updateSosLocation({
               sosSessionId: activeSosId,
               latitude: lat,
               longitude: lng,
               accuracy: acc,
             });
-            lastSentCoordRef.current = { lat, lng };
+            console.log('[useBrowserLocation] Backend sync successful!');
+            lastSentCoordRef.current = { lat, lng, time: Date.now() };
           } catch (err) {
             console.error('[useBrowserLocation] Failed to sync GPS to backend:', err);
           }
