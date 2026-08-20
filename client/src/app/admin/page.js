@@ -234,8 +234,8 @@ export default function SuperAdminOverviewPage() {
               <div className="space-y-4">
                 {activeSosList.map((sos) => {
                   const latestLoc = sos.locations?.[0];
-                  const lat = latestLoc?.latitude || sos.latitude;
-                  const lng = latestLoc?.longitude || sos.longitude;
+                  const lat = latestLoc?.latitude;
+                  const lng = latestLoc?.longitude;
 
                   return (
                     <div
@@ -261,7 +261,7 @@ export default function SuperAdminOverviewPage() {
                         <p className="text-xs font-bold text-rose-700 flex items-center space-x-1 pt-1">
                           <MapPin className="w-3.5 h-3.5 text-rose-600" />
                           <span>
-                            GPS: {lat}, {lng}
+                            GPS: {lat ? `${lat}, ${lng}` : 'Awaiting GPS...'}
                           </span>
                         </p>
                       </div>
@@ -399,8 +399,8 @@ export default function SuperAdminOverviewPage() {
               {/* INTERACTIVE LEAFLET GPS MAP CONTAINER */}
               <div className="rounded-3xl border-2 border-[#FFCCE1] overflow-hidden h-72 shadow-md relative">
                 <LiveLocationMap
-                  lat={trackingSos.locations?.[0]?.latitude || trackingSos.latitude}
-                  lng={trackingSos.locations?.[0]?.longitude || trackingSos.longitude}
+                  lat={trackingSos.locations?.[0]?.latitude}
+                  lng={trackingSos.locations?.[0]?.longitude}
                   isEmergency={true}
                 />
               </div>
@@ -410,8 +410,8 @@ export default function SuperAdminOverviewPage() {
                 <div className="flex items-center space-x-2 text-xs font-bold text-[#684E67]">
                   <MapPin className="w-4 h-4 text-[#FF2A6D]" />
                   <span>
-                    GPS: {trackingSos.locations?.[0]?.latitude || trackingSos.latitude},{' '}
-                    {trackingSos.locations?.[0]?.longitude || trackingSos.longitude}
+                    GPS: {trackingSos.locations?.[0]?.latitude || '—'},{' '}
+                    {trackingSos.locations?.[0]?.longitude || '—'}
                   </span>
                 </div>
 

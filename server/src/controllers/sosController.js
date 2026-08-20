@@ -40,16 +40,15 @@ export const startSos = async (req, res) => {
     const latitude = initialLat || 18.5204;
     const longitude = initialLng || 73.8567;
 
-    if (initialLat && initialLng) {
-      await prisma.sosLocation.create({
-        data: {
-          sosSessionId: session.id,
-          latitude: initialLat,
-          longitude: initialLng,
-          accuracy: 10,
-        },
-      });
-    }
+    // Always save initial location so Admin/Parent maps have data to display
+    await prisma.sosLocation.create({
+      data: {
+        sosSessionId: session.id,
+        latitude,
+        longitude,
+        accuracy: initialLat && initialLng ? 10 : 1000,
+      },
+    });
 
     await prisma.user.update({
       where: { id: userId },
