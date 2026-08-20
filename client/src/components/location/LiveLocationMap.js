@@ -106,14 +106,15 @@ export const LiveLocationMap = ({
         center={currentPosition}
         zoom={16}
         scrollWheelZoom={true}
-        className="w-full h-full z-0"
+        className="w-full h-full"
+        style={{ zIndex: 0 }}
       >
         <RecenterController center={currentPosition} />
 
-        {/* Google Maps Tile Layer */}
+        {/* OpenStreetMap Tile Layer (Free & Reliable) */}
         <TileLayer
-          attribution='&copy; Google Maps'
-          url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
         {/* Live Breadcrumb Trajectory Trail */}

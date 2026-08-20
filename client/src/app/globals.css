@@ -25,6 +25,28 @@ body {
   transition: transform 1.2s linear !important;
 }
 
+/* Ensure Leaflet map tiles render properly inside modals */
+.leaflet-container {
+  z-index: 1 !important;
+}
+
+.leaflet-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-tile-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-tile {
+  visibility: visible !important;
+}
+
+/* Force Leaflet controls above tiles but below modal */
+.leaflet-control {
+  z-index: 2 !important;
+}
+
 /* SLEEK DROPDOWN SCROLLBAR */
 .custom-select-scrollbar::-webkit-scrollbar {
   width: 5px;
