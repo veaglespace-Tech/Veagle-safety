@@ -300,7 +300,7 @@ export const updateSosLocation = async (req, res) => {
       const parsedAcc = accuracy ? parseFloat(accuracy) : 10;
 
       const payload = {
-        sosSessionId,
+        sosSessionId: parseInt(sosSessionId, 10),
         latitude: parsedLat,
         longitude: parsedLng,
         accuracy: parsedAcc,

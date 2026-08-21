@@ -108,14 +108,16 @@ export default function ParentDashboard() {
           socket.on('SOS_PERIODIC_5MIN_UPDATE', handleLiveEvent);
           socket.on('JOURNEY_STATUS_UPDATE', handleLiveEvent);
 
-          // Real-time SOS location updates from server (targeted to parent rooms)
+          // Real-time SOS location updates from server
           socket.on('SOS_LOCATION_UPDATE', (data) => {
             if (!data?.sosSessionId || !data?.latitude || !data?.longitude) return;
+            const incomingId = parseInt(data.sosSessionId, 10);
+            console.log('[Parent] SOS_LOCATION_UPDATE:', incomingId, data.latitude, data.longitude);
 
             // Update childrenList state with real-time lat/lng
             setChildrenList((prevList) =>
               prevList.map((item) => {
-                if (item.activeSos && item.activeSos.id === data.sosSessionId) {
+                if (item.activeSos && parseInt(item.activeSos.id, 10) === incomingId) {
                   return {
                     ...item,
                     activeSos: {
@@ -134,7 +136,8 @@ export default function ParentDashboard() {
 
             // Update tracking modal if open for this SOS session
             setTrackingChild((prev) => {
-              if (prev && prev.activeSos && prev.activeSos.id === data.sosSessionId) {
+              if (prev && prev.activeSos && parseInt(prev.activeSos.id, 10) === incomingId) {
+                console.log('[Parent] Updating tracking modal marker position');
                 return {
                   ...prev,
                   activeSos: {

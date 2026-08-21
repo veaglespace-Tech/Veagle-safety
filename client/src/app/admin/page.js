@@ -82,8 +82,12 @@ export default function SuperAdminOverviewPage() {
         });
 
         socket.on('SOS_LOCATION_UPDATE', (data) => {
+          const incomingId = parseInt(data.sosSessionId, 10);
+          console.log('[Admin] SOS_LOCATION_UPDATE received:', incomingId, data.latitude, data.longitude);
+
           setTrackingSos((prev) => {
-            if (prev && prev.id === data.sosSessionId) {
+            if (prev && parseInt(prev.id, 10) === incomingId) {
+              console.log('[Admin] Updating tracking modal marker position');
               return {
                 ...prev,
                 latitude: data.latitude,
@@ -99,7 +103,7 @@ export default function SuperAdminOverviewPage() {
             return {
               ...prev,
               activeSos: prev.activeSos.map((sos) => {
-                if (sos.id === data.sosSessionId) {
+                if (parseInt(sos.id, 10) === incomingId) {
                   return {
                     ...sos,
                     latitude: data.latitude,
