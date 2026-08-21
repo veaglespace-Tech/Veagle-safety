@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMap } from 'react-leaflet';
+import React, { useEffect, useState, useRef } from 'react';
+import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ShieldAlert, Radio, Navigation } from 'lucide-react';
@@ -34,33 +34,89 @@ const liveUserIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Map View Smooth Recenter Controller (debounced to prevent jitter)
-const RecenterController = ({ center }) => {
+/**
+ * Imperatively controls the Leaflet map marker + view.
+ * Uses native Leaflet API (L.marker, setLatLng) via refs to guarantee
+ * the marker moves when lat/lng props change — fixes issues where
+ * react-leaflet declarative Marker doesn't re-render on socket state updates.
+ */
+const ImperativeMarkerController = ({ lat, lng, accuracy, isEmergency, userName, speed }) => {
   const map = useMap();
-  const lat = center?.[0];
-  const lng = center?.[1];
-  const lastCenter = React.useRef([null, null]);
+  const markerRef = useRef(null);
+  const circleRef = useRef(null);
+  const lastCenter = useRef([null, null]);
 
   useEffect(() => {
-    if (lat && lng) {
-      const [prevLat, prevLng] = lastCenter.current;
-      // Only flyTo if location changed by more than ~11m (0.0001 degrees)
-      // This prevents jittery map animations from GPS micro-drift
-      const hasMoved =
-        prevLat === null ||
-        prevLng === null ||
-        Math.abs(lat - prevLat) > 0.0001 ||
-        Math.abs(lng - prevLng) > 0.0001;
+    if (!lat || !lng || isNaN(lat) || isNaN(lng)) return;
 
-      if (hasMoved) {
-        lastCenter.current = [lat, lng];
-        map.flyTo([lat, lng], map.getZoom() || 16, {
-          animate: true,
-          duration: 1.2,
-        });
-      }
+    const pos = [parseFloat(lat), parseFloat(lng)];
+    const icon = isEmergency ? emergencyIcon : liveUserIcon;
+
+    // Build popup HTML
+    const popupHtml = `
+      <div style="font-size:11px;min-width:150px;line-height:1.6">
+        <b>${userName || 'User'}</b><br/>
+        <span style="font-family:monospace;font-size:10px">Lat: ${parseFloat(lat).toFixed(5)}, Lng: ${parseFloat(lng).toFixed(5)}</span><br/>
+        <span>GPS: &plusmn;${accuracy || 15}m</span>
+        ${isEmergency ? '<br/><b style="color:#E62E5C">&#x1F6A8; EMERGENCY SOS</b>' : ''}
+      </div>
+    `;
+
+    // Create marker if it doesn't exist yet
+    if (!markerRef.current) {
+      markerRef.current = L.marker(pos, { icon }).addTo(map);
+      markerRef.current.bindPopup(popupHtml);
+    } else {
+      // Move existing marker to new position (this is the key fix!)
+      markerRef.current.setLatLng(pos);
+      markerRef.current.setPopupContent(popupHtml);
     }
-  }, [lat, lng, map]);
+
+    // Create or update accuracy circle
+    if (!circleRef.current) {
+      circleRef.current = L.circle(pos, {
+        radius: accuracy || 15,
+        color: isEmergency ? '#E62E5C' : '#4f46e5',
+        fillColor: isEmergency ? '#E62E5C' : '#818cf8',
+        fillOpacity: 0.25,
+        weight: 2,
+      }).addTo(map);
+    } else {
+      circleRef.current.setLatLng(pos);
+      circleRef.current.setRadius(accuracy || 15);
+    }
+
+    // Smooth flyTo if location changed significantly (>~11m)
+    const [prevLat, prevLng] = lastCenter.current;
+    const hasMoved =
+      prevLat === null ||
+      prevLng === null ||
+      Math.abs(pos[0] - prevLat) > 0.0001 ||
+      Math.abs(pos[1] - prevLng) > 0.0001;
+
+    if (hasMoved) {
+      lastCenter.current = [pos[0], pos[1]];
+      map.flyTo(pos, map.getZoom() || 16, {
+        animate: true,
+        duration: 1.2,
+      });
+    }
+  }, [lat, lng, accuracy, map, isEmergency, userName, speed]);
+
+  // Cleanup markers on component unmount
+  useEffect(() => {
+    return () => {
+      if (markerRef.current) {
+        map.removeLayer(markerRef.current);
+        markerRef.current = null;
+      }
+      if (circleRef.current) {
+        map.removeLayer(circleRef.current);
+        circleRef.current = null;
+      }
+    };
+  }, [map]);
+
   return null;
 };
 
@@ -109,7 +165,15 @@ export const LiveLocationMap = ({
         className="w-full h-full"
         style={{ zIndex: 0 }}
       >
-        <RecenterController center={currentPosition} />
+        {/* Imperative marker controller — guarantees marker movement on every lat/lng change */}
+        <ImperativeMarkerController
+          lat={lat}
+          lng={lng}
+          accuracy={accuracy}
+          isEmergency={isEmergency}
+          userName={userName}
+          speed={speed}
+        />
 
         {/* OpenStreetMap Tile Layer (Free & Reliable) */}
         <TileLayer
@@ -129,50 +193,6 @@ export const LiveLocationMap = ({
             }}
           />
         )}
-
-        {/* GPS Precision Accuracy Circle */}
-        <Circle
-          center={currentPosition}
-          radius={accuracy}
-          pathOptions={{
-            color: isEmergency ? '#E62E5C' : '#4f46e5',
-            fillColor: isEmergency ? '#E62E5C' : '#818cf8',
-            fillOpacity: 0.25,
-            weight: 2,
-          }}
-        />
-
-        {/* Real-time Marker */}
-        <Marker position={currentPosition} icon={isEmergency ? emergencyIcon : liveUserIcon}>
-          <Popup>
-            <div className="text-xs space-y-1.5 p-1 min-w-[160px]">
-              <div className="flex items-center space-x-1.5">
-                <Radio
-                  className={`w-3.5 h-3.5 ${isEmergency ? 'text-red-500 animate-pulse' : 'text-indigo-600'}`}
-                />
-                <p className="font-extrabold text-gray-900">{userName}</p>
-              </div>
-              <p className="text-gray-500 font-mono text-[11px]">
-                Lat: {lat?.toFixed(5)}, Lng: {lng?.toFixed(5)}
-              </p>
-              <p className="text-gray-600 text-[11px]">
-                GPS Precision: <span className="font-bold text-gray-800">±{accuracy}m</span>
-              </p>
-              {speed !== null && (
-                <p className="text-gray-600 text-[11px]">
-                  Speed:{' '}
-                  <span className="font-bold text-gray-800">{Math.round(speed * 3.6)} km/h</span>
-                </p>
-              )}
-              {isEmergency && (
-                <div className="bg-red-50 text-red-600 font-black text-[10px] px-2 py-1 rounded border border-red-200 mt-1 flex items-center space-x-1">
-                  <ShieldAlert className="w-3 h-3 text-red-500" />
-                  <span>EMERGENCY SOS BROADCAST</span>
-                </div>
-              )}
-            </div>
-          </Popup>
-        </Marker>
       </MapContainer>
 
       {/* Leaflet Live Overlay Badge */}
