@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { resolveEmergencySos, toggleAlarm } from '../../redux/slices/sosSlice.js';
+import { resolveEmergencySos, toggleAlarm, clearSosState, checkActiveSos } from '../../redux/slices/sosSlice.js';
 import { startEmergencySiren, stopEmergencySiren } from '../../utils/sirenAudio.js';
 import { LiveLocationMap } from '../../components/location/DynamicLiveLocationMap.js';
 import { useBrowserLocation } from '../../hooks/useBrowserLocation.js';
@@ -66,6 +66,49 @@ export default function ActiveSOSLivePage() {
       startLocationTracking();
     }
   }, [activeSession]);
+
+  // Listen for admin-initiated SOS resolve via Socket.IO
+  useEffect(() => {
+    if (!activeSession) return;
+
+    let socket = null;
+    const connectSocket = async () => {
+      try {
+        const { io } = await import('socket.io-client');
+        const { SERVER_URL } = await import('../../utils/api.js');
+        socket = io(SERVER_URL, {
+          transports: ['websocket', 'polling'],
+          reconnectionAttempts: 3,
+        });
+
+        socket.on('connect', () => {
+          if (user) {
+            const cleanPhone = user.phone ? user.phone.replace(/\D/g, '') : null;
+            socket.emit('register-user', {
+              email: user.email?.trim().toLowerCase(),
+              phone: cleanPhone,
+              role: user.role,
+            });
+          }
+        });
+
+        socket.on('SOS_ALARM_STOP', () => {
+          console.log('[ActiveSOS] Admin resolved SOS — clearing session');
+          stopEmergencySiren();
+          stopLocationTracking();
+          dispatch(clearSosState());
+        });
+      } catch (e) {
+        console.warn('[ActiveSOS] Socket connect error:', e.message);
+      }
+    };
+
+    connectSocket();
+
+    return () => {
+      if (socket) socket.disconnect();
+    };
+  }, [activeSession?.id, user]);
 
   const formatElapsed = (secs) => {
     const m = Math.floor(secs / 60)

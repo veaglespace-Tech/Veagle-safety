@@ -295,11 +295,15 @@ export const updateSosLocation = async (req, res) => {
     // Emit live location update to connected sockets
     const io = getIO();
     if (io) {
+      const parsedLat = parseFloat(latitude);
+      const parsedLng = parseFloat(longitude);
+      const parsedAcc = accuracy ? parseFloat(accuracy) : 10;
+
       const payload = {
         sosSessionId,
-        latitude,
-        longitude,
-        accuracy: accuracy || 10,
+        latitude: parsedLat,
+        longitude: parsedLng,
+        accuracy: parsedAcc,
         recordedAt: location.recordedAt,
         timestamp: location.recordedAt, // Required for live-track page
       };
@@ -366,6 +370,9 @@ export const updateSosLocation = async (req, res) => {
       targetRooms.forEach((roomName) => {
         io.to(roomName).emit('SOS_LOCATION_UPDATE', payload);
       });
+
+      // 4. Global fallback broadcast — ensures no admin or parent misses a location update
+      io.emit('SOS_LOCATION_UPDATE', payload);
     }
 
     return res.json({ message: 'Location updated', location });

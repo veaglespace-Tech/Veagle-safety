@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { checkActiveSos } from '../../redux/slices/sosSlice.js';
+import { checkActiveSos, clearSosState } from '../../redux/slices/sosSlice.js';
 import {
   ShieldAlert,
   Volume2,
@@ -106,11 +106,12 @@ export const EmergencyAlarmListener = () => {
           }
         });
 
-        socket.on('SOS_ALARM_STOP', () => {
+        socket.on('SOS_ALARM_STOP', (data) => {
           setAlarmData(null);
           stopEmergencySiren();
           setIsSirenActive(false);
-          // If the admin resolves the SOS, sync the Redux state so the victim's UI updates
+          // Admin resolved SOS — clear victim's active session immediately + confirm with API
+          dispatch(clearSosState());
           dispatch(checkActiveSos());
         });
       } catch (err) {
