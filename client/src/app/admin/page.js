@@ -5,6 +5,7 @@ import { AppLayout } from '../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../components/admin/AdminHeaderNav.js';
 import { LiveLocationMap } from '../../components/location/DynamicLiveLocationMap.js';
 import { api } from '../../utils/api.js';
+import { sosApi } from '../../redux/api/sosApi.js';
 import {
   AlertOctagon,
   Users,
@@ -30,6 +31,39 @@ export default function SuperAdminOverviewPage() {
 
   // LIVE GPS TRACKING MODAL STATE
   const [trackingSos, setTrackingSos] = useState(null);
+
+  // Reliable Polling Fallback for Live GPS Tracking
+  useEffect(() => {
+    if (!trackingSos?.id) return;
+    
+    const interval = setInterval(async () => {
+      try {
+        const data = await sosApi.getSosLocation(trackingSos.id);
+        if (data && data.location) {
+          const lat = parseFloat(data.location.latitude);
+          const lng = parseFloat(data.location.longitude);
+          
+          if (!isNaN(lat) && !isNaN(lng)) {
+            setTrackingSos(prev => {
+              if (prev && prev.id === trackingSos.id) {
+                return {
+                  ...prev,
+                  latitude: lat,
+                  longitude: lng,
+                  locations: [{ latitude: lat, longitude: lng }]
+                };
+              }
+              return prev;
+            });
+          }
+        }
+      } catch (e) {
+        console.log('[Admin Polling] Failed to fetch location:', e.message);
+      }
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [trackingSos?.id]);
 
   const showToast = (type, text) => {
     setToast({ type, text });

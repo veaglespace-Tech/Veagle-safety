@@ -60,6 +60,7 @@ router.post('/sos/start', authenticateToken, sosController.startSos);
 router.post('/sos/location', authenticateToken, sosController.updateSosLocation);
 router.post('/sos/resolve', authenticateToken, sosController.resolveSos);
 router.get('/sos/active', authenticateToken, sosController.getActiveSosSession);
+router.get('/sos/active/:id/location', authenticateToken, sosController.getSosLocation);
 router.get('/sos/public-track/:token', sosController.getPublicSosTracking);
 
 // Journey

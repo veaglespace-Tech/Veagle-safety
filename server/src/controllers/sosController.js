@@ -545,6 +545,30 @@ export const getActiveSosSession = async (req, res) => {
   }
 };
 
+export const getSosLocation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const session = await prisma.sosSession.findUnique({
+      where: { id: parseInt(id, 10) },
+      select: {
+        id: true,
+        locations: {
+          orderBy: { recordedAt: 'desc' },
+          take: 1,
+        }
+      }
+    });
+
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    return res.json({ location: session.locations[0] || null });
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to fetch location' });
+  }
+};
+
 export const getPublicSosTracking = async (req, res) => {
   try {
     const { token } = req.params;

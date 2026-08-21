@@ -26,6 +26,11 @@ export const sosApi = {
     return response.data;
   },
 
+  getSosLocation: async (id) => {
+    const response = await apiClient.get(`/sos/active/${id}/location`);
+    return response.data;
+  },
+
   getPublicTrack: async (token) => {
     const response = await apiClient.get(`/sos/public-track/${token}`);
     return response.data;
