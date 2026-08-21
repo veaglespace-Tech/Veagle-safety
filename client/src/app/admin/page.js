@@ -32,11 +32,11 @@ export default function SuperAdminOverviewPage() {
   // LIVE GPS TRACKING MODAL STATE
   const [trackingSos, setTrackingSos] = useState(null);
 
-  // Reliable Polling Fallback for Live GPS Tracking
+  // Reliable Polling Fallback & History Fetcher for Live GPS Tracking
   useEffect(() => {
     if (!trackingSos?.id) return;
     
-    const interval = setInterval(async () => {
+    const fetchLocationData = async () => {
       try {
         const data = await sosApi.getSosLocation(trackingSos.id);
         if (data && data.location) {
@@ -50,7 +50,8 @@ export default function SuperAdminOverviewPage() {
                   ...prev,
                   latitude: lat,
                   longitude: lng,
-                  locations: [{ latitude: lat, longitude: lng }]
+                  locations: [{ latitude: lat, longitude: lng }],
+                  locationHistory: data.history || []
                 };
               }
               return prev;
@@ -60,7 +61,11 @@ export default function SuperAdminOverviewPage() {
       } catch (e) {
         console.log('[Admin Polling] Failed to fetch location:', e.message);
       }
-    }, 3000); // Poll every 3 seconds
+    };
+
+    // Fetch immediately to load history trail, then poll every 3 seconds
+    fetchLocationData();
+    const interval = setInterval(fetchLocationData, 3000);
 
     return () => clearInterval(interval);
   }, [trackingSos?.id]);
@@ -440,6 +445,7 @@ export default function SuperAdminOverviewPage() {
                   lat={trackingSos.locations?.[0]?.latitude}
                   lng={trackingSos.locations?.[0]?.longitude}
                   isEmergency={true}
+                  locationHistory={trackingSos.locationHistory}
                 />
               </div>
 

@@ -127,16 +127,29 @@ export const LiveLocationMap = ({
   userName = 'User Location',
   isEmergency = false,
   speed = null,
+  locationHistory = [],
 }) => {
   const [trail, setTrail] = useState([]);
+
+  // Initialize trail with history on mount or when history prop updates significantly
+  useEffect(() => {
+    if (locationHistory && locationHistory.length > 0) {
+      const historicalPoints = locationHistory
+        .filter((loc) => loc.latitude && loc.longitude)
+        .map((loc) => [parseFloat(loc.latitude), parseFloat(loc.longitude)]);
+      setTrail(historicalPoints);
+    }
+  }, [locationHistory]);
 
   // Store trajectory path trail as coordinates update in real-time
   useEffect(() => {
     if (lat && lng) {
       setTrail((prev) => {
         const last = prev[prev.length - 1];
-        if (!last || last[0] !== lat || last[1] !== lng) {
-          return [...prev, [lat, lng]];
+        const newLat = parseFloat(lat);
+        const newLng = parseFloat(lng);
+        if (!last || last[0] !== newLat || last[1] !== newLng) {
+          return [...prev, [newLat, newLng]];
         }
         return prev;
       });

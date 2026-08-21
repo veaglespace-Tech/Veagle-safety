@@ -52,11 +52,11 @@ export default function ParentDashboard() {
     setMounted(true);
   }, []);
 
-  // Reliable Polling Fallback for Live GPS Tracking
+  // Reliable Polling Fallback & History Fetcher for Live GPS Tracking
   useEffect(() => {
     if (!trackingChild?.activeSos?.id) return;
     
-    const interval = setInterval(async () => {
+    const fetchLocationData = async () => {
       try {
         const data = await sosApi.getSosLocation(trackingChild.activeSos.id);
         if (data && data.location) {
@@ -74,7 +74,8 @@ export default function ParentDashboard() {
                       latitude: lat,
                       longitude: lng,
                       accuracy: data.location.accuracy || 10
-                    }
+                    },
+                    locationHistory: data.history || []
                   }
                 };
               }
@@ -85,7 +86,11 @@ export default function ParentDashboard() {
       } catch (e) {
         console.log('[Parent Polling] Failed to fetch location:', e.message);
       }
-    }, 3000); // Poll every 3 seconds
+    };
+
+    // Fetch immediately to load history trail, then poll every 3 seconds
+    fetchLocationData();
+    const interval = setInterval(fetchLocationData, 3000);
 
     return () => clearInterval(interval);
   }, [trackingChild?.activeSos?.id]);
@@ -745,6 +750,7 @@ export default function ParentDashboard() {
                 accuracy={trackingChild.activeSos?.latestLocation?.accuracy || 15}
                 userName={`${trackingChild.child?.fullName || 'Child'} (EMERGENCY)`}
                 isEmergency={true}
+                locationHistory={trackingChild.activeSos?.locationHistory}
               />
             </div>
 

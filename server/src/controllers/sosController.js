@@ -553,8 +553,8 @@ export const getSosLocation = async (req, res) => {
       select: {
         id: true,
         locations: {
-          orderBy: { recordedAt: 'desc' },
-          take: 1,
+          orderBy: { recordedAt: 'asc' }, // Ascending so we get timeline from start to finish
+          take: 200,
         }
       }
     });
@@ -563,7 +563,10 @@ export const getSosLocation = async (req, res) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    return res.json({ location: session.locations[0] || null });
+    return res.json({ 
+      location: session.locations[session.locations.length - 1] || null,
+      history: session.locations 
+    });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to fetch location' });
   }
