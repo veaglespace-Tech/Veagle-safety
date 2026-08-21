@@ -29,8 +29,8 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
         const res = await dispatch(
           startEmergencySos({
             isSilent: false,
-            latitude,
-            longitude,
+            initialLat: latitude,
+            initialLng: longitude,
             emergencyMessage: 'SUPERADMIN EMERGENCY SOS BROADCAST! URGENT ASSISTANCE REQUIRED!',
           })
         ).unwrap();

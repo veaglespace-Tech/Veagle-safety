@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ShieldAlert, VolumeX, Volume2, Radio, Siren, AlertCircle } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { startEmergencySos } from '../../redux/slices/sosSlice.js';
@@ -17,18 +17,35 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
   const [isSilent, setIsSilent] = useState(false);
   const progressIntervalRef = useRef(null);
   const startTimeRef = useRef(0);
+  const holdingRef = useRef(false); // Ref to avoid stale closure in endHold
+  const triggeredRef = useRef(false); // Prevent double-trigger
 
   const { activeSession } = useSelector((state) => state?.sos || {});
   const { latitude, longitude } = useSelector((state) => state?.location || {});
 
   const HOLD_DURATION = 2000;
 
-  const startHold = () => {
+  const clearHoldInterval = useCallback(() => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+  }, []);
+
+  const startHold = useCallback((e) => {
+    // Prevent default to stop context menu, text selection on mobile long press
+    if (e) e.preventDefault();
+
     if (activeSession) {
       router.push('/active-sos');
       return;
     }
 
+    // Prevent duplicate start if already holding
+    if (holdingRef.current) return;
+
+    holdingRef.current = true;
+    triggeredRef.current = false;
     setHolding(true);
     setProgress(0);
     setCountdown(2);
@@ -38,6 +55,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
       navigator.vibrate([100, 50, 100]);
     }
 
+    clearHoldInterval();
     progressIntervalRef.current = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current;
       const pct = Math.min((elapsed / HOLD_DURATION) * 100, 100);
@@ -48,22 +66,28 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
 
       if (elapsed >= HOLD_DURATION) {
         clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
         handleTriggered();
       }
     }, 30);
-  };
+  }, [activeSession, router, clearHoldInterval]);
 
-  const endHold = () => {
-    if (!holding) return;
+  const endHold = useCallback((e) => {
+    if (e) e.preventDefault();
+    if (!holdingRef.current) return;
+    holdingRef.current = false;
     setHolding(false);
     setProgress(0);
     setCountdown(2);
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-    }
-  };
+    clearHoldInterval();
+  }, [clearHoldInterval]);
 
   const handleTriggered = async () => {
+    // Prevent double-trigger
+    if (triggeredRef.current) return;
+    triggeredRef.current = true;
+
+    holdingRef.current = false;
     setHolding(false);
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate([300, 100, 300, 100, 400]);
@@ -107,12 +131,12 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
         longitude: realLng,
       });
 
-      // 3. Dispatch SOS to backend
+      // 3. Dispatch SOS to backend (use initialLat/initialLng to match server-side field names)
       const res = await dispatch(
         startEmergencySos({
           isSilent,
-          latitude: realLat,
-          longitude: realLng,
+          initialLat: realLat,
+          initialLng: realLng,
           accuracy: realAcc,
           emergencyMessage: isSilent
             ? 'Discreet Emergency SOS Triggered'
@@ -197,6 +221,9 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
           onMouseLeave={endHold}
           onTouchStart={startHold}
           onTouchEnd={endHold}
+          onTouchCancel={endHold}
+          onContextMenu={(e) => e.preventDefault()}
+          style={{ touchAction: 'manipulation', WebkitTouchCallout: 'none', userSelect: 'none' }}
           className={`absolute w-56 h-56 rounded-full flex flex-col items-center justify-center z-30 transition-all duration-300 transform cursor-pointer shadow-[0_20px_60px_rgba(255,42,109,0.45)] border-4 border-white active:scale-95 ${
             holding
               ? 'bg-gradient-to-tr from-[#E01A4F] via-[#FF2A6D] to-[#FFD700] text-white scale-110 shadow-[0_0_80px_rgba(255,42,109,0.8)] animate-pulse'
