@@ -40,7 +40,10 @@ export default function LivePublicTrackingPage() {
 
   useEffect(() => {
     loadPublicSos();
-    const socket = io(SERVER_URL);
+    const socket = io(SERVER_URL, {
+      forceNew: true,
+      transports: ['websocket', 'polling'],
+    });
 
     const onConnect = () => {
       setIsConnected(true);
@@ -99,18 +102,31 @@ export default function LivePublicTrackingPage() {
     };
   }, [token]);
 
-  const loadPublicSos = async () => {
+  // Robust Fallback: Poll for latest location every 4 seconds (handles mobile network drops)
+  useEffect(() => {
+    if (!token) return;
+    const intervalId = setInterval(() => {
+      loadPublicSos(true);
+    }, 4000);
+    return () => clearInterval(intervalId);
+  }, [token]);
+
+  const loadPublicSos = async (isPolling = false) => {
     try {
       const res = await api.get(`/sos/public-track/${token}`);
       const sosData = res.data.sosSession || res.data.session;
-      setSession(sosData);
+      
+      // Update session silently if polling
+      if (!isPolling) setSession(sosData);
+      else setSession(prev => prev ? { ...prev, ...sosData, locations: prev.locations } : sosData);
+
       if (sosData?.locations?.length > 0) {
         setLocation(sosData.locations[0]);
       }
     } catch (err) {
-      setError('Emergency link invalid, expired, or has ended.');
+      if (!isPolling) setError('Emergency link invalid, expired, or has ended.');
     } finally {
-      setLoading(false);
+      if (!isPolling) setLoading(false);
     }
   };
 
