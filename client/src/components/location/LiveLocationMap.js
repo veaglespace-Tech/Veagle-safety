@@ -142,8 +142,7 @@ export const LiveLocationMap = ({
   // Initialize trail with history on mount or when history prop updates significantly
   useEffect(() => {
     if (locationHistory && locationHistory.length > 0) {
-      const historicalPoints = [...locationHistory]
-        .reverse() // Reverse so it's Oldest -> Newest chronologically
+      const historicalPoints = locationHistory
         .filter((loc) => loc.latitude && loc.longitude)
         .map((loc) => [parseFloat(loc.latitude), parseFloat(loc.longitude)]);
       setTrail(historicalPoints);

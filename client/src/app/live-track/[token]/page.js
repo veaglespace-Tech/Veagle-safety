@@ -24,7 +24,6 @@ export const dynamic = 'force-dynamic';
 export default function LivePublicTrackingPage() {
   const { token } = useParams();
   const [session, setSession] = useState(null);
-  const sessionIdRef = React.useRef(null);
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,29 +32,15 @@ export default function LivePublicTrackingPage() {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (session) {
-      sessionIdRef.current = session.id;
-    }
-  }, [session]);
-
-  useEffect(() => {
     loadPublicSos();
-    const socket = io(SERVER_URL, {
-      forceNew: true,
-      transports: ['websocket', 'polling'],
-    });
+    const socket = io(SERVER_URL);
 
-    const onConnect = () => {
+    socket.on('connect', () => {
       setIsConnected(true);
       if (token) {
         socket.emit('join-track', { token });
       }
-    };
-
-    if (socket.connected) {
-      onConnect();
-    }
-    socket.on('connect', onConnect);
+    });
 
     socket.on('disconnect', () => {
       setIsConnected(false);
@@ -73,15 +58,18 @@ export default function LivePublicTrackingPage() {
 
     // Also listen for SOS_LOCATION_UPDATE (emitted to parent/guardian rooms)
     socket.on('SOS_LOCATION_UPDATE', (data) => {
-      // Only accept updates for this session's sosSessionId
-      if (sessionIdRef.current && data.sosSessionId && String(sessionIdRef.current) === String(data.sosSessionId)) {
-        setLocation({
-          latitude: data.latitude,
-          longitude: data.longitude,
-          accuracy: data.accuracy,
-          recordedAt: data.timestamp,
-        });
-      }
+      setSession((prev) => {
+        // Only accept updates for this session's sosSessionId
+        if (prev && data.sosSessionId && prev.id === data.sosSessionId) {
+          setLocation({
+            latitude: data.latitude,
+            longitude: data.longitude,
+            accuracy: data.accuracy,
+            recordedAt: data.timestamp,
+          });
+        }
+        return prev;
+      });
     });
 
     socket.on('SOS_ALARM_STOP', (data) => {
@@ -102,31 +90,18 @@ export default function LivePublicTrackingPage() {
     };
   }, [token]);
 
-  // Robust Fallback: Poll for latest location every 4 seconds (handles mobile network drops)
-  useEffect(() => {
-    if (!token) return;
-    const intervalId = setInterval(() => {
-      loadPublicSos(true);
-    }, 4000);
-    return () => clearInterval(intervalId);
-  }, [token]);
-
-  const loadPublicSos = async (isPolling = false) => {
+  const loadPublicSos = async () => {
     try {
       const res = await api.get(`/sos/public-track/${token}`);
       const sosData = res.data.sosSession || res.data.session;
-      
-      // Update session silently if polling
-      if (!isPolling) setSession(sosData);
-      else setSession(prev => prev ? { ...prev, ...sosData, locations: prev.locations } : sosData);
-
+      setSession(sosData);
       if (sosData?.locations?.length > 0) {
         setLocation(sosData.locations[0]);
       }
     } catch (err) {
-      if (!isPolling) setError('Emergency link invalid, expired, or has ended.');
+      setError('Emergency link invalid, expired, or has ended.');
     } finally {
-      if (!isPolling) setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -219,7 +194,6 @@ export default function LivePublicTrackingPage() {
               accuracy={location?.accuracy || 15}
               userName={`${victimName} (EMERGENCY)`}
               isEmergency={isEmergency}
-              locationHistory={session?.locations || []}
             />
             {isEmergency && (
               <div className="absolute top-4 left-4 right-4 z-[999] pointer-events-none flex justify-center">

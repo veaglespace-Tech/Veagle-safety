@@ -536,40 +536,10 @@ export const getActiveSosSession = async (req, res) => {
     const userId = req.user?.id;
     const session = await prisma.sosSession.findFirst({
       where: { userId, status: 'ACTIVE' },
-      include: { 
-        locations: { orderBy: { recordedAt: 'desc' }, take: 1 },
-        user: { include: { trustedContacts: true } }
-      },
+      include: { locations: { orderBy: { recordedAt: 'desc' }, take: 1 } },
     });
 
-    if (!session) return res.json({ session: null });
-
-    const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
-    const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
-    const latestLocation = session.locations?.[0];
-    const latitude = latestLocation?.latitude || 18.5204;
-    const longitude = latestLocation?.longitude || 73.8567;
-    const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
-
-    // Re-generate WhatsApp links for UI
-    const baseMessageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${session.user?.fullName || 'Sakhi Member'}\nPhone: ${session.user?.phone || ''}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Map:\n${trackingUrl}\n\n🌐 Google Maps:\n${googleMapsUrl}`;
-    const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(baseMessageText)}`;
-
-    const whatsappAlerts = (session.user?.trustedContacts || []).map((contact) => {
-      const cleanPhone = (contact.phone || '').replace(/\D/g, '');
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(baseMessageText)}`;
-      return { contactName: contact.name, phone: contact.phone, whatsappUrl };
-    });
-
-    return res.json({ 
-      session: {
-        ...session,
-        trackingUrl,
-        googleMapsUrl,
-        whatsappShareUrl,
-        whatsappAlerts,
-      } 
-    });
+    return res.json({ session });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to fetch active SOS session' });
   }
@@ -610,7 +580,7 @@ export const getPublicSosTracking = async (req, res) => {
       where: { shareToken: token },
       include: {
         user: { select: { fullName: true, phone: true, profilePhoto: true, bloodGroup: true } },
-        locations: { orderBy: { recordedAt: 'desc' }, take: 200 },
+        locations: { orderBy: { recordedAt: 'desc' }, take: 20 },
       },
     });
 
@@ -623,7 +593,7 @@ export const getPublicSosTracking = async (req, res) => {
       where: { shareToken: token },
       include: {
         user: { select: { fullName: true, phone: true, profilePhoto: true, bloodGroup: true } },
-        locations: { orderBy: { recordedAt: 'desc' }, take: 200 },
+        locations: { orderBy: { recordedAt: 'desc' }, take: 20 },
       },
     });
 
