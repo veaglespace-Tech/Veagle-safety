@@ -98,17 +98,18 @@ export default function PlatformGalleryPage() {
             {galleryMeta.subtitle}
           </p>
 
-          {/* CATEGORY FILTER CAPSULE BAR */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-6">
-            <div className="nav-chip-capsule flex flex-wrap items-center gap-1.5 p-1.5">
+          {/* CATEGORY FILTER CAPSULE BAR (SMOOTH HORIZONTAL SWIPE ON MOBILE, CENTERED ON DESKTOP) */}
+          <div className="w-full max-w-full flex items-center justify-center pt-4 sm:pt-6 px-1">
+            <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 bg-white/90 backdrop-blur-xl border-1.5 border-[#FFCCE1] rounded-full shadow-[0_4px_20px_rgba(255,92,138,0.1)] max-w-full overflow-x-auto no-scrollbar scrollbar-none px-2 sm:px-3">
               {categories.map((cat) => (
                 <button
+                  type="button"
                   key={cat}
                   onClick={() => setActiveTab(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-300 cursor-pointer ${
+                  className={`whitespace-nowrap px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer shrink-0 ${
                     activeTab === cat
-                      ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30 scale-105'
-                      : 'text-[#2A0826] hover:bg-white hover:text-[#FF5C8A]'
+                      ? 'bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white shadow-md shadow-[#FF5C8A]/35 scale-105 border border-white/30'
+                      : 'text-[#2A0826] hover:bg-[#FFF0F3] hover:text-[#FF5C8A] bg-transparent'
                   }`}
                 >
                   {cat}
@@ -116,6 +117,7 @@ export default function PlatformGalleryPage() {
               ))}
             </div>
           </div>
+
         </div>
 
         {/* GALLERY GRID */}

@@ -261,7 +261,6 @@ export default function UserTrustedContactsPage() {
                       options={RELATIONSHIPS.map((r) => ({ value: r, label: r }))}
                       value={relationship}
                       onChange={(e) => setRelationship(e.target.value)}
-                      alignRight={true}
                     />
                   </div>
 

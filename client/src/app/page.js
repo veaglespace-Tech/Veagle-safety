@@ -114,51 +114,27 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* HERO CTA BUTTONS WITH PURE 3D POP-UP EFFECT (NO MAGNETIC MOTION) */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-3 px-4 w-full">
-          {isLoggedIn ? (
-            <>
-              <Link
-                href={isSuperAdmin ? '/admin' : '/dashboard'}
-                className="btn-3d-rose-pop w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-3 whitespace-nowrap"
-              >
-                {isSuperAdmin ? (
-                  <Crown size={18} className="shrink-0" />
-                ) : (
-                  <LayoutDashboard size={18} className="shrink-0" />
-                )}
-                <span>{isSuperAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}</span>
-                <ArrowRight size={16} className="shrink-0" />
-              </Link>
+        {/* HERO CTA BUTTONS (ONLY FOR GUEST USERS - LOGGED IN USERS USE TOP TOGGLE NAVBAR) */}
+        {!isLoggedIn && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-3 px-4 w-full">
+            <Link
+              href="/auth?mode=register"
+              className="btn-3d-rose-pop w-full sm:w-auto px-6 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-3 whitespace-nowrap"
+            >
+              <span>PROTECT YOURSELF NOW</span>
+              <ArrowRight size={16} className="shrink-0" />
+            </Link>
 
-              <Link
-                href="/profile"
-                className="btn-3d-white-pop w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-2 whitespace-nowrap"
-              >
-                <Shield size={16} className="text-[#FF5C8A] shrink-0" />
-                <span>MY PROFILE</span>
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/auth?mode=register"
-                className="btn-3d-rose-pop w-full sm:w-auto px-6 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-3 whitespace-nowrap"
-              >
-                <span>PROTECT YOURSELF NOW</span>
-                <ArrowRight size={16} className="shrink-0" />
-              </Link>
+            <Link
+              href="/about"
+              className="btn-3d-white-pop w-full sm:w-auto px-6 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-2 whitespace-nowrap"
+            >
+              <Shield size={16} className="text-[#FF5C8A] shrink-0" />
+              <span>HOW IT WORKS</span>
+            </Link>
+          </div>
+        )}
 
-              <Link
-                href="/about"
-                className="btn-3d-white-pop w-full sm:w-auto px-6 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-2 whitespace-nowrap"
-              >
-                <Shield size={16} className="text-[#FF5C8A] shrink-0" />
-                <span>HOW IT WORKS</span>
-              </Link>
-            </>
-          )}
-        </div>
 
         {/* 3 FEATURE CARDS IN 3D FLIP ARCHITECTURE */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto pt-8 text-left">
