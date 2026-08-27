@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ShieldAlert, Radio, Navigation } from 'lucide-react';
+import { ShieldAlert, Radio, Navigation, Maximize, Minimize } from 'lucide-react';
 
 // Fix default Leaflet icon URLs for React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -130,6 +130,14 @@ export const LiveLocationMap = ({
   locationHistory = [],
 }) => {
   const [trail, setTrail] = useState([]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
+  };
 
   // Initialize trail with history on mount or when history prop updates significantly
   useEffect(() => {
@@ -170,7 +178,7 @@ export const LiveLocationMap = ({
   const currentPosition = [parseFloat(lat), parseFloat(lng)];
 
   return (
-    <div className="w-full h-full relative rounded-card overflow-hidden shadow-plum-subtle group">
+    <div className={`${isFullscreen ? 'fixed inset-0 z-[9999] bg-white' : 'w-full h-full relative rounded-card overflow-hidden shadow-plum-subtle group'}`}>
       <MapContainer
         center={currentPosition}
         zoom={16}
@@ -216,6 +224,17 @@ export const LiveLocationMap = ({
         <span className="text-[11px] font-black text-gray-800 tracking-wide uppercase">
           Live GPS Tracking
         </span>
+      </div>
+
+      {/* Fullscreen Toggle Button */}
+      <div className="absolute top-3 right-3 z-[400]">
+        <button
+          onClick={toggleFullscreen}
+          className="bg-white/95 hover:bg-white text-gray-700 p-2 rounded-md shadow-md border border-gray-200 transition-all flex items-center justify-center focus:outline-none"
+          title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+        >
+          {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+        </button>
       </div>
     </div>
   );
