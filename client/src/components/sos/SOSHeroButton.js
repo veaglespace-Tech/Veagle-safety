@@ -124,6 +124,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
       }
     }
 
+    try {
       // 2. Dispatch SOS to backend
       const res = await dispatch(
         startEmergencySos({
