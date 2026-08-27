@@ -14,6 +14,7 @@ import {
   VolumeX,
   AlertTriangle,
   User,
+  Navigation,
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { startEmergencySiren, stopEmergencySiren } from '../../../utils/sirenAudio.js';
