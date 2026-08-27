@@ -24,12 +24,19 @@ export const dynamic = 'force-dynamic';
 export default function LivePublicTrackingPage() {
   const { token } = useParams();
   const [session, setSession] = useState(null);
+  const sessionIdRef = React.useRef(null);
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSirenPlaying, setIsSirenPlaying] = useState(false);
 
   const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    if (session) {
+      sessionIdRef.current = session.id;
+    }
+  }, [session]);
 
   useEffect(() => {
     loadPublicSos();
@@ -63,18 +70,15 @@ export default function LivePublicTrackingPage() {
 
     // Also listen for SOS_LOCATION_UPDATE (emitted to parent/guardian rooms)
     socket.on('SOS_LOCATION_UPDATE', (data) => {
-      setSession((prev) => {
-        // Only accept updates for this session's sosSessionId
-        if (prev && data.sosSessionId && String(prev.id) === String(data.sosSessionId)) {
-          setLocation({
-            latitude: data.latitude,
-            longitude: data.longitude,
-            accuracy: data.accuracy,
-            recordedAt: data.timestamp,
-          });
-        }
-        return prev;
-      });
+      // Only accept updates for this session's sosSessionId
+      if (sessionIdRef.current && data.sosSessionId && String(sessionIdRef.current) === String(data.sosSessionId)) {
+        setLocation({
+          latitude: data.latitude,
+          longitude: data.longitude,
+          accuracy: data.accuracy,
+          recordedAt: data.timestamp,
+        });
+      }
     });
 
     socket.on('SOS_ALARM_STOP', (data) => {
