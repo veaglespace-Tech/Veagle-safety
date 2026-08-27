@@ -35,12 +35,17 @@ export default function LivePublicTrackingPage() {
     loadPublicSos();
     const socket = io(SERVER_URL);
 
-    socket.on('connect', () => {
+    const onConnect = () => {
       setIsConnected(true);
       if (token) {
         socket.emit('join-track', { token });
       }
-    });
+    };
+
+    if (socket.connected) {
+      onConnect();
+    }
+    socket.on('connect', onConnect);
 
     socket.on('disconnect', () => {
       setIsConnected(false);
@@ -60,7 +65,7 @@ export default function LivePublicTrackingPage() {
     socket.on('SOS_LOCATION_UPDATE', (data) => {
       setSession((prev) => {
         // Only accept updates for this session's sosSessionId
-        if (prev && data.sosSessionId && prev.id === data.sosSessionId) {
+        if (prev && data.sosSessionId && String(prev.id) === String(data.sosSessionId)) {
           setLocation({
             latitude: data.latitude,
             longitude: data.longitude,
