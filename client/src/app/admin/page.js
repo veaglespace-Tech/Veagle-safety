@@ -5,6 +5,7 @@ import { AppLayout } from '../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../components/admin/AdminHeaderNav.js';
 import { LiveLocationMap } from '../../components/location/DynamicLiveLocationMap.js';
 import { api } from '../../utils/api.js';
+import { sosApi } from '../../redux/api/sosApi.js';
 import {
   AlertOctagon,
   Users,
@@ -30,6 +31,44 @@ export default function SuperAdminOverviewPage() {
 
   // LIVE GPS TRACKING MODAL STATE
   const [trackingSos, setTrackingSos] = useState(null);
+
+  // Reliable Polling Fallback & History Fetcher for Live GPS Tracking
+  useEffect(() => {
+    if (!trackingSos?.id) return;
+    
+    const fetchLocationData = async () => {
+      try {
+        const data = await sosApi.getSosLocation(trackingSos.id);
+        if (data && data.location) {
+          const lat = parseFloat(data.location.latitude);
+          const lng = parseFloat(data.location.longitude);
+          
+          if (!isNaN(lat) && !isNaN(lng)) {
+            setTrackingSos(prev => {
+              if (prev && prev.id === trackingSos.id) {
+                return {
+                  ...prev,
+                  latitude: lat,
+                  longitude: lng,
+                  locations: [{ latitude: lat, longitude: lng }],
+                  locationHistory: data.history || []
+                };
+              }
+              return prev;
+            });
+          }
+        }
+      } catch (e) {
+        console.log('[Admin Polling] Failed to fetch location:', e.message);
+      }
+    };
+
+    // Fetch immediately to load history trail, then poll every 3 seconds
+    fetchLocationData();
+    const interval = setInterval(fetchLocationData, 3000);
+
+    return () => clearInterval(interval);
+  }, [trackingSos?.id]);
 
   const showToast = (type, text) => {
     setToast({ type, text });
@@ -62,6 +101,11 @@ export default function SuperAdminOverviewPage() {
           reconnectionAttempts: 5,
         });
 
+        // Register as admin to join admin-ops room for real-time SOS updates
+        socket.on('connect', () => {
+          socket.emit('register-user', { role: 'SUPER_ADMIN' });
+        });
+
         socket.on('SOS_ALARM_BROADCAST', (data) => {
           showToast(
             'error',
@@ -74,6 +118,42 @@ export default function SuperAdminOverviewPage() {
           showToast('success', 'Emergency SOS incident resolved');
           fetchOverviewData();
           setTrackingSos(null);
+        });
+
+        socket.on('SOS_LOCATION_UPDATE', (data) => {
+          const incomingId = parseInt(data.sosSessionId, 10);
+          console.log('[Admin] SOS_LOCATION_UPDATE received:', incomingId, data.latitude, data.longitude);
+
+          setTrackingSos((prev) => {
+            if (prev && parseInt(prev.id, 10) === incomingId) {
+              console.log('[Admin] Updating tracking modal marker position');
+              return {
+                ...prev,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                locations: [{ latitude: data.latitude, longitude: data.longitude }],
+              };
+            }
+            return prev;
+          });
+
+          setOverview((prev) => {
+            if (!prev || !prev.activeSos) return prev;
+            return {
+              ...prev,
+              activeSos: prev.activeSos.map((sos) => {
+                if (parseInt(sos.id, 10) === incomingId) {
+                  return {
+                    ...sos,
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    locations: [{ latitude: data.latitude, longitude: data.longitude }],
+                  };
+                }
+                return sos;
+              }),
+            };
+          });
         });
       } catch (e) {}
     };
@@ -197,8 +277,8 @@ export default function SuperAdminOverviewPage() {
               <div className="space-y-4">
                 {activeSosList.map((sos) => {
                   const latestLoc = sos.locations?.[0];
-                  const lat = latestLoc?.latitude || sos.latitude || 18.5204;
-                  const lng = latestLoc?.longitude || sos.longitude || 73.8567;
+                  const lat = latestLoc?.latitude;
+                  const lng = latestLoc?.longitude;
 
                   return (
                     <div
@@ -224,7 +304,7 @@ export default function SuperAdminOverviewPage() {
                         <p className="text-xs font-bold text-rose-700 flex items-center space-x-1 pt-1">
                           <MapPin className="w-3.5 h-3.5 text-rose-600" />
                           <span>
-                            GPS: {lat}, {lng}
+                            GPS: {lat ? `${lat}, ${lng}` : 'Awaiting GPS...'}
                           </span>
                         </p>
                       </div>
@@ -362,9 +442,10 @@ export default function SuperAdminOverviewPage() {
               {/* INTERACTIVE LEAFLET GPS MAP CONTAINER */}
               <div className="rounded-3xl border-2 border-[#FFCCE1] overflow-hidden h-72 shadow-md relative">
                 <LiveLocationMap
-                  lat={trackingSos.locations?.[0]?.latitude || trackingSos.latitude || 18.5204}
-                  lng={trackingSos.locations?.[0]?.longitude || trackingSos.longitude || 73.8567}
+                  lat={trackingSos.locations?.[0]?.latitude}
+                  lng={trackingSos.locations?.[0]?.longitude}
                   isEmergency={true}
+                  locationHistory={trackingSos.locationHistory}
                 />
               </div>
 
@@ -373,8 +454,8 @@ export default function SuperAdminOverviewPage() {
                 <div className="flex items-center space-x-2 text-xs font-bold text-[#684E67]">
                   <MapPin className="w-4 h-4 text-[#FF2A6D]" />
                   <span>
-                    GPS: {trackingSos.locations?.[0]?.latitude || trackingSos.latitude || 18.5204},{' '}
-                    {trackingSos.locations?.[0]?.longitude || trackingSos.longitude || 73.8567}
+                    GPS: {trackingSos.locations?.[0]?.latitude || '—'},{' '}
+                    {trackingSos.locations?.[0]?.longitude || '—'}
                   </span>
                 </div>
 

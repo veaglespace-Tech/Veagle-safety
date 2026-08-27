@@ -14,7 +14,7 @@ export const useSOSStore = () => {
     ...sosState,
     fetchActiveSos: () => dispatch(checkActiveSos()),
     triggerSos: (isSilent, lat, lng) =>
-      dispatch(startEmergencySos({ isSilent, latitude: lat, longitude: lng })),
+      dispatch(startEmergencySos({ isSilent, initialLat: lat, initialLng: lng })),
     resolveSos: (sessionId) => dispatch(resolveEmergencySos(sessionId)),
     toggleAlarm: () => dispatch(toggleAlarm()),
   };

@@ -60,8 +60,8 @@ const SECONDARY_LINES = [
 export default function EmergencyHelpServicesPage() {
   return (
     <AppLayout>
-      <div className="max-w-xl mx-auto px-4 pt-5 pb-4 space-y-5 lg:max-w-2xl">
-        <div className="animate-fade-up">
+      <div className="max-w-xl mx-auto px-4 pt-5 pb-4 space-y-5 lg:max-w-4xl xl:max-w-5xl">
+        <div className="flex items-center justify-between animate-fade-up">
           <h1 className="text-xl font-extrabold text-tichi-text tracking-tight">
             Emergency Contacts
           </h1>

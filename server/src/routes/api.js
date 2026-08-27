@@ -60,6 +60,7 @@ router.post('/sos/start', authenticateToken, sosController.startSos);
 router.post('/sos/location', authenticateToken, sosController.updateSosLocation);
 router.post('/sos/resolve', authenticateToken, sosController.resolveSos);
 router.get('/sos/active', authenticateToken, sosController.getActiveSosSession);
+router.get('/sos/active/:id/location', authenticateToken, sosController.getSosLocation);
 router.get('/sos/public-track/:token', sosController.getPublicSosTracking);
 
 // Journey
@@ -160,6 +161,6 @@ router.put('/coupons/:id', authenticateToken, requireSuperAdmin, couponControlle
 router.delete('/coupons/:id', authenticateToken, requireSuperAdmin, couponController.deleteCoupon);
 router.get('/coupons/assignable-users', authenticateToken, requireSuperAdmin, couponController.getAssignableUsers);
 router.get('/coupons/my-coupons', authenticateToken, couponController.getMyCoupons);
-router.post('/coupons/validate', authenticateToken, couponController.validateCoupon);
+router.post('/coupons/validate', optionalAuthToken, couponController.validateCoupon);
 
 export default router;

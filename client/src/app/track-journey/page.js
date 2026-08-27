@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 export default function UserTrackJourneyPage() {
-  const { latitude = 18.5204, longitude = 73.8567 } = useSelector((state) => state?.location || {});
+  const { latitude, longitude } = useSelector((state) => state?.location || {});
   const [activeTab, setActiveTab] = useState('JOURNEY');
   const [destination, setDestination] = useState('');
   const [minutes, setMinutes] = useState('30');
@@ -28,6 +28,14 @@ export default function UserTrackJourneyPage() {
   const [isCustomCheckin, setIsCustomCheckin] = useState(false);
   const [checkin, setCheckin] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Autocomplete State
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [destLat, setDestLat] = useState(null);
+  const [destLng, setDestLng] = useState(null);
+  const searchTimeoutRef = React.useRef(null);
 
   useEffect(() => {
     loadActiveJourney();
@@ -52,20 +60,69 @@ export default function UserTrackJourneyPage() {
     }
   };
 
+  const searchLocations = async (query) => {
+    if (!query || query.length < 3) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+    
+    setIsSearching(true);
+    setShowDropdown(true);
+
+    try {
+      // Free OpenStreetMap Nominatim API for location search
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&countrycodes=in`);
+      const data = await res.json();
+      setSearchResults(data);
+    } catch (err) {
+      console.error('Location search failed:', err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleDestinationChange = (e) => {
+    const val = e.target.value;
+    setDestination(val);
+    
+    // Clear previous selected coordinates if they start typing again
+    setDestLat(null);
+    setDestLng(null);
+
+    // Debounce the search API call
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
+      searchLocations(val);
+    }, 500);
+  };
+
+  const handleSelectLocation = (loc) => {
+    setDestination(loc.display_name);
+    setDestLat(parseFloat(loc.lat));
+    setDestLng(parseFloat(loc.lon));
+    setShowDropdown(false);
+  };
+
   const handleStartJourney = async (e) => {
     e.preventDefault();
     if (!destination || !minutes || Number(minutes) <= 0) {
       alert('Please enter a valid destination and travel duration in minutes.');
       return;
     }
+    if (!destLat || !destLng) {
+      alert('Please select a specific location from the dropdown suggestions.');
+      return;
+    }
+    
     setLoading(true);
     try {
       const res = await api.post('/journey/start', {
         destinationName: destination,
-        originLat: latitude || 18.5204,
-        originLng: longitude || 73.8567,
-        destLat: 18.5355,
-        destLng: 73.891,
+        originLat: latitude,
+        originLng: longitude,
+        destLat: destLat,
+        destLng: destLng,
         minutesToArrive: minutes,
       });
       setJourney(res.data.journey);
@@ -114,12 +171,12 @@ export default function UserTrackJourneyPage() {
 
   return (
     <AppLayout>
-      <div className="bg-[#FFF0F3] text-tichi-text font-sans relative overflow-hidden">
-        {/* BACKGROUND AMBIENT GLOW MESHES */}
-        <div className="absolute w-[700px] h-[700px] rounded-full bg-rose/15 blur-[150px] top-[-100px] left-[-200px] pointer-events-none" />
-        <div className="absolute w-[700px] h-[700px] rounded-full bg-gold/15 blur-[150px] bottom-[100px] right-[-200px] pointer-events-none" />
+      <div className="min-h-screen relative overflow-hidden">
+        {/* BACKGROUND BLOBS */}
+        <div className="fixed -top-[20%] -left-[10%] w-[50%] h-[50%] bg-[#FF5C8A]/20 blur-[120px] rounded-full pointer-events-none" />
+        <div className="fixed top-[40%] -right-[10%] w-[40%] h-[40%] bg-[#9B6B9E]/15 blur-[100px] rounded-full pointer-events-none" />
 
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4 space-y-6 relative z-10 animate-fade-up">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4 space-y-6 relative z-10 animate-fade-up lg:max-w-4xl xl:max-w-5xl">
           {/* PAGE TITLE HEADER */}
           <div className="text-center space-y-2">
             <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-[#FFF0F3] via-white to-[#FFF0F3] text-[#FF2A6D] border-2 border-[#FFCCE1] flex items-center justify-center mx-auto shadow-[0_8px_25px_rgba(255,92,138,0.2)]">
@@ -235,16 +292,43 @@ export default function UserTrackJourneyPage() {
                       <label className="block text-xs font-black uppercase tracking-wider text-[#2A0826] mb-2">
                         Where are you heading?
                       </label>
-                      <div className="relative">
-                        <MapPin className="w-5 h-5 text-[#FF2A6D] absolute left-3.5 top-3" />
+                      <div className="relative z-50">
+                        <MapPin className={`w-5 h-5 absolute left-3.5 top-3.5 transition-colors ${destLat ? 'text-emerald-500' : 'text-[#FF2A6D]'}`} />
                         <input
                           type="text"
-                          placeholder="e.g. Home, Office, Metro Station"
+                          placeholder="e.g. Shivaji Nagar, Pune"
                           value={destination}
-                          onChange={(e) => setDestination(e.target.value)}
+                          onChange={handleDestinationChange}
+                          onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
+                          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                           required
-                          className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-[#FFCCE1] text-xs font-bold focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF2A6D]/15 focus:outline-none bg-white transition-all text-[#2A0826] shadow-xs"
+                          className={`w-full pl-11 pr-10 py-3 rounded-2xl border-2 text-xs font-bold focus:ring-4 focus:outline-none bg-white transition-all shadow-xs ${
+                            destLat ? 'border-emerald-400 focus:border-emerald-500 focus:ring-emerald-500/15 text-emerald-900' : 'border-[#FFCCE1] focus:border-[#FF2A6D] focus:ring-[#FF2A6D]/15 text-[#2A0826]'
+                          }`}
                         />
+                        {isSearching && (
+                          <div className="absolute right-4 top-3.5 w-4 h-4 rounded-full border-2 border-[#FF2A6D] border-t-transparent animate-spin"></div>
+                        )}
+                        {destLat && !isSearching && (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-500 absolute right-4 top-3.5 animate-scale-up" />
+                        )}
+
+                        {/* DROPDOWN MENU */}
+                        {showDropdown && searchResults.length > 0 && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-[#FFCCE1] rounded-2xl shadow-xl overflow-hidden animate-fade-up">
+                            {searchResults.map((loc, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => handleSelectLocation(loc)}
+                                className="w-full text-left px-4 py-3 text-xs font-bold text-[#684E67] hover:bg-[#FFF0F3] hover:text-[#FF2A6D] border-b border-[#FFCCE1]/40 last:border-0 transition-colors flex flex-col cursor-pointer"
+                              >
+                                <span className="text-[#2A0826] text-sm truncate">{loc.name}</span>
+                                <span className="truncate opacity-70 mt-0.5">{loc.display_name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
 

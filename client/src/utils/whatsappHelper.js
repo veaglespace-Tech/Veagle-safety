@@ -25,8 +25,8 @@ export const openWhatsAppSosEmergency = ({
     } catch (e) {}
   }
 
-  const lat = latitude || 18.5204;
-  const lng = longitude || 73.8567;
+  const lat = latitude;
+  const lng = longitude;
   const mapLink = `https://www.google.com/maps?q=${lat},${lng}`;
   const trackingLink = publicShareToken
     ? `${window.location.origin}/live-track/${publicShareToken}`

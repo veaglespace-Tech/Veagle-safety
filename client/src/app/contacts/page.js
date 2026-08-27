@@ -124,7 +124,7 @@ export default function UserTrustedContactsPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-xl mx-auto px-4 pt-6 pb-4 space-y-6 lg:max-w-2xl">
+      <div className="max-w-xl mx-auto px-4 pt-6 pb-4 space-y-6 lg:max-w-4xl xl:max-w-5xl">
         <div className="flex items-end justify-between animate-fade-up">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
