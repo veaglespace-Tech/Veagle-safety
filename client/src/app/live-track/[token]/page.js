@@ -219,6 +219,7 @@ export default function LivePublicTrackingPage() {
               accuracy={location?.accuracy || 15}
               userName={`${victimName} (EMERGENCY)`}
               isEmergency={isEmergency}
+              locationHistory={session?.locations || []}
             />
             {isEmergency && (
               <div className="absolute top-4 left-4 right-4 z-[999] pointer-events-none flex justify-center">

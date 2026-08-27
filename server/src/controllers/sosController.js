@@ -610,7 +610,7 @@ export const getPublicSosTracking = async (req, res) => {
       where: { shareToken: token },
       include: {
         user: { select: { fullName: true, phone: true, profilePhoto: true, bloodGroup: true } },
-        locations: { orderBy: { recordedAt: 'desc' }, take: 20 },
+        locations: { orderBy: { recordedAt: 'desc' }, take: 200 },
       },
     });
 
@@ -623,7 +623,7 @@ export const getPublicSosTracking = async (req, res) => {
       where: { shareToken: token },
       include: {
         user: { select: { fullName: true, phone: true, profilePhoto: true, bloodGroup: true } },
-        locations: { orderBy: { recordedAt: 'desc' }, take: 20 },
+        locations: { orderBy: { recordedAt: 'desc' }, take: 200 },
       },
     });
 
