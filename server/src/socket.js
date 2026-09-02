@@ -9,6 +9,7 @@ let ioInstance = null;
  */
 export function initSocketIO(httpServer) {
   ioInstance = new SocketIOServer(httpServer, {
+    path: '/api/socket.io',
     cors: {
       origin: '*',
       methods: ['GET', 'POST'],

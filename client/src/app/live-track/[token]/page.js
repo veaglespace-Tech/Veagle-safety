@@ -34,6 +34,7 @@ export default function LivePublicTrackingPage() {
   useEffect(() => {
     loadPublicSos();
     const socket = io(SERVER_URL, {
+      path: '/api/socket.io',
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 10,
       timeout: 20000,

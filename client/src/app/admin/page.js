@@ -97,6 +97,7 @@ export default function SuperAdminOverviewPage() {
         const { io } = await import('socket.io-client');
         const { SERVER_URL } = await import('../../utils/api.js');
         socket = io(SERVER_URL, {
+          path: '/api/socket.io',
           transports: ['websocket', 'polling'],
           reconnectionAttempts: 5,
         });
