@@ -539,6 +539,19 @@ export const getActiveSosSession = async (req, res) => {
       include: { locations: { orderBy: { recordedAt: 'desc' }, take: 1 } },
     });
 
+    if (session) {
+      const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
+      session.trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
+      
+      const latitude = session.locations?.[0]?.latitude || 18.5204;
+      const longitude = session.locations?.[0]?.longitude || 73.8567;
+      const currentUser = await prisma.user.findUnique({ where: { id: userId } });
+      
+      const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      const baseMessageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${currentUser?.fullName || 'Sakhi Member'}\nPhone: ${currentUser?.phone || ''}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Map:\n${session.trackingUrl}\n\n🌐 Google Maps:\n${googleMapsUrl}`;
+      session.whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(baseMessageText)}`;
+    }
+
     return res.json({ session });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to fetch active SOS session' });
