@@ -33,12 +33,21 @@ export default function LivePublicTrackingPage() {
 
   useEffect(() => {
     loadPublicSos();
-    const socket = io(SERVER_URL, {
-      path: '/api/socket.io',
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: 10,
-      timeout: 20000,
-    });
+    
+    let socket = null;
+    let isMounted = true;
+
+    const connectSocket = async () => {
+      try {
+        const { io } = await import('socket.io-client');
+        const { SERVER_URL } = await import('../../../utils/api.js');
+        
+        socket = io(SERVER_URL, {
+          path: '/api/socket.io',
+          transports: ['websocket', 'polling'],
+          reconnectionAttempts: 10,
+          timeout: 20000,
+        });
 
     socket.on('connect', () => {
       setIsConnected(true);
@@ -88,9 +97,19 @@ export default function LivePublicTrackingPage() {
       });
     });
 
+      } catch (err) {
+        console.error('Socket connect error:', err);
+      }
+    };
+
+    connectSocket();
+
     return () => {
-      if (token) socket.emit('leave-track', { token });
-      socket.disconnect();
+      isMounted = false;
+      if (socket) {
+        if (token) socket.emit('leave-track', { token });
+        socket.disconnect();
+      }
       stopEmergencySiren();
     };
   }, [token]);
