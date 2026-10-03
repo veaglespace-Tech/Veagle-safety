@@ -125,25 +125,29 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
     }
 
     try {
-      // 2. Dispatch SOS to backend FIRST (so we get the shareToken)
+      // 2. Generate a tracking token on the client to avoid async popup blocking
+      const shareToken = crypto.randomUUID();
+
+      // 3. Open WhatsApp synchronously during the click event!
+      openWhatsAppSosEmergency({
+        latitude: realLat,
+        longitude: realLng,
+        publicShareToken: shareToken,
+      });
+
+      // 4. Dispatch SOS to backend (pass the token so backend uses it)
       const res = await dispatch(
         startEmergencySos({
           isSilent,
           initialLat: realLat,
           initialLng: realLng,
           accuracy: realAcc,
+          shareToken,
           emergencyMessage: isSilent
             ? 'Discreet Emergency SOS Triggered'
             : 'EMERGENCY SOS! I NEED HELP IMMEDIATELY!',
         })
       ).unwrap();
-
-      // 3. Open WhatsApp with the generated token
-      openWhatsAppSosEmergency({
-        latitude: realLat,
-        longitude: realLng,
-        publicShareToken: res?.shareToken,
-      });
 
       if (onTriggerComplete) onTriggerComplete();
       router.push('/active-sos');

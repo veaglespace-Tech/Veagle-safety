@@ -26,20 +26,23 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
       )
     ) {
       try {
+        const shareToken = crypto.randomUUID();
+        
+        openWhatsAppSosEmergency({
+          latitude,
+          longitude,
+          publicShareToken: shareToken,
+        });
+
         const res = await dispatch(
           startEmergencySos({
             isSilent: false,
             initialLat: latitude,
             initialLng: longitude,
+            shareToken,
             emergencyMessage: 'SUPERADMIN EMERGENCY SOS BROADCAST! URGENT ASSISTANCE REQUIRED!',
           })
         ).unwrap();
-
-        openWhatsAppSosEmergency({
-          latitude,
-          longitude,
-          publicShareToken: res?.shareToken,
-        });
 
         router.push('/active-sos');
       } catch (err) {

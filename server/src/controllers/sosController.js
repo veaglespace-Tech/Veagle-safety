@@ -7,7 +7,7 @@ import { collectEmergencyRecipients } from '../utils/recipientHelper.js';
 
 export const startSos = async (req, res) => {
   try {
-    const { isSilent, initialLat, initialLng } = req.body;
+    const { isSilent, initialLat, initialLng, shareToken } = req.body;
     const userId = req.user?.id;
 
     const currentUser = await prisma.user.findUnique({
@@ -33,7 +33,15 @@ export const startSos = async (req, res) => {
         data: {
           userId,
           isSilent: !!isSilent,
+          ...(shareToken && { shareToken }), // Use frontend-generated token if provided
         },
+      });
+    } else if (shareToken) {
+      // If session exists but frontend generated a new token (race condition), update it
+      // so the WhatsApp link they already opened remains valid!
+      session = await prisma.sosSession.update({
+        where: { id: session.id },
+        data: { shareToken },
       });
     }
 
