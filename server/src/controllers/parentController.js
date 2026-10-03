@@ -102,7 +102,7 @@ export const getParentOverview = asyncHandler(async (req, res) => {
             include: {
               locations: {
                 orderBy: { recordedAt: 'desc' },
-                take: 1,
+                take: 500,
               },
             },
             take: 1,
@@ -151,6 +151,7 @@ export const getParentOverview = asyncHandler(async (req, res) => {
               startedAt: activeSos.startedAt,
               shareToken: activeSos.shareToken,
               latestLocation,
+              locations: activeSos.locations || [],
             }
           : null,
         activeJourney,

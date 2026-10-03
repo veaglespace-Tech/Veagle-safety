@@ -446,7 +446,7 @@ export default function SuperAdminOverviewPage() {
                   lat={trackingSos.locations?.[0]?.latitude}
                   lng={trackingSos.locations?.[0]?.longitude}
                   isEmergency={true}
-                  locationHistory={trackingSos.locationHistory}
+                  locationHistory={trackingSos?.locations ? [...trackingSos.locations].reverse() : []}
                 />
               </div>
 

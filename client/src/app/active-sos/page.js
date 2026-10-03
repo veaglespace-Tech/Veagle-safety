@@ -192,6 +192,7 @@ export default function ActiveSOSLivePage() {
               accuracy={accuracy || 12}
               userName={`${firstName} (EMERGENCY)`}
               isEmergency={true}
+              locationHistory={activeSession?.locations ? [...activeSession.locations].reverse() : []}
             />
           </div>
         </div>

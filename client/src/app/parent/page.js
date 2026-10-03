@@ -751,7 +751,7 @@ export default function ParentDashboard() {
                 accuracy={trackingChild.activeSos?.latestLocation?.accuracy || 15}
                 userName={`${trackingChild.child?.fullName || 'Child'} (EMERGENCY)`}
                 isEmergency={true}
-                locationHistory={trackingChild.activeSos?.locationHistory}
+                locationHistory={trackingChild.activeSos?.locations ? [...trackingChild.activeSos.locations].reverse() : []}
               />
             </div>
 

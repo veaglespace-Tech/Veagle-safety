@@ -554,7 +554,7 @@ export const getActiveSosSession = async (req, res) => {
     const userId = req.user?.id;
     const session = await prisma.sosSession.findFirst({
       where: { userId, status: 'ACTIVE' },
-      include: { locations: { orderBy: { recordedAt: 'desc' }, take: 1 } },
+      include: { locations: { orderBy: { recordedAt: 'desc' }, take: 500 } },
     });
 
     if (session) {
@@ -611,7 +611,7 @@ export const getPublicSosTracking = async (req, res) => {
       where: { shareToken: token },
       include: {
         user: { select: { fullName: true, phone: true, profilePhoto: true, bloodGroup: true } },
-        locations: { orderBy: { recordedAt: 'desc' }, take: 20 },
+        locations: { orderBy: { recordedAt: 'desc' }, take: 500 },
       },
     });
 
@@ -624,7 +624,7 @@ export const getPublicSosTracking = async (req, res) => {
       where: { shareToken: token },
       include: {
         user: { select: { fullName: true, phone: true, profilePhoto: true, bloodGroup: true } },
-        locations: { orderBy: { recordedAt: 'desc' }, take: 20 },
+        locations: { orderBy: { recordedAt: 'desc' }, take: 500 },
       },
     });
 

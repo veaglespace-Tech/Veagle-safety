@@ -12,7 +12,7 @@ export const getAdminOverview = asyncHandler(async (req, res) => {
     where: { status: 'ACTIVE' },
     include: {
       user: { select: { id: true, fullName: true, email: true, phone: true, profilePhoto: true } },
-      locations: { orderBy: { recordedAt: 'desc' }, take: 1 },
+      locations: { orderBy: { recordedAt: 'desc' }, take: 500 },
       alerts: true,
     },
     orderBy: { startedAt: 'desc' },
