@@ -125,13 +125,7 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
     }
 
     try {
-      // 2. Open WhatsApp immediately
-      openWhatsAppSosEmergency({
-        latitude: realLat,
-        longitude: realLng,
-      });
-
-      // 3. Dispatch SOS to backend (use initialLat/initialLng to match server-side field names)
+      // 2. Dispatch SOS to backend FIRST (so we get the shareToken)
       const res = await dispatch(
         startEmergencySos({
           isSilent,
@@ -143,6 +137,13 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
             : 'EMERGENCY SOS! I NEED HELP IMMEDIATELY!',
         })
       ).unwrap();
+
+      // 3. Open WhatsApp with the generated token
+      openWhatsAppSosEmergency({
+        latitude: realLat,
+        longitude: realLng,
+        publicShareToken: res?.shareToken,
+      });
 
       if (onTriggerComplete) onTriggerComplete();
       router.push('/active-sos');

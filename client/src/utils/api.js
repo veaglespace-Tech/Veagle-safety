@@ -3,8 +3,15 @@ import axios from 'axios';
 const envServerUrl = typeof process !== 'undefined' ? (process.env?.NEXT_PUBLIC_SERVER_URL || process.env?.NEXT_PUBLIC_API_URL?.replace(/\/api$/, '')) : null;
 const envApiUrl = typeof process !== 'undefined' ? process.env?.NEXT_PUBLIC_API_URL : null;
 
-// Dynamically use current domain if in browser, else fallback to env or localhost
-export const SERVER_URL = typeof window !== 'undefined' ? (envServerUrl || window.location.origin) : (envServerUrl || 'http://localhost:5000');
+// Strong safeguard: If env variable accidentally contains localhost but we are running on a live domain, override it.
+let safeServerUrl = envServerUrl;
+if (typeof window !== 'undefined') {
+  if (!safeServerUrl || safeServerUrl.includes('localhost') || safeServerUrl.includes('127.0.0.1')) {
+    safeServerUrl = window.location.origin;
+  }
+}
+
+export const SERVER_URL = safeServerUrl || 'http://localhost:5000';
 export const API_URL = typeof window !== 'undefined' ? (envApiUrl || `${window.location.origin}/api`) : (envApiUrl || `${SERVER_URL}/api`);
 
 export const api = axios.create({

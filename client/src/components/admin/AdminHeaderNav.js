@@ -38,7 +38,7 @@ export const AdminHeaderNav = ({ metrics, onRefresh, toast }) => {
         openWhatsAppSosEmergency({
           latitude,
           longitude,
-          publicShareToken: res?.publicShareToken,
+          publicShareToken: res?.shareToken,
         });
 
         router.push('/active-sos');
