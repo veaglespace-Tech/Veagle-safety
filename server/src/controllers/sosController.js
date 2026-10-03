@@ -84,6 +84,16 @@ export const startSos = async (req, res) => {
       if (org.organization?.email) recipientEmails.push(org.organization.email.trim().toLowerCase());
     });
 
+    // Add all Super Admins to the dispatch list so they are notified
+    const superAdmins = await prisma.user.findMany({
+      where: { role: 'SUPER_ADMIN' },
+      select: { email: true }
+    }).catch(() => []);
+    
+    superAdmins.forEach((admin) => {
+      if (admin.email) recipientEmails.push(admin.email.trim().toLowerCase());
+    });
+
     // 2. Dispatch High-Priority Emergency Emails concurrently
     await Promise.all(
       Array.from(new Set(recipientEmails)).map(async (email) => {
