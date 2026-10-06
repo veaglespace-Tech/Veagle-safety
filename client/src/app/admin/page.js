@@ -256,7 +256,11 @@ export default function SuperAdminOverviewPage() {
               <p className="text-3xl font-black text-[#2A0826]">
                 ₹{overview?.metrics?.totalRevenue?.toFixed(2) || '0.00'}
               </p>
-              <p className="text-[11px] font-bold text-amber-600">Incl. 18% Global GST</p>
+              <p className="text-[11px] font-bold text-amber-600">
+                {overview?.metrics?.currentGstPercentage !== undefined && overview?.metrics?.currentGstPercentage !== null
+                  ? `Incl. ${overview.metrics.currentGstPercentage}% Global GST`
+                  : 'Incl. Global GST'}
+              </p>
             </div>
           </div>
 

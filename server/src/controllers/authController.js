@@ -28,6 +28,7 @@ export const register = asyncHandler(async (req, res) => {
     emergencyContactPhone,
     parentEmail,
     medicalNotes,
+    partnerReferralCode,
   } = req.body;
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -129,6 +130,16 @@ export const register = asyncHandler(async (req, res) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+  let referredByPartnerId = null;
+  if (partnerReferralCode) {
+    const partner = await prisma.referralPartner.findUnique({
+      where: { partnerReferralCode }
+    });
+    if (partner && partner.isActive) {
+      referredByPartnerId = partner.id;
+    }
+  }
+
   let user;
   try {
     user = await prisma.user.create({
@@ -153,6 +164,7 @@ export const register = asyncHandler(async (req, res) => {
         emailOtp: assignedRole === 'USER' ? otp : null,
         emailOtpExpiresAt: assignedRole === 'USER' ? otpExpires : null,
         subscriptionStatus: assignedRole === 'SUPER_ADMIN' ? 'ACTIVE' : 'INACTIVE',
+        referredByPartnerId,
       },
     });
   } catch (dbErr) {

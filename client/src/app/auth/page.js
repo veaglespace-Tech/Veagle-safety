@@ -225,6 +225,7 @@ function UserAuthForm() {
             selectedRole === 'USER' ? emergencyContactPhone.replace(/\D/g, '') : '9999999999',
           parentEmail: selectedRole === 'USER' ? parentEmail.trim() : '',
           password,
+          partnerReferralCode: searchParams?.get('ref') || '',
         })
       );
     }

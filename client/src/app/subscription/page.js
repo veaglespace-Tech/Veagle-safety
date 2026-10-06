@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUser } from '../../redux/slices/authSlice.js';
+import { fetchPlans } from '../../redux/slices/planSlice.js';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import Link from 'next/link';
 import {
@@ -22,11 +23,13 @@ import {
 export default function SubscriptionPage() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state?.auth || {});
+  const { plans = [] } = useSelector((state) => state?.plan || {});
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     dispatch(fetchUser());
+    dispatch(fetchPlans());
   }, [dispatch]);
 
   const isActive = mounted && user?.subscriptionStatus === 'ACTIVE';
@@ -49,6 +52,18 @@ export default function SubscriptionPage() {
           year: 'numeric',
         })
       : '01 Aug 2027';
+
+  const activePlan = plans[0] || {};
+  const basePrice = activePlan.basePrice !== undefined ? Number(activePlan.basePrice) : 24.0;
+  const gstRate =
+    activePlan.gstPercentage !== undefined && activePlan.gstPercentage !== null && !isNaN(Number(activePlan.gstPercentage))
+      ? Number(activePlan.gstPercentage)
+      : 18.0;
+  const totalAmount =
+    activePlan.totalPrice !== undefined && activePlan.totalPrice !== null && !isNaN(Number(activePlan.totalPrice))
+      ? Number(activePlan.totalPrice)
+      : Number((basePrice + (basePrice * gstRate) / 100).toFixed(2));
+  const gstAmount = Number(((basePrice * gstRate) / 100).toFixed(2));
 
   return (
     <AppLayout>
@@ -115,10 +130,13 @@ export default function SubscriptionPage() {
                   Total Paid
                 </p>
                 <p className="text-3xl font-black text-[#FF2A6D] tracking-tight mt-0.5">
-                  ₹28.32 <span className="text-xs font-bold text-[#684E67]">/ year</span>
+                  ₹{totalAmount.toFixed(2)}{' '}
+                  <span className="text-xs font-bold text-[#684E67]">/ year</span>
                 </p>
                 <p className="text-[10px] font-bold text-[#684E67] mt-0.5">
-                  Includes ₹24.00 Base + 18% GST (₹4.32)
+                  {gstRate === 0
+                    ? `Includes ₹${basePrice.toFixed(2)} Base (0% GST)`
+                    : `Includes ₹${basePrice.toFixed(2)} Base + ${gstRate}% GST (₹${gstAmount.toFixed(2)})`}
                 </p>
               </div>
             </div>

@@ -22,6 +22,11 @@ describe('SOS Controller - Unit Tests', () => {
     const prismaModule = await import('../src/config/prisma.js');
     prismaMock = prismaModule.prisma;
     
+    // Add missing mocks that aren't auto-generated or present
+    prismaMock.trustedContact = { findMany: jest.fn() };
+    prismaMock.parentChildLink = { findMany: jest.fn() };
+    prismaMock.organizationMember = { findMany: jest.fn() };
+    
     const socketModule = await import('../src/socket.js');
     socketMock = socketModule;
   });
@@ -70,6 +75,10 @@ describe('SOS Controller - Unit Tests', () => {
         latitude: 18.5204,
         longitude: 73.8567,
       });
+
+      prismaMock.trustedContact.findMany.mockResolvedValue([]);
+      prismaMock.parentChildLink.findMany.mockResolvedValue([]);
+      prismaMock.organizationMember.findMany.mockResolvedValue([]);
 
       const response = await request(app)
         .post('/api/sos/start')

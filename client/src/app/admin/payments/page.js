@@ -122,7 +122,7 @@ export default function AdminPaymentsPage() {
               <p className="text-3xl font-black text-purple-600">
                 ₹{paymentSummary?.totalGstCollected?.toFixed(2) || '0.00'}
               </p>
-              <p className="text-[11px] font-bold text-purple-600">18% GST audit ledger</p>
+              <p className="text-[11px] font-bold text-purple-600">GST audit ledger</p>
             </div>
           </div>
 

@@ -85,6 +85,12 @@ export default function AdminPlansPage() {
         ...planForm,
         durationDays: parseInt(planForm.durationDays, 10) || 0,
         basePrice: parseFloat(planForm.basePrice) || 0,
+        gstPercentage:
+          planForm.gstPercentage !== undefined &&
+          planForm.gstPercentage !== null &&
+          planForm.gstPercentage !== ''
+            ? parseFloat(planForm.gstPercentage)
+            : parseFloat(gstPercentage !== undefined ? gstPercentage : 18),
         features: (planForm.features || []).filter(
           (f) => f && typeof f === 'string' && f.trim().length > 0
         ),
@@ -205,7 +211,18 @@ export default function AdminPlansPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {plans.map((p) => {
                 const base = parseFloat(p.basePrice || 0);
-                const gst = base === 0 ? 0 : parseFloat(p.gstPercentage || gstPercentage);
+                const gst =
+                  base === 0
+                    ? 0
+                    : p.gstPercentage !== undefined &&
+                      p.gstPercentage !== null &&
+                      !isNaN(parseFloat(p.gstPercentage))
+                    ? parseFloat(p.gstPercentage)
+                    : gstPercentage !== undefined &&
+                      gstPercentage !== null &&
+                      !isNaN(parseFloat(gstPercentage))
+                    ? parseFloat(gstPercentage)
+                    : 18;
                 const total = base === 0 ? 0 : parseFloat((base + (base * gst) / 100).toFixed(2));
                 const planFeats = Array.isArray(p.features) ? p.features : [];
 
@@ -235,7 +252,11 @@ export default function AdminPlansPage() {
                       <div className="text-right">
                         <p className="font-black text-2xl text-[#FF2A6D]">₹{total}</p>
                         <p className="text-[10px] font-bold text-[#684E67]">
-                          {base === 0 ? '100% FREE TRIAL' : `₹${base} + ${gst}% GST`}
+                          {base === 0
+                            ? '100% FREE TRIAL'
+                            : gst === 0
+                            ? `₹${base} (0% GST)`
+                            : `₹${base} + ${gst}% GST`}
                         </p>
                       </div>
                     </div>
@@ -301,7 +322,10 @@ export default function AdminPlansPage() {
                               name: p.name,
                               description: p.description,
                               basePrice: p.basePrice,
-                              gstPercentage: p.gstPercentage || gstPercentage,
+                              gstPercentage:
+                                p.gstPercentage !== undefined && p.gstPercentage !== null
+                                  ? p.gstPercentage
+                                  : gstPercentage,
                               durationDays: p.durationDays,
                               features: parsedFeats,
                               isActive: p.isActive,

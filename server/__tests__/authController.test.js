@@ -24,19 +24,19 @@ describe('Auth Controller - Unit Tests', () => {
 
   describe('POST /api/auth/login', () => {
     it('should return 401 if user does not exist', async () => {
-      prismaMock.user.findUnique.mockResolvedValue(null);
+      prismaMock.user.findFirst.mockResolvedValue(null);
 
       const response = await request(app)
         .post('/api/auth/login')
         .send({ email: 'nonexistent@example.com', password: 'password123' });
 
       expect(response.status).toBe(401);
-      expect(response.body.error).toBe('Invalid credentials');
+      expect(response.body.error).toBe('Invalid email/phone or password');
     });
 
     it('should return 401 if password is incorrect', async () => {
       // Mock finding a user
-      prismaMock.user.findUnique.mockResolvedValue({
+      prismaMock.user.findFirst.mockResolvedValue({
         id: 1,
         email: 'test@example.com',
         password: 'hashedpassword',
@@ -50,7 +50,7 @@ describe('Auth Controller - Unit Tests', () => {
         .send({ email: 'test@example.com', password: 'wrongpassword' });
 
       expect(response.status).toBe(401);
-      expect(response.body.error).toBe('Invalid credentials');
+      expect(response.body.error).toBe('Invalid email or password');
     });
 
     it('should return a token if login is successful', async () => {
@@ -60,10 +60,11 @@ describe('Auth Controller - Unit Tests', () => {
         password: 'hashedpassword',
         fullName: 'Test User',
         role: 'USER',
-        safetyStatus: 'SAFE'
+        safetyStatus: 'SAFE',
+        isEmailVerified: true
       };
 
-      prismaMock.user.findUnique.mockResolvedValue(mockUser);
+      prismaMock.user.findFirst.mockResolvedValue(mockUser);
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(true); // Password match
 
       const response = await request(app)

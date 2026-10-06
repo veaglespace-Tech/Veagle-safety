@@ -166,7 +166,17 @@ export default function PlatformPricingPage() {
                           : 'bg-white text-[#FF2A6D] border-[#FFCCE1]'
                       }`}
                     >
-                      {isFree ? '100% FREE' : `+ ${plan.gstPercentage || 18}% GST`}
+                      {isFree
+                        ? '100% FREE'
+                        : plan.gstPercentage === 0
+                        ? '0% GST'
+                        : `+ ${
+                            plan.gstPercentage !== undefined &&
+                            plan.gstPercentage !== null &&
+                            !isNaN(Number(plan.gstPercentage))
+                              ? plan.gstPercentage
+                              : 18
+                          }% GST`}
                     </span>
                   </div>
 

@@ -49,17 +49,19 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
     plan = await prisma.plan.findFirst({ where: { isActive: true } });
   }
 
-  const baseAmount = plan ? plan.basePrice : 24.0;
-  let gstPercentage = plan ? plan.gstPercentage : 18.0;
+  const gstSetting = await prisma.systemSetting.findUnique({ where: { key: 'GST_PERCENTAGE' } });
+  const globalGst = (gstSetting && gstSetting.value !== undefined && gstSetting.value !== null && !isNaN(parseFloat(gstSetting.value)))
+    ? parseFloat(gstSetting.value)
+    : 18.0;
 
-  if (baseAmount === 0) {
-    gstPercentage = 0;
-  } else {
-    const gstSetting = await prisma.systemSetting.findUnique({ where: { key: 'GST_PERCENTAGE' } });
-    if (gstSetting) {
-      gstPercentage = parseFloat(gstSetting.value) || 18.0;
-    }
-  }
+  const baseAmount = plan ? plan.basePrice : 24.0;
+  let gstPercentage = baseAmount === 0
+    ? 0
+    : (gstSetting && gstSetting.value !== undefined && gstSetting.value !== null && !isNaN(parseFloat(gstSetting.value)))
+      ? parseFloat(gstSetting.value)
+      : (plan && plan.gstPercentage !== undefined && plan.gstPercentage !== null && !isNaN(parseFloat(plan.gstPercentage)))
+        ? parseFloat(plan.gstPercentage)
+        : globalGst;
 
   let discountedBaseAmount = baseAmount;
   let coupon = null;
@@ -76,7 +78,7 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
     }
   }
 
-  const gstAmount = discountedBaseAmount === 0 ? 0 : parseFloat(((discountedBaseAmount * gstPercentage) / 100).toFixed(2));
+  const gstAmount = (discountedBaseAmount === 0 || gstPercentage === 0) ? 0 : parseFloat(((discountedBaseAmount * gstPercentage) / 100).toFixed(2));
   const totalAmount = discountedBaseAmount === 0 ? 0 : parseFloat((discountedBaseAmount + gstAmount).toFixed(2));
 
   // IF PLAN IS 100% FREE (0 INR): Activate subscription directly without PayU!
@@ -346,14 +348,20 @@ export const handlePayUSuccess = asyncHandler(async (req, res) => {
         },
       });
     } else if (user) {
+      const gstSetting = await prisma.systemSetting.findUnique({ where: { key: 'GST_PERCENTAGE' } });
+      const currentGst = (gstSetting && !isNaN(parseFloat(gstSetting.value))) ? parseFloat(gstSetting.value) : 18.0;
+      const paidAmt = parseFloat(payuResponse.amount || 24.0);
+      const computedBase = currentGst > 0 ? parseFloat((paidAmt / (1 + currentGst / 100)).toFixed(2)) : paidAmt;
+      const computedGstAmt = parseFloat((paidAmt - computedBase).toFixed(2));
+
       paymentRecord = await prisma.paymentHistory.create({
         data: {
           userId: user.id,
           txnid,
-          amount: parseFloat(payuResponse.amount || 28.32),
-          baseAmount: 24.0,
-          gstAmount: 4.32,
-          gstPercentage: 18.0,
+          amount: paidAmt,
+          baseAmount: computedBase,
+          gstAmount: computedGstAmt,
+          gstPercentage: currentGst,
           status: 'SUCCESS',
           payuMoneyId: mihpayid || payuResponse.payuMoneyId || null,
           paymentMode: mode || payuResponse.mode || 'ONLINE',

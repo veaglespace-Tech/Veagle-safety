@@ -75,8 +75,14 @@ function CheckoutContent() {
   const isFreePlan = originalBasePrice === 0;
   const isZeroPrice = basePrice === 0;
 
-  const gstRate = isZeroPrice ? 0 : Number(selectedPlan.gstPercentage || 18.0);
-  const gstAmount = isZeroPrice ? 0 : Number(((basePrice * gstRate) / 100).toFixed(2));
+  const rawGst =
+    selectedPlan.gstPercentage !== undefined &&
+    selectedPlan.gstPercentage !== null &&
+    !isNaN(Number(selectedPlan.gstPercentage))
+      ? Number(selectedPlan.gstPercentage)
+      : 18.0;
+  const gstRate = isZeroPrice ? 0 : rawGst;
+  const gstAmount = isZeroPrice || gstRate === 0 ? 0 : Number(((basePrice * gstRate) / 100).toFixed(2));
   const totalPrice = isZeroPrice ? 0 : Number((basePrice + gstAmount).toFixed(2));
 
   const currentRegToken =
@@ -328,7 +334,7 @@ function CheckoutContent() {
               <div className="flex justify-between items-center text-xs font-extrabold text-[#684E67] border-b border-dashed border-[#FFCCE1] pb-4">
                 <span>GST Tax Added ({gstRate}%):</span>
                 <span className="font-mono text-sm font-black text-[#2A0826]">
-                  {isZeroPrice ? '₹0.00 (No GST)' : `₹${gstAmount.toFixed(2)}`}
+                  {isZeroPrice || gstRate === 0 ? '₹0.00 (0% GST)' : `₹${gstAmount.toFixed(2)}`}
                 </span>
               </div>
 

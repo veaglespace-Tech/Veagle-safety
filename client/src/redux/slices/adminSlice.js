@@ -69,7 +69,7 @@ const adminSlice = createSlice({
     builder
       .addCase(fetchAdminOverview.fulfilled, (state, action) => {
         state.overview = action.payload;
-        if (action.payload?.metrics?.currentGstPercentage) {
+        if (action.payload?.metrics?.currentGstPercentage !== undefined && action.payload?.metrics?.currentGstPercentage !== null) {
           state.gstPercentage = action.payload.metrics.currentGstPercentage;
         }
       })
