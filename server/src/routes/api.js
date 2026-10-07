@@ -12,6 +12,7 @@ import * as pushController from '../controllers/pushController.js';
 import * as settingController from '../controllers/settingController.js';
 import * as referralController from '../controllers/referralController.js';
 import * as couponController from '../controllers/couponController.js';
+import * as donationController from '../controllers/donationController.js';
 import { authenticateToken, optionalAuthToken, requireSuperAdmin } from '../middleware/auth.js';
 import { upload } from '../middleware/upload.js';
 import { validate } from '../middleware/validate.js';
@@ -48,6 +49,13 @@ router.get('/payment/payu-success', paymentController.handlePayUSuccess);
 router.post('/payment/payu-failure', paymentController.handlePayUFailure);
 router.get('/payment/payu-failure', paymentController.handlePayUFailure);
 router.get('/payment/history', authenticateToken, paymentController.getUserPaymentHistory);
+
+// Donations
+router.post('/donations/initiate', donationController.initiateDonation);
+router.post('/donations/payu-success', donationController.handleDonationSuccess);
+router.get('/donations/payu-success', donationController.handleDonationSuccess);
+router.post('/donations/payu-failure', donationController.handleDonationFailure);
+router.get('/donations/payu-failure', donationController.handleDonationFailure);
 
 // Contacts
 router.get('/contacts', authenticateToken, contactController.getContacts);
@@ -96,6 +104,7 @@ router.put('/admin/gst', authenticateToken, requireSuperAdmin, adminController.u
 router.get('/admin/payments', authenticateToken, requireSuperAdmin, adminController.getPaymentHistory);
 router.get('/admin/enquiries', authenticateToken, requireSuperAdmin, adminController.getContactEnquiries);
 router.post('/admin/enquiries/:id/resolve', authenticateToken, requireSuperAdmin, adminController.resolveContactEnquiry);
+router.get('/admin/donations', authenticateToken, requireSuperAdmin, donationController.getAllDonations);
 
 // Organization Portal Routes
 router.get('/organization/overview', authenticateToken, organizationController.getOrganizationOverview);

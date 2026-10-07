@@ -14,6 +14,7 @@ import {
   Sliders,
   CreditCard,
   User,
+  Heart,
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
@@ -57,6 +58,7 @@ export const BottomNavigation = () => {
     { path: '/admin/users', label: 'Users', icon: Users },
     { path: '/admin/plans', label: 'Plans', icon: Sliders },
     { path: '/admin/payments', label: 'Pay', icon: CreditCard },
+    { path: '/admin/donations', label: 'Donations', icon: Heart },
   ];
 
   const navItems = isSuperAdmin

@@ -47,6 +47,17 @@ function CheckoutContent() {
     }
   }, [dispatch, token, user]);
 
+  useEffect(() => {
+    // Reset processing state if user navigates back from PayU
+    const handlePageShow = (e) => {
+      if (e.persisted) {
+        setIsProcessing(false);
+      }
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
+
   if (!isMounted) {
     return null;
   }

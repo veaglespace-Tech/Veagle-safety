@@ -275,3 +275,18 @@ model Coupon {
   creator      User?            @relation("CreatedCoupons", fields: [createdById], references: [id])
   payments     PaymentHistory[]
 }
+
+model Donation {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String
+  phone         String
+  amount        Float
+  status        String   @default("PENDING") // PENDING, SUCCESS, FAILED
+  txnid         String   @unique
+  payuMoneyId   String?
+  paymentMode   String?
+  hash          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

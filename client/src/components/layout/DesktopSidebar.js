@@ -132,6 +132,12 @@ export const DesktopSidebar = () => {
       desc: 'Txn History & Revenue',
     },
     {
+      path: '/admin/donations',
+      label: 'Donations',
+      icon: Heart,
+      desc: 'Donation tracking',
+    },
+    {
       path: '/admin/enquiries',
       label: 'Contact Support',
       icon: HelpCircle,

@@ -46,6 +46,7 @@ function UserAuthForm() {
 
   useEffect(() => {
     setMounted(true);
+    generateCaptcha();
     if (searchParams && searchParams.get('mode') === 'register') {
       setIsLogin(false);
     } else {
@@ -79,6 +80,17 @@ function UserAuthForm() {
 
   // OTP State
   const [otpCode, setOtpCode] = useState('');
+
+  // Captcha State
+  const [captchaNum1, setCaptchaNum1] = useState(0);
+  const [captchaNum2, setCaptchaNum2] = useState(0);
+  const [userCaptcha, setUserCaptcha] = useState('');
+
+  const generateCaptcha = () => {
+    setCaptchaNum1(Math.floor(Math.random() * 10) + 1);
+    setCaptchaNum2(Math.floor(Math.random() * 10) + 1);
+    setUserCaptcha('');
+  };
 
   const {
     token,
@@ -158,6 +170,11 @@ function UserAuthForm() {
     if (isLogin) {
       if (!email || !password) {
         setValidationError('Email and Password are required.');
+        return false;
+      }
+      if (parseInt(userCaptcha) !== captchaNum1 + captchaNum2) {
+        setValidationError('Incorrect verification calculation.');
+        generateCaptcha();
         return false;
       }
       return true;
@@ -781,6 +798,23 @@ function UserAuthForm() {
                       >
                         {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
+                    </div>
+                  </div>
+
+                  {/* CAPTCHA */}
+                  <div>
+                    <label className="block text-[#684E67] font-extrabold mb-1">
+                      Verification: What is {captchaNum1} + {captchaNum2}? *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        required
+                        placeholder="Answer"
+                        value={userCaptcha}
+                        onChange={(e) => setUserCaptcha(e.target.value)}
+                        className="w-full px-4 py-3 bg-[#FFF0F3] border-1.5 border-[#FFCCE1] rounded-xl text-[#2A0826] font-bold focus:border-[#FF2A6D] focus:bg-white transition-all outline-none"
+                      />
                     </div>
                   </div>
                 </div>

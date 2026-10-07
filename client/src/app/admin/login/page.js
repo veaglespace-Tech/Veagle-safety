@@ -30,6 +30,22 @@ export default function SuperAdminLoginPage() {
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [localError, setLocalError] = useState(null);
+
+  // Captcha State
+  const [captchaNum1, setCaptchaNum1] = useState(0);
+  const [captchaNum2, setCaptchaNum2] = useState(0);
+  const [userCaptcha, setUserCaptcha] = useState('');
+
+  const generateCaptcha = () => {
+    setCaptchaNum1(Math.floor(Math.random() * 10) + 1);
+    setCaptchaNum2(Math.floor(Math.random() * 10) + 1);
+    setUserCaptcha('');
+  };
+
+  React.useEffect(() => {
+    generateCaptcha();
+  }, []);
+
   const router = useRouter();
 
   const handleAdminSubmit = async (e) => {
@@ -38,6 +54,12 @@ export default function SuperAdminLoginPage() {
 
     if (!email || !password) {
       setLocalError('Please enter Super Admin credentials.');
+      return;
+    }
+    
+    if (parseInt(userCaptcha) !== captchaNum1 + captchaNum2) {
+      setLocalError('Incorrect verification calculation.');
+      generateCaptcha();
       return;
     }
 
@@ -159,6 +181,23 @@ export default function SuperAdminLoginPage() {
                   >
                     {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
+                </div>
+              </div>
+
+              {/* CAPTCHA */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase tracking-wider text-[#2A0826] flex items-center justify-between">
+                  <span>VERIFICATION: WHAT IS {captchaNum1} + {captchaNum2}? *</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    required
+                    placeholder="Answer"
+                    value={userCaptcha}
+                    onChange={(e) => setUserCaptcha(e.target.value)}
+                    className="w-full bg-[#FFF0F3]/60 focus:bg-white border-1.5 border-[#FFCCE1] rounded-2xl py-3 px-4 text-xs font-bold text-[#2A0826] placeholder-[#684E67]/60 focus:outline-none focus:border-[#FF2A6D] focus:ring-4 focus:ring-[#FF5C8A]/15 transition-all shadow-sm"
+                  />
                 </div>
               </div>
 

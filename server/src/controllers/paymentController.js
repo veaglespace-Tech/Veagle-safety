@@ -235,7 +235,7 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
       actionUrl: config.payu.baseUrl,
       key: config.payu.key,
       txnid,
-      amount: totalAmount,
+      amount: parseFloat(totalAmount).toFixed(2),
       baseAmount: discountedBaseAmount,
       gstAmount,
       gstPercentage,
@@ -254,8 +254,16 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
  * PayU Success Callback Handler
  */
 export const handlePayUSuccess = asyncHandler(async (req, res) => {
-  const payuResponse = req.body;
+  const payuResponse = Object.keys(req.body).length > 0 ? req.body : req.query;
   const { txnid, mihpayid, mode, status, registrationToken } = payuResponse;
+
+  if (!txnid) {
+    const fallbackUrl = `${config.payu.clientUrl}/payment`;
+    if (req.headers['content-type']?.includes('application/x-www-form-urlencoded') || req.method === 'GET') {
+      return res.redirect(fallbackUrl);
+    }
+    return res.status(400).json({ success: false, message: 'Invalid payment callback data' });
+  }
 
   const verification = verifyPayUResponseHash(payuResponse);
 
@@ -421,7 +429,16 @@ export const handlePayUSuccess = asyncHandler(async (req, res) => {
  * PayU Failure Callback Handler
  */
 export const handlePayUFailure = asyncHandler(async (req, res) => {
-  const { txnid } = req.body;
+  const payuResponse = Object.keys(req.body).length > 0 ? req.body : req.query;
+  const { txnid } = payuResponse;
+
+  if (!txnid) {
+    const fallbackUrl = `${config.payu.clientUrl}/payment`;
+    if (req.headers['content-type']?.includes('application/x-www-form-urlencoded') || req.method === 'GET') {
+      return res.redirect(fallbackUrl);
+    }
+    return res.status(400).json({ success: false, message: 'Invalid payment callback data' });
+  }
 
   if (txnid) {
     await prisma.paymentHistory.updateMany({
