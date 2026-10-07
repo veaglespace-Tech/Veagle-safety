@@ -2,8 +2,8 @@
 
 import React, { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
-import { Footer } from '../../components/layout/Footer.js';
+import { PublicNavbar } from '../../../components/layout/PublicNavbar.js';
+import { Footer } from '../../../components/layout/Footer.js';
 import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
