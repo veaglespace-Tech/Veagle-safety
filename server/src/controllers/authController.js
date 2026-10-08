@@ -918,11 +918,26 @@ export const getPublicStats = asyncHandler(async (req, res) => {
   const userCount = await prisma.user.count({
     where: {
       role: 'USER',
-      status: 'ACTIVE',
     },
+  });
+
+  const settings = await prisma.systemSetting.findMany({
+    where: {
+      key: { in: ['FAKE_BASE_COUNT', 'TARGET_MISSION_COUNT'] },
+    },
+  });
+
+  let fakeBaseCount = 3472;
+  let targetMissionCount = '1 Cr+';
+
+  settings.forEach((s) => {
+    if (s.key === 'FAKE_BASE_COUNT') fakeBaseCount = parseInt(s.value, 10) || 3472;
+    if (s.key === 'TARGET_MISSION_COUNT') targetMissionCount = s.value || '1 Cr+';
   });
 
   return res.status(200).json({
     registeredUsers: userCount,
+    fakeBaseCount,
+    targetMissionCount,
   });
 });

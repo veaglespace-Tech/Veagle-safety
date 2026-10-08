@@ -30,7 +30,11 @@ import { api } from '../utils/api.js';
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
   const [mounted, setMounted] = useState(false);
-  const [stats, setStats] = useState({ registeredUsers: 0 });
+  const [stats, setStats] = useState({ 
+    registeredUsers: 0, 
+    fakeBaseCount: 3472, 
+    targetMissionCount: '1 Cr+' 
+  });
 
   useEffect(() => {
     setMounted(true);
@@ -40,8 +44,12 @@ export default function LandingPage() {
   const fetchStats = async () => {
     try {
       const res = await api.get('/stats/public');
-      if (res.data && res.data.registeredUsers !== undefined) {
-        setStats({ registeredUsers: res.data.registeredUsers });
+      if (res.data) {
+        setStats({ 
+          registeredUsers: res.data.registeredUsers !== undefined ? res.data.registeredUsers : 0,
+          fakeBaseCount: res.data.fakeBaseCount !== undefined ? res.data.fakeBaseCount : 3472,
+          targetMissionCount: res.data.targetMissionCount || '1 Cr+'
+        });
       }
     } catch (err) {
       console.error('Failed to fetch public stats', err);
@@ -92,17 +100,17 @@ export default function LandingPage() {
         <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 max-w-[1400px] mx-auto w-full">
            {/* Left side: Stats */}
            <div className="flex-1 flex flex-col items-center lg:items-end w-full">
-             <div className="bg-white p-8 sm:p-10 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(255,42,109,0.2)] border border-[#FFCCE1]/30 w-full max-w-[340px] relative text-center flex flex-col items-center">
+             <div className="bg-white p-8 sm:p-10 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(255,42,109,0.2)] border border-[#FFCCE1]/30 w-full max-w-[340px] relative text-center flex flex-col items-center min-h-[320px] justify-center">
                <div className="absolute top-6 right-6 bg-[#FFF0F3] w-12 h-12 rounded-full flex items-center justify-center">
                  <ShieldCheck size={24} className="text-[#FF2A6D]" strokeWidth={2.5} />
                </div>
                
-               <div className="mt-12">
-                 <h3 className="text-xl font-black text-[#FF2A6D] tracking-widest mb-2">WOMEN SAFE</h3>
-                 <p className="text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-3 tracking-tighter">
-                    {stats.registeredUsers.toLocaleString()}
+               <div className="mt-6 flex flex-col items-center w-full">
+                 <h3 className="text-lg sm:text-xl font-black text-[#FF2A6D] tracking-widest mb-1">WOMEN SAFE</h3>
+                 <p className="text-[70px] sm:text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-2 tracking-tighter">
+                    {((stats?.fakeBaseCount || 3472) + (stats?.registeredUsers || 0)).toLocaleString()}
                  </p>
-                 <p className="text-xs font-black text-[#7A6478] uppercase tracking-widest opacity-90">Women Made Safe</p>
+                 <p className="text-[10px] sm:text-xs font-black text-[#7A6478] uppercase tracking-widest opacity-90 bg-[#FFF0F3] px-3 py-1 rounded-full">Active Guardians</p>
                </div>
              </div>
            </div>
@@ -114,14 +122,17 @@ export default function LandingPage() {
 
            {/* Right side: Goal text */}
            <div className="flex-1 flex flex-col items-center lg:items-start w-full">
-             <div className="bg-gradient-to-br from-[#FA2E6E] to-[#E61B5C] text-white p-8 sm:p-10 rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(250,46,110,0.45)] w-full max-w-[340px] text-left">
-               <h3 className="text-[96px] font-black leading-[0.85] mb-6 tracking-tighter">1 Cr+</h3>
-               <p className="text-[36px] font-black leading-[1.05] mb-10 tracking-tight text-white/95">
-                 Women To<br />Protect
-               </p>
-               <div className="inline-flex items-center gap-2 bg-white/20 px-5 py-2.5 rounded-full text-sm font-black uppercase tracking-widest">
-                 <Heart size={16} className="text-white fill-white" />
-                 <span>Our Mission</span>
+             <div className="bg-gradient-to-br from-[#FA2E6E] to-[#E61B5C] p-8 sm:p-10 rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(250,46,110,0.45)] w-full max-w-[340px] relative text-center flex flex-col items-center min-h-[320px] justify-center">
+               <div className="absolute top-6 right-6 bg-white/20 w-12 h-12 rounded-full flex items-center justify-center">
+                 <Heart size={24} className="text-white" strokeWidth={2.5} />
+               </div>
+               
+               <div className="mt-6 flex flex-col items-center w-full">
+                 <h3 className="text-lg sm:text-xl font-black text-white/90 tracking-widest mb-1">OUR MISSION</h3>
+                 <p className="text-[70px] sm:text-[80px] font-black text-white leading-none mb-2 tracking-tighter">
+                   {stats?.targetMissionCount || '1 Cr+'}
+                 </p>
+                 <p className="text-[10px] sm:text-xs font-black text-white uppercase tracking-widest opacity-100 bg-white/20 px-3 py-1 rounded-full">Women To Protect</p>
                </div>
              </div>
            </div>
