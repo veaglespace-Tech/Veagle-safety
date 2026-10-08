@@ -911,3 +911,18 @@ export const resetPassword = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * Public Stats
+ */
+export const getPublicStats = asyncHandler(async (req, res) => {
+  const userCount = await prisma.user.count({
+    where: {
+      role: 'USER',
+      status: 'ACTIVE',
+    },
+  });
+
+  return res.status(200).json({
+    registeredUsers: userCount,
+  });
+});

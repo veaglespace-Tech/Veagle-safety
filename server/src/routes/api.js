@@ -39,6 +39,9 @@ router.post('/auth/reset-password', authController.resetPassword);
 // Public Contact Form Submission
 router.post('/contact', adminController.submitContactEnquiry);
 
+// Public Stats
+router.get('/stats/public', authController.getPublicStats);
+
 // Public Plans & Pricing
 router.get('/plans', adminController.getPlans);
 

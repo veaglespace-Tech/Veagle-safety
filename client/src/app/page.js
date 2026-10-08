@@ -25,14 +25,28 @@ import { Footer } from '../components/layout/Footer.js';
 import { Logo3DFlip } from '../components/ui/Logo3DFlip.js';
 import { HeroBannerCarousel } from '../components/ui/HeroBannerCarousel.js';
 import { Feature3DCard } from '../components/ui/Feature3DCard.js';
+import { api } from '../utils/api.js';
 
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
   const [mounted, setMounted] = useState(false);
+  const [stats, setStats] = useState({ registeredUsers: 0 });
 
   useEffect(() => {
     setMounted(true);
+    fetchStats();
   }, []);
+
+  const fetchStats = async () => {
+    try {
+      const res = await api.get('/stats/public');
+      if (res.data && res.data.registeredUsers !== undefined) {
+        setStats({ registeredUsers: res.data.registeredUsers });
+      }
+    } catch (err) {
+      console.error('Failed to fetch public stats', err);
+    }
+  };
 
   const isLoggedIn =
     mounted && (token || (typeof window !== 'undefined' && localStorage.getItem('tichi_token')));
@@ -73,8 +87,45 @@ export default function LandingPage() {
 
       {/* HERO SECTION WITH DIRECT AUTO-SCROLLING HERO BANNER */}
       <section className="relative z-10 pt-6 sm:pt-10 pb-6 px-4 sm:px-6 lg:px-8 text-center space-y-8">
-        {/* DIRECT 4K AUTO-SCROLL HERO BANNER */}
-        <HeroBannerCarousel />
+        
+        {/* HERO BANNER WITH FLOATING STATS */}
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 max-w-[1400px] mx-auto w-full">
+           {/* Left side: Stats */}
+           <div className="flex-1 flex flex-col items-center lg:items-end w-full">
+             <div className="bg-white p-8 sm:p-10 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(255,42,109,0.2)] border border-[#FFCCE1]/30 w-full max-w-[340px] relative text-center flex flex-col items-center">
+               <div className="absolute top-6 right-6 bg-[#FFF0F3] w-12 h-12 rounded-full flex items-center justify-center">
+                 <ShieldCheck size={24} className="text-[#FF2A6D]" strokeWidth={2.5} />
+               </div>
+               
+               <div className="mt-12">
+                 <h3 className="text-xl font-black text-[#FF2A6D] tracking-widest mb-2">WOMEN SAFE</h3>
+                 <p className="text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-3 tracking-tighter">
+                    {stats.registeredUsers.toLocaleString()}
+                 </p>
+                 <p className="text-xs font-black text-[#7A6478] uppercase tracking-widest opacity-90">Women Made Safe</p>
+               </div>
+             </div>
+           </div>
+
+           {/* Center: Image */}
+           <div className="flex-[2] w-full max-w-3xl">
+             <HeroBannerCarousel />
+           </div>
+
+           {/* Right side: Goal text */}
+           <div className="flex-1 flex flex-col items-center lg:items-start w-full">
+             <div className="bg-gradient-to-br from-[#FA2E6E] to-[#E61B5C] text-white p-8 sm:p-10 rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(250,46,110,0.45)] w-full max-w-[340px] text-left">
+               <h3 className="text-[96px] font-black leading-[0.85] mb-6 tracking-tighter">1 Cr+</h3>
+               <p className="text-[36px] font-black leading-[1.05] mb-10 tracking-tight text-white/95">
+                 Women To<br />Protect
+               </p>
+               <div className="inline-flex items-center gap-2 bg-white/20 px-5 py-2.5 rounded-full text-sm font-black uppercase tracking-widest">
+                 <Heart size={16} className="text-white fill-white" />
+                 <span>Our Mission</span>
+               </div>
+             </div>
+           </div>
+        </div>
 
         {/* MAIN TITLE */}
         <h1 className="heading-gradient-hero text-4xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-tight max-w-5xl mx-auto">
