@@ -459,7 +459,7 @@ export const resendOtp = asyncHandler(async (req, res) => {
  * Login User / SuperAdmin
  */
 export const login = asyncHandler(async (req, res) => {
-  const { email, password, isAdminLogin } = req.body;
+  const { email, password } = req.body;
 
   const inputStr = email?.trim() || '';
   const cleanPhone = inputStr.replace(/\D/g, '');
