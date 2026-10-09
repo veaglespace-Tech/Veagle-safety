@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import {
   Building,
@@ -25,9 +25,10 @@ import { api } from '../../utils/api.js';
 
 export default function OrganizationDashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { token, user } = useSelector((state) => state?.auth || {});
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState('monitor'); // 'monitor' | 'members' | 'settings'
+  const activeTab = searchParams?.get('tab') || 'monitor';
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -163,53 +164,6 @@ export default function OrganizationDashboard() {
           </button>
         </div>
 
-        {/* 3-TAB NAVIGATION BAR */}
-        <div className="flex flex-wrap items-center gap-2 bg-white/90 p-1.5 rounded-2xl border-2 border-[#FFCCE1] shadow-sm">
-          <button
-            type="button"
-            onClick={() => setActiveTab('monitor')}
-            className={`flex-1 min-w-[120px] py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center space-x-2 cursor-pointer ${
-              activeTab === 'monitor'
-                ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md'
-                : 'text-[#684E67] hover:text-[#FF2A6D]'
-            }`}
-          >
-            <Activity className="w-4 h-4" />
-            <span>Monitor</span>
-            {stats.activeSosCount > 0 && (
-              <span className="bg-white text-[#FF2A6D] px-2 py-0.5 rounded-full text-[10px] font-black animate-pulse">
-                {stats.activeSosCount} SOS
-              </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('members')}
-            className={`flex-1 min-w-[120px] py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center space-x-2 cursor-pointer ${
-              activeTab === 'members'
-                ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md'
-                : 'text-[#684E67] hover:text-[#FF2A6D]'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>Members ({stats.totalMembers})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('settings')}
-            className={`flex-1 min-w-[120px] py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center space-x-2 cursor-pointer ${
-              activeTab === 'settings'
-                ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md'
-                : 'text-[#684E67] hover:text-[#FF2A6D]'
-            }`}
-          >
-            <Settings className="w-4 h-4" />
-            <span>Settings</span>
-          </button>
-        </div>
-
         {/* TAB 1: LIVE SAFETY MONITOR */}
         {activeTab === 'monitor' && (
           <div className="space-y-6">
@@ -280,7 +234,7 @@ export default function OrganizationDashboard() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => setActiveTab('settings')}
+                    onClick={() => router.push('/organization?tab=settings')}
                     className="btn-3d-rose-pop px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider cursor-pointer"
                   >
                     GO TO SETTINGS

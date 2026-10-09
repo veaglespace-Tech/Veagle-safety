@@ -92,7 +92,26 @@ export const DesktopSidebar = () => {
 
   const parentNavItems = [];
 
-  const orgNavItems = [];
+  const orgNavItems = [
+    {
+      path: '/organization',
+      label: 'Live Monitor',
+      icon: Activity,
+      desc: 'Real-time safety tracking',
+    },
+    {
+      path: '/organization?tab=members',
+      label: 'Member Directory',
+      icon: Users,
+      desc: 'Manage enrolled users',
+    },
+    {
+      path: '/organization?tab=settings',
+      label: 'Referral & Settings',
+      icon: Settings,
+      desc: 'Your referral link',
+    },
+  ];
 
   const adminNavItems = [
     {
@@ -231,22 +250,22 @@ export const DesktopSidebar = () => {
               </Link>
             )}
             {isOrganization && (
-              <Link
-                href="/organization"
-                className={`flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all border shadow-sm cursor-pointer ${
-                  pathname === '/organization'
-                    ? 'bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white shadow-md border-white'
-                    : 'bg-[#FFF0F3] text-[#FF2A6D] border-[#FFCCE1] hover:bg-[#FF2A6D] hover:text-white'
-                }`}
-              >
-                <Users className="w-5 h-5 shrink-0" />
-                <span>ORGANIZATION MONITOR</span>
-              </Link>
+              <div className="flex items-center space-x-2 px-2 pb-1 text-[11px] font-black text-[#FF2A6D] uppercase tracking-wider">
+                <Users className="w-4 h-4 text-[#FF2A6D]" />
+                <span>Organization Portal</span>
+              </div>
             )}
 
             {activeNavItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.path;
+              // For organization tabs, check if the search param matches, otherwise check pathname
+              let isActive = pathname === item.path;
+              if (isOrganization && item.path.includes('?tab=')) {
+                 const tab = item.path.split('?tab=')[1];
+                 isActive = searchParams?.get('tab') === tab;
+              } else if (isOrganization && item.path === '/organization') {
+                 isActive = !searchParams?.get('tab') || searchParams?.get('tab') === 'monitor';
+              }
 
               return (
                 <Link
