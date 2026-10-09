@@ -45,12 +45,12 @@ export const AppLayout = ({ children, fullScreen = false }) => {
   useEffect(() => {
     if (!mounted) return;
 
-    // Unauthenticated user trying to access /admin routes -> redirect to /admin/login
-    if (pathname.startsWith('/admin') && pathname !== '/admin/login' && !hasAuthToken) {
+    // Unauthenticated user trying to access /admin routes -> redirect to /auth?mode=login
+    if (pathname.startsWith('/admin') && !hasAuthToken) {
       if (typeof window !== 'undefined') {
-        window.location.replace('/admin/login');
+        window.location.replace('/auth?mode=login');
       } else {
-        router.push('/admin/login');
+        router.push('/auth?mode=login');
       }
       return;
     }
@@ -74,14 +74,13 @@ export const AppLayout = ({ children, fullScreen = false }) => {
       } catch (e) {}
     }
 
-    // Non-admin trying to access /admin -> redirect to /admin/login
+    // Non-admin trying to access /admin -> redirect to /auth?mode=login
     if (
       hasAuthToken &&
       pathname.startsWith('/admin') &&
-      pathname !== '/admin/login' &&
       !isSuperAdmin
     ) {
-      router.push('/admin/login');
+      router.push('/auth?mode=login');
       return;
     }
 

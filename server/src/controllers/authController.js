@@ -277,7 +277,8 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   // Case 1: Check existing DB user (for resend OTP / existing users)
   const existingUser = email ? await prisma.user.findUnique({ where: { email } }) : null;
   if (existingUser) {
-    if (existingUser.isEmailVerified) {
+    // Skip OTP check only if email is verified AND the user is NOT a SUPER_ADMIN logging in
+    if (existingUser.isEmailVerified && existingUser.role !== 'SUPER_ADMIN' && !existingUser.emailOtp) {
       const token = jwt.sign(
         { id: existingUser.id, userId: existingUser.id, role: existingUser.role, email: existingUser.email },
         config.jwt.secret,
@@ -297,7 +298,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       });
     }
 
-    if (existingUser.emailOtp !== otp) {
+    if (!existingUser.emailOtp || existingUser.emailOtp !== otp) {
       return res.status(400).json({ error: 'Invalid OTP code. Please check your email and try again.' });
     }
 
@@ -481,15 +482,29 @@ export const login = asyncHandler(async (req, res) => {
     return res.status(401).json({ error: 'Invalid email or password' });
   }
 
-  // SuperAdmin Dedicated URL Access Control Enforcement
-  if (isAdminLogin) {
-    if (user.role !== 'SUPER_ADMIN') {
-      return res.status(403).json({ error: 'Access denied. SuperAdmin privileges required.' });
+  // SuperAdmin Login with OTP
+  if (user.role === 'SUPER_ADMIN') {
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { emailOtp: newOtp, emailOtpExpiresAt: otpExpires },
+    });
+
+    console.log(`🔑 [SUPER_ADMIN OTP] Email: ${user.email} | OTP: ${newOtp}`);
+
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: user.email, userName: user.fullName, otp: newOtp });
+    } catch (e) {
+      console.warn('[Admin Login OTP Email Notice]', e.message);
     }
-  } else {
-    if (user.role === 'SUPER_ADMIN') {
-      return res.status(403).json({ error: 'SuperAdmin access is restricted. Please use the dedicated admin login URL.' });
-    }
+
+    return res.status(200).json({
+      message: 'OTP sent for Admin Verification.',
+      requiresVerification: true,
+      email: user.email,
+    });
   }
 
   if (!user.isEmailVerified && user.role === 'USER') {
