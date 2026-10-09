@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import {
@@ -23,7 +23,7 @@ import {
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { api } from '../../utils/api.js';
 
-export default function OrganizationDashboard() {
+function OrganizationDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { token, user } = useSelector((state) => state?.auth || {});
@@ -424,5 +424,17 @@ export default function OrganizationDashboard() {
         )}
       </div>
     </AppLayout>
+  );
+}
+
+export default function OrganizationDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#FFF0F3] flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-3 border-[#FF2A6D] border-t-transparent animate-spin" />
+      </div>
+    }>
+      <OrganizationDashboardContent />
+    </Suspense>
   );
 }
