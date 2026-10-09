@@ -243,6 +243,7 @@ function UserAuthForm() {
           parentEmail: selectedRole === 'USER' ? parentEmail.trim() : '',
           password,
           partnerReferralCode: searchParams?.get('ref') || '',
+          orgReferralCode: searchParams?.get('ref') || '',
         })
       );
     }

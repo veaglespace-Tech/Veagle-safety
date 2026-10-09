@@ -13,7 +13,7 @@ model User {
   email                  String    @unique
   phone                  String
   passwordHash           String
-  role                   String    @default("USER") // USER, SUPER_ADMIN
+  role                   String    @default("USER") // USER, SUPER_ADMIN, ORGANIZATION
   profilePhoto           String?   @db.LongText
   bloodGroup             String?
   address                String?
@@ -44,8 +44,10 @@ model User {
   journeys                Journey[]
   safetyCheckins          SafetyCheckin[]
   paymentHistories        PaymentHistory[]
-  organizationMemberships OrganizationMember[] @relation("OrgMemberUser")
-  managedOrganizations    OrganizationMember[] @relation("OrgOwner")
+  organizationId          Int?
+  organization            User?                @relation("OrganizationUsers", fields: [organizationId], references: [id])
+  organizationUsers       User[]               @relation("OrganizationUsers")
+  orgReferralCode         String?              @unique
   parentLinks             ParentChildLink[]    @relation("ParentLinks")
   childLinks              ParentChildLink[]    @relation("ChildLinks")
 
@@ -214,19 +216,6 @@ model ContactEnquiry {
   updatedAt      DateTime  @updatedAt
 }
 
-model OrganizationMember {
-  id             Int      @id @default(autoincrement())
-  organizationId Int
-  organization   User     @relation("OrgOwner", fields: [organizationId], references: [id], onDelete: Cascade)
-  userId         Int
-  user           User     @relation("OrgMemberUser", fields: [userId], references: [id], onDelete: Cascade)
-  memberCode     String?
-  department     String?
-  status         String   @default("ACTIVE") // ACTIVE, PENDING
-  createdAt      DateTime @default(now())
-
-  @@unique([organizationId, userId])
-}
 
 model ParentChildLink {
   id           Int      @id @default(autoincrement())

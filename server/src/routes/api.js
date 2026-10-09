@@ -111,8 +111,8 @@ router.get('/admin/donations', authenticateToken, requireSuperAdmin, donationCon
 
 // Organization Portal Routes
 router.get('/organization/overview', authenticateToken, organizationController.getOrganizationOverview);
-router.post('/organization/members', authenticateToken, organizationController.addMember);
-router.delete('/organization/members/:membershipId', authenticateToken, organizationController.removeMember);
+router.get('/organization/settings', authenticateToken, organizationController.getOrganizationSettings);
+router.delete('/organization/members/:userId', authenticateToken, organizationController.removeMember);
 
 // Parent Portal Routes
 router.get('/parent/overview', authenticateToken, parentController.getParentOverview);

@@ -29,6 +29,7 @@ export const register = asyncHandler(async (req, res) => {
     parentEmail,
     medicalNotes,
     partnerReferralCode,
+    orgReferralCode,
   } = req.body;
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -140,6 +141,16 @@ export const register = asyncHandler(async (req, res) => {
     }
   }
 
+  let organizationId = null;
+  if (orgReferralCode) {
+    const orgUser = await prisma.user.findUnique({
+      where: { orgReferralCode }
+    });
+    if (orgUser && orgUser.role === 'ORGANIZATION') {
+      organizationId = orgUser.id;
+    }
+  }
+
   let user;
   try {
     user = await prisma.user.create({
@@ -165,6 +176,7 @@ export const register = asyncHandler(async (req, res) => {
         emailOtpExpiresAt: assignedRole === 'USER' ? otpExpires : null,
         subscriptionStatus: assignedRole === 'SUPER_ADMIN' ? 'ACTIVE' : 'INACTIVE',
         referredByPartnerId,
+        organizationId,
       },
     });
   } catch (dbErr) {
