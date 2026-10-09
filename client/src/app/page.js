@@ -30,7 +30,11 @@ import { api } from '../utils/api.js';
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
   const [mounted, setMounted] = useState(false);
-  const [stats, setStats] = useState({ registeredUsers: 0 });
+  const [stats, setStats] = useState({ 
+    registeredUsers: 0, 
+    fakeBaseCount: 3472, 
+    targetMissionCount: '1 Cr+' 
+  });
 
   useEffect(() => {
     setMounted(true);
@@ -40,8 +44,12 @@ export default function LandingPage() {
   const fetchStats = async () => {
     try {
       const res = await api.get('/stats/public');
-      if (res.data && res.data.registeredUsers !== undefined) {
-        setStats({ registeredUsers: res.data.registeredUsers });
+      if (res.data) {
+        setStats({ 
+          registeredUsers: res.data.registeredUsers !== undefined ? res.data.registeredUsers : 0,
+          fakeBaseCount: res.data.fakeBaseCount !== undefined ? res.data.fakeBaseCount : 3472,
+          targetMissionCount: res.data.targetMissionCount || '1 Cr+'
+        });
       }
     } catch (err) {
       console.error('Failed to fetch public stats', err);
@@ -106,7 +114,7 @@ export default function LandingPage() {
                <div className="mt-4 sm:mt-12 flex flex-col items-center justify-center">
                  <h3 className="text-[10px] sm:text-xl font-black text-[#FF2A6D] tracking-widest mb-1 sm:mb-2">WOMEN SAFE</h3>
                  <p className="text-3xl sm:text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-1 sm:mb-3 tracking-tighter">
-                    {stats.registeredUsers.toLocaleString()}
+                    {((stats?.fakeBaseCount || 3472) + (stats?.registeredUsers || 0)).toLocaleString()}
                  </p>
                  <p className="text-[8px] sm:text-xs font-black text-[#7A6478] uppercase tracking-widest opacity-90 bg-[#FFF0F3] px-2 py-1 rounded-full w-[max-content]">ACTIVE GUARDIANS</p>
                </div>
@@ -116,7 +124,7 @@ export default function LandingPage() {
            {/* Right side: Goal text */}
            <div className="col-span-1 lg:col-auto order-3 lg:order-3 flex-1 flex flex-col items-center lg:items-start w-full">
              <div className="bg-gradient-to-br from-[#FA2E6E] to-[#E61B5C] text-white p-4 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(250,46,110,0.45)] w-full max-w-[340px] text-center sm:text-left h-full flex flex-col justify-center items-center sm:items-start">
-               <h3 className="text-4xl sm:text-[96px] font-black leading-[0.85] mb-2 sm:mb-6 tracking-tighter">1 Cr+</h3>
+               <h3 className="text-4xl sm:text-[96px] font-black leading-[0.85] mb-2 sm:mb-6 tracking-tighter">{stats?.targetMissionCount || '1 Cr+'}</h3>
                <p className="text-[11px] sm:text-[36px] font-black leading-[1.05] mb-3 sm:mb-10 tracking-tight text-white/95">
                  Women To<br className="hidden sm:block" />Protect
                </p>
