@@ -106,7 +106,7 @@ export default function LandingPage() {
 
            {/* Left side: Stats */}
            <div className="col-span-1 lg:col-auto order-2 lg:order-1 flex-1 flex flex-col items-center lg:items-end w-full">
-             <div className="bg-white p-4 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(255,42,109,0.2)] border border-[#FFCCE1]/30 w-full max-w-[340px] relative text-center flex flex-col items-center h-full justify-center">
+             <div className="bg-white p-4 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(255,42,109,0.2)] border border-[#FFCCE1]/30 w-full max-w-[340px] relative text-center flex flex-col items-center h-full lg:h-[380px] justify-center">
                <div className="absolute top-3 right-3 sm:top-6 sm:right-6 bg-[#FFF0F3] w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center">
                  <ShieldCheck className="text-[#FF2A6D] w-4 h-4 sm:w-6 sm:h-6" strokeWidth={2.5} />
                </div>
@@ -123,7 +123,7 @@ export default function LandingPage() {
 
            {/* Right side: Goal text */}
            <div className="col-span-1 lg:col-auto order-3 lg:order-3 flex-1 flex flex-col items-center lg:items-start w-full">
-             <div className="bg-gradient-to-br from-[#FA2E6E] to-[#E61B5C] text-white p-4 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(250,46,110,0.45)] w-full max-w-[340px] text-center sm:text-left h-full flex flex-col justify-center items-center sm:items-start">
+             <div className="bg-gradient-to-br from-[#FA2E6E] to-[#E61B5C] text-white p-4 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(250,46,110,0.45)] w-full max-w-[340px] text-center sm:text-left h-full lg:h-[380px] flex flex-col justify-center items-center sm:items-start">
                <h3 className="text-4xl sm:text-[96px] font-black leading-[0.85] mb-2 sm:mb-6 tracking-tighter">{stats?.targetMissionCount || '1 Cr+'}</h3>
                <p className="text-[11px] sm:text-[36px] font-black leading-[1.05] mb-3 sm:mb-10 tracking-tight text-white/95">
                  Women To<br className="hidden sm:block" />Protect
