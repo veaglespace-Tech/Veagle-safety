@@ -201,9 +201,14 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.error = null;
+        if (action.payload.requiresVerification) {
+          state.pendingVerificationEmail = action.payload.email;
+          state.showOtpModal = true;
+          return;
+        }
         state.token = action.payload.token;
         state.user = action.payload.user;
-        state.error = null;
         if (typeof window !== 'undefined' && action.payload.user) {
           localStorage.setItem('tichi_user', JSON.stringify(action.payload.user));
         }
