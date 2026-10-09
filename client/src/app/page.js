@@ -89,38 +89,39 @@ export default function LandingPage() {
       <section className="relative z-10 pt-6 sm:pt-10 pb-6 px-4 sm:px-6 lg:px-8 text-center space-y-8">
         
         {/* HERO BANNER WITH FLOATING STATS */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 max-w-[1400px] mx-auto w-full">
+        <div className="grid grid-cols-2 lg:flex lg:flex-row items-stretch lg:items-center justify-center gap-3 sm:gap-6 lg:gap-8 max-w-[1400px] mx-auto w-full">
+           
+           {/* Center: Image */}
+           <div className="col-span-2 lg:col-auto order-1 lg:order-2 flex-[2] w-full max-w-3xl mx-auto flex items-center justify-center">
+             <HeroBannerCarousel />
+           </div>
+
            {/* Left side: Stats */}
-           <div className="flex-1 flex flex-col items-center lg:items-end w-full">
-             <div className="bg-white p-8 sm:p-10 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(255,42,109,0.2)] border border-[#FFCCE1]/30 w-full max-w-[340px] relative text-center flex flex-col items-center">
-               <div className="absolute top-6 right-6 bg-[#FFF0F3] w-12 h-12 rounded-full flex items-center justify-center">
-                 <ShieldCheck size={24} className="text-[#FF2A6D]" strokeWidth={2.5} />
+           <div className="col-span-1 lg:col-auto order-2 lg:order-1 flex-1 flex flex-col items-center lg:items-end w-full">
+             <div className="bg-white p-4 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(255,42,109,0.2)] border border-[#FFCCE1]/30 w-full max-w-[340px] relative text-center flex flex-col items-center h-full justify-center">
+               <div className="absolute top-3 right-3 sm:top-6 sm:right-6 bg-[#FFF0F3] w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center">
+                 <ShieldCheck className="text-[#FF2A6D] w-4 h-4 sm:w-6 sm:h-6" strokeWidth={2.5} />
                </div>
                
-               <div className="mt-12">
-                 <h3 className="text-xl font-black text-[#FF2A6D] tracking-widest mb-2">WOMEN SAFE</h3>
-                 <p className="text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-3 tracking-tighter">
+               <div className="mt-4 sm:mt-12 flex flex-col items-center justify-center">
+                 <h3 className="text-[10px] sm:text-xl font-black text-[#FF2A6D] tracking-widest mb-1 sm:mb-2">WOMEN SAFE</h3>
+                 <p className="text-3xl sm:text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-1 sm:mb-3 tracking-tighter">
                     {stats.registeredUsers.toLocaleString()}
                  </p>
-                 <p className="text-xs font-black text-[#7A6478] uppercase tracking-widest opacity-90">Women Made Safe</p>
+                 <p className="text-[8px] sm:text-xs font-black text-[#7A6478] uppercase tracking-widest opacity-90 bg-[#FFF0F3] px-2 py-1 rounded-full w-[max-content]">ACTIVE GUARDIANS</p>
                </div>
              </div>
            </div>
 
-           {/* Center: Image */}
-           <div className="flex-[2] w-full max-w-3xl">
-             <HeroBannerCarousel />
-           </div>
-
            {/* Right side: Goal text */}
-           <div className="flex-1 flex flex-col items-center lg:items-start w-full">
-             <div className="bg-gradient-to-br from-[#FA2E6E] to-[#E61B5C] text-white p-8 sm:p-10 rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(250,46,110,0.45)] w-full max-w-[340px] text-left">
-               <h3 className="text-[96px] font-black leading-[0.85] mb-6 tracking-tighter">1 Cr+</h3>
-               <p className="text-[36px] font-black leading-[1.05] mb-10 tracking-tight text-white/95">
-                 Women To<br />Protect
+           <div className="col-span-1 lg:col-auto order-3 lg:order-3 flex-1 flex flex-col items-center lg:items-start w-full">
+             <div className="bg-gradient-to-br from-[#FA2E6E] to-[#E61B5C] text-white p-4 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(250,46,110,0.45)] w-full max-w-[340px] text-center sm:text-left h-full flex flex-col justify-center items-center sm:items-start">
+               <h3 className="text-4xl sm:text-[96px] font-black leading-[0.85] mb-2 sm:mb-6 tracking-tighter">1 Cr+</h3>
+               <p className="text-[11px] sm:text-[36px] font-black leading-[1.05] mb-3 sm:mb-10 tracking-tight text-white/95">
+                 Women To<br className="hidden sm:block" />Protect
                </p>
-               <div className="inline-flex items-center gap-2 bg-white/20 px-5 py-2.5 rounded-full text-sm font-black uppercase tracking-widest">
-                 <Heart size={16} className="text-white fill-white" />
+               <div className="inline-flex items-center justify-center gap-1 sm:gap-2 bg-white/20 px-2.5 sm:px-5 py-1 sm:py-2.5 rounded-full text-[8px] sm:text-sm font-black uppercase tracking-widest w-[max-content]">
+                 <Heart className="text-white fill-white w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
                  <span>Our Mission</span>
                </div>
              </div>
