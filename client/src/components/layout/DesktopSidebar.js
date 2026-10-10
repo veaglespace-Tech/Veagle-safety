@@ -362,27 +362,26 @@ export const DesktopSidebar = () => {
         </div>
       </aside>
 
-      {/* 2. MOBILE SUPERADMIN FLOATING TOGGLE BUTTON & SLIDE-OVER DRAWER */}
+      {/* 2. MOBILE SUPERADMIN FLOATING TOGGLE BUTTON */}
       {isSuperAdmin && (
-        <>
-          {/* MOBILE SUPERADMIN BOTTOM DOCK BAR */}
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-2xl border-t-2 border-[#FFCCE1] z-[80] flex items-center justify-center shadow-[0_-4px_25px_rgba(42,8,38,0.12)]">
-            <button
-              type="button"
-              onClick={() => setMobileOpen(true)}
-              className="bg-gradient-to-r from-[#2A0826] via-[#4A154B] to-[#2A0826] text-white px-6 py-3 rounded-full shadow-lg border-2 border-amber-400/60 flex items-center space-x-2.5 active:scale-95 transition-all cursor-pointer hover:border-amber-300 font-sans shrink-0 whitespace-nowrap"
-              aria-label="Open SuperAdmin Menu"
-            >
-              <Command className="w-5 h-5 text-amber-300 animate-pulse shrink-0" />
-              <span className="text-xs font-black uppercase tracking-wider text-amber-300">
-                ADMIN MENU
-              </span>
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FF2A6D] animate-ping ml-0.5 shrink-0" />
-            </button>
-          </div>
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-2xl border-t-2 border-[#FFCCE1] z-[80] flex items-center justify-center shadow-[0_-4px_25px_rgba(42,8,38,0.12)]">
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            className="bg-gradient-to-r from-[#2A0826] via-[#4A154B] to-[#2A0826] text-white px-6 py-3 rounded-full shadow-lg border-2 border-amber-400/60 flex items-center space-x-2.5 active:scale-95 transition-all cursor-pointer hover:border-amber-300 font-sans shrink-0 whitespace-nowrap"
+            aria-label="Open SuperAdmin Menu"
+          >
+            <Command className="w-5 h-5 text-amber-300 animate-pulse shrink-0" />
+            <span className="text-xs font-black uppercase tracking-wider text-amber-300">
+              ADMIN MENU
+            </span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FF2A6D] animate-ping ml-0.5 shrink-0" />
+          </button>
+        </div>
+      )}
 
-          {/* MOBILE SIDEBAR DRAWER OVERLAY */}
-          {mobileOpen && (
+      {/* 3. MOBILE SIDEBAR DRAWER OVERLAY (FOR ALL USERS) */}
+      {mobileOpen && (
             <div className="lg:hidden fixed inset-0 z-[100] flex font-sans">
               {/* Dark Glass Backdrop */}
               <div
@@ -532,8 +531,6 @@ export const DesktopSidebar = () => {
               </div>
             </div>
           )}
-        </>
-      )}
     </>
   );
 };
