@@ -400,7 +400,7 @@ export const handlePayUSuccess = asyncHandler(async (req, res) => {
         )
       : null;
 
-    const clientRedirectUrl = `${config.payu.clientUrl}/payment/success?status=success&txnid=${txnid}`;
+    const clientRedirectUrl = `${config.payu.clientUrl}/payment/success?status=success&txnid=${txnid}&token=${sessionToken || ''}`;
     if (req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
       return res.redirect(clientRedirectUrl);
     }
