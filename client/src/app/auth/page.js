@@ -141,6 +141,8 @@ function UserAuthForm() {
     }
   }, [wasOtpModalOpened, showOtpModal, registrationToken, user, token, router]);
 
+  const formTopRef = useRef(null);
+
   useEffect(() => {
     if (token && user) {
       if (user.role === 'SUPER_ADMIN') {
@@ -156,6 +158,12 @@ function UserAuthForm() {
       }
     }
   }, [token, user, router]);
+
+  useEffect(() => {
+    if ((error || validationError) && formTopRef.current) {
+      formTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [error, validationError]);
 
   const toggleMode = (loginMode) => {
     setIsLogin(loginMode);
@@ -398,6 +406,7 @@ function UserAuthForm() {
           )}
 
           {/* NOTIFICATIONS */}
+          <div ref={formTopRef} />
           {(validationError || error) && (
             <div className="bg-[#FFF0F3] border-1.5 border-[#FF2A6D] text-[#FF2A6D] p-4 rounded-2xl text-xs font-black flex items-center space-x-2 shadow-sm">
               <AlertCircle className="w-4 h-4 shrink-0 text-[#FF2A6D]" />
