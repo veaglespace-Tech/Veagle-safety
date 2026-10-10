@@ -405,7 +405,11 @@ export const DesktopSidebar = () => {
                         Sakhi Suraksha
                       </h2>
                       <p className="text-[9px] font-black text-[#FF2A6D] tracking-widest uppercase mt-0.5">
-                        SuperAdmin Mobile
+                        {isParent
+                          ? 'Parental Command'
+                          : isOrganization
+                            ? 'Organization Portal'
+                            : '24/7 Safety Command'}
                       </p>
                     </div>
                   </Link>
@@ -421,21 +425,23 @@ export const DesktopSidebar = () => {
                 </div>
 
                 {/* ACTIVE EMERGENCY SOS NOTICE */}
-                {activeSession && (
+                {activeSession && !isParent && !isOrganization && (
                   <div className="mx-4 mt-4 bg-gradient-to-r from-[#FF2A6D] to-[#E01A4F] text-white text-xs font-black p-3.5 rounded-2xl flex items-center space-x-3 shadow-md border border-white/30 animate-pulse">
                     <AlertTriangle className="w-4 h-4 shrink-0 animate-bounce" />
                     <span>SOS ACTIVE — LIVE MAP SHARING</span>
                   </div>
                 )}
 
-                {/* SUPERADMIN TABS NAVIGATION LIST */}
+                {/* DYNAMIC NAVIGATION LIST */}
                 <nav className="flex-1 px-4 py-5 space-y-2.5 overflow-y-auto scrollbar-none">
-                  <div className="flex items-center space-x-2 px-2 pb-1 text-[11px] font-black text-[#FF2A6D] uppercase tracking-wider">
-                    <Command className="w-4 h-4 text-[#FF2A6D]" />
-                    <span>SuperAdmin Command</span>
-                  </div>
+                  {isSuperAdmin && (
+                    <div className="flex items-center space-x-2 px-2 pb-1 text-[11px] font-black text-[#FF2A6D] uppercase tracking-wider">
+                      <Command className="w-4 h-4 text-[#FF2A6D]" />
+                      <span>SuperAdmin Command</span>
+                    </div>
+                  )}
 
-                  {adminNavItems.map((item) => {
+                  {activeNavItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = pathname === item.path;
 
