@@ -4,6 +4,9 @@ import { config } from '../config/index.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { generatePayUHash, verifyPayUResponseHash } from '../utils/payu.js';
 
+if (!global.pendingRegistrations) {
+  global.pendingRegistrations = new Map();
+}
 /**
  * Initiate PayU Payment for User Subscription
  */
@@ -226,6 +229,12 @@ export const initiatePayUPayment = asyncHandler(async (req, res) => {
     }
   }
 
+  if (req.body.registrationToken) {
+    global.pendingRegistrations.set(txnid, req.body.registrationToken);
+    // Cleanup memory after 30 mins
+    setTimeout(() => global.pendingRegistrations.delete(txnid), 30 * 60 * 1000);
+  }
+
   const surl = `${config.payu.serverBaseUrl}/api/payment/payu-success`;
   const furl = `${config.payu.serverBaseUrl}/api/payment/payu-failure`;
 
@@ -265,6 +274,12 @@ export const handlePayUSuccess = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'Invalid payment callback data' });
   }
 
+  let finalRegToken = registrationToken;
+  if (!finalRegToken && global.pendingRegistrations.has(txnid)) {
+    finalRegToken = global.pendingRegistrations.get(txnid);
+    global.pendingRegistrations.delete(txnid);
+  }
+
   const verification = verifyPayUResponseHash(payuResponse);
 
   let paymentRecord = await prisma.paymentHistory.findUnique({ where: { txnid } });
@@ -272,9 +287,9 @@ export const handlePayUSuccess = asyncHandler(async (req, res) => {
   let user = null;
   let decodedRegistration = null;
 
-  if (registrationToken) {
+  if (finalRegToken) {
     try {
-      decodedRegistration = jwt.verify(registrationToken, config.jwt.secret);
+      decodedRegistration = jwt.verify(finalRegToken, config.jwt.secret);
     } catch (e) {
       console.error('Registration token verification error:', e.message);
     }

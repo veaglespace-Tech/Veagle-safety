@@ -43,6 +43,18 @@ function OrganizationDashboardContent() {
   const [referralCode, setReferralCode] = useState('');
   const [copySuccess, setCopySuccess] = useState(false);
 
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -80,6 +92,12 @@ function OrganizationDashboardContent() {
       fetchOverview();
       fetchSettings();
     }
+    
+    const handleStatusChange = () => {
+      if (token) fetchOverview();
+    };
+    window.addEventListener('sos-status-changed', handleStatusChange);
+    return () => window.removeEventListener('sos-status-changed', handleStatusChange);
   }, [mounted, token]);
 
   // Auth Protection
@@ -97,34 +115,28 @@ function OrganizationDashboardContent() {
     }
   }
 
-  const handleRemoveMember = async (userId, memberName) => {
-    if (!window.confirm(`Are you sure you want to remove ${memberName} from your Organization?`))
-      return;
-    try {
-      const res = await api.delete(`/organization/members/${userId}`);
-      if (res.data && res.data.success) {
-        fetchOverview();
-      }
-    } catch (err) {
-      alert(err?.response?.data?.error || 'Failed to remove member.');
-    }
-  };
 
   const copyReferralLink = () => {
-    const link = `${window.location.origin}/register?ref=${referralCode}`;
+    const link = `${window.location.origin}/auth?mode=register&ref=${referralCode}`;
     navigator.clipboard.writeText(link);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
   const filteredMembers = members.filter((m) => {
-    const term = searchTerm.toLowerCase();
+    const term = debouncedSearch.toLowerCase();
     return (
       m.user.fullName?.toLowerCase().includes(term) ||
       m.user.email?.toLowerCase().includes(term) ||
       m.user.phone?.includes(term)
     );
   });
+
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
+  const paginatedMembers = filteredMembers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   if (!mounted) return null;
 
@@ -340,36 +352,56 @@ function OrganizationDashboardContent() {
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-[#FFCCE1]/60">
-                {filteredMembers.map((m) => (
-                  <div
-                    key={m.userId}
-                    className="py-4 flex items-center justify-between gap-4"
-                  >
-                    <div className="flex items-center space-x-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center font-black text-xs shrink-0">
-                        {m.user.fullName?.charAt(0) || 'M'}
-                      </div>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <h4 className="font-black text-sm text-[#2A0826]">{m.user.fullName}</h4>
+              <div className="space-y-4">
+                <div className="divide-y divide-[#FFCCE1]/60">
+                  {paginatedMembers.map((m) => (
+                    <div
+                      key={m.userId}
+                      className="py-4 flex items-center justify-between gap-4"
+                    >
+                      <div className="flex items-center space-x-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF5C8A] to-[#FF2A6D] text-white flex items-center justify-center font-black text-xs shrink-0">
+                          {m.user.fullName?.charAt(0) || 'M'}
                         </div>
-                        <p className="text-xs font-bold text-[#684E67]">
-                          {m.user.email} • {m.user.phone}
-                        </p>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <h4 className="font-black text-sm text-[#2A0826]">{m.user.fullName}</h4>
+                          </div>
+                          <p className="text-xs font-bold text-[#684E67]">
+                            {m.user.email} • {m.user.phone}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  ))}
+                </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveMember(m.userId, m.user.fullName)}
-                      className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer"
-                      title="Remove Member"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-4 border-t border-[#FFCCE1]/60">
+                    <span className="text-xs font-bold text-[#684E67]">
+                      Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredMembers.length)} of {filteredMembers.length} members
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#2A0826] bg-[#FFF0F3] hover:bg-[#FFCCE1] disabled:opacity-50 transition-colors"
+                      >
+                        Prev
+                      </button>
+                      <span className="text-xs font-black text-[#2A0826]">{currentPage} / {totalPages}</span>
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#2A0826] bg-[#FFF0F3] hover:bg-[#FFCCE1] disabled:opacity-50 transition-colors"
+                      >
+                        Next
+                      </button>
+                    </div>
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
@@ -398,7 +430,7 @@ function OrganizationDashboardContent() {
                  <input 
                    type="text"
                    readOnly
-                   value={referralCode ? `${typeof window !== 'undefined' ? window.location.origin : ''}/register?ref=${referralCode}` : 'Loading...'}
+                   value={referralCode ? `${typeof window !== 'undefined' ? window.location.origin : ''}/auth?mode=register&ref=${referralCode}` : 'Loading...'}
                    className="w-full bg-white border border-[#FFCCE1] rounded-xl px-4 py-3 text-xs font-black text-[#2A0826] outline-none"
                  />
                  <button

@@ -18,6 +18,8 @@ export const registerSchema = z.object({
   country: z.string().optional(),
   pincode: z.string().regex(/^\d{6}$/, "Please enter a valid 6-digit Pincode").optional().or(z.literal('')),
   medicalNotes: z.string().optional(),
+  orgReferralCode: z.string().optional(),
+  partnerReferralCode: z.string().optional(),
 });
 
 export const loginSchema = z.object({

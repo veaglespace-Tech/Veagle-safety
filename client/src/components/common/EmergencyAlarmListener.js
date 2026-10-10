@@ -75,6 +75,10 @@ export const EmergencyAlarmListener = () => {
             return; // Ignore recurring broadcast for explicitly dismissed session
           }
 
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('sos-status-changed'));
+          }
+
           // CRITICAL: Do NOT show siren alert to the victim who triggered SOS!
           // The victim might be in danger — a loud siren + fullscreen alert on their
           // device could attract unwanted attention and put them at greater risk.
@@ -108,6 +112,9 @@ export const EmergencyAlarmListener = () => {
         });
 
         socket.on('SOS_ALARM_STOP', (data) => {
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('sos-status-changed'));
+          }
           setAlarmData(null);
           stopEmergencySiren();
           setIsSirenActive(false);
