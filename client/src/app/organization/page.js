@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleSosMute } from '../../redux/slices/sosSlice.js';
 import {
   Building,
   Users,
@@ -26,8 +27,10 @@ import { api } from '../../utils/api.js';
 
 function OrganizationDashboardContent() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const { token, user } = useSelector((state) => state?.auth || {});
+  const mutedSosIds = useSelector((state) => state?.sos?.mutedSosIds || []);
   const [mounted, setMounted] = useState(false);
   const activeTab = searchParams?.get('tab') || 'monitor';
 
@@ -49,6 +52,17 @@ function OrganizationDashboardContent() {
   const itemsPerPage = 5;
   const [isSirenActive, setIsSirenActive] = useState(false);
 
+  // Evaluate siren based on active SOS list and muted IDs
+  useEffect(() => {
+    const activeSosMembers = members.filter(m => m.activeSos);
+    const hasUnmutedSos = activeSosMembers.some(m => !mutedSosIds.includes(String(m.activeSos.id)));
+    
+    // Tell EmergencyAlarmListener whether to keep playing
+    window.dispatchEvent(new CustomEvent('set-siren-state', { detail: { active: hasUnmutedSos && activeSosMembers.length > 0 } }));
+    setIsSirenActive(hasUnmutedSos && activeSosMembers.length > 0);
+  }, [members, mutedSosIds]);
+
+  // Sync actual global siren state (in case muted from popup)
   useEffect(() => {
     const handleSirenChange = (e) => setIsSirenActive(e.detail.active);
     window.addEventListener('siren-status-changed', handleSirenChange);
@@ -305,15 +319,15 @@ function OrganizationDashboardContent() {
                             </span>
                             <button
                               type="button"
-                              onClick={() => window.dispatchEvent(new CustomEvent('toggle-siren-audio'))}
+                              onClick={() => dispatch(toggleSosMute(m.activeSos.id))}
                               className={`px-3 py-1 text-xs font-black rounded-full flex items-center space-x-1 transition-colors border shadow-sm ${
-                                isSirenActive
+                                !mutedSosIds.includes(String(m.activeSos.id))
                                   ? 'bg-emerald-500 text-white border-emerald-600 hover:bg-emerald-600'
                                   : 'bg-white text-red-600 border-red-200 hover:bg-rose-50'
                               }`}
                             >
-                              {isSirenActive ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                              <span>{isSirenActive ? 'MUTE' : 'SIREN'}</span>
+                              {!mutedSosIds.includes(String(m.activeSos.id)) ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                              <span>{!mutedSosIds.includes(String(m.activeSos.id)) ? 'MUTE' : 'SIREN'}</span>
                             </button>
                             {m.activeSos.shareToken && (
                               <a

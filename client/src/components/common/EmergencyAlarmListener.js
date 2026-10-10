@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { checkActiveSos, clearSosState } from '../../redux/slices/sosSlice.js';
+import { checkActiveSos, clearSosState, muteSos } from '../../redux/slices/sosSlice.js';
 import {
   ShieldAlert,
   Volume2,
@@ -19,15 +19,21 @@ import { startEmergencySiren, stopEmergencySiren } from '../../utils/sirenAudio.
 export const EmergencyAlarmListener = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state?.auth || {});
+  const mutedSosIds = useSelector((state) => state?.sos?.mutedSosIds || []);
   const [alarmData, setAlarmData] = useState(null);
   const [isSirenActive, setIsSirenActive] = useState(false);
   const dismissedSosIdsRef = useRef(new Set());
   const socketRef = useRef(null);
   const userRef = useRef(user);
+  const mutedSosIdsRef = useRef(mutedSosIds);
 
   useEffect(() => {
     userRef.current = user;
   }, [user]);
+
+  useEffect(() => {
+    mutedSosIdsRef.current = mutedSosIds;
+  }, [mutedSosIds]);
 
   const registerUserRooms = (socketInstance, u) => {
     if (!socketInstance || !u) return;
@@ -102,11 +108,14 @@ export const EmergencyAlarmListener = () => {
 
           console.log('[EmergencyAlarmListener] SOS ALARM BROADCAST received:', data);
           setAlarmData(data);
-          try {
-            startEmergencySiren();
-            setIsSirenActive(true);
-          } catch (e) {
-            console.warn('Audio requires user click gesture');
+          
+          if (!mutedSosIdsRef.current.includes(String(sosId))) {
+            try {
+              startEmergencySiren();
+              setIsSirenActive(true);
+            } catch (e) {
+              console.warn('Audio requires user click gesture');
+            }
           }
         });
 
@@ -157,8 +166,23 @@ export const EmergencyAlarmListener = () => {
 
   useEffect(() => {
     const onToggle = () => handleStartAudioSiren();
+    const onSetState = (e) => {
+      if (e.detail.active && !isSirenActive) {
+        startEmergencySiren();
+        setIsSirenActive(true);
+      } else if (!e.detail.active && isSirenActive) {
+        stopEmergencySiren();
+        setIsSirenActive(false);
+      }
+    };
+    
     window.addEventListener('toggle-siren-audio', onToggle);
-    return () => window.removeEventListener('toggle-siren-audio', onToggle);
+    window.addEventListener('set-siren-state', onSetState);
+    
+    return () => {
+      window.removeEventListener('toggle-siren-audio', onToggle);
+      window.removeEventListener('set-siren-state', onSetState);
+    };
   }, [isSirenActive]);
 
   const handleDismiss = (e) => {
@@ -169,6 +193,7 @@ export const EmergencyAlarmListener = () => {
       const sosId = alarmData.sosId || alarmData.id || alarmData.sosSessionId;
       if (sosId) {
         dismissedSosIdsRef.current.add(String(sosId));
+        dispatch(muteSos(String(sosId))); // Sync with individual mute system
       }
     }
     setAlarmData(null);

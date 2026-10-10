@@ -23,15 +23,31 @@ import {
   Volume2
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleSosMute } from '../../redux/slices/sosSlice.js';
 
 export default function SuperAdminOverviewPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const mutedSosIds = useSelector((state) => state?.sos?.mutedSosIds || []);
+
   const [mounted, setMounted] = useState(false);
   const [overview, setOverview] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [isSirenActive, setIsSirenActive] = useState(false);
 
+  // Evaluate siren based on active SOS list and muted IDs
+  useEffect(() => {
+    const activeSosList = overview?.activeSos || [];
+    const hasUnmutedSos = activeSosList.some(sos => !mutedSosIds.includes(String(sos.id)));
+    
+    // Tell EmergencyAlarmListener whether to keep playing
+    window.dispatchEvent(new CustomEvent('set-siren-state', { detail: { active: hasUnmutedSos && activeSosList.length > 0 } }));
+    setIsSirenActive(hasUnmutedSos && activeSosList.length > 0);
+  }, [overview?.activeSos, mutedSosIds]);
+
+  // Sync actual global siren state (in case muted from popup)
   useEffect(() => {
     const handleSirenChange = (e) => setIsSirenActive(e.detail.active);
     window.addEventListener('siren-status-changed', handleSirenChange);
@@ -325,15 +341,15 @@ export default function SuperAdminOverviewPage() {
                       <div className="flex flex-wrap items-center gap-3">
                         <button
                           type="button"
-                          onClick={() => window.dispatchEvent(new CustomEvent('toggle-siren-audio'))}
+                          onClick={() => dispatch(toggleSosMute(sos.id))}
                           className={`px-4 py-2.5 font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer uppercase tracking-wider ${
-                            isSirenActive
+                            !mutedSosIds.includes(String(sos.id))
                               ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                               : 'bg-white text-red-600 border border-red-200 hover:bg-rose-50'
                           }`}
                         >
-                          {isSirenActive ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                          <span>{isSirenActive ? 'MUTE SIREN' : 'PLAY SIREN'}</span>
+                          {!mutedSosIds.includes(String(sos.id)) ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                          <span>{!mutedSosIds.includes(String(sos.id)) ? 'MUTE SIREN' : 'PLAY SIREN'}</span>
                         </button>
                         <button
                           type="button"
