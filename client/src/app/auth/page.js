@@ -207,6 +207,24 @@ function UserAuthForm() {
       return false;
     }
 
+    if (!emergencyContactName.trim()) {
+      setValidationError('Emergency Contact Name is required.');
+      return false;
+    }
+
+    if (!emergencyContactRelation.trim()) {
+      setValidationError('Emergency Contact Relation is required.');
+      return false;
+    }
+
+    const cleanEmergencyPhone = emergencyContactPhone.replace(/\D/g, '');
+    if (!phoneRegex.test(cleanEmergencyPhone)) {
+      setValidationError(
+        'Please enter a valid 10-digit mobile number for Emergency Contact.'
+      );
+      return false;
+    }
+
     if (password.length < 6) {
       setValidationError('Password must be at least 6 characters long.');
       return false;
@@ -230,17 +248,16 @@ function UserAuthForm() {
           email: email.trim(),
           phone: phone.replace(/\D/g, ''),
           role: selectedRole,
-          bloodGroup: selectedRole === 'USER' ? bloodGroup : 'N/A',
-          address: selectedRole === 'USER' ? address.trim() : 'N/A',
-          city: selectedRole === 'USER' ? city.trim() : 'N/A',
-          state: selectedRole === 'USER' ? state.trim() : 'N/A',
+          bloodGroup: bloodGroup,
+          address: address.trim(),
+          city: city.trim(),
+          state: state.trim(),
           country: 'India',
-          pincode: selectedRole === 'USER' ? pincode.trim() : '411001',
-          emergencyContactName: selectedRole === 'USER' ? emergencyContactName.trim() : 'N/A',
-          emergencyContactRelation: selectedRole === 'USER' ? emergencyContactRelation : 'N/A',
-          emergencyContactPhone:
-            selectedRole === 'USER' ? emergencyContactPhone.replace(/\D/g, '') : '9999999999',
-          parentEmail: selectedRole === 'USER' ? parentEmail.trim() : '',
+          pincode: pincode.trim(),
+          emergencyContactName: emergencyContactName.trim(),
+          emergencyContactRelation: emergencyContactRelation,
+          emergencyContactPhone: emergencyContactPhone.replace(/\D/g, ''),
+          parentEmail: parentEmail.trim(),
           password,
           partnerReferralCode: searchParams?.get('ref') || '',
           orgReferralCode: searchParams?.get('ref') || '',
