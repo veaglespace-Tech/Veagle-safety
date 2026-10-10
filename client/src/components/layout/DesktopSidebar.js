@@ -345,7 +345,7 @@ export const DesktopSidebar = () => {
                   {displayName}
                 </p>
                 <p className="text-[10px] font-bold text-[#FF2A6D] truncate">
-                  {isSuperAdmin ? 'Super Admin' : 'Active Protection'}
+                  {isSuperAdmin ? 'Super Admin' : isOrganization ? 'Organization Admin' : isParent ? 'Parent / Guardian' : 'Active Protection'}
                 </p>
               </div>
             </Link>
@@ -480,14 +480,24 @@ export const DesktopSidebar = () => {
 
                 {/* FOOTER ACTION BUTTONS & USER CARD */}
                 <div className="p-4 border-t border-[#FFCCE1]/60 bg-gradient-to-b from-white to-[#FFF0F3]/80 space-y-3">
-                  <Link
-                    href="/admin?tab=overview"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center space-x-2.5 w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-4 py-3 rounded-2xl text-xs shadow-md uppercase tracking-wider border border-white/30"
-                  >
-                    <AlertTriangle className="w-4 h-4 animate-pulse" />
-                    <span>EMERGENCY COMMAND</span>
-                  </Link>
+                  {!isParent && !isOrganization && (
+                    <Link
+                      href={
+                        isSuperAdmin ? '/admin?tab=overview' : activeSession ? '/active-sos' : '/dashboard'
+                      }
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-center space-x-2.5 w-full bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white font-black px-4 py-3 rounded-2xl text-xs shadow-md uppercase tracking-wider border border-white/30"
+                    >
+                      <AlertTriangle className="w-4 h-4 animate-pulse" />
+                      <span>
+                        {isSuperAdmin
+                          ? '🚨 EMERGENCY COMMAND'
+                          : activeSession
+                            ? '🚨 VIEW SOS STATUS'
+                            : 'EMERGENCY SOS'}
+                      </span>
+                    </Link>
+                  )}
 
                   {/* USER CARD */}
                   <div className="bg-white border border-[#FFCCE1] p-3 rounded-2xl flex items-center justify-between shadow-xs">
@@ -511,7 +521,9 @@ export const DesktopSidebar = () => {
                         <p className="font-black text-xs text-[#2A0826] group-hover:text-[#FF2A6D] transition-colors truncate">
                           {displayName}
                         </p>
-                        <p className="text-[10px] font-bold text-[#FF2A6D] truncate">Super Admin</p>
+                        <p className="text-[10px] font-bold text-[#FF2A6D] truncate">
+                          {isSuperAdmin ? 'Super Admin' : isOrganization ? 'Organization Admin' : isParent ? 'Parent / Guardian' : 'Active Protection'}
+                        </p>
                       </div>
                     </Link>
 
