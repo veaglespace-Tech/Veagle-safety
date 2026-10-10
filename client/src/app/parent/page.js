@@ -21,6 +21,8 @@ import {
   ArrowUpRight,
   Shield,
   Eye,
+  VolumeX,
+  Volume2
 } from 'lucide-react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { LiveLocationMap } from '../../components/location/DynamicLiveLocationMap.js';
@@ -50,6 +52,14 @@ export default function ParentDashboard() {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  const [isSirenActive, setIsSirenActive] = useState(false);
+
+  useEffect(() => {
+    const handleSirenChange = (e) => setIsSirenActive(e.detail.active);
+    window.addEventListener('siren-status-changed', handleSirenChange);
+    return () => window.removeEventListener('siren-status-changed', handleSirenChange);
   }, []);
 
   // Reliable Polling Fallback & History Fetcher for Live GPS Tracking
@@ -505,6 +515,18 @@ export default function ParentDashboard() {
                       <div className="pt-1 space-y-2">
                         {item.activeSos && (
                           <div className="flex flex-col sm:flex-row gap-2">
+                            <button
+                              type="button"
+                              onClick={() => window.dispatchEvent(new CustomEvent('toggle-siren-audio'))}
+                              className={`flex-shrink-0 px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 transition-all border shadow-sm ${
+                                isSirenActive
+                                  ? 'bg-emerald-500 text-white border-emerald-600 hover:bg-emerald-600'
+                                  : 'bg-white text-red-600 border-red-200 hover:bg-rose-50'
+                              }`}
+                            >
+                              {isSirenActive ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                              <span>{isSirenActive ? 'MUTE' : 'SIREN'}</span>
+                            </button>
                             <button
                               type="button"
                               onClick={() => setTrackingChild(item)}

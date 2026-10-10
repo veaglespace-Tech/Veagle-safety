@@ -15,10 +15,11 @@ import {
   X,
   Navigation,
   RefreshCw,
-  Activity,
   ArrowUpRight,
   Settings,
   Copy,
+  VolumeX,
+  Volume2
 } from 'lucide-react';
 import { AppLayout } from '../../components/layout/AppLayout.js';
 import { api } from '../../utils/api.js';
@@ -46,6 +47,13 @@ function OrganizationDashboardContent() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [isSirenActive, setIsSirenActive] = useState(false);
+
+  useEffect(() => {
+    const handleSirenChange = (e) => setIsSirenActive(e.detail.active);
+    window.addEventListener('siren-status-changed', handleSirenChange);
+    return () => window.removeEventListener('siren-status-changed', handleSirenChange);
+  }, []);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -290,11 +298,23 @@ function OrganizationDashboardContent() {
 
                       <div className="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end">
                         {m.activeSos ? (
-                          <div className="flex items-center space-x-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="bg-[#FF2A6D] text-white text-xs font-black px-3 py-1 rounded-full animate-pulse flex items-center space-x-1">
                               <AlertTriangle className="w-3.5 h-3.5" />
                               <span>SOS ACTIVE</span>
                             </span>
+                            <button
+                              type="button"
+                              onClick={() => window.dispatchEvent(new CustomEvent('toggle-siren-audio'))}
+                              className={`px-3 py-1 text-xs font-black rounded-full flex items-center space-x-1 transition-colors border shadow-sm ${
+                                isSirenActive
+                                  ? 'bg-emerald-500 text-white border-emerald-600 hover:bg-emerald-600'
+                                  : 'bg-white text-red-600 border-red-200 hover:bg-rose-50'
+                              }`}
+                            >
+                              {isSirenActive ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                              <span>{isSirenActive ? 'MUTE' : 'SIREN'}</span>
+                            </button>
                             {m.activeSos.shareToken && (
                               <a
                                 href={`/live-track/${m.activeSos.shareToken}`}

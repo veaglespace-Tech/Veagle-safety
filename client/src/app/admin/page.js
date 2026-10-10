@@ -19,6 +19,8 @@ import {
   X,
   Clock,
   ExternalLink,
+  VolumeX,
+  Volume2
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -28,6 +30,13 @@ export default function SuperAdminOverviewPage() {
   const [overview, setOverview] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const [isSirenActive, setIsSirenActive] = useState(false);
+
+  useEffect(() => {
+    const handleSirenChange = (e) => setIsSirenActive(e.detail.active);
+    window.addEventListener('siren-status-changed', handleSirenChange);
+    return () => window.removeEventListener('siren-status-changed', handleSirenChange);
+  }, []);
 
   // LIVE GPS TRACKING MODAL STATE
   const [trackingSos, setTrackingSos] = useState(null);
@@ -313,7 +322,19 @@ export default function SuperAdminOverviewPage() {
                         </p>
                       </div>
 
-                      <div className="flex items-center space-x-3">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => window.dispatchEvent(new CustomEvent('toggle-siren-audio'))}
+                          className={`px-4 py-2.5 font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer uppercase tracking-wider ${
+                            isSirenActive
+                              ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                              : 'bg-white text-red-600 border border-red-200 hover:bg-rose-50'
+                          }`}
+                        >
+                          {isSirenActive ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                          <span>{isSirenActive ? 'MUTE SIREN' : 'PLAY SIREN'}</span>
+                        </button>
                         <button
                           type="button"
                           onClick={() => setTrackingSos(sos)}

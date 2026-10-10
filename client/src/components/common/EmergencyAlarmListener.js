@@ -147,11 +147,19 @@ export const EmergencyAlarmListener = () => {
     if (isSirenActive) {
       stopEmergencySiren();
       setIsSirenActive(false);
+      window.dispatchEvent(new CustomEvent('siren-status-changed', { detail: { active: false } }));
     } else {
       startEmergencySiren();
       setIsSirenActive(true);
+      window.dispatchEvent(new CustomEvent('siren-status-changed', { detail: { active: true } }));
     }
   };
+
+  useEffect(() => {
+    const onToggle = () => handleStartAudioSiren();
+    window.addEventListener('toggle-siren-audio', onToggle);
+    return () => window.removeEventListener('toggle-siren-audio', onToggle);
+  }, [isSirenActive]);
 
   const handleDismiss = (e) => {
     if (e) e.stopPropagation();
