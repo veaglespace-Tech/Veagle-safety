@@ -100,10 +100,8 @@ export const SOSHeroButton = ({ onTriggerComplete }) => {
       return;
     }
 
-    // Start emergency siren audio immediately unless in silent mode
-    if (!isSilent) {
-      startEmergencySiren();
-    }
+    // Victim siren is kept OFF as per requirements to prevent escalating danger.
+    // The siren will only sound on Admin, Organization, and Parent dashboards via Socket broadcast.
 
     if (!('geolocation' in navigator)) {
       alert('Your browser does not support Geolocation. Cannot trigger live tracking SOS.');

@@ -99,7 +99,6 @@ export default function SuperAdminOverviewPage() {
         socket = io(SERVER_URL, {
           path: '/api/socket.io',
           transports: ['websocket', 'polling'],
-          reconnectionAttempts: 5,
         });
 
         // Register as admin to join admin-ops room for real-time SOS updates

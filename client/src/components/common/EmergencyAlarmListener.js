@@ -57,7 +57,6 @@ export const EmergencyAlarmListener = () => {
         socket = io(SERVER_URL, {
           path: '/api/socket.io',
           transports: ['websocket', 'polling'],
-          reconnectionAttempts: 5,
           timeout: 10000,
         });
         socketRef.current = socket;
