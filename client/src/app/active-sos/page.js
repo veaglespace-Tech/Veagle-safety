@@ -218,7 +218,7 @@ export default function ActiveSOSLivePage() {
         <div className="lg:col-span-5 xl:col-span-4 space-y-4">
           <div className="grid grid-cols-3 gap-2.5">
             {[
-              { icon: MapPin, label: 'GPS Accuracy', value: `±${accuracy || '--'}m` },
+              { icon: MapPin, label: 'GPS Accuracy', value: `±${accuracy ? Number(accuracy).toFixed(1) : '--'}m` },
               { icon: Users, label: 'Notified', value: `${contactsCount} Contact${contactsCount !== 1 ? 's' : ''}` },
               { icon: Clock, label: 'Duration', value: formatElapsed(elapsed) },
             ].map((stat) => {
