@@ -8,7 +8,7 @@ export const registerSchema = z.object({
   role: z.enum(['USER', 'SUPER_ADMIN', 'ORGANIZATION', 'PARENT']).optional().default('USER'),
   emergencyContactName: z.string().optional(),
   emergencyContactRelation: z.string().optional(),
-  emergencyContactPhone: z.string().transform(val => val ? val.replace(/\D/g, '') : '').pipe(z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid 10-digit mobile number for Emergency Contact").optional().or(z.literal(''))),
+  emergencyContactPhone: z.string().optional().transform(val => val ? val.replace(/\D/g, '') : '').pipe(z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid 10-digit mobile number for Emergency Contact").optional().or(z.literal(''))),
   parentEmail: z.string().email("Please enter a valid Parent Email address").optional().or(z.literal('')),
   profilePhoto: z.string().url().optional(),
   bloodGroup: z.string().optional(),
