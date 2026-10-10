@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
