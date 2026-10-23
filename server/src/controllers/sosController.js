@@ -3,6 +3,7 @@ import { config } from '../config/index.js';
 import { sendSosEmergencyAlert, sendSosSafeAlert } from '../services/mailer.js';
 import { getIO } from '../socket.js';
 import { sendEmergencyPushToEmails } from './pushController.js';
+import { sendEmergencySirenPush } from '../services/fcmService.js';
 import { collectEmergencyRecipients } from '../utils/recipientHelper.js';
 
 export const startSos = async (req, res) => {
@@ -234,6 +235,46 @@ export const startSos = async (req, res) => {
       longitude,
     });
 
+    // 6. Send Native Mobile FCM Push (High-Decibel Siren to Parents, Guardians & Admins)
+    try {
+      const recipientUserIds = new Set();
+      // Add linked parents
+      parentLinks.forEach((link) => {
+        if (link.parentId) recipientUserIds.add(link.parentId);
+      });
+      // Add organization admin if any
+      if (currentUser?.organizationId) {
+        recipientUserIds.add(currentUser.organizationId);
+      }
+      // Add super admins
+      const superAdmins = await prisma.user.findMany({
+        where: { role: 'SUPER_ADMIN' },
+        select: { id: true },
+      });
+      superAdmins.forEach((a) => recipientUserIds.add(a.id));
+
+      if (recipientUserIds.size > 0) {
+        const deviceTokenRecords = await prisma.deviceToken.findMany({
+          where: { userId: { in: Array.from(recipientUserIds) } },
+          select: { token: true },
+        });
+
+        const fcmTokens = deviceTokenRecords.map((t) => t.token);
+        if (fcmTokens.length > 0) {
+          sendEmergencySirenPush({
+            tokens: fcmTokens,
+            victimName: currentUser?.fullName || 'Sakhi Suraksha User',
+            sosId: session.id,
+            trackingUrl,
+            latitude,
+            longitude,
+          }).catch((err) => console.error('[FCM] Push dispatch error:', err.message));
+        }
+      }
+    } catch (pushErr) {
+      console.warn('[FCM] Failed collecting device tokens:', pushErr.message);
+    }
+
     return res.json({
       message: 'SOS Activated! Emergency Emails, WhatsApp Alerts & Siren Broadcasted.',
       sosSession: {
@@ -284,6 +325,8 @@ export const updateSosLocation = async (req, res) => {
             parentEmail: true,
             emergencyContactPhone: true,
             trustedContacts: { select: { email: true, phone: true } },
+            // Include org admin so we can push location to org dashboard too
+            organization: { select: { email: true, phone: true } },
           },
         },
       },
@@ -377,7 +420,19 @@ export const updateSosLocation = async (req, res) => {
         });
       }
 
-      // Emit to each parent/guardian room
+      // Add organization admin rooms — so org dashboard live map updates in real-time
+      if (session?.user?.organization?.email) {
+        targetRooms.add(`user:${session.user.organization.email.trim().toLowerCase()}`);
+      }
+      if (session?.user?.organization?.phone) {
+        const cleanOrgPhone = session.user.organization.phone.replace(/\D/g, '');
+        if (cleanOrgPhone) {
+          targetRooms.add(`user:${cleanOrgPhone}`);
+          if (cleanOrgPhone.length >= 10) targetRooms.add(`user:${cleanOrgPhone.slice(-10)}`);
+        }
+      }
+
+      // Emit to each parent/guardian/org-admin room
       targetRooms.forEach((roomName) => {
         io.to(roomName).emit('SOS_LOCATION_UPDATE', payload);
       });
