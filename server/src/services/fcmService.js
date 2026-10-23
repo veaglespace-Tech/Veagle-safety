@@ -53,9 +53,13 @@ export function initFirebase() {
  * @param {number} [params.longitude] - Victim longitude
  */
 export async function sendEmergencySirenPush({ tokens, victimName, sosId, trackingUrl, latitude, longitude }) {
-  if (!tokens || tokens.length === 0) {
-    return { success: false, reason: 'No device tokens provided' };
+  const validTokens = (tokens || []).filter((t) => typeof t === 'string' && t.trim().length > 10);
+
+  if (validTokens.length === 0) {
+    return { success: false, reason: 'No valid device tokens provided' };
   }
+
+  console.log(`[FCM] Target tokens count: ${validTokens.length}. Sample: ${validTokens[0].substring(0, 20)}...`);
 
   // Ensure Firebase is initialized
   initFirebase();
@@ -67,7 +71,7 @@ export async function sendEmergencySirenPush({ tokens, victimName, sosId, tracki
 
   // High-Priority Android Alarm Payload
   const message = {
-    tokens,
+    tokens: validTokens,
     notification: {
       title: '🚨 EMERGENCY SOS ALERT!',
       body: `${victimName} activated SOS! Tap to open live tracker.`,
