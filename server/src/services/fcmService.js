@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+import { getMessaging } from 'firebase-admin/messaging';
 import path from 'path';
 import fs from 'fs';
 
@@ -110,7 +111,8 @@ export async function sendEmergencySirenPush({ tokens, victimName, sosId, tracki
   };
 
   try {
-    const response = await admin.messaging().sendEachForMulticast(message);
+    const messaging = getMessaging();
+    const response = await messaging.sendEachForMulticast(message);
     console.log(`✅ [FCM] Emergency Siren dispatched: ${response.successCount} success, ${response.failureCount} failed`);
     return {
       success: true,
