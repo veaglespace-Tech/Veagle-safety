@@ -114,6 +114,15 @@ export async function sendEmergencySirenPush({ tokens, victimName, sosId, tracki
     const messaging = getMessaging();
     const response = await messaging.sendEachForMulticast(message);
     console.log(`✅ [FCM] Emergency Siren dispatched: ${response.successCount} success, ${response.failureCount} failed`);
+
+    if (response.failureCount > 0) {
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          console.error(`❌ [FCM Error] Token #${idx} failed:`, resp.error?.code, resp.error?.message);
+        }
+      });
+    }
+
     return {
       success: true,
       successCount: response.successCount,
