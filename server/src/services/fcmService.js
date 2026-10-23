@@ -120,11 +120,26 @@ export async function sendEmergencySirenPush({ tokens, victimName, sosId, tracki
     console.log(`✅ [FCM] Emergency Siren dispatched: ${response.successCount} success, ${response.failureCount} failed`);
 
     if (response.failureCount > 0) {
-      response.responses.forEach((resp, idx) => {
+      const { prisma } = await import('../config/prisma.js');
+      for (let idx = 0; idx < response.responses.length; idx++) {
+        const resp = response.responses[idx];
         if (!resp.success) {
-          console.error(`❌ [FCM Error] Token #${idx} failed:`, resp.error?.code, resp.error?.message);
+          const badToken = validTokens[idx];
+          const errCode = resp.error?.code || 'UNKNOWN_ERROR';
+          const errMsg = resp.error?.message || 'No description provided';
+          console.error(`🚨 [FCM Exact Error] Token #${idx} (${badToken.substring(0, 25)}...): Code = "${errCode}", Message = "${errMsg}"`);
+
+          // If token is invalid or unregistered, automatically remove it from the DB
+          if (
+            errCode === 'messaging/registration-token-not-registered' ||
+            errCode === 'messaging/invalid-argument' ||
+            errCode === 'messaging/invalid-registration-token'
+          ) {
+            console.warn(`🧹 [FCM Cleanup] Removing stale token from database: ${badToken.substring(0, 25)}...`);
+            await prisma.deviceToken.deleteMany({ where: { token: badToken } }).catch(() => {});
+          }
         }
-      });
+      }
     }
 
     return {
