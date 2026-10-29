@@ -31,7 +31,7 @@ export function initFirebase() {
       firebaseInitialized = true;
       console.log('✅ [FCM] Firebase Admin SDK initialized with FIREBASE_CONFIG');
     } else {
-      console.warn('⚠️ [FCM] No serviceAccountKey.json or FIREBASE_CONFIG found. Emergency push will be simulated/logged.');
+      console.warn('⚠️ [FCM] No serviceAccountKey.json or FIREBASE_CONFIG found.');
     }
   } catch (error) {
     console.warn('⚠️ [FCM] Initialization warning:', error.message);
@@ -41,27 +41,83 @@ export function initFirebase() {
 }
 
 /**
- * Send High-Priority Emergency Siren Push Notification
+ * Send High-Priority Emergency Siren Push via Expo Push Service
  * Wakes device from sleep and plays emergency siren on channel: 'emergency_sos_siren_channel'
- * 
- * @param {Object} params
- * @param {string[]} params.tokens - FCM device tokens of parents & admins
- * @param {string} params.victimName - Name of person who triggered SOS
- * @param {string|number} params.sosId - SOS Session ID
- * @param {string} params.trackingUrl - Live location tracking URL
- * @param {number} [params.latitude] - Victim latitude
- * @param {number} [params.longitude] - Victim longitude
  */
-export async function sendEmergencySirenPush({ tokens, victimName, sosId, trackingUrl, latitude, longitude }) {
-  const validTokens = (tokens || []).filter((t) => typeof t === 'string' && t.trim().length > 10);
+async function sendExpoEmergencyPush({ tokens, victimName, sosId, trackingUrl, latitude, longitude }) {
+  if (!tokens || tokens.length === 0) return { success: true, count: 0 };
 
-  if (validTokens.length === 0) {
-    return { success: false, reason: 'No valid device tokens provided' };
+  console.log(`[ExpoPush] Sending emergency siren to ${tokens.length} Expo tokens...`);
+
+  const messages = tokens.map((to) => ({
+    to,
+    title: '🚨 EMERGENCY SOS ALERT!',
+    body: `${victimName} activated SOS! Tap to open live tracker.`,
+    data: {
+      type: 'SOS_TRIGGERED',
+      sosId: String(sosId),
+      victimName: String(victimName),
+      trackingUrl: String(trackingUrl || ''),
+      latitude: String(latitude || ''),
+      longitude: String(longitude || ''),
+      timestamp: new Date().toISOString(),
+    },
+    sound: 'default',
+    priority: 'high',
+    channelId: 'emergency_sos_siren_channel',
+    _displayInForeground: true,
+  }));
+
+  try {
+    const res = await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-Encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(messages),
+    });
+
+    const data = await res.json();
+    const tickets = Array.isArray(data?.data) ? data.data : [];
+    let successCount = 0;
+    let failureCount = 0;
+
+    const { prisma } = await import('../config/prisma.js');
+
+    for (let i = 0; i < tickets.length; i++) {
+      const ticket = tickets[i];
+      if (ticket.status === 'ok') {
+        successCount++;
+      } else {
+        failureCount++;
+        const badToken = tokens[i];
+        console.error(`🚨 [ExpoPush Error] Token #${i} (${badToken.substring(0, 25)}...):`, ticket.message, ticket.details);
+
+        if (ticket.details?.error === 'DeviceNotRegistered') {
+          console.warn(`🧹 [ExpoPush Cleanup] Removing unregistered Expo token from database: ${badToken.substring(0, 25)}...`);
+          await prisma.deviceToken.deleteMany({ where: { token: badToken } }).catch(() => {});
+        }
+      }
+    }
+
+    console.log(`✅ [ExpoPush] Dispatched: ${successCount} success, ${failureCount} failed`);
+    return { success: true, successCount, failureCount };
+  } catch (err) {
+    console.error('❌ [ExpoPush] Network dispatch error:', err.message);
+    return { success: false, error: err.message };
   }
+}
 
-  console.log(`[FCM] Target tokens count: ${validTokens.length}. Sample: ${validTokens[0].substring(0, 20)}...`);
+/**
+ * Send High-Priority Emergency Siren Push via Native Firebase Admin SDK
+ */
+async function sendFcmEmergencyPush({ tokens, victimName, sosId, trackingUrl, latitude, longitude }) {
+  if (!tokens || tokens.length === 0) return { success: true, count: 0 };
 
-  // Ensure Firebase is initialized
+  console.log(`[FCM] Target tokens count: ${tokens.length}. Sample: ${tokens[0].substring(0, 20)}...`);
+
   initFirebase();
 
   if (!firebaseInitialized) {
@@ -69,9 +125,8 @@ export async function sendEmergencySirenPush({ tokens, victimName, sosId, tracki
     return { success: false, reason: 'Firebase not configured' };
   }
 
-  // High-Priority Android Alarm Payload
   const message = {
-    tokens: validTokens,
+    tokens,
     notification: {
       title: '🚨 EMERGENCY SOS ALERT!',
       body: `${victimName} activated SOS! Tap to open live tracker.`,
@@ -86,10 +141,10 @@ export async function sendEmergencySirenPush({ tokens, victimName, sosId, tracki
       timestamp: new Date().toISOString(),
     },
     android: {
-      priority: 'high', // Wakes the device from Doze mode immediately
+      priority: 'high',
       notification: {
-        channelId: 'emergency_sos_siren_channel', // Matches mobile notificationService.js
-        sound: 'alarm_siren.wav',                  // Matches res/raw/alarm_siren.wav & expo-notifications
+        channelId: 'emergency_sos_siren_channel',
+        sound: 'default',
         priority: 'max',
         visibility: 'public',
         defaultVibrateTimings: false,
@@ -106,7 +161,7 @@ export async function sendEmergencySirenPush({ tokens, victimName, sosId, tracki
             title: '🚨 EMERGENCY SOS ALERT!',
             body: `${victimName} activated SOS!`,
           },
-          sound: 'alarm_siren.wav',
+          sound: 'default',
           badge: 1,
           'interruption-level': 'critical',
         },
@@ -124,17 +179,12 @@ export async function sendEmergencySirenPush({ tokens, victimName, sosId, tracki
       for (let idx = 0; idx < response.responses.length; idx++) {
         const resp = response.responses[idx];
         if (!resp.success) {
-          const badToken = validTokens[idx];
+          const badToken = tokens[idx];
           const errCode = resp.error?.code || 'UNKNOWN_ERROR';
           const errMsg = resp.error?.message || 'No description provided';
           console.error(`🚨 [FCM Exact Error] Token #${idx} (${badToken.substring(0, 25)}...): Code = "${errCode}", Message = "${errMsg}"`);
 
-          // If token is invalid or unregistered, automatically remove it from the DB
-          if (
-            errCode === 'messaging/registration-token-not-registered' ||
-            errCode === 'messaging/invalid-argument' ||
-            errCode === 'messaging/invalid-registration-token'
-          ) {
+          if (errCode === 'messaging/registration-token-not-registered') {
             console.warn(`🧹 [FCM Cleanup] Removing stale token from database: ${badToken.substring(0, 25)}...`);
             await prisma.deviceToken.deleteMany({ where: { token: badToken } }).catch(() => {});
           }
@@ -151,4 +201,57 @@ export async function sendEmergencySirenPush({ tokens, victimName, sosId, tracki
     console.error('❌ [FCM] Emergency Siren push failed:', error.message);
     return { success: false, error: error.message };
   }
+}
+
+/**
+ * Send High-Priority Emergency Siren Push Notification
+ * Wakes device from sleep and plays emergency siren on channel: 'emergency_sos_siren_channel'
+ * Supports BOTH Expo Push Tokens and Native FCM Tokens!
+ * 
+ * @param {Object} params
+ * @param {string[]} params.tokens - FCM / Expo device tokens of parents & admins
+ * @param {string} params.victimName - Name of person who triggered SOS
+ * @param {string|number} params.sosId - SOS Session ID
+ * @param {string} params.trackingUrl - Live location tracking URL
+ * @param {number} [params.latitude] - Victim latitude
+ * @param {number} [params.longitude] - Victim longitude
+ */
+export async function sendEmergencySirenPush({ tokens, victimName, sosId, trackingUrl, latitude, longitude }) {
+  const validTokens = Array.from(new Set((tokens || []).filter((t) => typeof t === 'string' && t.trim().length > 10)));
+
+  if (validTokens.length === 0) {
+    return { success: false, reason: 'No valid device tokens provided' };
+  }
+
+  const isExpoToken = (t) => t.startsWith('ExponentPushToken[') || t.startsWith('ExpoPushToken[');
+  const expoTokens = validTokens.filter(isExpoToken);
+  const fcmTokens = validTokens.filter((t) => !isExpoToken(t));
+
+  console.log(`[Push Dispatch] Total: ${validTokens.length} (Expo: ${expoTokens.length}, Native FCM: ${fcmTokens.length})`);
+
+  const results = {};
+
+  if (expoTokens.length > 0) {
+    results.expo = await sendExpoEmergencyPush({
+      tokens: expoTokens,
+      victimName,
+      sosId,
+      trackingUrl,
+      latitude,
+      longitude,
+    });
+  }
+
+  if (fcmTokens.length > 0) {
+    results.fcm = await sendFcmEmergencyPush({
+      tokens: fcmTokens,
+      victimName,
+      sosId,
+      trackingUrl,
+      latitude,
+      longitude,
+    });
+  }
+
+  return { success: true, results };
 }
