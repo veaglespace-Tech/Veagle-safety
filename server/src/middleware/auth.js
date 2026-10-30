@@ -30,7 +30,12 @@ export const optionalAuthToken = (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, config.jwtSecret);
-      req.user = decoded;
+      const resolvedId = decoded.id || decoded.userId;
+      req.user = {
+        ...decoded,
+        id: resolvedId,
+        userId: resolvedId,
+      };
     } catch (err) {
       // Ignore token verification errors for optional auth (e.g. pending registration flow)
     }

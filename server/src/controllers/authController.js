@@ -591,6 +591,19 @@ export const getProfile = asyncHandler(async (req, res) => {
       emergencyContactPhone: true,
       parentEmail: true,
       medicalNotes: true,
+      childLinks: {
+        where: { status: 'ACTIVE' },
+        include: {
+          parent: {
+            select: {
+              id: true,
+              fullName: true,
+              phone: true,
+              email: true,
+            },
+          },
+        },
+      },
       createdAt: true,
       updatedAt: true,
     },
@@ -852,8 +865,29 @@ export const verifyNewEmail = asyncHandler(async (req, res) => {
 
 /**
  * Logout User
+ * Deletes FCM device token from DeviceToken table so logged out users don't receive sirens
  */
 export const logout = asyncHandler(async (req, res) => {
+  const { token: fcmToken } = req.body || {};
+  const userId = req.user?.id || req.user?.userId;
+
+  try {
+    const deleteFilters = [];
+    if (fcmToken) deleteFilters.push({ token: fcmToken });
+    if (userId) deleteFilters.push({ userId });
+
+    if (deleteFilters.length > 0) {
+      const result = await prisma.deviceToken.deleteMany({
+        where: {
+          OR: deleteFilters,
+        },
+      });
+      console.log(`[Logout] Deleted ${result.count} FCM device token(s) (token: ${Boolean(fcmToken)}, user: ${userId || 'N/A'})`);
+    }
+  } catch (err) {
+    console.warn('[Logout] Warning deleting FCM device token:', err.message);
+  }
+
   res.status(200).json({ message: 'Logged out successfully' });
 });
 

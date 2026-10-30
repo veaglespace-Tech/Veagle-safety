@@ -129,6 +129,7 @@ export const sendSosEmergencyAlert = async ({
   latitude,
   longitude,
   sosId,
+  cc,
 }) => {
   try {
     const mapUrl = googleMapsUrl || `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -137,6 +138,7 @@ export const sendSosEmergencyAlert = async ({
     const info = await transporter.sendMail({
       from: `"🚨 Sakhi Suraksha Emergency Command" <${config.emailService.user || 'sos@sakhisuraksha.org'}>`,
       to: recipientEmail,
+      ...(cc && { cc }),
       subject: `🚨 CRITICAL EMERGENCY SOS ALERT: ${userName} Needs Help Immediately!`,
       attachments: avatar.attachments,
       html: `
