@@ -279,7 +279,7 @@ export const startSos = async (req, res) => {
     }
 
     // 5. Send Web Push Notifications to all trusted contacts' devices
-    const contactEmailsList = Array.from(recipientEmails);
+    const contactEmailsList = Array.from(primaryEmails);
     await sendEmergencyPushToEmails({
       emails: contactEmailsList,
       victimName: currentUser?.fullName || 'Sakhi Suraksha User',
@@ -529,7 +529,20 @@ export const resolveSos = async (req, res) => {
     const isOwner = existingSession.userId === userId;
     const isAdmin = req.user?.role === 'SUPER_ADMIN' || req.user?.role === 'ADMIN';
 
-    if (!isOwner && !isAdmin) {
+    // Allow linked parents to resolve/stop the running SOS session
+    let isLinkedParent = false;
+    if (!isOwner && !isAdmin && userId) {
+      const parentLink = await prisma.parentChildLink.findFirst({
+        where: {
+          parentId: userId,
+          childId: existingSession.userId,
+          status: 'ACTIVE',
+        },
+      });
+      if (parentLink) isLinkedParent = true;
+    }
+
+    if (!isOwner && !isAdmin && !isLinkedParent) {
       return res.status(403).json({ error: 'Unauthorized to resolve this SOS session' });
     }
 
@@ -538,7 +551,7 @@ export const resolveSos = async (req, res) => {
       data: {
         status: 'RESOLVED',
         resolvedAt: new Date(),
-        resolutionNote: resolutionNote || 'Resolved by user',
+        resolutionNote: resolutionNote || (isLinkedParent ? 'Resolved by Guardian/Parent' : 'Resolved by user'),
       },
       include: {
         user: {
