@@ -12,7 +12,7 @@ import {
   loginUser,
   verifyEmailOtp,
   resendOtpCode,
-  clearAuthMessages,+
+  clearAuthMessages,
   setShowOtpModal,
 } from '../../redux/slices/authSlice.js';
 import {
