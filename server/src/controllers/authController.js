@@ -5,6 +5,7 @@ import { prisma } from '../config/prisma.js';
 import { config } from '../config/index.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { sendEmailVerificationOtp, sendWelcomeEmail, sendPasswordResetEmail } from '../services/mailer.js';
+import { syncParentProfileAndLink } from '../services/parentService.js';
 
 /**
  * Register User / SuperAdmin with Email Verification OTP
@@ -179,6 +180,19 @@ export const register = asyncHandler(async (req, res) => {
       });
     } catch (e) {
       console.log('[Register Notice] Primary contact creation skipped:', e.message);
+    }
+
+    // Auto-create/sync Parent Guardian account and link to child
+    try {
+      await syncParentProfileAndLink({
+        childId: user.id,
+        parentPhone: emergencyContactPhone,
+        parentName: emergencyContactName,
+        parentEmail: user.parentEmail || '',
+        relationship: emergencyContactRelation || 'Parent',
+      });
+    } catch (syncErr) {
+      console.warn('[Register Notice] Auto parent profile sync notice:', syncErr.message);
     }
   }
 
@@ -469,12 +483,13 @@ export const login = asyncHandler(async (req, res) => {
 
   const inputStr = email?.trim() || '';
   const cleanPhone = inputStr.replace(/\D/g, '');
+  const phone10 = cleanPhone.length >= 10 ? cleanPhone.slice(-10) : cleanPhone;
 
   const user = await prisma.user.findFirst({
     where: {
       OR: [
         { email: inputStr.toLowerCase() },
-        cleanPhone.length >= 10 ? { phone: { contains: cleanPhone } } : undefined,
+        phone10.length >= 10 ? { phone: phone10 } : undefined,
       ].filter(Boolean),
     },
   });
@@ -483,9 +498,25 @@ export const login = asyncHandler(async (req, res) => {
     return res.status(401).json({ error: 'Invalid email/phone or password' });
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-  if (!isPasswordValid) {
-    return res.status(401).json({ error: 'Invalid email or password' });
+  // ONLY PARENT role can log in using phone number without password
+  const isPhoneLogin = phone10.length >= 10 && user.phone === phone10;
+
+  if (isPhoneLogin && !password) {
+    // Check if the user has PARENT role
+    if (user.role !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Phone-only direct login is exclusively for Parents/Guardians. Regular members must sign in using Email/Mobile and Password.',
+      });
+    }
+    // PARENT role verified - allow direct mobile sign-in
+  } else {
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required to sign in' });
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
   }
 
   // SuperAdmin Login with OTP
@@ -782,6 +813,21 @@ export const updateSettings = asyncHandler(async (req, res) => {
         medicalNotes: true,
       },
     });
+
+    // If emergency contact phone was updated, ensure parent profile & link are synchronized
+    if (emergencyContactPhone) {
+      try {
+        await syncParentProfileAndLink({
+          childId: targetUserId,
+          parentPhone: emergencyContactPhone,
+          parentName: emergencyContactName || updatedUser.emergencyContactName,
+          parentEmail: parentEmail || updatedUser.parentEmail,
+          relationship: 'Parent',
+        });
+      } catch (syncErr) {
+        console.warn('[updateSettings] syncParentProfileAndLink notice:', syncErr.message);
+      }
+    }
 
     return res.status(200).json({
       message: 'Profile updated successfully',
