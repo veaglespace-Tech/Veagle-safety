@@ -12,7 +12,7 @@ import {
   loginUser,
   verifyEmailOtp,
   resendOtpCode,
-  clearAuthMessages,
+  clearAuthMessages,+
   setShowOtpModal,
 } from '../../redux/slices/authSlice.js';
 import {
@@ -398,11 +398,10 @@ function UserAuthForm() {
               <button
                 type="button"
                 onClick={() => toggleMode(true)}
-                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${
-                  isLogin
+                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${isLogin
                     ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-[0_4px_16px_rgba(255,42,109,0.35)] scale-[1.02]'
                     : 'text-[#684E67] hover:text-[#2A0826]'
-                }`}
+                  }`}
               >
                 <Lock className="w-3.5 h-3.5" />
                 <span>SIGN IN</span>
@@ -410,11 +409,10 @@ function UserAuthForm() {
               <button
                 type="button"
                 onClick={() => toggleMode(false)}
-                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${
-                  !isLogin
+                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center space-x-2 ${!isLogin
                     ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-[0_4px_16px_rgba(255,42,109,0.35)] scale-[1.02]'
                     : 'text-[#684E67] hover:text-[#2A0826]'
-                }`}
+                  }`}
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>CREATE ACCOUNT</span>
@@ -494,11 +492,10 @@ function UserAuthForm() {
                       <button
                         type="button"
                         onClick={() => setSelectedRole('USER')}
-                        className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
-                          selectedRole === 'USER'
+                        className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${selectedRole === 'USER'
                             ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-sm'
                             : 'text-[#684E67] hover:text-[#FF2A6D]'
-                        }`}
+                          }`}
                       >
                         <UserIcon className="w-3.5 h-3.5" />
                         <span className="truncate">Personal</span>
@@ -506,11 +503,10 @@ function UserAuthForm() {
                       <button
                         type="button"
                         onClick={() => setSelectedRole('ORGANIZATION')}
-                        className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
-                          selectedRole === 'ORGANIZATION'
+                        className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${selectedRole === 'ORGANIZATION'
                             ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-sm'
                             : 'text-[#684E67] hover:text-[#FF2A6D]'
-                        }`}
+                          }`}
                       >
                         <Building className="w-3.5 h-3.5" />
                         <span className="truncate">Org</span>
@@ -821,11 +817,10 @@ function UserAuthForm() {
                           setLoginRole('USER');
                           setValidationError('');
                         }}
-                        className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
-                          loginRole === 'USER'
+                        className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${loginRole === 'USER'
                             ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-sm'
                             : 'text-[#684E67] hover:text-[#FF2A6D]'
-                        }`}
+                          }`}
                       >
                         <UserIcon className="w-3.5 h-3.5" />
                         <span className="truncate">Member / Org</span>
@@ -836,11 +831,10 @@ function UserAuthForm() {
                           setLoginRole('PARENT');
                           setValidationError('');
                         }}
-                        className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
-                          loginRole === 'PARENT'
+                        className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${loginRole === 'PARENT'
                             ? 'bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-sm'
                             : 'text-[#684E67] hover:text-[#FF2A6D]'
-                        }`}
+                          }`}
                       >
                         <Users className="w-3.5 h-3.5" />
                         <span className="truncate">Parent / Guardian</span>
