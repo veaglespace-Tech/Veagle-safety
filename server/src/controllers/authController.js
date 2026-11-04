@@ -87,10 +87,9 @@ export const register = asyncHandler(async (req, res) => {
     });
 
     return res.status(200).json({
-      message: `Account already initiated. OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
+      message: `Account already initiated. OTP code sent to ${cleanEmail}.`,
       requiresVerification: true,
       email: cleanEmail,
-      debugOtp: otp,
     });
   }
 
@@ -222,11 +221,10 @@ export const register = asyncHandler(async (req, res) => {
       });
 
       return res.status(200).json({
-        message: `OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
+        message: `OTP code sent to ${cleanEmail}.`,
         requiresVerification: true,
         pendingToken: pendingRegistrationToken,
         email: cleanEmail,
-        debugOtp: otp,
       });
     }
 
@@ -436,8 +434,7 @@ export const resendOtp = asyncHandler(async (req, res) => {
     });
 
     return res.status(200).json({
-      message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,
-      debugOtp: newOtp,
+      message: `A new 6-digit OTP code has been sent to ${email}.`,
     });
   }
 
@@ -463,9 +460,8 @@ export const resendOtp = asyncHandler(async (req, res) => {
   });
 
   return res.status(200).json({
-    message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,
+    message: `A new 6-digit OTP code has been sent to ${email}.`,
     pendingToken: updatedPendingToken || pendingToken,
-    debugOtp: newOtp,
   });
 });
 
@@ -587,10 +583,9 @@ export const login = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json({
-      message: `OTP sent for Admin Verification. (OTP Code: ${newOtp})`,
+      message: `OTP sent for Admin Verification.`,
       requiresVerification: true,
       email: user.email,
-      debugOtp: newOtp,
     });
   }
 
