@@ -45,7 +45,7 @@ export function FloatingBottomLeftCounter() {
         <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00C853]" />
       </span>
       <span className="text-[10px] uppercase font-black tracking-wider text-[#684E67]">
-        Live Views
+        Visitors
       </span>
       <span className="text-xs font-mono font-black text-[#FF2A6D] bg-[#FFF0F3] px-2 py-0.5 rounded-full border border-[#FFCCE1]">
         {count.toLocaleString()}
