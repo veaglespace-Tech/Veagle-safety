@@ -126,7 +126,7 @@ export default function LandingPage() {
                <div className="mt-4 sm:mt-12 flex flex-col items-center justify-center">
                  <h3 className="text-[10px] sm:text-xl font-black text-[#FF2A6D] tracking-widest mb-1 sm:mb-2">WOMEN SAFE</h3>
                  <p suppressHydrationWarning className="text-3xl sm:text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-1 sm:mb-3 tracking-tighter">
-                    {((stats?.fakeBaseCount || 3472) + (stats?.registeredUsers || 0)).toLocaleString()}
+                    {mounted ? ((stats?.fakeBaseCount || 3472) + (stats?.registeredUsers || 0)).toLocaleString() : '3,478'}
                  </p>
                  <p className="text-[8px] sm:text-xs font-black text-[#7A6478] uppercase tracking-widest opacity-90 bg-[#FFF0F3] px-2 py-1 rounded-full w-[max-content]">ACTIVE GUARDIANS</p>
                </div>
