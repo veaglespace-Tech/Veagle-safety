@@ -15,7 +15,7 @@ export function VisitorRenderTracker() {
   return null;
 }
 
-export function VisitorCounterBadge({ className = '' }) {
+export function FloatingBottomLeftCounter() {
   const [count, setCount] = useState(null);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export function VisitorCounterBadge({ className = '' }) {
     };
 
     fetchCount();
-    const interval = setInterval(fetchCount, 15000); // refresh every 15s
+    const interval = setInterval(fetchCount, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -37,12 +37,19 @@ export function VisitorCounterBadge({ className = '' }) {
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-[#FFF0F3] to-[#FFE6EE] border border-[#FFCCE1] text-[#FF2A6D] text-[10px] sm:text-[11px] font-black tracking-wide shadow-xs ${className}`}
-      title="Total Website Views & Renders (+2 per visit/render)"
+      className="fixed bottom-4 left-4 z-40 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border-1.5 border-[#FFCCE1] shadow-[0_4px_16px_rgba(255,42,109,0.18)] hover:scale-105 transition-all duration-300 pointer-events-auto select-none"
+      title="Live Website Views & Renders (+2 per visit/render)"
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-[#00C853] animate-pulse shrink-0" />
-      <span className="text-[#684E67] font-bold">Views:</span>
-      <span className="font-mono font-black text-[#FF2A6D]">{count.toLocaleString()}</span>
+      <span className="relative flex h-2 w-2 shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C853] opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00C853]" />
+      </span>
+      <span className="text-[10px] uppercase font-black tracking-wider text-[#684E67]">
+        Live Views
+      </span>
+      <span className="text-xs font-mono font-black text-[#FF2A6D] bg-[#FFF0F3] px-2 py-0.5 rounded-full border border-[#FFCCE1]">
+        {count.toLocaleString()}
+      </span>
     </div>
   );
 }

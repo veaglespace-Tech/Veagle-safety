@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Logo3DFlip } from '../ui/Logo3DFlip.js';
-import { VisitorCounterBadge } from '../common/VisitorRenderTracker.js';
 
 export const Footer = () => {
   return (
@@ -28,11 +27,6 @@ export const Footer = () => {
               Privacy Policy
             </Link>
           </div>
-        </div>
-
-        {/* CENTER/BADGE: VISITOR & RENDER COUNTER */}
-        <div className="flex items-center justify-center">
-          <VisitorCounterBadge />
         </div>
 
         {/* RIGHT: DESIGNED & DEVELOPED BY */}
