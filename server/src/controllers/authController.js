@@ -489,6 +489,26 @@ export const login = asyncHandler(async (req, res) => {
       },
     });
 
+    // Also check TrustedContact if phone was added as a guardian contact by a child
+    if (!user) {
+      const contact = await prisma.trustedContact.findFirst({
+        where: {
+          phone: { contains: phone10 },
+        },
+      });
+
+      if (contact) {
+        const { syncParentProfileAndLink } = await import('../services/parentService.js');
+        user = await syncParentProfileAndLink({
+          childId: contact.userId,
+          parentPhone: phone10,
+          parentName: contact.name || 'Parent Guardian',
+          parentEmail: contact.email || '',
+          relationship: contact.relationship || 'Guardian',
+        });
+      }
+    }
+
     // If no dedicated PARENT account found by phone, check if this phone was entered as emergency contact
     if (!user) {
       const child = await prisma.user.findFirst({
@@ -516,7 +536,7 @@ export const login = asyncHandler(async (req, res) => {
       where: {
         OR: [
           { email: inputStr.toLowerCase() },
-          phone10.length >= 10 ? { phone: phone10 } : undefined,
+          phone10.length >= 10 ? { phone: { contains: phone10 } } : undefined,
         ].filter(Boolean),
       },
     });
@@ -527,7 +547,8 @@ export const login = asyncHandler(async (req, res) => {
   }
 
   // ONLY PARENT role can log in using phone number without password
-  const isPhoneLogin = phone10.length >= 10 && user.phone === phone10;
+  const userPhoneClean = user.phone ? user.phone.replace(/\D/g, '') : '';
+  const isPhoneLogin = phone10.length >= 10 && (userPhoneClean.endsWith(phone10) || phone10.endsWith(userPhoneClean));
 
   if (isPhoneLogin && !password) {
     // Check if the user has PARENT role
