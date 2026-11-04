@@ -30,23 +30,22 @@ import { api } from '../utils/api.js';
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
   const [mounted, setMounted] = useState(false);
-  const [stats, setStats] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('sakhi_public_stats');
-        if (cached) return JSON.parse(cached);
-      } catch (e) {}
-    }
-    return {
-      registeredUsers: 0,
-      fakeBaseCount: 3472,
-      targetMissionCount: '1 Cr+',
-    };
+  const [stats, setStats] = useState({
+    registeredUsers: 0,
+    fakeBaseCount: 3472,
+    targetMissionCount: '1 Cr+',
   });
-  const [statsLoaded, setStatsLoaded] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    // Load from cache after mount to prevent SSR hydration mismatch
+    try {
+      const cached = localStorage.getItem('sakhi_public_stats');
+      if (cached) {
+        setStats(JSON.parse(cached));
+      }
+    } catch (e) {}
+
     fetchStats();
   }, []);
 
@@ -60,12 +59,9 @@ export default function LandingPage() {
           targetMissionCount: res.data.targetMissionCount || '1 Cr+',
         };
         setStats(newStats);
-        setStatsLoaded(true);
-        if (typeof window !== 'undefined') {
-          try {
-            localStorage.setItem('sakhi_public_stats', JSON.stringify(newStats));
-          } catch (e) {}
-        }
+        try {
+          localStorage.setItem('sakhi_public_stats', JSON.stringify(newStats));
+        } catch (e) {}
       }
     } catch (err) {
       console.error('Failed to fetch public stats', err);
@@ -129,7 +125,7 @@ export default function LandingPage() {
                
                <div className="mt-4 sm:mt-12 flex flex-col items-center justify-center">
                  <h3 className="text-[10px] sm:text-xl font-black text-[#FF2A6D] tracking-widest mb-1 sm:mb-2">WOMEN SAFE</h3>
-                 <p className="text-3xl sm:text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-1 sm:mb-3 tracking-tighter">
+                 <p suppressHydrationWarning className="text-3xl sm:text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-1 sm:mb-3 tracking-tighter">
                     {((stats?.fakeBaseCount || 3472) + (stats?.registeredUsers || 0)).toLocaleString()}
                  </p>
                  <p className="text-[8px] sm:text-xs font-black text-[#7A6478] uppercase tracking-widest opacity-90 bg-[#FFF0F3] px-2 py-1 rounded-full w-[max-content]">ACTIVE GUARDIANS</p>
