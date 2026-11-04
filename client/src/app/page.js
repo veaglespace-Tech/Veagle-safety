@@ -30,11 +30,20 @@ import { api } from '../utils/api.js';
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
   const [mounted, setMounted] = useState(false);
-  const [stats, setStats] = useState({ 
-    registeredUsers: 0, 
-    fakeBaseCount: 3472, 
-    targetMissionCount: '1 Cr+' 
+  const [stats, setStats] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('sakhi_public_stats');
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return {
+      registeredUsers: 0,
+      fakeBaseCount: 3472,
+      targetMissionCount: '1 Cr+',
+    };
   });
+  const [statsLoaded, setStatsLoaded] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -45,11 +54,18 @@ export default function LandingPage() {
     try {
       const res = await api.get('/stats/public');
       if (res.data) {
-        setStats({ 
+        const newStats = {
           registeredUsers: res.data.registeredUsers !== undefined ? res.data.registeredUsers : 0,
           fakeBaseCount: res.data.fakeBaseCount !== undefined ? res.data.fakeBaseCount : 3472,
-          targetMissionCount: res.data.targetMissionCount || '1 Cr+'
-        });
+          targetMissionCount: res.data.targetMissionCount || '1 Cr+',
+        };
+        setStats(newStats);
+        setStatsLoaded(true);
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('sakhi_public_stats', JSON.stringify(newStats));
+          } catch (e) {}
+        }
       }
     } catch (err) {
       console.error('Failed to fetch public stats', err);
