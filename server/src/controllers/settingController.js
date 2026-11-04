@@ -61,3 +61,46 @@ export const updateSettings = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update settings' });
   }
 };
+
+/**
+ * Public Counter: Increments visitor / render count by 2 per render
+ */
+export const trackVisitorRender = async (req, res) => {
+  try {
+    const key = 'VISITOR_RENDER_COUNT';
+
+    // Find existing setting or initialize
+    const existing = await prisma.systemSetting.findUnique({ where: { key } });
+    let currentCount = 0;
+    if (existing && existing.value) {
+      currentCount = parseInt(existing.value, 10) || 0;
+    }
+
+    const nextCount = currentCount + 2;
+
+    const updated = await prisma.systemSetting.upsert({
+      where: { key },
+      update: { value: String(nextCount) },
+      create: { key, value: String(nextCount) },
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: parseInt(updated.value, 10),
+    });
+  } catch (error) {
+    console.error('[trackVisitorRender Error]:', error.message);
+    return res.status(500).json({ success: false, error: 'Failed to update render counter' });
+  }
+};
+
+export const getVisitorRenderCount = async (req, res) => {
+  try {
+    const key = 'VISITOR_RENDER_COUNT';
+    const setting = await prisma.systemSetting.findUnique({ where: { key } });
+    const count = setting && setting.value ? parseInt(setting.value, 10) : 0;
+    return res.status(200).json({ success: true, count });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Failed to get visitor count' });
+  }
+};

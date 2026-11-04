@@ -80,11 +80,12 @@ export const register = asyncHandler(async (req, res) => {
       where: { id: existingUser.id },
       data: { emailOtp: otp, emailOtpExpiresAt: otpExpires },
     });
-    try {
-      await sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName || fullName, otp });
-    } catch (emailErr) {
+
+    // Send OTP email in background so the UI doesn't freeze in "PROCESSING..."
+    sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName || fullName, otp }).catch((emailErr) => {
       console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
-    }
+    });
+
     return res.status(200).json({
       message: `Account already initiated. OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
       requiresVerification: true,
@@ -215,11 +216,10 @@ export const register = asyncHandler(async (req, res) => {
         { expiresIn: '2h' }
       );
 
-      try {
-        await sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName, otp });
-      } catch (emailErr) {
+      // Send OTP verification email in background for instant UI transition
+      sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName, otp }).catch((emailErr) => {
         console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
-      }
+      });
 
       return res.status(200).json({
         message: `OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
@@ -327,12 +327,10 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       }
     }
 
-    // Send Welcome Email after successful verification
-    try {
-      await sendWelcomeEmail({ recipientEmail: updatedUser.email, userName: updatedUser.fullName });
-    } catch (welcomeErr) {
+    // Send Welcome Email asynchronously in background so response returns instantly
+    sendWelcomeEmail({ recipientEmail: updatedUser.email, userName: updatedUser.fullName }).catch((welcomeErr) => {
       console.warn('[Welcome Email Notice] Failed to send welcome email:', welcomeErr.message);
-    }
+    });
 
     const token = jwt.sign(
       { id: updatedUser.id, userId: updatedUser.id, role: updatedUser.role, email: updatedUser.email },
@@ -433,11 +431,9 @@ export const resendOtp = asyncHandler(async (req, res) => {
       },
     });
 
-    try {
-      await sendEmailVerificationOtp({ recipientEmail: email, userName: user.fullName, otp: newOtp });
-    } catch (emailErr) {
+    sendEmailVerificationOtp({ recipientEmail: email, userName: user.fullName, otp: newOtp }).catch((emailErr) => {
       console.warn('[Resend OTP Email Notice] Failed to send email:', emailErr.message);
-    }
+    });
 
     return res.status(200).json({
       message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,
@@ -462,11 +458,9 @@ export const resendOtp = asyncHandler(async (req, res) => {
     } catch (e) {}
   }
 
-  try {
-    await sendEmailVerificationOtp({ recipientEmail: email, userName: 'Sakhi Member', otp: newOtp });
-  } catch (emailErr) {
+  sendEmailVerificationOtp({ recipientEmail: email, userName: 'Sakhi Member', otp: newOtp }).catch((emailErr) => {
     console.warn('[Resend OTP Email Notice] Failed to send email:', emailErr.message);
-  }
+  });
 
   return res.status(200).json({
     message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,

@@ -41,6 +41,8 @@ router.post('/contact', adminController.submitContactEnquiry);
 
 // Public Stats
 router.get('/stats/public', authController.getPublicStats);
+router.post('/stats/visitor-render', settingController.trackVisitorRender);
+router.get('/stats/visitor-render', settingController.getVisitorRenderCount);
 
 // Public Plans & Pricing
 router.get('/plans', adminController.getPlans);
