@@ -64,7 +64,8 @@ export default function LandingPage() {
         } catch (e) {}
       }
     } catch (err) {
-      console.error('Failed to fetch public stats', err);
+      // Use fallback or cached stats gracefully
+      console.warn('[LandingPage] Notice: Using fallback stats:', err?.message || 'Network unavailable');
     }
   };
 
