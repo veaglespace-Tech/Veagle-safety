@@ -71,9 +71,11 @@ export const trackVisitorRender = async (req, res) => {
 
     // Find existing setting or initialize
     const existing = await prisma.systemSetting.findUnique({ where: { key } });
-    let currentCount = 0;
+    const BASE_START_COUNT = 10000;
+    let currentCount = BASE_START_COUNT;
     if (existing && existing.value) {
-      currentCount = parseInt(existing.value, 10) || 0;
+      const parsed = parseInt(existing.value, 10);
+      currentCount = (!isNaN(parsed) && parsed >= BASE_START_COUNT) ? parsed : (BASE_START_COUNT + (parsed || 0));
     }
 
     const nextCount = currentCount + 2;
@@ -98,7 +100,12 @@ export const getVisitorRenderCount = async (req, res) => {
   try {
     const key = 'VISITOR_RENDER_COUNT';
     const setting = await prisma.systemSetting.findUnique({ where: { key } });
-    const count = setting && setting.value ? parseInt(setting.value, 10) : 0;
+    const BASE_START_COUNT = 10000;
+    let count = BASE_START_COUNT;
+    if (setting && setting.value) {
+      const parsed = parseInt(setting.value, 10);
+      count = (!isNaN(parsed) && parsed >= BASE_START_COUNT) ? parsed : (BASE_START_COUNT + (parsed || 0));
+    }
     return res.status(200).json({ success: true, count });
   } catch (error) {
     return res.status(500).json({ success: false, error: 'Failed to get visitor count' });

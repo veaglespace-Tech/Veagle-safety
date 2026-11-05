@@ -23,7 +23,8 @@ export function FloatingBottomLeftCounter() {
       try {
         const res = await api.get('/stats/visitor-render');
         if (res.data?.success && typeof res.data?.count === 'number') {
-          setCount(res.data.count);
+          const safeVal = Math.max(10000, res.data.count);
+          setCount(safeVal);
         }
       } catch (e) {}
     };
