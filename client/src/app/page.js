@@ -41,7 +41,7 @@ export default function LandingPage() {
       } catch (e) {}
     }
     return {
-      registeredUsers: 0,
+      registeredUsers: 11,
       fakeBaseCount: 3472,
       targetMissionCount: '1 Cr+',
     };
