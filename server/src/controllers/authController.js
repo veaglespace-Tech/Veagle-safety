@@ -469,15 +469,15 @@ export const resendOtp = asyncHandler(async (req, res) => {
  * Login User / SuperAdmin
  */
 export const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, isParentLogin = false } = req.body;
 
   const inputStr = email?.trim() || '';
   const cleanPhone = inputStr.replace(/\D/g, '');
   const phone10 = cleanPhone.length >= 10 ? cleanPhone.slice(-10) : cleanPhone;
 
-  // If logging in via phone without password (Parent login), look up PARENT role first
+  // If logging in via phone without password (Parent login) or isParentLogin is requested, look up PARENT role first
   let user;
-  if (phone10.length >= 10 && !password) {
+  if (phone10.length >= 10 && (isParentLogin || !password)) {
     user = await prisma.user.findFirst({
       where: {
         phone: { contains: phone10 },
@@ -525,6 +525,31 @@ export const login = asyncHandler(async (req, res) => {
         });
       }
     }
+
+    // If parent user found, ensure all children that list this number or parent email are linked
+    if (user) {
+      try {
+        const matchingKids = await prisma.user.findMany({
+          where: {
+            id: { not: user.id },
+            OR: [
+              { emergencyContactPhone: { contains: phone10 } },
+              user.email ? { parentEmail: user.email } : undefined,
+            ].filter(Boolean),
+          },
+          select: { id: true },
+        });
+        for (const kid of matchingKids) {
+          await prisma.parentChildLink.upsert({
+            where: { parentId_childId: { parentId: user.id, childId: kid.id } },
+            update: { status: 'ACTIVE' },
+            create: { parentId: user.id, childId: kid.id, relationship: 'Child', status: 'ACTIVE' },
+          });
+        }
+      } catch (linkErr) {
+        console.warn('[Parent Login Auto-Link Notice]:', linkErr.message);
+      }
+    }
   }
 
   if (!user) {
@@ -539,12 +564,12 @@ export const login = asyncHandler(async (req, res) => {
   }
 
   if (!user) {
-    return res.status(401).json({ error: 'No account found with this email or mobile number.' });
+    return res.status(401).json({ error: 'Invalid email/phone or password' });
   }
 
   // ONLY PARENT role can log in using phone number without password
   const userPhoneClean = user.phone ? user.phone.replace(/\D/g, '') : '';
-  const isPhoneLogin = phone10.length >= 10 && (userPhoneClean.endsWith(phone10) || phone10.endsWith(userPhoneClean));
+  const isPhoneLogin = (phone10.length >= 10 && (userPhoneClean.endsWith(phone10) || phone10.endsWith(userPhoneClean))) || isParentLogin;
 
   if (isPhoneLogin && !password) {
     // Check if the user has PARENT role
