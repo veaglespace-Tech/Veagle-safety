@@ -30,22 +30,25 @@ import { api } from '../utils/api.js';
 export default function LandingPage() {
   const { token, user } = useSelector((state) => state?.auth || {});
   const [mounted, setMounted] = useState(false);
-  const [stats, setStats] = useState({
-    registeredUsers: 0,
-    fakeBaseCount: 3472,
-    targetMissionCount: '1 Cr+',
+  const [stats, setStats] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('sakhi_public_stats');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
+      } catch (e) {}
+    }
+    return {
+      registeredUsers: 0,
+      fakeBaseCount: 3472,
+      targetMissionCount: '1 Cr+',
+    };
   });
 
   useEffect(() => {
     setMounted(true);
-    // Load from cache after mount to prevent SSR hydration mismatch
-    try {
-      const cached = localStorage.getItem('sakhi_public_stats');
-      if (cached) {
-        setStats(JSON.parse(cached));
-      }
-    } catch (e) {}
-
     fetchStats();
   }, []);
 
@@ -127,7 +130,7 @@ export default function LandingPage() {
                <div className="mt-4 sm:mt-12 flex flex-col items-center justify-center">
                  <h3 className="text-[10px] sm:text-xl font-black text-[#FF2A6D] tracking-widest mb-1 sm:mb-2">WOMEN SAFE</h3>
                  <p suppressHydrationWarning className="text-3xl sm:text-[80px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FF2A6D] to-[#FF5C8A] leading-none mb-1 sm:mb-3 tracking-tighter">
-                    {mounted ? ((stats?.fakeBaseCount || 3472) + (stats?.registeredUsers || 0)).toLocaleString() : '3,478'}
+                    {((stats?.fakeBaseCount || 3472) + (stats?.registeredUsers || 0)).toLocaleString()}
                  </p>
                  <p className="text-[8px] sm:text-xs font-black text-[#7A6478] uppercase tracking-widest opacity-90 bg-[#FFF0F3] px-2 py-1 rounded-full w-[max-content]">ACTIVE GUARDIANS</p>
                </div>
