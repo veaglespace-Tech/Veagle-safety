@@ -31,6 +31,7 @@ export default function ContactSupportPage() {
   const [loading, setLoading] = useState(false);
   const [errorNotice, setErrorNotice] = useState(null);
   const [supportEmail, setSupportEmail] = useState('support@sakhisuraksha.org');
+  const [supportPhone, setSupportPhone] = useState('+91 92252 41608');
 
   React.useEffect(() => {
     const fetchEmail = async () => {
@@ -224,6 +225,15 @@ export default function ContactSupportPage() {
               </p>
 
               <div className="pt-3 border-t-1.5 border-[#FFCCE1] space-y-2.5 text-xs font-extrabold">
+                <div className="flex items-center space-x-2.5 text-[#2A0826]">
+                  <Phone className="w-4 h-4 text-[#FF5C8A] shrink-0" />
+                  <span>
+                    Helpline:{' '}
+                    <a href={`tel:${supportPhone.replace(/\s+/g, '')}`} className="text-[#FF2A6D] hover:underline font-black">
+                      {supportPhone}
+                    </a>
+                  </span>
+                </div>
                 <div className="flex items-center space-x-2.5 text-[#2A0826]">
                   <Mail className="w-4 h-4 text-[#FF5C8A] shrink-0" />
                   <span>
