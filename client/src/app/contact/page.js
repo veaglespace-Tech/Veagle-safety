@@ -34,17 +34,18 @@ export default function ContactSupportPage() {
   const [supportPhone, setSupportPhone] = useState('+91 92252 41608');
 
   React.useEffect(() => {
-    const fetchEmail = async () => {
+    const fetchSettingsData = async () => {
       try {
-        const res = await settingApi.fetchSettings(['SUPPORT_EMAIL']);
-        if (res.success && res.data.SUPPORT_EMAIL) {
-          setSupportEmail(res.data.SUPPORT_EMAIL);
+        const res = await settingApi.fetchSettings(['SUPPORT_EMAIL', 'SUPPORT_PHONE']);
+        if (res.success && res.data) {
+          if (res.data.SUPPORT_EMAIL) setSupportEmail(res.data.SUPPORT_EMAIL);
+          if (res.data.SUPPORT_PHONE) setSupportPhone(res.data.SUPPORT_PHONE);
         }
       } catch (err) {
         // Fallback to default
       }
     };
-    fetchEmail();
+    fetchSettingsData();
   }, []);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
