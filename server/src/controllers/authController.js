@@ -80,16 +80,16 @@ export const register = asyncHandler(async (req, res) => {
       where: { id: existingUser.id },
       data: { emailOtp: otp, emailOtpExpiresAt: otpExpires },
     });
-
-    // Send OTP email in background so the UI doesn't freeze in "PROCESSING..."
-    sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName || fullName, otp }).catch((emailErr) => {
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName || fullName, otp });
+    } catch (emailErr) {
       console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
-    });
-
+    }
     return res.status(200).json({
-      message: `Account already initiated. OTP code sent to ${cleanEmail}.`,
+      message: `Account already initiated. OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
       requiresVerification: true,
       email: cleanEmail,
+      debugOtp: otp,
     });
   }
 
@@ -215,16 +215,18 @@ export const register = asyncHandler(async (req, res) => {
         { expiresIn: '2h' }
       );
 
-      // Send OTP verification email in background for instant UI transition
-      sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName, otp }).catch((emailErr) => {
+      try {
+        await sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName, otp });
+      } catch (emailErr) {
         console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
-      });
+      }
 
       return res.status(200).json({
-        message: `OTP code sent to ${cleanEmail}.`,
+        message: `OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
         requiresVerification: true,
         pendingToken: pendingRegistrationToken,
         email: cleanEmail,
+        debugOtp: otp,
       });
     }
 
@@ -325,10 +327,12 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       }
     }
 
-    // Send Welcome Email asynchronously in background so response returns instantly
-    sendWelcomeEmail({ recipientEmail: updatedUser.email, userName: updatedUser.fullName }).catch((welcomeErr) => {
+    // Send Welcome Email after successful verification
+    try {
+      await sendWelcomeEmail({ recipientEmail: updatedUser.email, userName: updatedUser.fullName });
+    } catch (welcomeErr) {
       console.warn('[Welcome Email Notice] Failed to send welcome email:', welcomeErr.message);
-    });
+    }
 
     const token = jwt.sign(
       { id: updatedUser.id, userId: updatedUser.id, role: updatedUser.role, email: updatedUser.email },
@@ -429,12 +433,15 @@ export const resendOtp = asyncHandler(async (req, res) => {
       },
     });
 
-    sendEmailVerificationOtp({ recipientEmail: email, userName: user.fullName, otp: newOtp }).catch((emailErr) => {
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: email, userName: user.fullName, otp: newOtp });
+    } catch (emailErr) {
       console.warn('[Resend OTP Email Notice] Failed to send email:', emailErr.message);
-    });
+    }
 
     return res.status(200).json({
-      message: `A new 6-digit OTP code has been sent to ${email}.`,
+      message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,
+      debugOtp: newOtp,
     });
   }
 
@@ -455,13 +462,16 @@ export const resendOtp = asyncHandler(async (req, res) => {
     } catch (e) {}
   }
 
-  sendEmailVerificationOtp({ recipientEmail: email, userName: 'Sakhi Member', otp: newOtp }).catch((emailErr) => {
+  try {
+    await sendEmailVerificationOtp({ recipientEmail: email, userName: 'Sakhi Member', otp: newOtp });
+  } catch (emailErr) {
     console.warn('[Resend OTP Email Notice] Failed to send email:', emailErr.message);
-  });
+  }
 
   return res.status(200).json({
-    message: `A new 6-digit OTP code has been sent to ${email}.`,
+    message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,
     pendingToken: updatedPendingToken || pendingToken,
+    debugOtp: newOtp,
   });
 });
 
@@ -469,15 +479,17 @@ export const resendOtp = asyncHandler(async (req, res) => {
  * Login User / SuperAdmin
  */
 export const login = asyncHandler(async (req, res) => {
-  const { email, password, isParentLogin = false } = req.body;
+  const { email, password } = req.body;
 
   const inputStr = email?.trim() || '';
   const cleanPhone = inputStr.replace(/\D/g, '');
   const phone10 = cleanPhone.length >= 10 ? cleanPhone.slice(-10) : cleanPhone;
 
-  // If logging in via phone without password (Parent login) or isParentLogin is requested, look up PARENT role first
-  let user;
-  if (phone10.length >= 10 && (isParentLogin || !password)) {
+  const { isParentLogin = false } = req.body;
+
+  let user = null;
+  if ((isParentLogin || !password) && phone10.length >= 10) {
+    // 1. Look for existing PARENT user account with this phone
     user = await prisma.user.findFirst({
       where: {
         phone: { contains: phone10 },
@@ -494,7 +506,6 @@ export const login = asyncHandler(async (req, res) => {
       });
 
       if (contact) {
-        const { syncParentProfileAndLink } = await import('../services/parentService.js');
         user = await syncParentProfileAndLink({
           childId: contact.userId,
           parentPhone: phone10,
@@ -505,22 +516,23 @@ export const login = asyncHandler(async (req, res) => {
       }
     }
 
-    // If no dedicated PARENT account found by phone, check if this phone was entered as emergency contact
+    // 2. If no dedicated PARENT account exists yet, check if any child listed this number
     if (!user) {
-      const child = await prisma.user.findFirst({
+      const childUser = await prisma.user.findFirst({
         where: {
-          emergencyContactPhone: { contains: phone10 },
+          OR: [
+            { emergencyContactPhone: { contains: phone10 } },
+            { phone: { contains: phone10 } },
+          ],
         },
       });
 
-      if (child) {
-        // Auto-create/sync Parent account immediately so they can log in seamlessly
-        const { syncParentProfileAndLink } = await import('../services/parentService.js');
+      if (childUser) {
         user = await syncParentProfileAndLink({
-          childId: child.id,
+          childId: childUser.id,
           parentPhone: phone10,
-          parentName: child.emergencyContactName || 'Parent Guardian',
-          parentEmail: child.parentEmail || '',
+          parentName: childUser.emergencyContactName || 'Parent Guardian',
+          parentEmail: childUser.parentEmail || '',
           relationship: 'Parent',
         });
       }
@@ -557,7 +569,7 @@ export const login = asyncHandler(async (req, res) => {
       where: {
         OR: [
           { email: inputStr.toLowerCase() },
-          phone10.length >= 10 ? { phone: { contains: phone10 } } : undefined,
+          phone10.length >= 10 ? { phone: phone10 } : undefined,
         ].filter(Boolean),
       },
     });
@@ -608,9 +620,10 @@ export const login = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json({
-      message: `OTP sent for Admin Verification.`,
+      message: `OTP sent for Admin Verification. (OTP Code: ${newOtp})`,
       requiresVerification: true,
       email: user.email,
+      debugOtp: newOtp,
     });
   }
 
