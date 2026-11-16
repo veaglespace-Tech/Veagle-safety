@@ -693,6 +693,9 @@ function ParentDashboardContent() {
                               src={c.profilePhoto}
                               alt={c.fullName}
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
                             />
                           ) : (
                             c.fullName?.charAt(0) || 'C'
