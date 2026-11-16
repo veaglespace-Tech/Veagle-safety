@@ -28,8 +28,8 @@ export const config = {
     backupAccountsRaw: process.env.SMTP_BACKUP_ACCOUNTS || '',
   },
   razorpay: {
-    keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_TzzM4GlVTuysWB',
-    keySecret: process.env.RAZORPAY_KEY_SECRET || '7D4eWuimEdPtjUoIkj4Q8AeW',
+    keyId: getEnv('RAZORPAY_KEY_ID'),
+    keySecret: getEnv('RAZORPAY_KEY_SECRET'),
     clientUrl: process.env.CLIENT_URL || (process.env.NODE_ENV === 'production' ? 'https://sakhisuraksha.veaglespace.com' : 'http://localhost:3000'),
     serverBaseUrl: process.env.SERVER_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://sakhisuraksha.veaglespace.com' : 'http://localhost:5000'),
   },
