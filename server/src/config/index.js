@@ -27,10 +27,9 @@ export const config = {
     pass: process.env.EMAIL_PASS || process.env.SMTP_PASS || '',
     backupAccountsRaw: process.env.SMTP_BACKUP_ACCOUNTS || '',
   },
-  payu: {
-    baseUrl: process.env.PAYU_BASE_URL || 'https://test.payu.in/_payment',
-    key: process.env.PAYU_TEST_KEY || process.env['PAYU_TEST_KEY '] || 'GKJE3Z',
-    salt: process.env.payu_test_salt || process.env['payu_test_salt '] || '0zqiCnB4GslxAanSxjEAutWkWuggFiGs',
+  razorpay: {
+    keyId: process.env.RAZORPAY_KEY_ID || '',
+    keySecret: process.env.RAZORPAY_KEY_SECRET || '',
     clientUrl: process.env.CLIENT_URL || (process.env.NODE_ENV === 'production' ? 'http://localhost:3002' : 'http://localhost:3000'),
     serverBaseUrl: process.env.SERVER_BASE_URL || (process.env.NODE_ENV === 'production' ? 'http://localhost:5002' : 'http://localhost:5000'),
   },

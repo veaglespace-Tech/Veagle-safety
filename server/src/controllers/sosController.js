@@ -76,7 +76,7 @@ export const startSos = async (req, res) => {
 
     // Organization memberships removed — model does not exist in current schema
 
-    const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
+    const clientBaseUrl = process.env.CLIENT_URL || config.razorpay?.clientUrl || 'http://localhost:3000';
     const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
@@ -772,7 +772,7 @@ export const getActiveSosSession = async (req, res) => {
     });
 
     if (session) {
-      const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
+      const clientBaseUrl = process.env.CLIENT_URL || config.razorpay?.clientUrl || 'http://localhost:3000';
       session.trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
       
       const latitude = session.locations?.[0]?.latitude || 18.5204;

@@ -64,7 +64,7 @@ export const startSosPeriodicWorker = () => {
 
       if (activeSessions.length === 0) return;
 
-      const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
+      const clientBaseUrl = process.env.CLIENT_URL || config.razorpay?.clientUrl || 'http://localhost:3000';
 
       for (const session of activeSessions) {
         const sessionKey = `session_${session.id}`;

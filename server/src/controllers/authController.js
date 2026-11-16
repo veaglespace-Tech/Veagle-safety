@@ -69,33 +69,14 @@ export const register = asyncHandler(async (req, res) => {
 
   const existingUser = await prisma.user.findUnique({ where: { email: cleanEmail } });
   if (existingUser) {
-    if (existingUser.isEmailVerified) {
+    if (existingUser.isEmailVerified && existingUser.subscriptionStatus === 'ACTIVE') {
       return res.status(409).json({ error: 'An account with this email already exists. Please Sign In instead.' });
     }
-
-    // Update existing unverified user with new OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
-    await prisma.user.update({
-      where: { id: existingUser.id },
-      data: { emailOtp: otp, emailOtpExpiresAt: otpExpires },
-    });
-    try {
-      await sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName || fullName, otp });
-    } catch (emailErr) {
-      console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
-    }
-    return res.status(200).json({
-      message: `Account already initiated. OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
-      requiresVerification: true,
-      email: cleanEmail,
-      debugOtp: otp,
-    });
   }
 
   // Check if verified account already exists with this mobile number
   const existingPhoneUser = await prisma.user.findFirst({
-    where: { phone: cleanPhone, isEmailVerified: true },
+    where: { phone: cleanPhone, isEmailVerified: true, subscriptionStatus: 'ACTIVE' },
   });
   if (existingPhoneUser) {
     return res.status(409).json({ error: 'An account with this mobile number already exists. Please Sign In instead.' });
@@ -127,7 +108,58 @@ export const register = asyncHandler(async (req, res) => {
     }
   }
 
-  const requiresOtpVerification = assignedRole === 'USER' || assignedRole === 'PARENT';
+  // FOR REGULAR USERS: ZERO DB INSERTION BEFORE PAYMENT!
+  // Store all user registration details securely in a signed pendingRegistrationToken.
+  // Database record will ONLY be created upon 100% verified Razorpay payment.
+  if (assignedRole === 'USER') {
+    const pendingRegistrationToken = jwt.sign(
+      {
+        fullName: cleanFullName,
+        email: cleanEmail,
+        phone: cleanPhone,
+        passwordHash,
+        role: 'USER',
+        profilePhoto: profilePhoto || 'https://ik.imagekit.io/m5ei0wbuw/avatar-woman-1.png',
+        bloodGroup: bloodGroup || 'O+',
+        address: address || 'Not Specified',
+        city: city || 'Pune',
+        state: state || 'Maharashtra',
+        country: country || 'India',
+        pincode: pincode || '411001',
+        emergencyContactName: emergencyContactName || null,
+        emergencyContactRelation: emergencyContactRelation || 'Guardian',
+        emergencyContactPhone: emergencyContactPhone || null,
+        parentEmail: parentEmail ? parentEmail.trim().toLowerCase() : null,
+        medicalNotes: medicalNotes || null,
+        partnerReferralCode: partnerReferralCode || null,
+        orgReferralCode: orgReferralCode || null,
+        referredByPartnerId,
+        organizationId,
+        otp,
+        otpExpiresAt: otpExpires.getTime(),
+        type: 'PENDING_REGISTRATION',
+      },
+      config.jwt.secret,
+      { expiresIn: '2h' }
+    );
+
+    try {
+      await sendEmailVerificationOtp({ recipientEmail: cleanEmail, userName: cleanFullName, otp });
+    } catch (emailErr) {
+      console.warn('[Register Email Notice] Verification email notice:', emailErr.message);
+    }
+
+    return res.status(200).json({
+      message: `Account initiated successfully. Please enter the 6-digit OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
+      requiresVerification: true,
+      email: cleanEmail,
+      pendingToken: pendingRegistrationToken,
+      debugOtp: otp,
+    });
+  }
+
+  // Non-USER roles (Parent, SuperAdmin, Organization) - Direct DB registration
+  const requiresOtpVerification = assignedRole === 'PARENT';
 
   let user;
   try {
@@ -265,7 +297,56 @@ export const verifyEmail = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: '6-digit OTP code is required' });
   }
 
-  // Case 1: Check existing DB user (for resend OTP / existing users)
+  // Priority Case: Pending registration token verification (NO DB insertion yet)
+  if (pendingToken) {
+    let decoded;
+    try {
+      decoded = jwt.verify(pendingToken, config.jwt.secret);
+    } catch (err) {
+      return res.status(400).json({ error: 'Registration session expired or invalid. Please try registering again.' });
+    }
+
+    if (decoded.otp !== otp) {
+      return res.status(400).json({ error: 'Invalid OTP code. Please check your email and try again.' });
+    }
+
+    if (decoded.otpExpiresAt && Date.now() > decoded.otpExpiresAt) {
+      return res.status(400).json({ error: 'OTP code has expired. Please click Resend OTP.' });
+    }
+
+    // Issue a verified registration token to be passed to Checkout and Razorpay
+    const { exp, iat, otp: _discardOtp, otpExpiresAt: _discardExp, ...cleanPayload } = decoded;
+    const registrationToken = jwt.sign(
+      {
+        ...cleanPayload,
+        isEmailVerified: true,
+        type: 'VERIFIED_REGISTRATION',
+      },
+      config.jwt.secret,
+      { expiresIn: '2h' }
+    );
+
+    return res.status(200).json({
+      message: 'Email verified successfully! Please select your plan and complete payment to activate account.',
+      registrationToken,
+      user: {
+        fullName: decoded.fullName,
+        email: decoded.email,
+        phone: decoded.phone,
+        role: decoded.role || 'USER',
+        bloodGroup: decoded.bloodGroup,
+        address: decoded.address,
+        city: decoded.city,
+        state: decoded.state,
+        pincode: decoded.pincode,
+        emergencyContactName: decoded.emergencyContactName,
+        emergencyContactPhone: decoded.emergencyContactPhone,
+        subscriptionStatus: 'INACTIVE',
+      },
+    });
+  }
+
+  // Fallback Case: Check existing DB user (for PARENT / ADMIN accounts already created in DB)
   const existingUser = email ? await prisma.user.findUnique({ where: { email } }) : null;
   if (existingUser) {
     // Skip OTP check only if email is verified AND the user is NOT a SUPER_ADMIN logging in
@@ -354,56 +435,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
     });
   }
 
-  // Case 2: Pending registration token verification (NO DB insertion yet)
-  if (!pendingToken) {
-    return res.status(400).json({ error: 'Registration session expired. Please register again.' });
-  }
-
-  let decoded;
-  try {
-    decoded = jwt.verify(pendingToken, config.jwt.secret);
-  } catch (err) {
-    return res.status(400).json({ error: 'Registration session expired or invalid. Please try registering again.' });
-  }
-
-  if (decoded.otp !== otp) {
-    return res.status(400).json({ error: 'Invalid OTP code. Please check your email and try again.' });
-  }
-
-  if (decoded.otpExpiresAt && Date.now() > decoded.otpExpiresAt) {
-    return res.status(400).json({ error: 'OTP code has expired. Please click Resend OTP.' });
-  }
-
-  // Issue a verified registration token to be passed to Checkout and PayU
-  const { exp, iat, ...cleanPayload } = decoded;
-  const registrationToken = jwt.sign(
-    {
-      ...cleanPayload,
-      isEmailVerified: true,
-      type: 'VERIFIED_REGISTRATION',
-    },
-    config.jwt.secret,
-    { expiresIn: '2h' }
-  );
-
-  res.status(200).json({
-    message: 'Email verified successfully! Please select your plan and complete payment to activate account.',
-    registrationToken,
-    user: {
-      fullName: decoded.fullName,
-      email: decoded.email,
-      phone: decoded.phone,
-      role: decoded.role,
-      bloodGroup: decoded.bloodGroup,
-      address: decoded.address,
-      city: decoded.city,
-      state: decoded.state,
-      pincode: decoded.pincode,
-      emergencyContactName: decoded.emergencyContactName,
-      emergencyContactPhone: decoded.emergencyContactPhone,
-      subscriptionStatus: 'INACTIVE',
-    },
-  });
+  return res.status(400).json({ error: 'Registration session expired. Please register again.' });
 });
 
 /**

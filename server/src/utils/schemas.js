@@ -31,4 +31,5 @@ export const loginSchema = z.object({
 export const verifyEmailSchema = z.object({
   email: z.string().email("Please enter a valid email address").toLowerCase().trim(),
   otp: z.string().length(6, "OTP must be 6 digits"),
+  pendingToken: z.string().optional(),
 });

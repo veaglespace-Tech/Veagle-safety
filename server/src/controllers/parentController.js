@@ -503,7 +503,7 @@ export const triggerChildSos = asyncHandler(async (req, res) => {
     include: { parent: true },
   }).catch(() => []);
 
-  const clientBaseUrl = process.env.CLIENT_URL || config.payu?.clientUrl || 'http://localhost:3000';
+  const clientBaseUrl = process.env.CLIENT_URL || config.razorpay?.clientUrl || 'http://localhost:3000';
   const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
   const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
