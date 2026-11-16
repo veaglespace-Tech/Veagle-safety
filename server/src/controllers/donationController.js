@@ -1,7 +1,7 @@
 import { prisma } from '../config/prisma.js';
 import { config } from '../config/index.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { razorpay, verifyRazorpaySignature } from '../utils/razorpay.js';
+import { getRazorpayClient, verifyRazorpaySignature } from '../utils/razorpay.js';
 
 export const initiateDonation = asyncHandler(async (req, res) => {
   const { name, email, phone, amount } = req.body;
@@ -21,7 +21,7 @@ export const initiateDonation = asyncHandler(async (req, res) => {
   // Razorpay amount in paise
   const amountInPaise = Math.round(parsedAmount * 100);
 
-  const razorpayOrder = await razorpay.orders.create({
+  const razorpayOrder = await getRazorpayClient().orders.create({
     amount: amountInPaise,
     currency: 'INR',
     receipt: txnid,
