@@ -1,5 +1,9 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import { fileURLToPath } from 'node:url';
+
+// Resolve the backend .env from this file, not process.cwd(). PM2 may start
+// the server from the repository root, while the file lives in server/.env.
+dotenv.config({ path: fileURLToPath(new URL('../../.env', import.meta.url)) });
 
 // Helper to extract clean env values
 const getEnv = (key, defaultValue = '') => {
