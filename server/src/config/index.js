@@ -1,9 +1,26 @@
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
+import path from 'node:path';
 
-// Resolve the backend .env from this file, not process.cwd(). PM2 may start
-// the server from the repository root, while the file lives in server/.env.
-dotenv.config({ path: fileURLToPath(new URL('../../.env', import.meta.url)) });
+// PM2 can start the backend with either the repository root or server folder
+// as its cwd. Load the known env locations without replacing values injected
+// by the process manager, and ignore blank entries in an earlier file.
+const serverDir = fileURLToPath(new URL('../..', import.meta.url));
+const repoDir = path.dirname(serverDir);
+const envFiles = [
+  path.join(serverDir, '.env'),
+  path.join(repoDir, '.env'),
+  path.join(process.cwd(), '.env'),
+];
+
+for (const envFile of [...new Set(envFiles)]) {
+  if (!fs.existsSync(envFile)) continue;
+  const parsed = dotenv.parse(fs.readFileSync(envFile));
+  for (const [key, value] of Object.entries(parsed)) {
+    if (value && !process.env[key]) process.env[key] = value;
+  }
+}
 
 // Helper to extract clean env values
 const getEnv = (key, defaultValue = '') => {
