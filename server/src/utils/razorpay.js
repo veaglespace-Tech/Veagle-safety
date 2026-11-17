@@ -26,6 +26,7 @@ const cleanKey = (k) => {
 /**
  * Dynamically resolves Razorpay credentials strictly from environment variables or .env files.
  * Features:
+ * - Supports both standard '=' and ':' delimiters (e.g., KEY=VALUE and KEY : VALUE)
  * - UTF-8 BOM stripping
  * - Case-insensitive key matching
  * - Quote stripping
@@ -49,12 +50,31 @@ export function resolveRazorpayCredentials() {
       if (fs.existsSync(filePath)) {
         try {
           const content = fs.readFileSync(filePath, 'utf-8');
-          const parsed = dotenv.parse(content);
-          for (const [k, v] of Object.entries(parsed)) {
-            const normalizedKey = cleanKey(k);
-            const normalizedVal = cleanValue(v);
-            if (normalizedKey && normalizedVal) {
-              diskEnv[normalizedKey] = normalizedVal;
+
+          // 1. Try standard dotenv parser
+          try {
+            const parsed = dotenv.parse(content);
+            for (const [k, v] of Object.entries(parsed)) {
+              const normalizedKey = cleanKey(k);
+              const normalizedVal = cleanValue(v);
+              if (normalizedKey && normalizedVal) {
+                diskEnv[normalizedKey] = normalizedVal;
+              }
+            }
+          } catch (_) {}
+
+          // 2. Custom line-by-line parser supporting both '=' and ':' (e.g. KEY : VALUE)
+          const lines = content.split(/\r?\n/);
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('#')) continue;
+            const match = trimmed.match(/^([^=:]+)[\s:=]+(.*)$/);
+            if (match) {
+              const normalizedKey = cleanKey(match[1]);
+              const normalizedVal = cleanValue(match[2]);
+              if (normalizedKey && normalizedVal) {
+                diskEnv[normalizedKey] = normalizedVal;
+              }
             }
           }
         } catch (_) {}
@@ -72,7 +92,7 @@ export function resolveRazorpayCredentials() {
     }
   }
 
-  // Find keyId
+  // Find keyId (supports RAZORPAY_API_KEY, RAZORPAY_KEY_ID, etc.)
   let keyId =
     envMap['RAZORPAY_KEY_ID'] ||
     envMap['RAZORPAY_API_KEY'] ||
@@ -91,7 +111,7 @@ export function resolveRazorpayCredentials() {
     }
   }
 
-  // Find keySecret
+  // Find keySecret (supports RAZORPAY_API_SECRET, RAZORPAY_KEY_SECRET, etc.)
   let keySecret =
     envMap['RAZORPAY_KEY_SECRET'] ||
     envMap['RAZORPAY_API_SECRET'] ||

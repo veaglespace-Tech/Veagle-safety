@@ -23,6 +23,21 @@ for (const envFile of [...new Set(envFiles)]) {
       const cleanK = String(key).replace(/^\uFEFF/, '').trim();
       if (value && !process.env[cleanK]) process.env[cleanK] = value;
     }
+
+    // Support KEY : VALUE syntax as well
+    const lines = rawContent.split(/\r?\n/);
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const match = trimmed.match(/^([^=:]+)[\s:=]+(.*)$/);
+      if (match) {
+        const cleanK = String(match[1]).replace(/^\uFEFF/, '').trim();
+        const cleanV = String(match[2]).trim().replace(/^["']|["']$/g, '');
+        if (cleanV && !process.env[cleanK]) {
+          process.env[cleanK] = cleanV;
+        }
+      }
+    }
   } catch (_) {}
 }
 
