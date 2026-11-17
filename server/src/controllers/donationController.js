@@ -1,7 +1,7 @@
 import { prisma } from '../config/prisma.js';
 import { config } from '../config/index.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { getRazorpayClient, verifyRazorpaySignature } from '../utils/razorpay.js';
+import { getRazorpayClient, verifyRazorpaySignature, resolveRazorpayCredentials } from '../utils/razorpay.js';
 
 export const initiateDonation = asyncHandler(async (req, res) => {
   const { name, email, phone, amount } = req.body;
@@ -20,18 +20,27 @@ export const initiateDonation = asyncHandler(async (req, res) => {
 
   // Razorpay amount in paise
   const amountInPaise = Math.round(parsedAmount * 100);
+  const { keyId: activeKeyId } = resolveRazorpayCredentials();
 
-  const razorpayOrder = await getRazorpayClient().orders.create({
-    amount: amountInPaise,
-    currency: 'INR',
-    receipt: txnid,
-    notes: {
-      name,
-      email,
-      phone,
-      purpose: productinfo,
-    },
-  });
+  let razorpayOrder;
+  try {
+    razorpayOrder = await getRazorpayClient().orders.create({
+      amount: amountInPaise,
+      currency: 'INR',
+      receipt: txnid,
+      notes: {
+        name,
+        email,
+        phone,
+        purpose: productinfo,
+      },
+    });
+  } catch (rzpErr) {
+    console.error('[Donation Order Creation Error]:', rzpErr);
+    return res.status(400).json({
+      error: rzpErr?.error?.description || rzpErr?.message || 'Payment gateway initialization failed. Please try again.',
+    });
+  }
 
   // Save pending donation
   await prisma.donation.create({
@@ -50,7 +59,7 @@ export const initiateDonation = asyncHandler(async (req, res) => {
     message: 'Donation order created',
     paymentData: {
       orderId: razorpayOrder.id,
-      keyId: config.razorpay.keyId,
+      keyId: activeKeyId,
       txnid,
       amount: amountInPaise,
       amountDisplay: parsedAmount.toFixed(2),

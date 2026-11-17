@@ -164,10 +164,12 @@ function CheckoutContent() {
       // FREE plan handled directly
       if (res.data?.isFree) {
         if (res.data.token) {
+          localStorage.setItem('tichi_token', res.data.token);
           localStorage.setItem('tichi_auth_token', res.data.token);
           localStorage.setItem('token', res.data.token);
         }
-        router.push(`/payment/success?status=success&txnid=${res.data.txnid}&free=true`);
+        localStorage.removeItem('tichi_reg_token');
+        router.push(`/payment/success?status=success&txnid=${res.data.txnid}&free=true&token=${res.data.token || ''}`);
         return;
       }
 
@@ -209,9 +211,11 @@ function CheckoutContent() {
 
             if (verifyRes.data?.success) {
               if (verifyRes.data.token) {
+                localStorage.setItem('tichi_token', verifyRes.data.token);
                 localStorage.setItem('tichi_auth_token', verifyRes.data.token);
                 localStorage.setItem('token', verifyRes.data.token);
               }
+              localStorage.removeItem('tichi_reg_token');
               router.push(
                 `/payment/success?status=success&txnid=${payData.txnid}&amount=${payData.amountDisplay}&token=${verifyRes.data.token || ''}`
               );

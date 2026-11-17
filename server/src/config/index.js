@@ -24,7 +24,16 @@ for (const envFile of [...new Set(envFiles)]) {
 
 // Helper to extract clean env values
 const getEnv = (key, defaultValue = '') => {
-  return process.env[key] || process.env[key.trim()] || defaultValue;
+  const val = process.env[key] || process.env[key.trim()];
+  if (!val) return defaultValue;
+  let str = String(val).trim();
+  if (
+    (str.startsWith('"') && str.endsWith('"')) ||
+    (str.startsWith("'") && str.endsWith("'"))
+  ) {
+    str = str.slice(1, -1).trim();
+  }
+  return str || defaultValue;
 };
 
 const jwtSecretValue = process.env.JWT_KEY || process.env.JWT_SECRET || (process.env.NODE_ENV !== 'production' ? 'tichi_suraksha_super_secret_jwt_key_2026' : undefined);
@@ -49,8 +58,19 @@ export const config = {
     backupAccountsRaw: process.env.SMTP_BACKUP_ACCOUNTS || '',
   },
   razorpay: {
-    keyId: getEnv('RAZORPAY_KEY_ID'),
-    keySecret: getEnv('RAZORPAY_KEY_SECRET'),
+    keyId:
+      getEnv('RAZORPAY_KEY_ID') ||
+      getEnv('RAZORPAY_API_KEY') ||
+      getEnv('RAZORPAY_KEY') ||
+      getEnv('NEXT_PUBLIC_RAZORPAY_KEY_ID') ||
+      getEnv('NEXT_PUBLIC_RAZORPAY_KEY') ||
+      'rzp_test_TzzM4GlVTuysWB',
+    keySecret:
+      getEnv('RAZORPAY_KEY_SECRET') ||
+      getEnv('RAZORPAY_API_SECRET') ||
+      getEnv('RAZORPAY_SECRET') ||
+      getEnv('RAZORPAY_SECRET_KEY') ||
+      '7D4eWuimEdPtjUoIkj4Q8AeW',
     clientUrl: process.env.CLIENT_URL || (process.env.NODE_ENV === 'production' ? 'https://sakhisuraksha.veaglespace.com' : 'http://localhost:3000'),
     serverBaseUrl: process.env.SERVER_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://sakhisuraksha.veaglespace.com' : 'http://localhost:5000'),
   },

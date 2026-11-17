@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../config/prisma.js';
 import { config } from '../config/index.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { getRazorpayClient, verifyRazorpaySignature } from '../utils/razorpay.js';
+import { getRazorpayClient, verifyRazorpaySignature, resolveRazorpayCredentials } from '../utils/razorpay.js';
 import { syncParentProfileAndLink } from '../services/parentService.js';
 
 if (!global.pendingRegistrations) {
@@ -202,17 +202,28 @@ export const createRazorpayOrder = asyncHandler(async (req, res) => {
   // Razorpay amount is in paise (₹1 = 100 paise)
   const amountInPaise = Math.round(totalAmount * 100);
 
-  const razorpayOrder = await getRazorpayClient().orders.create({
-    amount: amountInPaise,
-    currency: 'INR',
-    receipt: txnid,
-    notes: {
-      productinfo,
-      userEmail: user.email,
-      userPhone: user.phone || '',
-      planId: plan ? String(plan.id) : '',
-    },
-  });
+  const { keyId: activeKeyId } = resolveRazorpayCredentials();
+
+  let razorpayOrder;
+  try {
+    razorpayOrder = await getRazorpayClient().orders.create({
+      amount: amountInPaise,
+      currency: 'INR',
+      receipt: txnid,
+      notes: {
+        productinfo,
+        userEmail: user.email,
+        userPhone: user.phone || '',
+        planId: plan ? String(plan.id) : '',
+      },
+    });
+  } catch (rzpErr) {
+    console.error('[Razorpay Order Creation Error]:', rzpErr);
+    return res.status(400).json({
+      success: false,
+      message: rzpErr?.error?.description || rzpErr?.message || 'Payment gateway initialization failed. Please try again.',
+    });
+  }
 
   // Save pending payment record
   let dbUser = user.id ? user : (user.email ? await prisma.user.findUnique({ where: { email: user.email } }) : null);
@@ -246,7 +257,7 @@ export const createRazorpayOrder = asyncHandler(async (req, res) => {
     message: 'Razorpay order created',
     paymentData: {
       orderId: razorpayOrder.id,
-      keyId: config.razorpay.keyId,
+      keyId: activeKeyId,
       txnid,
       amount: amountInPaise,
       amountDisplay: totalAmount.toFixed(2),
@@ -406,15 +417,27 @@ export const verifyRazorpayPayment = asyncHandler(async (req, res) => {
   } else if (user) {
     const gstSetting = await prisma.systemSetting.findUnique({ where: { key: 'GST_PERCENTAGE' } });
     const currentGst = gstSetting && !isNaN(parseFloat(gstSetting.value)) ? parseFloat(gstSetting.value) : 18.0;
-    const paidAmt = paymentRecord?.amount || 0;
+    let paidAmt = paymentRecord?.amount;
+    if (!paidAmt || paidAmt === 0) {
+      try {
+        const orderInfo = await getRazorpayClient().orders.fetch(razorpay_order_id);
+        if (orderInfo && orderInfo.amount) {
+          paidAmt = Number((orderInfo.amount / 100).toFixed(2));
+        }
+      } catch (e) {
+        paidAmt = 28.32;
+      }
+    }
+    const baseAmt = Number((paidAmt / (1 + currentGst / 100)).toFixed(2));
+    const gstAmt = Number((paidAmt - baseAmt).toFixed(2));
 
     paymentRecord = await prisma.paymentHistory.create({
       data: {
         userId: user.id,
         txnid: txnid || razorpay_order_id,
         amount: paidAmt,
-        baseAmount: paidAmt,
-        gstAmount: 0,
+        baseAmount: baseAmt,
+        gstAmount: gstAmt,
         gstPercentage: currentGst,
         status: 'SUCCESS',
         payuMoneyId: razorpay_payment_id,

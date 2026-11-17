@@ -48,8 +48,8 @@ jobs:
             
              
             echo "Restarting application..."
-            pm2 restart veagle-safety-server
-            pm2 restart veagle-safety-client
+            pm2 restart veagle-safety-server --update-env
+            pm2 restart veagle-safety-client --update-env
 
             echo "================================"
             echo "Deployment completed!"

@@ -24,7 +24,9 @@ function SuccessContent() {
   useEffect(() => {
     if (token && typeof window !== 'undefined') {
       localStorage.setItem('tichi_token', token);
+      localStorage.setItem('tichi_auth_token', token);
       localStorage.setItem('token', token);
+      localStorage.removeItem('tichi_reg_token');
     }
     dispatch(fetchUser());
 
