@@ -64,13 +64,13 @@ export const config = {
       getEnv('RAZORPAY_KEY') ||
       getEnv('NEXT_PUBLIC_RAZORPAY_KEY_ID') ||
       getEnv('NEXT_PUBLIC_RAZORPAY_KEY') ||
-      'rzp_test_TzzM4GlVTuysWB',
+      '',
     keySecret:
       getEnv('RAZORPAY_KEY_SECRET') ||
       getEnv('RAZORPAY_API_SECRET') ||
       getEnv('RAZORPAY_SECRET') ||
       getEnv('RAZORPAY_SECRET_KEY') ||
-      '7D4eWuimEdPtjUoIkj4Q8AeW',
+      '',
     clientUrl: process.env.CLIENT_URL || (process.env.NODE_ENV === 'production' ? 'https://sakhisuraksha.veaglespace.com' : 'http://localhost:3000'),
     serverBaseUrl: process.env.SERVER_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://sakhisuraksha.veaglespace.com' : 'http://localhost:5000'),
   },
