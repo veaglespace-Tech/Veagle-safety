@@ -7,7 +7,7 @@ import Razorpay from 'razorpay';
 import { config } from '../config/index.js';
 
 const cleanValue = (val) => {
-  if (!val) return '';
+  if (val === undefined || val === null) return '';
   let str = String(val).trim();
   if (
     (str.startsWith('"') && str.endsWith('"')) ||
@@ -18,12 +18,18 @@ const cleanValue = (val) => {
   return str;
 };
 
+const cleanKey = (k) => {
+  if (!k) return '';
+  return String(k).replace(/^\uFEFF/, '').trim().toUpperCase();
+};
+
 /**
  * Dynamically resolves Razorpay credentials strictly from environment variables or .env files.
- * Checks:
- * 1. Disk .env files (to pick up live edits without requiring server restart)
- * 2. process.env with all known alias keys
- * 3. config.razorpay
+ * Features:
+ * - UTF-8 BOM stripping
+ * - Case-insensitive key matching
+ * - Quote stripping
+ * - Multi-path lookup (server/.env, repo/.env, cwd/.env, VPS paths)
  */
 export function resolveRazorpayCredentials() {
   const diskEnv = {};
@@ -45,8 +51,10 @@ export function resolveRazorpayCredentials() {
           const content = fs.readFileSync(filePath, 'utf-8');
           const parsed = dotenv.parse(content);
           for (const [k, v] of Object.entries(parsed)) {
-            if (v && String(v).trim()) {
-              diskEnv[k.trim()] = String(v).trim();
+            const normalizedKey = cleanKey(k);
+            const normalizedVal = cleanValue(v);
+            if (normalizedKey && normalizedVal) {
+              diskEnv[normalizedKey] = normalizedVal;
             }
           }
         } catch (_) {}
@@ -54,34 +62,54 @@ export function resolveRazorpayCredentials() {
     }
   } catch (_) {}
 
-  const findValue = (...keys) => {
-    for (const k of keys) {
-      if (diskEnv[k]) return cleanValue(diskEnv[k]);
-      if (process.env[k]) return cleanValue(process.env[k]);
+  // Collect from process.env as well
+  const envMap = { ...diskEnv };
+  for (const [k, v] of Object.entries(process.env)) {
+    const normalizedKey = cleanKey(k);
+    const normalizedVal = cleanValue(v);
+    if (normalizedKey && normalizedVal && !envMap[normalizedKey]) {
+      envMap[normalizedKey] = normalizedVal;
     }
-    return '';
-  };
+  }
 
-  const keyId =
-    findValue(
-      'RAZORPAY_KEY_ID',
-      'RAZORPAY_API_KEY',
-      'RAZORPAY_KEY',
-      'NEXT_PUBLIC_RAZORPAY_KEY_ID',
-      'NEXT_PUBLIC_RAZORPAY_KEY'
-    ) ||
+  // Find keyId
+  let keyId =
+    envMap['RAZORPAY_KEY_ID'] ||
+    envMap['RAZORPAY_API_KEY'] ||
+    envMap['RAZORPAY_KEY'] ||
+    envMap['NEXT_PUBLIC_RAZORPAY_KEY_ID'] ||
+    envMap['NEXT_PUBLIC_RAZORPAY_KEY'] ||
     cleanValue(config.razorpay?.keyId);
 
-  const keySecret =
-    findValue(
-      'RAZORPAY_KEY_SECRET',
-      'RAZORPAY_API_SECRET',
-      'RAZORPAY_SECRET',
-      'RAZORPAY_SECRET_KEY'
-    ) ||
+  if (!keyId) {
+    // Flexible search: any key containing RAZORPAY and (KEY or ID) but NOT SECRET
+    for (const [k, v] of Object.entries(envMap)) {
+      if (k.includes('RAZORPAY') && (k.includes('KEY') || k.includes('ID')) && !k.includes('SECRET')) {
+        keyId = v;
+        break;
+      }
+    }
+  }
+
+  // Find keySecret
+  let keySecret =
+    envMap['RAZORPAY_KEY_SECRET'] ||
+    envMap['RAZORPAY_API_SECRET'] ||
+    envMap['RAZORPAY_SECRET'] ||
+    envMap['RAZORPAY_SECRET_KEY'] ||
     cleanValue(config.razorpay?.keySecret);
 
-  return { keyId, keySecret };
+  if (!keySecret) {
+    // Flexible search: any key containing RAZORPAY and SECRET
+    for (const [k, v] of Object.entries(envMap)) {
+      if (k.includes('RAZORPAY') && k.includes('SECRET')) {
+        keySecret = v;
+        break;
+      }
+    }
+  }
+
+  return { keyId: keyId || '', keySecret: keySecret || '' };
 }
 
 /**

@@ -16,10 +16,14 @@ const envFiles = [
 
 for (const envFile of [...new Set(envFiles)]) {
   if (!fs.existsSync(envFile)) continue;
-  const parsed = dotenv.parse(fs.readFileSync(envFile));
-  for (const [key, value] of Object.entries(parsed)) {
-    if (value && !process.env[key]) process.env[key] = value;
-  }
+  try {
+    const rawContent = fs.readFileSync(envFile, 'utf-8');
+    const parsed = dotenv.parse(rawContent);
+    for (const [key, value] of Object.entries(parsed)) {
+      const cleanK = String(key).replace(/^\uFEFF/, '').trim();
+      if (value && !process.env[cleanK]) process.env[cleanK] = value;
+    }
+  } catch (_) {}
 }
 
 // Helper to extract clean env values
