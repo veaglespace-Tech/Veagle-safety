@@ -6,6 +6,18 @@ import { config } from '../config/index.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { sendEmailVerificationOtp, sendWelcomeEmail, sendPasswordResetEmail } from '../services/mailer.js';
 import { syncParentProfileAndLink } from '../services/parentService.js';
+const createUserAccessToken = (user) => jwt.sign(
+  {
+    id: user.id,
+    userId: user.id,
+    role: user.role,
+    email: user.email,
+    tokenVersion: user.authTokenVersion || 0,
+  },
+  config.jwt.secret,
+  { expiresIn: config.jwt.expiresIn }
+);
+
 
 /**
  * Register User / SuperAdmin with Email Verification OTP
@@ -263,11 +275,7 @@ export const register = asyncHandler(async (req, res) => {
     }
 
     // Non-USER roles (SuperAdmin, Organization) get immediate JWT login
-    const token = jwt.sign(
-      { id: user.id, userId: user.id, role: user.role, email: user.email },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
-    );
+    const token = createUserAccessToken(user);
 
     return res.status(201).json({
       message: `${user.role} account registered successfully`,
@@ -349,25 +357,9 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   // Fallback Case: Check existing DB user (for PARENT / ADMIN accounts already created in DB)
   const existingUser = email ? await prisma.user.findUnique({ where: { email } }) : null;
   if (existingUser) {
-    // Skip OTP check only if email is verified AND the user is NOT a SUPER_ADMIN logging in
+    // Verified accounts must use password login; OTP verification must not mint a session.
     if (existingUser.isEmailVerified && existingUser.role !== 'SUPER_ADMIN' && !existingUser.emailOtp) {
-      const token = jwt.sign(
-        { id: existingUser.id, userId: existingUser.id, role: existingUser.role, email: existingUser.email },
-        config.jwt.secret,
-        { expiresIn: config.jwt.expiresIn }
-      );
-      return res.status(200).json({
-        message: 'Email is already verified',
-        token,
-        user: {
-          id: existingUser.id,
-          fullName: existingUser.fullName,
-          email: existingUser.email,
-          phone: existingUser.phone,
-          role: existingUser.role,
-          subscriptionStatus: existingUser.subscriptionStatus,
-        },
-      });
+      return res.status(400).json({ error: 'Email is already verified. Please sign in.' });
     }
 
     if (!existingUser.emailOtp || existingUser.emailOtp !== otp) {
@@ -415,11 +407,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       console.warn('[Welcome Email Notice] Failed to send welcome email:', welcomeErr.message);
     }
 
-    const token = jwt.sign(
-      { id: updatedUser.id, userId: updatedUser.id, role: updatedUser.role, email: updatedUser.email },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
-    );
+    const token = createUserAccessToken(updatedUser);
 
     return res.status(200).json({
       message: 'Email verified successfully!',
@@ -685,11 +673,7 @@ export const login = asyncHandler(async (req, res) => {
   }
 
 
-  const token = jwt.sign(
-    { id: user.id, userId: user.id, role: user.role, email: user.email },
-    config.jwt.secret,
-    { expiresIn: config.jwt.expiresIn }
-  );
+  const token = createUserAccessToken(user);
 
   res.status(200).json({
     message: 'Logged in successfully',
@@ -1031,6 +1015,13 @@ export const logout = asyncHandler(async (req, res) => {
   const { token: fcmToken } = req.body || {};
   const userId = req.user?.id || req.user?.userId;
 
+  if (userId) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { authTokenVersion: { increment: 1 } },
+    });
+  }
+
   try {
     const deleteFilters = [];
     if (fcmToken) deleteFilters.push({ token: fcmToken });
@@ -1129,6 +1120,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
     where: { id: user.id },
     data: {
       passwordHash,
+      authTokenVersion: { increment: 1 },
       resetPasswordToken: null,
       resetPasswordExpiresAt: null,
     },

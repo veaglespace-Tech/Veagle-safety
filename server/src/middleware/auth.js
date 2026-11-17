@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config/index.js';
+import { prisma } from '../config/prisma.js';
 
-export const authenticateToken = (req, res, next) => {
+export const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -9,21 +10,37 @@ export const authenticateToken = (req, res, next) => {
     return res.status(401).json({ error: 'Access token required' });
   }
 
+  let decoded;
   try {
-    const decoded = jwt.verify(token, config.jwtSecret);
+    decoded = jwt.verify(token, config.jwtSecret);
+  } catch (err) {
+    return res.status(403).json({ error: 'Invalid or expired session token' });
+  }
+
+  try {
     const resolvedId = decoded.id || decoded.userId;
+    const currentUser = await prisma.user.findUnique({
+      where: { id: Number(resolvedId) },
+      select: { id: true, role: true, authTokenVersion: true },
+    });
+    if (!currentUser || (decoded.tokenVersion ?? 0) !== currentUser.authTokenVersion) {
+      return res.status(401).json({ error: 'Session expired. Please sign in again.' });
+    }
+
     req.user = {
       ...decoded,
       id: resolvedId,
       userId: resolvedId,
+      role: currentUser.role,
     };
     next();
   } catch (err) {
-    return res.status(403).json({ error: 'Invalid or expired session token' });
+    console.error('Session validation failed:', err);
+    return res.status(503).json({ error: 'Unable to validate session right now. Please try again.' });
   }
 };
 
-export const optionalAuthToken = (req, res, next) => {
+export const optionalAuthToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -31,18 +48,19 @@ export const optionalAuthToken = (req, res, next) => {
     try {
       const decoded = jwt.verify(token, config.jwtSecret);
       const resolvedId = decoded.id || decoded.userId;
-      req.user = {
-        ...decoded,
-        id: resolvedId,
-        userId: resolvedId,
-      };
+      const currentUser = await prisma.user.findUnique({
+        where: { id: Number(resolvedId) },
+        select: { id: true, role: true, authTokenVersion: true },
+      });
+      if (currentUser && (decoded.tokenVersion ?? 0) === currentUser.authTokenVersion) {
+        req.user = { ...decoded, id: resolvedId, userId: resolvedId, role: currentUser.role };
+      }
     } catch (err) {
       // Ignore token verification errors for optional auth (e.g. pending registration flow)
     }
   }
   next();
 };
-
 export const requireSuperAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== 'SUPER_ADMIN') {
     return res.status(403).json({ error: 'Access denied. Super Admin privileges required.' });
