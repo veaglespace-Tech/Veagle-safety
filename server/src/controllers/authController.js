@@ -265,11 +265,10 @@ export const register = asyncHandler(async (req, res) => {
       }
 
       return res.status(200).json({
-        message: `OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
+        message: `OTP code sent to ${cleanEmail}.`,
         requiresVerification: true,
         pendingToken: pendingRegistrationToken,
         email: cleanEmail,
-        debugOtp: otp,
       });
     }
 
@@ -631,8 +630,6 @@ export const login = asyncHandler(async (req, res) => {
       data: { emailOtp: newOtp, emailOtpExpiresAt: otpExpires },
     });
 
-    console.log(`🔑 [SUPER_ADMIN OTP] Email: ${user.email} | OTP: ${newOtp}`);
-
     try {
       await sendEmailVerificationOtp({ recipientEmail: user.email, userName: user.fullName, otp: newOtp });
     } catch (e) {
@@ -640,10 +637,9 @@ export const login = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json({
-      message: `OTP sent for Admin Verification. (OTP Code: ${newOtp})`,
+      message: 'OTP sent for Admin Verification.',
       requiresVerification: true,
       email: user.email,
-      debugOtp: newOtp,
     });
   }
 
@@ -656,8 +652,6 @@ export const login = asyncHandler(async (req, res) => {
       where: { id: user.id },
       data: { emailOtp: newOtp, emailOtpExpiresAt: otpExpires },
     });
-
-    console.log(`🔑 [OTP RESENT on Login] Email: ${user.email} | OTP: ${newOtp}`);
 
     try {
       await sendEmailVerificationOtp({ recipientEmail: user.email, userName: user.fullName, otp: newOtp });
