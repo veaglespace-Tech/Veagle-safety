@@ -49,10 +49,10 @@ jobs:
             npx prisma generate
 
             echo "Restarting backend..."
-            pm2 restart sakhi-suraksha-server --update-env
+            pm2 restart veagle-safety-server --update-env
 
             echo "Restarting frontend..."
-            pm2 restart sakhi-suraksha-client --update-env
+            pm2 restart veagle-safety-client --update-env
 
             echo "Saving PM2 process list..."
             pm2 save
