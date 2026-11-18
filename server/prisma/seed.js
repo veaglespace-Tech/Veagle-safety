@@ -50,9 +50,9 @@ export async function seedDatabase() {
   const superAdmin = await prisma.user.create({
     data: {
       id: 1,
-      fullName: 'Super Admin',
+      fullName: 'Veagle Space',
       email: superAdminEmail,
-      phone: '7756099153',
+      phone: '8237999101',
       passwordHash,
       role: 'SUPER_ADMIN',
       isEmailVerified: true,
