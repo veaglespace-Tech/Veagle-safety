@@ -541,12 +541,15 @@ export const triggerChildSos = asyncHandler(async (req, res) => {
   const ccList = Array.from(ccEmails);
   const toList = Array.from(primaryEmails);
   const primaryRecipients = Array.from(new Set([...toList, ...ccList]));
+  if (primaryRecipients.length === 0) {
+    console.warn(`[Parent SOS Email Dispatch] No valid guardian/admin recipients found for session #${session.id}`);
+  }
 
   // 9. Send emergency emails to guardians (without duplicate CC spam)
   await Promise.all(
     primaryRecipients.map(async (email) => {
       try {
-        await sendSosEmergencyAlert({
+        const delivered = await sendSosEmergencyAlert({
           recipientEmail: email,
           recipientName: 'Safety Guardian',
           userName: child.fullName || 'Sakhi User',
@@ -566,11 +569,22 @@ export const triggerChildSos = asyncHandler(async (req, res) => {
             sosSessionId: session.id,
             channel: 'EMAIL',
             recipient: email,
-            status: 'SENT',
+            status: delivered ? 'SENT' : 'FAILED',
           },
         }).catch(() => {});
+        if (!delivered) {
+          console.error(`[Parent-Triggered SOS Email Error] Delivery failed for recipient ${email}`);
+        }
       } catch (emailErr) {
         console.error(`[Parent-Triggered SOS Email Error] Failed for ${email}:`, emailErr.message);
+        await prisma.sosAlert.create({
+          data: {
+            sosSessionId: session.id,
+            channel: 'EMAIL',
+            recipient: email,
+            status: 'FAILED',
+          },
+        }).catch(() => {});
       }
     })
   );

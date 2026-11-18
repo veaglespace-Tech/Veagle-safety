@@ -124,14 +124,17 @@ export const startSos = async (req, res) => {
     const ccList = Array.from(ccEmails);
     const toList = Array.from(primaryEmails);
     const primaryRecipients = Array.from(new Set([...toList, ...ccList]));
+    if (primaryRecipients.length === 0) {
+      console.warn(`[SOS Email Dispatch] No valid guardian/admin recipients found for session #${session.id}`);
+    }
 
     // 2. Dispatch High-Priority Emergency Emails to Guardians
     await Promise.all(
       primaryRecipients.map(async (email) => {
         try {
-          await sendSosEmergencyAlert({
+          const delivered = await sendSosEmergencyAlert({
             recipientEmail: email,
-          recipientName: ccList.includes(email) ? 'Safety Command Center' : 'Safety Guardian',
+            recipientName: ccList.includes(email) ? 'Safety Command Center' : 'Safety Guardian',
             userName: currentUser?.fullName || 'Sakhi User',
             userPhone: currentUser?.phone || 'N/A',
             userEmail: currentUser?.email || 'N/A',
@@ -148,11 +151,22 @@ export const startSos = async (req, res) => {
               sosSessionId: session.id,
               channel: 'EMAIL',
               recipient: email,
-              status: 'SENT',
+              status: delivered ? 'SENT' : 'FAILED',
             },
           }).catch(() => {});
+          if (!delivered) {
+            console.error(`[Emergency Email Error] Delivery failed for recipient ${email}`);
+          }
         } catch (emailErr) {
           console.error(`[Emergency Email Error] Failed for ${email}:`, emailErr.message);
+          await prisma.sosAlert.create({
+            data: {
+              sosSessionId: session.id,
+              channel: 'EMAIL',
+              recipient: email,
+              status: 'FAILED',
+            },
+          }).catch(() => {});
         }
       })
     );
