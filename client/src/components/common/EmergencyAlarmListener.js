@@ -14,7 +14,7 @@ import {
   BellRing,
   MessageSquare,
 } from 'lucide-react';
-import { startEmergencySiren, stopEmergencySiren } from '../../utils/sirenAudio.js';
+import { startEmergencySiren, stopEmergencySiren, isEmergencySirenUnlocked } from '../../utils/sirenAudio.js';
 
 export const EmergencyAlarmListener = () => {
   const dispatch = useDispatch();
@@ -102,9 +102,12 @@ export const EmergencyAlarmListener = () => {
 
           console.log('[EmergencyAlarmListener] SOS ALARM BROADCAST received:', data);
           setAlarmData(data);
-          // Browsers require a user gesture before starting audio or vibration.
-          // Keep the control in the playable state until the user taps it.
-          setIsSirenActive(false);
+          // Start immediately when this browser has already received a user gesture.
+          // Otherwise keep the Play Siren fallback because autoplay is browser-blocked.
+          const started = isEmergencySirenUnlocked()
+            ? startEmergencySiren({ vibrate: false })
+            : false;
+          setIsSirenActive(started);
         });
 
         socket.on('SOS_ALARM_STOP', (data) => {
@@ -154,6 +157,11 @@ export const EmergencyAlarmListener = () => {
 
   useEffect(() => {
     const onToggle = () => handleStartAudioSiren();
+    const onAudioUnlocked = () => {
+      if (!alarmData || isSirenActive) return;
+      const started = startEmergencySiren({ vibrate: false });
+      setIsSirenActive(started);
+    };
     const onSetState = (e) => {
       if (!e.detail.active && isSirenActive) {
         stopEmergencySiren();
@@ -163,12 +171,14 @@ export const EmergencyAlarmListener = () => {
     
     window.addEventListener('toggle-siren-audio', onToggle);
     window.addEventListener('set-siren-state', onSetState);
+    window.addEventListener('emergency-audio-unlocked', onAudioUnlocked);
     
     return () => {
       window.removeEventListener('toggle-siren-audio', onToggle);
       window.removeEventListener('set-siren-state', onSetState);
+      window.removeEventListener('emergency-audio-unlocked', onAudioUnlocked);
     };
-  }, [isSirenActive]);
+  }, [isSirenActive, alarmData]);
 
   const handleDismiss = (e) => {
     if (e) e.stopPropagation();

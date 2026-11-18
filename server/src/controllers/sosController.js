@@ -96,7 +96,8 @@ export const startSos = async (req, res) => {
       if (isValidEmail(c.email)) primaryEmails.add(c.email.trim().toLowerCase());
     });
 
-    // CC Emails: Organization Admin + System Admin (if configured)
+    // Include every registered system admin as well as the optional deployment
+    // override, so SOS email delivery does not depend on ADMIN_EMAIL being set.
     const ccEmails = new Set();
     if (isValidEmail(currentUser?.organization?.email)) {
       ccEmails.add(currentUser.organization.email.trim().toLowerCase());
@@ -106,9 +107,23 @@ export const startSos = async (req, res) => {
       ccEmails.add(process.env.ADMIN_EMAIL.trim().toLowerCase());
     }
 
+    const systemAdmins = await prisma.user.findMany({
+      where: { role: { in: ['SUPER_ADMIN', 'ADMIN'] } },
+      select: { email: true },
+    }).catch((err) => {
+      console.error('[SOS Admin Email Lookup Error]:', err.message);
+      return [];
+    });
+    systemAdmins.forEach((admin) => {
+      const adminEmail = admin.email?.trim().toLowerCase();
+      if (isValidEmail(adminEmail) && adminEmail !== currentUser?.email?.trim().toLowerCase()) {
+        ccEmails.add(adminEmail);
+      }
+    });
+
     const ccList = Array.from(ccEmails);
     const toList = Array.from(primaryEmails);
-    const primaryRecipients = toList.length > 0 ? toList : (ccList.length > 0 ? [ccList[0]] : []);
+    const primaryRecipients = Array.from(new Set([...toList, ...ccList]));
 
     // 2. Dispatch High-Priority Emergency Emails to Guardians
     await Promise.all(
@@ -116,7 +131,7 @@ export const startSos = async (req, res) => {
         try {
           await sendSosEmergencyAlert({
             recipientEmail: email,
-            recipientName: 'Safety Guardian',
+          recipientName: ccList.includes(email) ? 'Safety Command Center' : 'Safety Guardian',
             userName: currentUser?.fullName || 'Sakhi User',
             userPhone: currentUser?.phone || 'N/A',
             userEmail: currentUser?.email || 'N/A',
@@ -141,27 +156,6 @@ export const startSos = async (req, res) => {
         }
       })
     );
-
-    // Send single notification to Org/Admin CC if configured
-    if (ccList.length > 0) {
-      for (const adminEmail of ccList) {
-        if (!primaryRecipients.includes(adminEmail)) {
-          sendSosEmergencyAlert({
-            recipientEmail: adminEmail,
-            recipientName: 'Safety Command Center',
-            userName: currentUser?.fullName || 'Sakhi User',
-            userPhone: currentUser?.phone || 'N/A',
-            userEmail: currentUser?.email || 'N/A',
-            userPhoto: currentUser?.profilePhoto || null,
-            trackingUrl,
-            googleMapsUrl,
-            latitude,
-            longitude,
-            sosId: session.id,
-          }).catch((err) => console.error('[Admin Alert Notice]:', err.message));
-        }
-      }
-    }
 
     // 3. Format Direct WhatsApp Emergency Alert Links for Guardians
     const baseMessageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${currentUser?.fullName || 'Sakhi Member'}\nPhone: ${currentUser?.phone || ''}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Map:\n${trackingUrl}\n\n🌐 Google Maps:\n${googleMapsUrl}`;

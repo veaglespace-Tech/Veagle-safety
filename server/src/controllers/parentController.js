@@ -527,9 +527,20 @@ export const triggerChildSos = asyncHandler(async (req, res) => {
     ccEmails.add(process.env.ADMIN_EMAIL.trim().toLowerCase());
   }
 
+  const systemAdmins = await prisma.user.findMany({
+    where: { role: { in: ['SUPER_ADMIN', 'ADMIN'] } },
+    select: { email: true },
+  }).catch((err) => {
+    console.error('[Parent SOS Admin Email Lookup Error]:', err.message);
+    return [];
+  });
+  systemAdmins.forEach((admin) => {
+    if (isValidEmail(admin.email)) ccEmails.add(admin.email.trim().toLowerCase());
+  });
+
   const ccList = Array.from(ccEmails);
   const toList = Array.from(primaryEmails);
-  const primaryRecipients = toList.length > 0 ? toList : (ccList.length > 0 ? [ccList[0]] : []);
+  const primaryRecipients = Array.from(new Set([...toList, ...ccList]));
 
   // 9. Send emergency emails to guardians (without duplicate CC spam)
   await Promise.all(
@@ -563,28 +574,6 @@ export const triggerChildSos = asyncHandler(async (req, res) => {
       }
     })
   );
-
-  // Send single notification to Org/Admin CC if configured
-  if (ccList.length > 0) {
-    for (const adminEmail of ccList) {
-      if (!primaryRecipients.includes(adminEmail)) {
-        sendSosEmergencyAlert({
-          recipientEmail: adminEmail,
-          recipientName: 'Safety Command Center',
-          userName: child.fullName || 'Sakhi User',
-          userPhone: child.phone || 'N/A',
-          userEmail: child.email || 'N/A',
-          userPhoto: child.profilePhoto || null,
-          trackingUrl,
-          googleMapsUrl,
-          latitude,
-          longitude,
-          sosId: session.id,
-          extraNote: `⚠️ This SOS was triggered by ${link.parent.fullName} (Parent) on behalf of ${child.fullName}.`,
-        }).catch(() => {});
-      }
-    }
-  }
 
   // 10. Build WhatsApp alert links
   const baseMessageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\n⚠️ Triggered by Parent: ${link.parent.fullName}\nVictim: ${child.fullName}\nPhone: ${child.phone || ''}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Map:\n${trackingUrl}\n\n🌐 Google Maps:\n${googleMapsUrl}`;
