@@ -19,21 +19,15 @@ import { startEmergencySiren, stopEmergencySiren } from '../../utils/sirenAudio.
 export const EmergencyAlarmListener = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state?.auth || {});
-  const mutedSosIds = useSelector((state) => state?.sos?.mutedSosIds || []);
   const [alarmData, setAlarmData] = useState(null);
   const [isSirenActive, setIsSirenActive] = useState(false);
   const dismissedSosIdsRef = useRef(new Set());
   const socketRef = useRef(null);
   const userRef = useRef(user);
-  const mutedSosIdsRef = useRef(mutedSosIds);
 
   useEffect(() => {
     userRef.current = user;
   }, [user]);
-
-  useEffect(() => {
-    mutedSosIdsRef.current = mutedSosIds;
-  }, [mutedSosIds]);
 
   const registerUserRooms = (socketInstance, u) => {
     if (!socketInstance || !u) return;
@@ -108,15 +102,9 @@ export const EmergencyAlarmListener = () => {
 
           console.log('[EmergencyAlarmListener] SOS ALARM BROADCAST received:', data);
           setAlarmData(data);
-          
-          if (!mutedSosIdsRef.current.includes(String(sosId))) {
-            try {
-              startEmergencySiren();
-              setIsSirenActive(true);
-            } catch (e) {
-              console.warn('Audio requires user click gesture');
-            }
-          }
+          // Browsers require a user gesture before starting audio or vibration.
+          // Keep the control in the playable state until the user taps it.
+          setIsSirenActive(false);
         });
 
         socket.on('SOS_ALARM_STOP', (data) => {
@@ -167,10 +155,7 @@ export const EmergencyAlarmListener = () => {
   useEffect(() => {
     const onToggle = () => handleStartAudioSiren();
     const onSetState = (e) => {
-      if (e.detail.active && !isSirenActive) {
-        startEmergencySiren();
-        setIsSirenActive(true);
-      } else if (!e.detail.active && isSirenActive) {
+      if (!e.detail.active && isSirenActive) {
         stopEmergencySiren();
         setIsSirenActive(false);
       }
