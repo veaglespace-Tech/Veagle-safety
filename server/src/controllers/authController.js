@@ -162,11 +162,10 @@ export const register = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json({
-      message: `Account initiated successfully. Please enter the 6-digit OTP code sent to ${cleanEmail}. (OTP Code: ${otp})`,
+      message: `Account initiated successfully. Please enter the 6-digit OTP code sent to ${cleanEmail}.`,
       requiresVerification: true,
       email: cleanEmail,
       pendingToken: pendingRegistrationToken,
-      debugOtp: otp,
     });
   }
 
@@ -460,8 +459,7 @@ export const resendOtp = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json({
-      message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,
-      debugOtp: newOtp,
+      message: `A new 6-digit OTP code has been sent to ${email}.`,
     });
   }
 
@@ -470,16 +468,19 @@ export const resendOtp = asyncHandler(async (req, res) => {
   if (pendingToken) {
     try {
       const decoded = jwt.verify(pendingToken, config.jwt.secret);
+      const { exp: _oldExp, iat: _oldIat, nbf: _oldNbf, ...registrationPayload } = decoded;
       updatedPendingToken = jwt.sign(
         {
-          ...decoded,
+          ...registrationPayload,
           otp: newOtp,
           otpExpiresAt: newOtpExpires.getTime(),
         },
         config.jwt.secret,
         { expiresIn: '2h' }
       );
-    } catch (e) {}
+    } catch (e) {
+      return res.status(400).json({ error: 'Registration session expired or invalid. Please register again.' });
+    }
   }
 
   try {
@@ -489,9 +490,8 @@ export const resendOtp = asyncHandler(async (req, res) => {
   }
 
   return res.status(200).json({
-    message: `A new 6-digit OTP code has been sent to ${email}. (OTP Code: ${newOtp})`,
+    message: `A new 6-digit OTP code has been sent to ${email}.`,
     pendingToken: updatedPendingToken || pendingToken,
-    debugOtp: newOtp,
   });
 });
 
