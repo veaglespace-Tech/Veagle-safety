@@ -4,7 +4,7 @@ import { sendSosEmergencyAlert, sendSosSafeAlert } from '../services/mailer.js';
 import { getIO } from '../socket.js';
 import { sendEmergencyPushToEmails } from './pushController.js';
 import { sendEmergencySirenPush } from '../services/fcmService.js';
-import { collectEmergencyRecipients } from '../utils/recipientHelper.js';
+import { collectEmergencyRecipients, isValidEmail } from '../utils/recipientHelper.js';
 
 export const startSos = async (req, res) => {
   try {
@@ -80,52 +80,37 @@ export const startSos = async (req, res) => {
     const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-    // 1. Collect Recipient Emails (Primary TO: Guardians, Parents, Emergency Contact)
+    // 1. Collect Recipient Emails (Primary TO: Guardians, Parents, Emergency Contacts - NOT the victim herself)
     const primaryEmails = new Set();
     
-    // Linked parents
+    // Linked parents (verified active links only)
     parentLinks.forEach((link) => {
-      if (link.parent?.email) primaryEmails.add(link.parent.email.trim().toLowerCase());
+      if (isValidEmail(link.parent?.email)) primaryEmails.add(link.parent.email.trim().toLowerCase());
     });
     // Parent email on profile
-    if (currentUser?.parentEmail) {
+    if (isValidEmail(currentUser?.parentEmail)) {
       primaryEmails.add(currentUser.parentEmail.trim().toLowerCase());
     }
     // Trusted guardian contacts
     contacts.forEach((c) => {
-      if (c.email) primaryEmails.add(c.email.trim().toLowerCase());
+      if (isValidEmail(c.email)) primaryEmails.add(c.email.trim().toLowerCase());
     });
-    // User's own email
-    if (currentUser?.email) {
-      primaryEmails.add(currentUser.email.trim().toLowerCase());
-    }
 
-    // CC Emails: Organization Admin + Super Admins + System Admin
+    // CC Emails: Organization Admin + System Admin (if configured)
     const ccEmails = new Set();
-    if (currentUser?.organization?.email) {
+    if (isValidEmail(currentUser?.organization?.email)) {
       ccEmails.add(currentUser.organization.email.trim().toLowerCase());
     }
 
-    const superAdmins = await prisma.user.findMany({
-      where: { role: 'SUPER_ADMIN' },
-      select: { email: true }
-    }).catch(() => []);
-    
-    superAdmins.forEach((admin) => {
-      if (admin.email) ccEmails.add(admin.email.trim().toLowerCase());
-    });
-
-    const defaultAdminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
-    if (defaultAdminEmail) {
-      ccEmails.add(defaultAdminEmail.trim().toLowerCase());
+    if (process.env.ADMIN_EMAIL && isValidEmail(process.env.ADMIN_EMAIL)) {
+      ccEmails.add(process.env.ADMIN_EMAIL.trim().toLowerCase());
     }
 
     const ccList = Array.from(ccEmails);
-
-    // 2. Dispatch High-Priority Emergency Emails
     const toList = Array.from(primaryEmails);
     const primaryRecipients = toList.length > 0 ? toList : (ccList.length > 0 ? [ccList[0]] : []);
 
+    // 2. Dispatch High-Priority Emergency Emails to Guardians
     await Promise.all(
       primaryRecipients.map(async (email) => {
         try {
@@ -141,7 +126,6 @@ export const startSos = async (req, res) => {
             latitude,
             longitude,
             sosId: session.id,
-            cc: ccList.filter(c => c !== email),
           });
 
           await prisma.sosAlert.create({
@@ -157,6 +141,27 @@ export const startSos = async (req, res) => {
         }
       })
     );
+
+    // Send single notification to Org/Admin CC if configured
+    if (ccList.length > 0) {
+      for (const adminEmail of ccList) {
+        if (!primaryRecipients.includes(adminEmail)) {
+          sendSosEmergencyAlert({
+            recipientEmail: adminEmail,
+            recipientName: 'Safety Command Center',
+            userName: currentUser?.fullName || 'Sakhi User',
+            userPhone: currentUser?.phone || 'N/A',
+            userEmail: currentUser?.email || 'N/A',
+            userPhoto: currentUser?.profilePhoto || null,
+            trackingUrl,
+            googleMapsUrl,
+            latitude,
+            longitude,
+            sosId: session.id,
+          }).catch((err) => console.error('[Admin Alert Notice]:', err.message));
+        }
+      }
+    }
 
     // 3. Format Direct WhatsApp Emergency Alert Links for Guardians
     const baseMessageText = `🚨 SAKHI EMERGENCY SOS ALERT!\n\nVictim: ${currentUser?.fullName || 'Sakhi Member'}\nPhone: ${currentUser?.phone || ''}\n\n📍 GPS Coordinates:\nLat: ${latitude}, Lng: ${longitude}\n\n👉 Live Location Map:\n${trackingUrl}\n\n🌐 Google Maps:\n${googleMapsUrl}`;
@@ -675,10 +680,16 @@ export const resolveSos = async (req, res) => {
       },
     });
 
-    const targetUserId = userId || session.userId;
-    if (targetUserId) {
+    // Ensure the victim (session.userId) is marked SAFE
+    if (session.userId) {
       await prisma.user.update({
-        where: { id: targetUserId },
+        where: { id: session.userId },
+        data: { safetyStatus: 'SAFE' },
+      }).catch(() => {});
+    }
+    if (userId && userId !== session.userId) {
+      await prisma.user.update({
+        where: { id: userId },
         data: { safetyStatus: 'SAFE' },
       }).catch(() => {});
     }
@@ -688,8 +699,8 @@ export const resolveSos = async (req, res) => {
     const longitude = latestLocation?.longitude || session.longitude || 73.8567;
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-    // 1. Collect Recipient Emails for Safe Confirmation (User + Admin + Parent + Guardians)
-    const recipientEmails = collectEmergencyRecipients(session.user);
+    // 1. Collect Recipient Emails for Safe Confirmation (Parent + Guardians)
+    const recipientEmails = collectEmergencyRecipients(session.user, session.user?.trustedContacts, { includeVictim: false });
 
     console.log('[resolveSos] ===== SAFE EMAIL DEBUG =====');
     console.log('[resolveSos] User:', session.user?.fullName, '| email:', session.user?.email);

@@ -118,6 +118,7 @@ router.post('/parent/link-child', authenticateToken, parentController.linkChild)
 router.delete('/parent/children/:linkId', authenticateToken, parentController.unlinkChild);
 router.post('/parent/ping-checkin', authenticateToken, parentController.pingChildCheckin);
 router.post('/parent/trigger-child-sos', authenticateToken, requireActiveSubscription, parentController.triggerChildSos);
+router.post('/parent/resolve-child-sos', authenticateToken, requireActiveSubscription, parentController.resolveChildSos);
 
 // Push Notifications (Web Push & Mobile FCM Device Tokens)
 router.get('/push/vapid-key', pushController.getVapidPublicKey);

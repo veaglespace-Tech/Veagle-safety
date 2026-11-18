@@ -79,6 +79,7 @@ function ParentDashboardContent() {
 
   // Parent-triggered SOS state
   const [triggeringSosForChildId, setTriggeringSosForChildId] = useState(null);
+  const [resolvingSosForChildId, setResolvingSosForChildId] = useState(null);
   const [parentSosError, setParentSosError] = useState('');
   const [parentSosSuccess, setParentSosSuccess] = useState('');
 
@@ -402,6 +403,39 @@ function ParentDashboardContent() {
     }
   };
 
+  // Handle Parent Resolving SOS / Marking Child Safe
+  const handleResolveChildSos = async (childId, childName, sosSessionId) => {
+    setParentSosError('');
+    setParentSosSuccess('');
+
+    const confirmed = window.confirm(
+      `✅ MARK ${childName.toUpperCase()} SAFE NOW\n\nAre you sure ${childName} is safe now?\n\nThis will:\n• Resolve the active emergency SOS alert\n• Stop the emergency siren on all guardian devices\n• Send safe confirmation notifications to all guardians\n• Reset status to Normal Safe Zone`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setResolvingSosForChildId(childId);
+      const res = await api.post('/parent/resolve-child-sos', { childId, sosSessionId });
+      if (res.data?.success) {
+        if (sosSessionId) {
+          dispatch(toggleSosMute(sosSessionId));
+        }
+        setParentSosSuccess(
+          res.data.message || `Emergency SOS resolved! ${childName} is marked safe.`
+        );
+        setTimeout(() => setParentSosSuccess(''), 6000);
+        fetchOverview(false);
+      }
+    } catch (err) {
+      const errMsg = err?.response?.data?.error || `Failed to mark ${childName} safe. Please try again.`;
+      setParentSosError(errMsg);
+      setTimeout(() => setParentSosError(''), 6000);
+    } finally {
+      setResolvingSosForChildId(null);
+    }
+  };
+
   if (!mounted) return null;
 
   return (
@@ -623,7 +657,23 @@ function ParentDashboardContent() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+              {childrenList.find(c => c.activeSos) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const activeChild = childrenList.find(c => c.activeSos);
+                    if (activeChild) {
+                      handleResolveChildSos(activeChild.id, activeChild.fullName, activeChild.activeSos.id);
+                    }
+                  }}
+                  disabled={Boolean(resolvingSosForChildId)}
+                  className="flex-1 sm:flex-initial bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1.5 shadow border border-emerald-300 cursor-pointer disabled:opacity-60"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>MARK CHILD SAFE NOW</span>
+                </button>
+              )}
               <a
                 href="tel:112"
                 className="flex-1 sm:flex-initial bg-white text-rose-600 hover:bg-rose-50 px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1.5 shadow"
@@ -878,7 +928,25 @@ function ParentDashboardContent() {
                         </a>
                       )}
 
-                      {/* 6. PARENT TRIGGER SOS — only when child has NO active SOS & subscription is ACTIVE */}
+                      {/* 6. PARENT RESOLVE SOS / MARK SAFE NOW — when child HAS active SOS */}
+                      {item.activeSos && (
+                        <button
+                          type="button"
+                          onClick={() => handleResolveChildSos(c.id, c.fullName, item.activeSos.id)}
+                          disabled={resolvingSosForChildId === c.id}
+                          className="w-full mt-2 py-3 px-4 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 shadow-md cursor-pointer transition-all bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-700 text-white border-2 border-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed"
+                          title={`Mark ${c.fullName} safe now and resolve the active SOS alert`}
+                        >
+                          <CheckCircle2 className={`w-4 h-4 ${resolvingSosForChildId === c.id ? 'animate-spin' : ''}`} />
+                          <span>
+                            {resolvingSosForChildId === c.id
+                              ? `MARKING ${c.fullName.split(' ')[0].toUpperCase()} SAFE...`
+                              : `✅ MARK ${c.fullName.split(' ')[0].toUpperCase()} SAFE NOW`}
+                          </span>
+                        </button>
+                      )}
+
+                      {/* 7. PARENT TRIGGER SOS — only when child has NO active SOS & subscription is ACTIVE */}
                       {!item.activeSos && c.subscriptionStatus === 'ACTIVE' && (
                         <button
                           type="button"

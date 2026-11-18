@@ -1,33 +1,59 @@
 /**
- * Helper utility to collect and normalize all recipient emails for an emergency session
- * (User + Admin + Parent Email + Trusted Guardian Contacts)
+ * Helper utility to collect, validate, and normalize recipient emails for emergency alerts.
+ * Ensures:
+ * - Only valid RFC-compliant emails are included.
+ * - Internal dummy emails (e.g. *.internal, example.com) are excluded.
+ * - Victims are NOT spammed with rescue emails asking themselves to help themselves.
+ * - No hardcoded email addresses — ADMIN_EMAIL is strictly read from environment variables.
  */
-export const collectEmergencyRecipients = (user, contacts = []) => {
-  const adminEmail = process.env.ADMIN_EMAIL || 'abhijeetambhore4@gmail.com';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const isValidEmail = (email) => {
+  if (!email || typeof email !== 'string') return false;
+  const clean = email.trim().toLowerCase();
+  if (
+    clean.endsWith('.internal') ||
+    clean.includes('example.com') ||
+    clean.includes('test.com') ||
+    clean === 'null' ||
+    clean === 'undefined' ||
+    clean === 'n/a'
+  ) {
+    return false;
+  }
+  return EMAIL_REGEX.test(clean);
+};
+
+export const collectEmergencyRecipients = (user, contacts = [], options = {}) => {
+  const { includeVictim = false } = options;
   const recipientEmails = new Set();
 
-  if (user?.email && typeof user.email === 'string') {
-    recipientEmails.add(user.email.trim().toLowerCase());
-  }
-
-  if (adminEmail && typeof adminEmail === 'string') {
-    recipientEmails.add(adminEmail.trim().toLowerCase());
-  }
-
-  if (user?.parentEmail && typeof user.parentEmail === 'string') {
+  // 1. Parent email on victim profile
+  if (isValidEmail(user?.parentEmail)) {
     recipientEmails.add(user.parentEmail.trim().toLowerCase());
   }
 
-  // Support both passed contacts array AND user.trustedContacts relation array
+  // 2. Trusted contacts of the victim
   const contactList = Array.isArray(contacts) && contacts.length > 0
     ? contacts
     : (user?.trustedContacts && Array.isArray(user.trustedContacts) ? user.trustedContacts : []);
 
   contactList.forEach((c) => {
-    if (c?.email && typeof c.email === 'string' && c.email.trim()) {
+    if (isValidEmail(c?.email)) {
       recipientEmails.add(c.email.trim().toLowerCase());
     }
   });
+
+  // 3. User's own email only if specifically requested
+  if (includeVictim && isValidEmail(user?.email)) {
+    recipientEmails.add(user.email.trim().toLowerCase());
+  }
+
+  // 4. System Admin email ONLY if explicitly configured in environment variables
+  if (process.env.ADMIN_EMAIL && isValidEmail(process.env.ADMIN_EMAIL)) {
+    recipientEmails.add(process.env.ADMIN_EMAIL.trim().toLowerCase());
+  }
 
   return Array.from(recipientEmails);
 };
