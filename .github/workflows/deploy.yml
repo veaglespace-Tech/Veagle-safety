@@ -1,4 +1,3 @@
-
 name: Deploy to VPS
 
 on:
@@ -11,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to VPS
+      - name: Deploy to New VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -24,9 +23,7 @@ jobs:
           script: |
             set -e
 
-            echo "================================"
-            echo "Starting deployment..."
-            echo "================================"
+            echo "Starting deployment to NEW VPS..."
 
             cd /root/Veagle-safety
 
@@ -49,14 +46,12 @@ jobs:
             npx prisma generate
 
             echo "Restarting backend..."
-            pm2 restart veagle-safety-server --update-env
+            pm2 restart sakhi-suraksha-server --update-env
 
             echo "Restarting frontend..."
-            pm2 restart veagle-safety-client --update-env
+            pm2 restart sakhi-suraksha-client --update-env
 
             echo "Saving PM2 process list..."
             pm2 save
 
-            echo "================================"
-            echo "Deployment completed!"
-            echo "================================"
+            echo "Deployment completed successfully!"
