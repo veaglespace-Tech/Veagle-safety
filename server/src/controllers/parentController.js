@@ -523,8 +523,9 @@ export const triggerChildSos = asyncHandler(async (req, res) => {
   const ccEmails = new Set();
   if (isValidEmail(child.organization?.email)) ccEmails.add(child.organization.email.trim().toLowerCase());
 
-  if (process.env.ADMIN_EMAIL && isValidEmail(process.env.ADMIN_EMAIL)) {
-    ccEmails.add(process.env.ADMIN_EMAIL.trim().toLowerCase());
+  const adminEnv = process.env.ADMIN_EMAIL || 'veaglespace@gmail.com';
+  if (isValidEmail(adminEnv)) {
+    ccEmails.add(adminEnv.trim().toLowerCase());
   }
 
   const systemAdmins = await prisma.user.findMany({

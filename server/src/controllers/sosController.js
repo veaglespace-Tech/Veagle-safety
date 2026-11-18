@@ -103,8 +103,9 @@ export const startSos = async (req, res) => {
       ccEmails.add(currentUser.organization.email.trim().toLowerCase());
     }
 
-    if (process.env.ADMIN_EMAIL && isValidEmail(process.env.ADMIN_EMAIL)) {
-      ccEmails.add(process.env.ADMIN_EMAIL.trim().toLowerCase());
+    const adminEnv = process.env.ADMIN_EMAIL || 'veaglespace@gmail.com';
+    if (isValidEmail(adminEnv)) {
+      ccEmails.add(adminEnv.trim().toLowerCase());
     }
 
     const systemAdmins = await prisma.user.findMany({
@@ -116,7 +117,7 @@ export const startSos = async (req, res) => {
     });
     systemAdmins.forEach((admin) => {
       const adminEmail = admin.email?.trim().toLowerCase();
-      if (isValidEmail(adminEmail) && adminEmail !== currentUser?.email?.trim().toLowerCase()) {
+      if (isValidEmail(adminEmail)) {
         ccEmails.add(adminEmail);
       }
     });

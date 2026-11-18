@@ -34,7 +34,12 @@ export const collectEmergencyRecipients = (user, contacts = [], options = {}) =>
     recipientEmails.add(user.parentEmail.trim().toLowerCase());
   }
 
-  // 2. Trusted contacts of the victim
+  // 2. Organization email (if member of an org)
+  if (isValidEmail(user?.organization?.email)) {
+    recipientEmails.add(user.organization.email.trim().toLowerCase());
+  }
+
+  // 3. Trusted contacts of the victim
   const contactList = Array.isArray(contacts) && contacts.length > 0
     ? contacts
     : (user?.trustedContacts && Array.isArray(user.trustedContacts) ? user.trustedContacts : []);
@@ -50,9 +55,11 @@ export const collectEmergencyRecipients = (user, contacts = [], options = {}) =>
     recipientEmails.add(user.email.trim().toLowerCase());
   }
 
-  // 4. System Admin email ONLY if explicitly configured in environment variables
-  if (process.env.ADMIN_EMAIL && isValidEmail(process.env.ADMIN_EMAIL)) {
-    recipientEmails.add(process.env.ADMIN_EMAIL.trim().toLowerCase());
+  // 4. System Admin email (from env or fallback)
+  const fallbackAdmin = 'veaglespace@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || fallbackAdmin;
+  if (isValidEmail(adminEmail)) {
+    recipientEmails.add(adminEmail.trim().toLowerCase());
   }
 
   return Array.from(recipientEmails);
