@@ -1,3 +1,4 @@
+
 name: Deploy to VPS
 
 on:
@@ -33,23 +34,28 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            echo "Frontend..."
+            echo "Installing frontend dependencies..."
             cd client
-            npm install
+            npm ci
 
-            echo "Building project..."
+            echo "Building frontend..."
             npm run build
 
-            echo "Backend..."
+            echo "Installing backend dependencies..."
             cd ../server
-            npm install
+            npm ci
+
+            echo "Generating Prisma Client..."
             npx prisma generate
-            npx prisma db push --accept-data-loss
-            
-             
-            echo "Restarting application..."
-            pm2 restart veagle-safety-server --update-env
-            pm2 restart veagle-safety-client --update-env
+
+            echo "Restarting backend..."
+            pm2 restart sakhi-suraksha-server --update-env
+
+            echo "Restarting frontend..."
+            pm2 restart sakhi-suraksha-client --update-env
+
+            echo "Saving PM2 process list..."
+            pm2 save
 
             echo "================================"
             echo "Deployment completed!"
