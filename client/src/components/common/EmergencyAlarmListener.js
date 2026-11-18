@@ -90,7 +90,7 @@ export const EmergencyAlarmListener = () => {
             const userPhone = (currentUser.phone || '').replace(/\D/g, '');
 
             const isVictim =
-              (currentUser.id && victimId && currentUser.id === victimId) ||
+              (currentUser.id != null && victimId != null && String(currentUser.id) === String(victimId)) ||
               (userEmail && victimEmail && userEmail === victimEmail) ||
               (userPhone && victimPhone && userPhone.slice(-10) === victimPhone.slice(-10));
 
