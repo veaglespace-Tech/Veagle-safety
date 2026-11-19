@@ -13,7 +13,6 @@ const createUserAccessToken = (user) => jwt.sign(
     userId: user.id,
     role: user.role,
     email: user.email,
-    tokenVersion: user.authTokenVersion || 0,
   },
   config.jwt.secret,
   { expiresIn: config.jwt.expiresIn }
@@ -1007,13 +1006,6 @@ export const logout = asyncHandler(async (req, res) => {
   const { token: fcmToken } = req.body || {};
   const userId = req.user?.id || req.user?.userId;
 
-  if (userId) {
-    await prisma.user.update({
-      where: { id: userId },
-      data: { authTokenVersion: { increment: 1 } },
-    });
-  }
-
   try {
     const deleteFilters = [];
     if (fcmToken) deleteFilters.push({ token: fcmToken });
@@ -1112,7 +1104,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
     where: { id: user.id },
     data: {
       passwordHash,
-      authTokenVersion: { increment: 1 },
       resetPasswordToken: null,
       resetPasswordExpiresAt: null,
     },

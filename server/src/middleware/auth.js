@@ -19,19 +19,16 @@ export const authenticateToken = async (req, res, next) => {
 
   try {
     const resolvedId = decoded.id || decoded.userId;
-    const currentUser = await prisma.user.findUnique({
-      where: { id: Number(resolvedId) },
-      select: { id: true, role: true, authTokenVersion: true },
-    });
-    if (!currentUser || (decoded.tokenVersion ?? 0) !== currentUser.authTokenVersion) {
-      return res.status(401).json({ error: 'Session expired. Please sign in again.' });
+    const numId = Number(resolvedId);
+    if (!resolvedId || isNaN(numId)) {
+      return res.status(401).json({ error: 'Session expired or invalid payload. Please sign in again.' });
     }
 
     req.user = {
       ...decoded,
-      id: resolvedId,
-      userId: resolvedId,
-      role: currentUser.role,
+      id: numId,
+      userId: numId,
+      role: decoded.role || 'USER',
     };
     next();
   } catch (err) {
@@ -48,13 +45,12 @@ export const optionalAuthToken = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, config.jwtSecret);
       const resolvedId = decoded.id || decoded.userId;
-      const currentUser = await prisma.user.findUnique({
-        where: { id: Number(resolvedId) },
-        select: { id: true, role: true, authTokenVersion: true },
-      });
-      if (currentUser && (decoded.tokenVersion ?? 0) === currentUser.authTokenVersion) {
-        req.user = { ...decoded, id: resolvedId, userId: resolvedId, role: currentUser.role };
-      }
+      const numId = Number(resolvedId);
+      req.user = {
+        ...decoded,
+        id: isNaN(numId) ? resolvedId : numId,
+        userId: isNaN(numId) ? resolvedId : numId,
+      };
     } catch (err) {
       // Ignore token verification errors for optional auth (e.g. pending registration flow)
     }

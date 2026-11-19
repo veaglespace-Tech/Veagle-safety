@@ -13,7 +13,6 @@ model User {
   email                  String    @unique
   phone                  String
   passwordHash           String
-  authTokenVersion       Int       @default(0)
   role                   String    @default("USER") // USER, SUPER_ADMIN, ORGANIZATION
   profilePhoto           String?   @db.LongText
   bloodGroup             String?
