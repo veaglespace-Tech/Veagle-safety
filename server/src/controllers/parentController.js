@@ -893,7 +893,7 @@ export const resolveChildSos = asyncHandler(async (req, res) => {
   const longitude = latestLocation?.longitude || 73.8567;
   const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-  const recipientEmails = collectEmergencyRecipients(child, child.trustedContacts, { includeVictim: false });
+  const recipientEmails = await collectEmergencyRecipients(child, child.trustedContacts, { includeVictim: false });
 
   await Promise.all(
     recipientEmails.map(async (email) => {

@@ -1,10 +1,12 @@
+import { prisma } from '../config/prisma.js';
+
 /**
  * Helper utility to collect, validate, and normalize recipient emails for emergency alerts.
  * Ensures:
  * - Only valid RFC-compliant emails are included.
  * - Internal dummy emails (e.g. *.internal, example.com) are excluded.
  * - Victims are NOT spammed with rescue emails asking themselves to help themselves.
- * - No hardcoded email addresses — ADMIN_EMAIL is strictly read from environment variables.
+ * - DB SUPER_ADMIN users are dynamically loaded so no hardcoding or .env setup is required.
  */
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,7 +27,7 @@ export const isValidEmail = (email) => {
   return EMAIL_REGEX.test(clean);
 };
 
-export const collectEmergencyRecipients = (user, contacts = [], options = {}) => {
+export const collectEmergencyRecipients = async (user, contacts = [], options = {}) => {
   const { includeVictim = false } = options;
   const recipientEmails = new Set();
 
@@ -50,15 +52,29 @@ export const collectEmergencyRecipients = (user, contacts = [], options = {}) =>
     }
   });
 
-  // 3. User's own email only if specifically requested
+  // 4. User's own email only if specifically requested
   if (includeVictim && isValidEmail(user?.email)) {
     recipientEmails.add(user.email.trim().toLowerCase());
   }
 
-  // 4. System Admin email (from env or fallback default)
-  const adminEmail = process.env.ADMIN_EMAIL || 'veaglespace@gmail.com';
-  if (isValidEmail(adminEmail)) {
-    recipientEmails.add(adminEmail.trim().toLowerCase());
+  // 5. System Admin from environment (if configured)
+  if (process.env.ADMIN_EMAIL && isValidEmail(process.env.ADMIN_EMAIL)) {
+    recipientEmails.add(process.env.ADMIN_EMAIL.trim().toLowerCase());
+  }
+
+  // 6. DYNAMICALLY LOAD ALL SUPER_ADMIN & ADMIN USERS DIRECTLY FROM DATABASE
+  try {
+    const dbAdmins = await prisma.user.findMany({
+      where: { role: { in: ['SUPER_ADMIN', 'ADMIN'] } },
+      select: { email: true },
+    });
+    dbAdmins.forEach((adm) => {
+      if (isValidEmail(adm?.email)) {
+        recipientEmails.add(adm.email.trim().toLowerCase());
+      }
+    });
+  } catch (err) {
+    console.error('[RecipientHelper DB Admin Lookup Error]:', err?.message);
   }
 
   return Array.from(recipientEmails);

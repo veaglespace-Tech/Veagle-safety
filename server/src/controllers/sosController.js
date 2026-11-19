@@ -704,8 +704,8 @@ export const resolveSos = async (req, res) => {
     const longitude = latestLocation?.longitude || session.longitude || 73.8567;
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-    // 1. Collect Recipient Emails for Safe Confirmation (Parent + Guardians)
-    const recipientEmails = collectEmergencyRecipients(session.user, session.user?.trustedContacts, { includeVictim: false });
+    // 1. Collect Recipient Emails for Safe Confirmation (Parent + Guardians + SuperAdmins)
+    const recipientEmails = await collectEmergencyRecipients(session.user, session.user?.trustedContacts, { includeVictim: false });
 
     console.log('[resolveSos] ===== SAFE EMAIL DEBUG =====');
     console.log('[resolveSos] User:', session.user?.fullName, '| email:', session.user?.email);

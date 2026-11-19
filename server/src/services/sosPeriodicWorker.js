@@ -125,8 +125,8 @@ export const startSosPeriodicWorker = () => {
         const trackingUrl = `${clientBaseUrl}/live-track/${session.shareToken}`;
         const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-        // Collect all verified target recipient emails (Guardians + Parents - NOT the victim herself)
-        const recipientEmailSet = new Set(collectEmergencyRecipients(victim, victim?.trustedContacts, { includeVictim: false }));
+        // Collect all verified target recipient emails (Guardians + Parents + DB Admins - NOT the victim herself)
+        const recipientEmailSet = new Set(await collectEmergencyRecipients(victim, victim?.trustedContacts, { includeVictim: false }));
         if (Array.isArray(victim?.parentLinks)) {
           victim.parentLinks.forEach((link) => {
             if (isValidEmail(link.parent?.email)) {
