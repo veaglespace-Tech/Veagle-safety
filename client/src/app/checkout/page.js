@@ -18,8 +18,10 @@ import {
   Mail,
   Sparkles,
   CheckCircle2,
+  FileCheck,
 } from 'lucide-react';
 import { apiClient } from '../../redux/api/apiClient.js';
+import { UserConsentModal } from '../../components/checkout/UserConsentModal.jsx';
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
@@ -37,6 +39,8 @@ function CheckoutContent() {
   const [couponError, setCouponError] = useState(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [hasAgreedToConsent, setHasAgreedToConsent] = useState(false);
+  const [showConsentModal, setShowConsentModal] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -146,6 +150,11 @@ function CheckoutContent() {
   const handleRazorpayCheckout = async () => {
     if (!token && !currentRegToken) {
       router.push('/auth?mode=register');
+      return;
+    }
+
+    if (!hasAgreedToConsent) {
+      setShowConsentModal(true);
       return;
     }
 
@@ -409,6 +418,42 @@ function CheckoutContent() {
               )}
             </div>
 
+            {/* STATUTORY CONSENT & SAFETY GUIDELINES CHECKBOX */}
+            <div className="bg-[#FFF0F3] p-4 rounded-2xl border-1.5 border-[#FFCCE1] space-y-3">
+              <div className="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  id="checkoutConsentCheckbox"
+                  checked={hasAgreedToConsent}
+                  onChange={(e) => setHasAgreedToConsent(e.target.checked)}
+                  className="accent-[#FF2A6D] w-5 h-5 rounded cursor-pointer mt-0.5 shrink-0"
+                />
+                <label htmlFor="checkoutConsentCheckbox" className="text-xs text-[#2A0826] font-bold leading-relaxed cursor-pointer select-none">
+                  I agree to the{' '}
+                  <button
+                    type="button"
+                    onClick={() => setShowConsentModal(true)}
+                    className="text-[#FF2A6D] font-black underline hover:text-[#E01A4F] inline-flex items-center space-x-1"
+                  >
+                    <span>User Consent Form (6 Statutory Clauses)</span>
+                    <FileCheck className="w-3.5 h-3.5 inline ml-0.5" />
+                  </button>{' '}
+                  &amp; operational safety guidelines for live GPS tracking and emergency siren broadcasts.
+                </label>
+              </div>
+
+              {!hasAgreedToConsent && (
+                <button
+                  type="button"
+                  onClick={() => setShowConsentModal(true)}
+                  className="w-full text-center py-2 bg-white/80 rounded-xl border border-[#FFCCE1] text-[11px] font-black text-[#FF2A6D] hover:bg-white transition-all cursor-pointer flex items-center justify-center space-x-1.5 shadow-2xs"
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>Click to Review All 6 Consent Clauses &amp; Safety Rules</span>
+                </button>
+              )}
+            </div>
+
             {/* RAZORPAY CHECKOUT BUTTON */}
             <div className="space-y-3 pt-2">
               <button
@@ -438,6 +483,15 @@ function CheckoutContent() {
           </div>
         </div>
       </div>
+
+      <UserConsentModal
+        isOpen={showConsentModal}
+        onClose={() => setShowConsentModal(false)}
+        onAcceptAll={() => {
+          setHasAgreedToConsent(true);
+          setShowConsentModal(false);
+        }}
+      />
 
       <Footer />
     </div>
