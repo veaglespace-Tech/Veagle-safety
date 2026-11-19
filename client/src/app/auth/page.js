@@ -834,10 +834,10 @@ function UserAuthForm() {
                               onClick={() => setShowConsentModal(true)}
                               className="text-[#FF2A6D] font-black underline hover:text-[#E01A4F] inline-flex items-center space-x-1"
                             >
-                              <span>User Consent Form (6 Statutory Clauses)</span>
+                              <span>User Safety Consent Form (7 Statutory Clauses)</span>
                               <FileCheck className="w-3.5 h-3.5 inline ml-0.5" />
                             </button>{' '}
-                            &amp; operational safety guidelines for live GPS tracking and emergency siren broadcasts. *
+                            &amp; operational safety guidelines for emergency protection and life-safety response. *
                           </label>
                         </div>
 
@@ -848,7 +848,7 @@ function UserAuthForm() {
                             className="w-full text-center py-2 bg-white rounded-xl border border-[#FFCCE1] text-[11px] font-black text-[#FF2A6D] hover:bg-rose-50 transition-all cursor-pointer flex items-center justify-center space-x-1.5 shadow-2xs"
                           >
                             <Shield className="w-3.5 h-3.5" />
-                            <span>Click to Review All 6 Consent Clauses &amp; Safety Rules</span>
+                            <span>Click to Review All 7 Safety Consent Clauses &amp; Rules</span>
                           </button>
                         )}
                       </div>

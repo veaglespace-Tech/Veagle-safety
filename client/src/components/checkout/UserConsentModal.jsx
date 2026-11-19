@@ -22,43 +22,50 @@ import {
 
 export const USER_CONSENT_ITEMS = [
   {
+    id: 'safety_data_collection',
+    title: '1. Personal Safety Data Collection & Emergency Usage Consent',
+    icon: ShieldCheck,
+    summary: 'Explicit permission to collect and securely store your personal identity details (Full Name, Phone Number, Profile Photo, Residential Address, Emergency Contacts, and Blood Group) strictly for your personal protection and life-safety response.',
+    usage: 'This data is collected solely for your safety and protection. It will never be sold, rented, or shared with third-party advertisers, and is accessed strictly during emergency situations and rescue operations.'
+  },
+  {
     id: 'live_gps',
-    title: '1. Real-Time GPS Location Tracking',
+    title: '2. Real-Time GPS Location Tracking',
     icon: MapPin,
     summary: 'Permission for the application to access high-accuracy background GPS coordinates during emergency SOS activations and "Safe Journey" tracking.',
     usage: 'Strictly accessed for emergency rescue and displayed only on secure live maps to linked parents/guardians and emergency contacts.'
   },
   {
     id: 'guardian_sharing',
-    title: '2. Guardian, Parent & Organization Data Sharing',
+    title: '3. Guardian, Parent & Organization Data Sharing',
     icon: Users,
     summary: 'Permission to securely transmit your basic profile (Name, phone, blood group) and live GPS location during distress situations to your parents, trusted contacts, and organization/college admin.',
     usage: 'Enables quick coordination between family members, authorities, and rescue teams.'
   },
   {
     id: 'emergency_broadcast',
-    title: '3. Emergency Alerts & Siren Broadcast',
+    title: '4. Emergency Alerts & Siren Broadcast',
     icon: BellRing,
     summary: 'Full consent to send automated high-decibel siren pushes, instant WhatsApp alerts, priority emails, and SMS tracking notifications to your guardians when SOS is activated.',
     usage: 'Ensures guardians receive an immediate alert even when their phone is locked or on silent.'
   },
   {
     id: 'medical_disclosure',
-    title: '4. Medical & Emergency Info Disclosure',
+    title: '5. Medical & Emergency Info Disclosure',
     icon: HeartPulse,
     summary: 'Consent to disclose your Blood Group and optional medical notes to first responders, doctors, and police during an active rescue.',
     usage: 'Enables timely first-aid and medical care without delays.'
   },
   {
     id: 'payment_billing',
-    title: '5. Payment, Subscription & Statutory Billing',
+    title: '6. Payment, Subscription & Statutory Billing',
     icon: CreditCard,
     summary: 'Consent to securely process subscription transactions via RBI-authorized payment gateways (Razorpay) and maintain GST-compliant billing records.',
     usage: 'Ensures lawful invoice generation and continuous safety plan protection.'
   },
   {
     id: 'minor_consent',
-    title: '6. Minor / Student Parental Consent',
+    title: '7. Minor / Student Parental Consent',
     icon: GraduationCap,
     summary: 'If the user is under 18 years of age (school/college student), parental/legal guardian consent has been obtained to create this account and allow parental tracking.',
     usage: 'Complies with Indian Digital Personal Data Protection (DPDP) Act requirements.'
@@ -136,7 +143,7 @@ export function UserConsentModal({ isOpen, onClose, onAcceptAll }) {
         {/* SCROLLABLE LIST OF POINTS (CLEAN & SIMPLE) */}
         <div className="flex-1 overflow-y-auto space-y-2.5 pr-1.5 text-left custom-scrollbar">
           <p className="text-[11px] font-black uppercase tracking-wider text-[#FF2A6D]">
-            Statutory Consent Clauses (6 Points)
+            Statutory Consent Clauses (7 Points)
           </p>
 
           <div className="space-y-2">
@@ -209,7 +216,7 @@ export function UserConsentModal({ isOpen, onClose, onAcceptAll }) {
               className="accent-[#FF2A6D] w-4 h-4 cursor-pointer mt-0.5 shrink-0"
             />
             <label htmlFor="mainConsentConfirm" className="text-xs font-bold text-[#2A0826] cursor-pointer leading-snug">
-              I have read, understood, and accept all 6 statutory clauses and safety guidelines for live GPS tracking and emergency siren broadcasts.
+              I have read, understood, and accept all 7 statutory clauses and safety guidelines for emergency safety data usage, live GPS tracking, and alert broadcasts.
             </label>
           </div>
 
