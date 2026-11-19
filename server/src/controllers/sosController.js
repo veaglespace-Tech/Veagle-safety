@@ -103,24 +103,11 @@ export const startSos = async (req, res) => {
       ccEmails.add(currentUser.organization.email.trim().toLowerCase());
     }
 
-    const adminEnv = process.env.ADMIN_EMAIL || 'veaglespace@gmail.com';
+    // Only alert designated admin email if explicitly configured in environment
+    const adminEnv = process.env.ADMIN_EMAIL;
     if (isValidEmail(adminEnv)) {
       ccEmails.add(adminEnv.trim().toLowerCase());
     }
-
-    const systemAdmins = await prisma.user.findMany({
-      where: { role: { in: ['SUPER_ADMIN', 'ADMIN'] } },
-      select: { email: true },
-    }).catch((err) => {
-      console.error('[SOS Admin Email Lookup Error]:', err.message);
-      return [];
-    });
-    systemAdmins.forEach((admin) => {
-      const adminEmail = admin.email?.trim().toLowerCase();
-      if (isValidEmail(adminEmail)) {
-        ccEmails.add(adminEmail);
-      }
-    });
 
     const ccList = Array.from(ccEmails);
     const toList = Array.from(primaryEmails);

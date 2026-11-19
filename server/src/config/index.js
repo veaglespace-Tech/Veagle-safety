@@ -12,6 +12,11 @@ const envFiles = [
   path.join(serverDir, '.env'),
   path.join(repoDir, '.env'),
   path.join(process.cwd(), '.env'),
+  path.resolve(process.cwd(), 'server', '.env'),
+  path.resolve(process.cwd(), '..', '.env'),
+  '/root/Veagle-safety/server/.env',
+  '/root/Veagle-safety/.env',
+  '/root/.env',
 ];
 
 for (const envFile of [...new Set(envFiles)]) {

@@ -257,17 +257,27 @@ export const linkChild = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: 'Please enter child mobile number or email address.' });
   }
 
-  const cleanEmail = identifier.trim().toLowerCase();
+  const isEmail = identifier.includes('@');
+  const cleanEmail = isEmail ? identifier.trim().toLowerCase() : '';
   const cleanPhone = identifier.replace(/\D/g, '');
-  const phoneLast10 = cleanPhone.length >= 10 ? cleanPhone.slice(-10) : cleanPhone;
+  const phone10 = cleanPhone.length >= 10 ? cleanPhone.slice(-10) : '';
+
+  if (!cleanEmail && !phone10) {
+    return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number or email address.' });
+  }
+
+  const searchConditions = [];
+  if (cleanEmail && isValidEmail(cleanEmail)) searchConditions.push({ email: cleanEmail });
+  if (phone10 && phone10.length === 10) searchConditions.push({ phone: { endsWith: phone10 } });
+
+  if (searchConditions.length === 0) {
+    return res.status(400).json({ error: 'Invalid search criteria. Please provide a valid 10-digit phone or email.' });
+  }
 
   // Find child by email or phone
   const childUser = await prisma.user.findFirst({
     where: {
-      OR: [
-        { email: cleanEmail },
-        phoneLast10 ? { phone: { contains: phoneLast10 } } : undefined,
-      ].filter(Boolean),
+      OR: searchConditions,
     },
   });
 

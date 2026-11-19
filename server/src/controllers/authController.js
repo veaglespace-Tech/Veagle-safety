@@ -6,6 +6,7 @@ import { config } from '../config/index.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { sendEmailVerificationOtp, sendWelcomeEmail, sendPasswordResetEmail } from '../services/mailer.js';
 import { syncParentProfileAndLink } from '../services/parentService.js';
+import { isValidEmail } from '../utils/recipientHelper.js';
 const createUserAccessToken = (user) => jwt.sign(
   {
     id: user.id,
@@ -374,11 +375,11 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       try {
         const parentEmailClean = updatedUser.email ? updatedUser.email.trim().toLowerCase() : '';
         const parentPhoneClean = updatedUser.phone ? updatedUser.phone.replace(/\D/g, '') : '';
-        const phoneLast10 = parentPhoneClean.length >= 10 ? parentPhoneClean.slice(-10) : parentPhoneClean;
+        const phone10 = parentPhoneClean.length >= 10 ? parentPhoneClean.slice(-10) : '';
 
         const userConditions = [];
-        if (parentEmailClean) userConditions.push({ parentEmail: parentEmailClean });
-        if (phoneLast10 && phoneLast10.length >= 6) userConditions.push({ emergencyContactPhone: { contains: phoneLast10 } });
+        if (isValidEmail(parentEmailClean)) userConditions.push({ parentEmail: parentEmailClean });
+        if (phone10 && phone10.length === 10) userConditions.push({ emergencyContactPhone: { endsWith: phone10 } });
 
         if (userConditions.length > 0) {
           const matchingKids = await prisma.user.findMany({
@@ -535,18 +536,15 @@ export const login = asyncHandler(async (req, res) => {
       }
     }
 
-    // 2. If no dedicated PARENT account exists yet, check if any child listed this number
-    if (!user) {
+    // 2. If no dedicated PARENT account exists yet, check if any child listed this number as their emergency contact
+    if (!user && phone10 && phone10.length === 10) {
       const childUser = await prisma.user.findFirst({
         where: {
-          OR: [
-            { emergencyContactPhone: { contains: phone10 } },
-            { phone: { contains: phone10 } },
-          ],
+          emergencyContactPhone: { endsWith: phone10 },
         },
       });
 
-      if (childUser) {
+      if (childUser && childUser.id !== user?.id) {
         user = await syncParentProfileAndLink({
           childId: childUser.id,
           parentPhone: phone10,
@@ -564,8 +562,8 @@ export const login = asyncHandler(async (req, res) => {
           where: {
             id: { not: user.id },
             OR: [
-              { emergencyContactPhone: { contains: phone10 } },
-              user.email ? { parentEmail: user.email } : undefined,
+              phone10 && phone10.length === 10 ? { emergencyContactPhone: { endsWith: phone10 } } : undefined,
+              isValidEmail(user.email) ? { parentEmail: user.email.trim().toLowerCase() } : undefined,
             ].filter(Boolean),
           },
           select: { id: true },

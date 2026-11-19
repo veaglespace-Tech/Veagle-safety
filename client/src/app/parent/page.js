@@ -929,10 +929,10 @@ function ParentDashboardContent() {
                       )}
 
                       {/* 6. PARENT RESOLVE SOS / MARK SAFE NOW — when child HAS active SOS */}
-                      {item.activeSos && (
+                      {(item.activeSos || c.safetyStatus === 'SOS_ACTIVE') && (
                         <button
                           type="button"
-                          onClick={() => handleResolveChildSos(c.id, c.fullName, item.activeSos.id)}
+                          onClick={() => handleResolveChildSos(c.id, c.fullName, item.activeSos?.id)}
                           disabled={resolvingSosForChildId === c.id}
                           className="w-full mt-2 py-3 px-4 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 shadow-md cursor-pointer transition-all bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-700 text-white border-2 border-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed"
                           title={`Mark ${c.fullName} safe now and resolve the active SOS alert`}
@@ -947,7 +947,7 @@ function ParentDashboardContent() {
                       )}
 
                       {/* 7. PARENT TRIGGER SOS — only when child has NO active SOS & subscription is ACTIVE */}
-                      {!item.activeSos && c.subscriptionStatus === 'ACTIVE' && (
+                      {!item.activeSos && c.safetyStatus !== 'SOS_ACTIVE' && c.subscriptionStatus === 'ACTIVE' && (
                         <button
                           type="button"
                           onClick={() => handleTriggerChildSos(c.id, c.fullName)}

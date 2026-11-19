@@ -55,9 +55,8 @@ export const collectEmergencyRecipients = (user, contacts = [], options = {}) =>
     recipientEmails.add(user.email.trim().toLowerCase());
   }
 
-  // 4. System Admin email (from env or fallback)
-  const fallbackAdmin = 'veaglespace@gmail.com';
-  const adminEmail = process.env.ADMIN_EMAIL || fallbackAdmin;
+  // 4. System Admin email (from env only if explicitly configured)
+  const adminEmail = process.env.ADMIN_EMAIL;
   if (isValidEmail(adminEmail)) {
     recipientEmails.add(adminEmail.trim().toLowerCase());
   }

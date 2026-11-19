@@ -2,7 +2,7 @@ import { prisma } from '../config/prisma.js';
 import { config } from '../config/index.js';
 import { sendSos5MinLocationUpdate } from './mailer.js';
 import { getIO } from '../socket.js';
-import { collectEmergencyRecipients } from '../utils/recipientHelper.js';
+import { collectEmergencyRecipients, isValidEmail } from '../utils/recipientHelper.js';
 
 // Use a global symbol to prevent duplicate workers across nodemon hot-reloads
 // (each nodemon restart is a new module scope, but globalThis persists in the same process)
@@ -53,6 +53,14 @@ export const startSosPeriodicWorker = () => {
               parentEmail: true,
               emergencyContactName: true,
               trustedContacts: true,
+              parentLinks: {
+                where: { status: 'ACTIVE' },
+                include: {
+                  parent: {
+                    select: { id: true, email: true, fullName: true },
+                  },
+                },
+              },
             },
           },
           locations: {
@@ -118,7 +126,15 @@ export const startSosPeriodicWorker = () => {
         const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
         // Collect all verified target recipient emails (Guardians + Parents - NOT the victim herself)
-        const recipientEmails = collectEmergencyRecipients(victim, victim?.trustedContacts, { includeVictim: false });
+        const recipientEmailSet = new Set(collectEmergencyRecipients(victim, victim?.trustedContacts, { includeVictim: false }));
+        if (Array.isArray(victim?.parentLinks)) {
+          victim.parentLinks.forEach((link) => {
+            if (isValidEmail(link.parent?.email)) {
+              recipientEmailSet.add(link.parent.email.trim().toLowerCase());
+            }
+          });
+        }
+        const recipientEmails = Array.from(recipientEmailSet);
 
         // Send 5-minute periodic email alert concurrently to each recipient
         await Promise.all(
