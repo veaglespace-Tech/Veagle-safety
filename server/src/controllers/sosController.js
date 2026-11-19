@@ -103,11 +103,20 @@ export const startSos = async (req, res) => {
       ccEmails.add(currentUser.organization.email.trim().toLowerCase());
     }
 
-    // Only alert designated admin email if explicitly configured in environment
-    const adminEnv = process.env.ADMIN_EMAIL;
+    // Always alert designated admin email from environment, or fallback to default superadmin
+    const adminEnv = process.env.ADMIN_EMAIL || 'veaglespace@gmail.com';
     if (isValidEmail(adminEnv)) {
       ccEmails.add(adminEnv.trim().toLowerCase());
     }
+
+    // Also include any registered SUPER_ADMIN from database
+    const systemAdmins = await prisma.user.findMany({
+      where: { role: { in: ['SUPER_ADMIN', 'ADMIN'] } },
+      select: { email: true },
+    }).catch(() => []);
+    systemAdmins.forEach((adm) => {
+      if (isValidEmail(adm.email)) ccEmails.add(adm.email.trim().toLowerCase());
+    });
 
     const ccList = Array.from(ccEmails);
     const toList = Array.from(primaryEmails);
