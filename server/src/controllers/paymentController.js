@@ -137,7 +137,7 @@ export const createRazorpayOrder = asyncHandler(async (req, res) => {
               data: {
                 userId: activeUser.id,
                 name: decodedRegistration.emergencyContactName,
-                relationship: 'Primary Guardian / Emergency Contact',
+                relationship: 'Guardian',
                 phone: decodedRegistration.emergencyContactPhone,
                 email: decodedRegistration.parentEmail || '',
                 isVerified: true,
@@ -391,7 +391,7 @@ export const verifyRazorpayPayment = asyncHandler(async (req, res) => {
             data: {
               userId: user.id,
               name: decodedRegistration.emergencyContactName,
-              relationship: 'Primary Guardian / Emergency Contact',
+              relationship: 'Guardian',
               phone: decodedRegistration.emergencyContactPhone,
               email: decodedRegistration.parentEmail || '',
               isVerified: true,

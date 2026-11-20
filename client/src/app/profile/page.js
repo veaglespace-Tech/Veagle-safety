@@ -69,7 +69,7 @@ export default function UserProfileSettingsPage() {
   const [pincode, setPincode] = useState('');
   const [emergencyContactName, setEmergencyContactName] = useState('');
   const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
-  const [emergencyContactRelation, setEmergencyContactRelation] = useState('Parent');
+  const [emergencyContactRelation, setEmergencyContactRelation] = useState('Guardian');
   const [medicalNotes, setMedicalNotes] = useState('');
 
   // PASSWORD UPDATE STATE
@@ -108,7 +108,7 @@ export default function UserProfileSettingsPage() {
       setPincode(user.pincode || '');
       setEmergencyContactName(user.emergencyContactName || '');
       setEmergencyContactPhone(user.emergencyContactPhone || '');
-      setEmergencyContactRelation(user.emergencyContactRelation || 'Parent');
+      setEmergencyContactRelation(user.emergencyContactRelation || 'Guardian');
       setMedicalNotes(user.medicalNotes || '');
     }
   };
@@ -667,7 +667,7 @@ export default function UserProfileSettingsPage() {
                         href="#sec-3"
                         className="px-4 py-2 bg-[#FFF0F3] hover:bg-[#FF2A6D] hover:text-white text-[#FF2A6D] rounded-full text-xs font-black transition-all border border-[#FFCCE1] shrink-0 hover:scale-105 active:scale-95 shadow-xs"
                       >
-                        3. Emergency Guardian
+                        3. Emergency Guardian Contact
                       </a>
                       <a
                         href="#sec-4"
@@ -1055,7 +1055,7 @@ export default function UserProfileSettingsPage() {
                           3. Primary Emergency Guardian Contact
                         </h3>
                         <p className="text-xs text-[#684E67] font-bold leading-relaxed">
-                          First guardian notified automatically during an emergency SOS broadcast
+                          Guardian notified automatically during an emergency SOS broadcast
                         </p>
                       </div>
                     </div>
@@ -1090,11 +1090,11 @@ export default function UserProfileSettingsPage() {
                         {isEditing ? (
                           <CustomSelect
                             options={[
+                              { value: 'Guardian', label: 'Guardian' },
                               { value: 'Parent', label: 'Parent' },
                               { value: 'Spouse', label: 'Spouse' },
                               { value: 'Sibling', label: 'Sibling' },
                               { value: 'Friend', label: 'Friend' },
-                              { value: 'Guardian', label: 'Guardian' },
                               { value: 'Relative', label: 'Relative' },
                               { value: 'Other', label: 'Other' },
                             ]}

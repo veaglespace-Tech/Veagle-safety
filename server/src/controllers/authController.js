@@ -537,7 +537,7 @@ export const login = asyncHandler(async (req, res) => {
         user = await syncParentProfileAndLink({
           childId: contact.userId,
           parentPhone: phone10,
-          parentName: contact.name || 'Parent Guardian',
+          parentName: contact.name || 'Guardian',
           parentEmail: contact.email || '',
           relationship: contact.relationship || 'Guardian',
         });
@@ -556,7 +556,7 @@ export const login = asyncHandler(async (req, res) => {
         user = await syncParentProfileAndLink({
           childId: childUser.id,
           parentPhone: phone10,
-          parentName: childUser.emergencyContactName || 'Parent Guardian',
+          parentName: childUser.emergencyContactName || 'Guardian',
           parentEmail: childUser.parentEmail || '',
           relationship: 'Parent',
         });

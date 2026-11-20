@@ -870,7 +870,7 @@ export const resolveChildSos = asyncHandler(async (req, res) => {
     data: {
       status: 'RESOLVED',
       resolvedAt: new Date(),
-      resolutionNote: `Resolved by parent: ${link.parent.fullName || 'Parent Guardian'} (ID: ${parentId})`,
+      resolutionNote: `Resolved by guardian: ${link.parent.fullName || 'Guardian'} (ID: ${parentId})`,
     },
   });
 
