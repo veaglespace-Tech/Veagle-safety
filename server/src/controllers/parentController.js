@@ -538,8 +538,9 @@ export const triggerChildSos = asyncHandler(async (req, res) => {
     ccEmails.add(adminEnv.trim().toLowerCase());
   }
 
+  // Only Platform SUPER_ADMIN receives system-wide emergency alerts (NOT other orgs)
   const systemAdmins = await prisma.user.findMany({
-    where: { role: { in: ['SUPER_ADMIN', 'ADMIN'] } },
+    where: { role: 'SUPER_ADMIN' },
     select: { email: true },
   }).catch((err) => {
     console.error('[Parent SOS Admin Email Lookup Error]:', err.message);

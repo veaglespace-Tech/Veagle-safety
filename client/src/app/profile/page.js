@@ -539,6 +539,12 @@ export default function UserProfileSettingsPage() {
                       <span>Blood Group: {displayBloodGroup}</span>
                     </div>
                   )}
+                  {user?.organization && (
+                    <div className="flex items-center space-x-1.5 bg-gradient-to-r from-purple-50 via-white to-pink-50 px-3.5 py-1.5 rounded-full text-purple-900 font-black border border-purple-200 shadow-xs">
+                      <Building className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Institute: <span className="text-[#FF2A6D]">{user.organization.fullName}</span></span>
+                    </div>
+                  )}
                 </div>
 
                 {avatarToast && (
@@ -724,6 +730,32 @@ export default function UserProfileSettingsPage() {
                     </span>
                   )}
                 </div>
+
+                {user?.organization && (
+                  <div className="bg-gradient-to-r from-purple-50 via-white to-pink-50 border-2 border-purple-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+                    <div className="flex items-center space-x-3.5">
+                      <div className="w-11 h-11 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center border border-purple-200 shrink-0">
+                        <Building className="w-5 h-5 text-purple-700" />
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-[9px] font-black uppercase tracking-wider bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full">
+                            ENROLLED VIA INSTITUTE / ORGANIZATION
+                          </span>
+                        </div>
+                        <h4 className="text-sm sm:text-base font-black text-[#2A0826] mt-0.5">
+                          {user.organization.fullName}
+                        </h4>
+                        <p className="text-xs text-[#684E67] font-bold">
+                          Organization Email: <span className="text-purple-700 font-black">{user.organization.email || 'N/A'}</span> • Direct SOS Monitoring Active
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-[11px] font-black text-purple-800 bg-white px-3 py-1.5 rounded-xl border border-purple-200 shrink-0 shadow-xs">
+                      🏛️ Enrolled Member
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
