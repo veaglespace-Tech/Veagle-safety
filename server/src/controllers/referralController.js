@@ -163,8 +163,10 @@ export const getPartnerById = async (req, res) => {
             id: true,
             fullName: true,
             email: true,
+            phone: true,
             role: true,
             subscriptionStatus: true,
+            safetyStatus: true,
             currentPlanId: true,
             createdAt: true,
           },
@@ -181,13 +183,103 @@ export const getPartnerById = async (req, res) => {
       where: { code: partner.partnerReferralCode }
     });
 
+    // Dynamic Plan & Commission Rate from Database
+    const activePlan = await prisma.plan.findFirst({
+      where: { isActive: true },
+      orderBy: { id: 'asc' },
+    });
+    const planPrice = activePlan ? Number(activePlan.basePrice || activePlan.totalPrice) : 24;
+
+    const couponType = coupon ? coupon.discountType : 'PERCENTAGE';
+    const couponVal = coupon ? Number(coupon.discountValue) : 10;
+
+    let commissionRate = 10;
+    let commissionPerUser = 2.4;
+
+    if (couponType === 'FLAT_AMOUNT') {
+      commissionPerUser = couponVal;
+      commissionRate = planPrice > 0 ? Number(((couponVal / planPrice) * 100).toFixed(1)) : 10;
+    } else {
+      commissionRate = couponVal;
+      commissionPerUser = Math.round(((planPrice * commissionRate) / 100) * 100) / 100;
+    }
+
+    const referredUserIds = partner.referredUsers.map((u) => u.id);
+    let totalGrossRevenue = 0;
+    let totalEarnings = 0;
+    const userPaymentMap = {};
+
+    if (referredUserIds.length > 0) {
+      const successfulPayments = await prisma.paymentHistory.findMany({
+        where: {
+          userId: { in: referredUserIds },
+          status: 'SUCCESS',
+        },
+      });
+
+      successfulPayments.forEach((pay) => {
+        const amt = pay.amount || pay.baseAmount || 0;
+        totalGrossRevenue += amt;
+        if (!userPaymentMap[pay.userId]) {
+          userPaymentMap[pay.userId] = { count: 0, totalPaid: 0 };
+        }
+        userPaymentMap[pay.userId].count += 1;
+        userPaymentMap[pay.userId].totalPaid += amt;
+      });
+
+      if (couponType === 'FLAT_AMOUNT') {
+        totalEarnings = successfulPayments.length * commissionPerUser;
+      } else {
+        totalEarnings = Math.round(((totalGrossRevenue * commissionRate) / 100) * 100) / 100;
+      }
+    }
+
+    const activeSubscribersCount = partner.referredUsers.filter((u) => u.subscriptionStatus === 'ACTIVE').length;
+    if (totalEarnings === 0 && activeSubscribersCount > 0) {
+      totalEarnings = Math.round(activeSubscribersCount * commissionPerUser * 100) / 100;
+      totalGrossRevenue = activeSubscribersCount * planPrice;
+    }
+
+    const clientBaseUrl = config.clientUrl || 'https://sakhisuraksha.veaglespace.com';
+    const referralLink = `${clientBaseUrl}/auth?ref=${partner.partnerReferralCode}`;
+
+    const enrichedUsers = partner.referredUsers.map((u) => {
+      const userPayments = userPaymentMap[u.id] || { count: 0, totalPaid: 0 };
+      let userCommission = 0;
+      if (couponType === 'FLAT_AMOUNT') {
+        userCommission = userPayments.count > 0 ? userPayments.count * commissionPerUser : (u.subscriptionStatus === 'ACTIVE' ? commissionPerUser : 0);
+      } else {
+        userCommission = userPayments.totalPaid > 0 ? Math.round(((userPayments.totalPaid * commissionRate) / 100) * 100) / 100 : (u.subscriptionStatus === 'ACTIVE' ? commissionPerUser : 0);
+      }
+      return {
+        ...u,
+        totalPaid: userPayments.totalPaid || (u.subscriptionStatus === 'ACTIVE' ? planPrice : 0),
+        paymentsCount: userPayments.count,
+        commissionEarned: userCommission,
+      };
+    });
+
     res.status(200).json({ 
       success: true, 
       partner: {
         ...partner,
-        discountType: coupon ? coupon.discountType : 'PERCENTAGE',
-        discountPercentage: coupon ? coupon.discountValue : null,
-        discountValue: coupon ? coupon.discountValue : null,
+        discountType: couponType,
+        discountPercentage: couponType === 'PERCENTAGE' ? couponVal : commissionRate,
+        discountValue: couponVal,
+        commissionRate,
+        commissionPerUser,
+        referralLink,
+        stats: {
+          totalReferred: partner.referredUsers.length,
+          activeSubscribers: activeSubscribersCount,
+          freeMembers: partner.referredUsers.length - activeSubscribersCount,
+          totalGrossRevenue,
+          totalEarnings,
+          paidEarnings: 0,
+          pendingEarnings: totalEarnings,
+          planPrice,
+        },
+        referredUsers: enrichedUsers,
       }
     });
   } catch (error) {

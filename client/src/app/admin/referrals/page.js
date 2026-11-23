@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { AppLayout } from '../../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../../components/admin/AdminHeaderNav.js';
 import { referralApi } from '../../../redux/api/referralApi.js';
@@ -20,6 +21,8 @@ import {
   Trash2,
   PowerOff,
   Power,
+  Eye,
+  ExternalLink,
 } from 'lucide-react';
 
 export default function AdminReferralsPage() {
@@ -401,8 +404,17 @@ export default function AdminReferralsPage() {
                     </tr>
                   ) : (
                     partners.map((partner) => (
-                      <tr key={partner.id} className="hover:bg-[#FFF0F3]/30 transition-colors">
-                        <td className="p-5 font-black text-sm text-[#2A0826]">{partner.name}</td>
+                      <tr key={partner.id} className="hover:bg-[#FFF0F3]/40 transition-colors group">
+                        <td className="p-5 font-black text-sm text-[#2A0826]">
+                          <Link
+                            href={`/admin/referrals/${partner.id}`}
+                            className="hover:text-[#FF2A6D] transition-colors inline-flex items-center gap-2 group-hover:translate-x-0.5 transform duration-150"
+                            title="Click to view full partner details & commission breakdown"
+                          >
+                            <span>{partner.name}</span>
+                            <ExternalLink className="w-3.5 h-3.5 text-[#FF2A6D] opacity-40 group-hover:opacity-100 transition-opacity" />
+                          </Link>
+                        </td>
                         <td className="p-5 space-y-1">
                           <p className="text-xs font-bold text-[#684E67] flex items-center space-x-1">
                             <Mail className="w-3 h-3 text-[#FF2A6D]" /> <span>{partner.email}</span>
@@ -416,7 +428,7 @@ export default function AdminReferralsPage() {
                         </td>
                         <td className="p-5">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="bg-amber-100 text-amber-800 text-xs font-black px-3 py-1.5 rounded-xl uppercase border border-amber-200">
+                            <span className="bg-amber-100 text-amber-800 text-xs font-black px-3 py-1.5 rounded-xl uppercase border border-amber-200 font-mono">
                               {partner.partnerReferralCode}
                             </span>
                             <span className="bg-pink-50 text-[#FF2A6D] text-[10px] font-black px-2 py-0.5 rounded-lg border border-pink-200 whitespace-nowrap">
@@ -445,13 +457,14 @@ export default function AdminReferralsPage() {
                         </td>
                         <td className="p-5 text-right">
                           <div className="flex items-center justify-end space-x-2">
-                            <button
-                              onClick={() => openPartnerStats(partner.id)}
-                              className="text-[10px] font-black text-[#FF2A6D] hover:text-white transition-colors uppercase tracking-wider bg-[#FFF0F3] hover:bg-[#FF2A6D] px-2 py-1.5 rounded-lg border border-[#FFCCE1] whitespace-nowrap mr-2"
-                              title="View Stats"
+                            <Link
+                              href={`/admin/referrals/${partner.id}`}
+                              className="text-xs font-black text-[#FF2A6D] hover:text-white transition-all uppercase tracking-wider bg-[#FFF0F3] hover:bg-[#FF2A6D] px-3 py-1.5 rounded-xl border border-[#FFCCE1] whitespace-nowrap inline-flex items-center gap-1.5 shadow-xs mr-1"
+                              title="View Complete Partner Details & Commission Breakdown"
                             >
-                              Stats
-                            </button>
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Details</span>
+                            </Link>
                             <button
                               onClick={() => handleEditClick(partner)}
                               className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors"
