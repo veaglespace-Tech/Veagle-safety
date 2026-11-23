@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../../components/admin/AdminHeaderNav.js';
 import { referralApi } from '../../../redux/api/referralApi.js';
+import { adminApi } from '../../../redux/api/adminApi.js';
 import {
   Network,
   Plus,
@@ -23,7 +24,9 @@ import {
 
 export default function AdminReferralsPage() {
   const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState('partners'); // 'partners' | 'applications'
   const [partners, setPartners] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null);
 
@@ -34,12 +37,23 @@ export default function AdminReferralsPage() {
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState(null);
 
+  const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [approvalForm, setApprovalForm] = useState({
+    partnerReferralCode: '',
+    discountType: 'PERCENTAGE',
+    discountPercentage: '10',
+  });
+  const [isApproving, setIsApproving] = useState(false);
+  const [activePlanPrice, setActivePlanPrice] = useState(24);
+
   const [form, setForm] = useState({
     name: '',
     email: '',
     mobile: '',
     partnerReferralCode: '',
-    discountPercentage: '',
+    discountType: 'PERCENTAGE',
+    discountPercentage: '10',
     isActive: true,
   });
 
@@ -51,8 +65,12 @@ export default function AdminReferralsPage() {
   const fetchPartners = async () => {
     try {
       setIsLoading(true);
-      const res = await referralApi.getAllPartners();
-      if (res.success) setPartners(res.partners || []);
+      const [partnersRes, appsRes] = await Promise.all([
+        referralApi.getAllPartners(),
+        referralApi.getPartnerApplications().catch(() => ({ success: false, applications: [] })),
+      ]);
+      if (partnersRes.success) setPartners(partnersRes.partners || []);
+      if (appsRes.success) setApplications(appsRes.applications || []);
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Failed to load referral partners');
     } finally {
@@ -63,16 +81,54 @@ export default function AdminReferralsPage() {
   useEffect(() => {
     setMounted(true);
     fetchPartners();
+
+    const loadPlanPrice = async () => {
+      try {
+        const res = await adminApi.fetchPlans();
+        const plans = res?.plans || res?.data?.plans || [];
+        const active = plans.find((p) => p.isActive) || plans[0];
+        if (active && (active.basePrice || active.totalPrice)) {
+          setActivePlanPrice(Number(active.basePrice || active.totalPrice));
+        }
+      } catch (err) {
+        // Fallback to default ₹24 plan price
+      }
+    };
+    loadPlanPrice();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const val = Number(form.discountPercentage);
+
+    if (form.discountType === 'FLAT_AMOUNT') {
+      if (val > activePlanPrice) {
+        showToast('error', `Flat commission (₹${val}) cannot exceed active plan price of ₹${activePlanPrice}!`);
+        return;
+      }
+      if (val <= 0 || isNaN(val)) {
+        showToast('error', 'Commission amount must be greater than ₹0.');
+        return;
+      }
+    } else {
+      if (val > 100) {
+        showToast('error', 'Commission percentage cannot exceed 100%!');
+        return;
+      }
+      if (val <= 0 || isNaN(val)) {
+        showToast('error', 'Commission percentage must be greater than 0%.');
+        return;
+      }
+    }
+
     try {
       const payload = {
         partnerName: form.name,
         email: form.email,
         mobile: form.mobile,
         partnerReferralCode: form.partnerReferralCode,
+        discountType: form.discountType || 'PERCENTAGE',
+        discountValue: form.discountPercentage,
         discountPercentage: form.discountPercentage,
         isActive: form.isActive,
       };
@@ -99,7 +155,8 @@ export default function AdminReferralsPage() {
           email: '',
           mobile: '',
           partnerReferralCode: '',
-          discountPercentage: '',
+          discountType: 'PERCENTAGE',
+          discountPercentage: '10',
           isActive: true,
         });
         fetchPartners();
@@ -119,7 +176,8 @@ export default function AdminReferralsPage() {
       email: partner.email,
       mobile: partner.mobile || '',
       partnerReferralCode: partner.partnerReferralCode || '',
-      discountPercentage: partner.discountPercentage || '',
+      discountType: partner.discountType || 'PERCENTAGE',
+      discountPercentage: partner.discountValue || partner.discountPercentage || '10',
       isActive: partner.isActive,
     });
     setIsEditMode(true);
@@ -158,7 +216,8 @@ export default function AdminReferralsPage() {
       email: '',
       mobile: '',
       partnerReferralCode: '',
-      discountPercentage: '',
+      discountType: 'PERCENTAGE',
+      discountPercentage: '10',
       isActive: true,
     });
     setIsEditMode(false);
@@ -175,6 +234,65 @@ export default function AdminReferralsPage() {
       }
     } catch (err) {
       showToast('error', 'Failed to fetch partner details');
+    }
+  };
+
+  const openApproveModal = (app) => {
+    setSelectedApp(app);
+    // suggest code based on name or blank for auto
+    const cleanName = (app.fullName || '').replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase();
+    setApprovalForm({
+      partnerReferralCode: cleanName ? `${cleanName}${Math.floor(10 + Math.random() * 90)}` : '',
+      discountType: 'PERCENTAGE',
+      discountPercentage: '10',
+    });
+    setIsApproveModalOpen(true);
+  };
+
+  const handleApproveSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedApp) return;
+
+    const val = Number(approvalForm.discountPercentage);
+    if (approvalForm.discountType === 'FLAT_AMOUNT') {
+      if (val > activePlanPrice) {
+        showToast('error', `Flat commission (₹${val}) cannot exceed active plan price of ₹${activePlanPrice}!`);
+        return;
+      }
+      if (val <= 0 || isNaN(val)) {
+        showToast('error', 'Commission amount must be greater than ₹0.');
+        return;
+      }
+    } else {
+      if (val > 100) {
+        showToast('error', 'Commission percentage cannot exceed 100%!');
+        return;
+      }
+      if (val <= 0 || isNaN(val)) {
+        showToast('error', 'Commission percentage must be greater than 0%.');
+        return;
+      }
+    }
+
+    try {
+      setIsApproving(true);
+      const payload = {
+        partnerReferralCode: approvalForm.partnerReferralCode,
+        discountType: approvalForm.discountType || 'PERCENTAGE',
+        discountValue: approvalForm.discountPercentage,
+        discountPercentage: approvalForm.discountPercentage,
+      };
+      const res = await referralApi.approvePartnerApplication(selectedApp.id, payload);
+      if (res.success) {
+        showToast('success', res.message || 'Partner application approved and code generated!');
+        setIsApproveModalOpen(false);
+        setSelectedApp(null);
+        fetchPartners();
+      }
+    } catch (err) {
+      showToast('error', err.response?.data?.message || 'Failed to approve application');
+    } finally {
+      setIsApproving(false);
     }
   };
 
@@ -208,7 +326,41 @@ export default function AdminReferralsPage() {
             </button>
           </div>
 
+          {/* TABS */}
+          <div className="flex items-center space-x-3 border-b-2 border-[#FFCCE1] pb-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab('partners')}
+              className={`pb-3 px-4 text-xs sm:text-sm font-black uppercase tracking-wider transition-all border-b-2 -mb-1.5 cursor-pointer flex items-center space-x-2 ${
+                activeTab === 'partners'
+                  ? 'border-[#FF2A6D] text-[#FF2A6D]'
+                  : 'border-transparent text-[#684E67] hover:text-[#2A0826]'
+              }`}
+            >
+              <Network className="w-4 h-4" />
+              <span>Active Partners ({partners.length})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('applications')}
+              className={`pb-3 px-4 text-xs sm:text-sm font-black uppercase tracking-wider transition-all border-b-2 -mb-1.5 cursor-pointer flex items-center space-x-2 ${
+                activeTab === 'applications'
+                  ? 'border-[#FF2A6D] text-[#FF2A6D]'
+                  : 'border-transparent text-[#684E67] hover:text-[#2A0826]'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              <span>Partner Applications</span>
+              {applications.filter((a) => a.status === 'PENDING').length > 0 && (
+                <span className="bg-[#FF2A6D] text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-pulse">
+                  {applications.filter((a) => a.status === 'PENDING').length} New
+                </span>
+              )}
+            </button>
+          </div>
+
           {/* PARTNERS LIST */}
+          {activeTab === 'partners' ? (
           <div className="bg-white rounded-[36px] border-2 border-[#FFCCE1] shadow-md overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[800px]">
@@ -263,9 +415,16 @@ export default function AdminReferralsPage() {
                           )}
                         </td>
                         <td className="p-5">
-                          <span className="bg-amber-100 text-amber-800 text-xs font-black px-3 py-1.5 rounded-xl uppercase border border-amber-200">
-                            {partner.partnerReferralCode}
-                          </span>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="bg-amber-100 text-amber-800 text-xs font-black px-3 py-1.5 rounded-xl uppercase border border-amber-200">
+                              {partner.partnerReferralCode}
+                            </span>
+                            <span className="bg-pink-50 text-[#FF2A6D] text-[10px] font-black px-2 py-0.5 rounded-lg border border-pink-200 whitespace-nowrap">
+                              {partner.discountType === 'FLAT_AMOUNT'
+                                ? `₹${partner.discountValue || 0} Flat`
+                                : `${partner.discountPercentage || partner.discountValue || 10}%`}
+                            </span>
+                          </div>
                         </td>
                         <td className="p-5 text-center">
                           <div className="inline-flex items-center space-x-1.5 bg-purple-50 text-purple-700 font-black px-3 py-1 rounded-xl border border-purple-200 text-xs">
@@ -327,6 +486,102 @@ export default function AdminReferralsPage() {
               </table>
             </div>
           </div>
+          ) : (
+          /* APPLICATIONS LIST */
+          <div className="bg-white rounded-[36px] border-2 border-[#FFCCE1] shadow-md overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[850px]">
+                <thead>
+                  <tr className="bg-[#FFF0F3]/60 border-b-2 border-[#FFCCE1]">
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest">
+                      Applicant Name &amp; Date
+                    </th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest">
+                      Contact Info
+                    </th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest">
+                      Details / Note
+                    </th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-center">
+                      Status
+                    </th>
+                    <th className="p-5 text-[11px] font-black text-[#2A0826] uppercase tracking-widest text-right">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#FFCCE1]/50">
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-sm font-bold text-[#684E67]">
+                        Loading applications...
+                      </td>
+                    </tr>
+                  ) : applications.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-sm font-bold text-[#684E67]">
+                        No partner applications submitted yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    applications.map((app) => (
+                      <tr key={app.id} className="hover:bg-[#FFF0F3]/30 transition-colors">
+                        <td className="p-5 space-y-1">
+                          <p className="font-black text-sm text-[#2A0826]">{app.fullName}</p>
+                          <p className="text-[11px] font-bold text-gray-500 flex items-center space-x-1">
+                            <Calendar className="w-3 h-3 text-[#FF2A6D]" />
+                            <span>{new Date(app.createdAt).toLocaleDateString()}</span>
+                          </p>
+                        </td>
+                        <td className="p-5 space-y-1">
+                          <p className="text-xs font-bold text-[#684E67] flex items-center space-x-1">
+                            <Mail className="w-3 h-3 text-[#FF2A6D]" /> <span>{app.email}</span>
+                          </p>
+                          {app.phone && (
+                            <p className="text-xs font-bold text-[#684E67] flex items-center space-x-1">
+                              <Phone className="w-3 h-3 text-[#FF2A6D]" /> <span>{app.phone}</span>
+                            </p>
+                          )}
+                        </td>
+                        <td className="p-5 max-w-sm">
+                          <div className="text-xs text-[#684E67] whitespace-pre-line font-medium line-clamp-3">
+                            {app.message}
+                          </div>
+                        </td>
+                        <td className="p-5 text-center">
+                          {app.status === 'PENDING' ? (
+                            <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-3 py-1 rounded-full uppercase">
+                              Pending Review
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full uppercase">
+                              Approved
+                            </span>
+                          )}
+                        </td>
+                        <td className="p-5 text-right">
+                          {app.status === 'PENDING' ? (
+                            <button
+                              onClick={() => openApproveModal(app)}
+                              className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-black text-xs rounded-xl shadow-sm transition-all uppercase tracking-wider cursor-pointer"
+                            >
+                              Approve Partner
+                            </button>
+                          ) : (
+                            <span className="text-xs font-black text-emerald-600 flex items-center justify-end space-x-1">
+                              <CheckCircle2 className="w-4 h-4" />
+                              <span>Approved</span>
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          )}
         </div>
       </div>
 
@@ -401,19 +656,55 @@ export default function AdminReferralsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
-                    Discount (%)
+                    Commission Model
                   </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    value={form.discountPercentage}
-                    onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all"
-                    placeholder="e.g. 10"
-                  />
+                  <select
+                    value={form.discountType}
+                    onChange={(e) => setForm({ ...form, discountType: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all cursor-pointer"
+                  >
+                    <option value="PERCENTAGE">Percentage (%)</option>
+                    <option value="FLAT_AMOUNT">Flat Amount (₹)</option>
+                  </select>
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                    {form.discountType === 'FLAT_AMOUNT' ? 'Commission / Flat Value (₹)' : 'Commission / Discount (%)'}
+                  </label>
+                  {form.discountType === 'FLAT_AMOUNT' && (
+                    <span className="text-[11px] font-bold text-[#FF2A6D] bg-[#FFF0F3] px-2 py-0.5 rounded-full border border-[#FFCCE1]">
+                      Max Plan Limit: ₹{activePlanPrice}
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="number"
+                  step={form.discountType === 'FLAT_AMOUNT' ? '0.5' : '0.1'}
+                  min="0.1"
+                  max={form.discountType === 'FLAT_AMOUNT' ? activePlanPrice : 100}
+                  value={form.discountPercentage}
+                  onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })}
+                  className={`w-full px-4 py-3 bg-[#FFF0F3]/30 border rounded-2xl text-sm font-bold outline-none transition-all ${
+                    form.discountType === 'FLAT_AMOUNT' && Number(form.discountPercentage) > activePlanPrice
+                      ? 'border-red-500 ring-2 ring-red-400/20 text-red-600'
+                      : 'border-[#FFCCE1] focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 text-[#2A0826]'
+                  }`}
+                  placeholder={form.discountType === 'FLAT_AMOUNT' ? `e.g. 5 (Max ₹${activePlanPrice})` : 'e.g. 10 (Max 100%)'}
+                />
+                {form.discountType === 'FLAT_AMOUNT' && Number(form.discountPercentage) > activePlanPrice ? (
+                  <p className="text-xs text-red-600 font-black animate-pulse flex items-center gap-1">
+                    <span>⚠️ Cannot exceed active subscription plan price of ₹{activePlanPrice}!</span>
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-gray-500 font-bold">
+                    {form.discountType === 'FLAT_AMOUNT'
+                      ? `₹${form.discountPercentage || 0} flat per ₹${activePlanPrice} yearly subscription (shown to partner as ${form.discountPercentage ? ((Number(form.discountPercentage) / activePlanPrice) * 100).toFixed(1) : 0}%)`
+                      : `${form.discountPercentage || 0}% per ₹${activePlanPrice} plan (= ₹${form.discountPercentage ? ((activePlanPrice * Number(form.discountPercentage)) / 100).toFixed(2) : 0}/user)`}
+                  </p>
+                )}
               </div>
 
               <div className="pt-4">
@@ -526,6 +817,121 @@ export default function AdminReferralsPage() {
                 </table>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+      {/* APPROVE APPLICATION MODAL */}
+      {isApproveModalOpen && selectedApp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2A0826]/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white w-full max-w-md rounded-[32px] border-2 border-emerald-200 shadow-2xl overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-emerald-100 flex items-center justify-between bg-emerald-50/50">
+              <h3 className="font-black text-lg text-[#2A0826] flex items-center space-x-2">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                <span>Approve Partner Application</span>
+              </h3>
+              <button
+                onClick={() => setIsApproveModalOpen(false)}
+                className="p-2 hover:bg-emerald-100 rounded-full text-[#684E67] transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleApproveSubmit} className="p-6 space-y-4">
+              <div className="bg-[#FFF0F3]/60 p-4 rounded-2xl border border-[#FFCCE1] space-y-1 text-xs">
+                <p className="font-black text-[#2A0826] text-sm">{selectedApp.fullName}</p>
+                <p className="text-[#684E67] font-bold">Email: {selectedApp.email}</p>
+                {selectedApp.phone && <p className="text-[#684E67] font-bold">Phone: {selectedApp.phone}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                  Partner Referral Code
+                </label>
+                <input
+                  type="text"
+                  value={approvalForm.partnerReferralCode}
+                  onChange={(e) =>
+                    setApprovalForm({
+                      ...approvalForm,
+                      partnerReferralCode: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''),
+                    })
+                  }
+                  placeholder="e.g. SAKHI10 (Leave blank to auto-generate)"
+                  className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-black text-[#FF2A6D] uppercase outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all font-mono"
+                />
+                <p className="text-[10px] text-gray-500 font-bold">
+                  Leave blank to auto-generate a random 6-character unique code.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                    Commission Model
+                  </label>
+                  <select
+                    value={approvalForm.discountType}
+                    onChange={(e) => setApprovalForm({ ...approvalForm, discountType: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 transition-all cursor-pointer"
+                  >
+                    <option value="PERCENTAGE">Percentage (%)</option>
+                    <option value="FLAT_AMOUNT">Flat Amount (₹)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                      {approvalForm.discountType === 'FLAT_AMOUNT' ? 'Flat Amount (₹)' : 'Percentage (%)'}
+                    </label>
+                    {approvalForm.discountType === 'FLAT_AMOUNT' && (
+                      <span className="text-[10px] font-bold text-[#FF2A6D] bg-[#FFF0F3] px-2 py-0.5 rounded-full border border-[#FFCCE1]">
+                        Max: ₹{activePlanPrice}
+                      </span>
+                    )}
+                  </div>
+                  <input
+                    type="number"
+                    step={approvalForm.discountType === 'FLAT_AMOUNT' ? '0.5' : '0.1'}
+                    min="0.1"
+                    max={approvalForm.discountType === 'FLAT_AMOUNT' ? activePlanPrice : 100}
+                    value={approvalForm.discountPercentage}
+                    onChange={(e) =>
+                      setApprovalForm({ ...approvalForm, discountPercentage: e.target.value })
+                    }
+                    placeholder={approvalForm.discountType === 'FLAT_AMOUNT' ? `e.g. 5 (Max ₹${activePlanPrice})` : 'e.g. 10'}
+                    className={`w-full px-4 py-3 bg-[#FFF0F3]/30 border rounded-2xl text-sm font-bold outline-none transition-all ${
+                      approvalForm.discountType === 'FLAT_AMOUNT' && Number(approvalForm.discountPercentage) > activePlanPrice
+                        ? 'border-red-500 ring-2 ring-red-400/20 text-red-600'
+                        : 'border-[#FFCCE1] focus:border-[#FF2A6D] focus:ring-2 focus:ring-[#FF2A6D]/20 text-[#2A0826]'
+                    }`}
+                  />
+                </div>
+              </div>
+              {approvalForm.discountType === 'FLAT_AMOUNT' && Number(approvalForm.discountPercentage) > activePlanPrice ? (
+                <p className="text-xs text-red-600 font-black animate-pulse flex items-center gap-1">
+                  <span>⚠️ Cannot exceed active subscription plan price of ₹{activePlanPrice}!</span>
+                </p>
+              ) : (
+                <p className="text-[10px] text-gray-500 font-bold">
+                  {approvalForm.discountType === 'FLAT_AMOUNT'
+                    ? `₹${approvalForm.discountPercentage || 0} flat per ₹${activePlanPrice} yearly subscription (shown to partner as ${approvalForm.discountPercentage ? ((Number(approvalForm.discountPercentage) / activePlanPrice) * 100).toFixed(1) : 0}%)`
+                    : `${approvalForm.discountPercentage || 0}% per ₹${activePlanPrice} plan (= ₹${approvalForm.discountPercentage ? ((activePlanPrice * Number(approvalForm.discountPercentage)) / 100).toFixed(2) : 0}/user)`}
+                </p>
+              )}
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isApproving}
+                  className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-black text-xs sm:text-sm rounded-2xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer uppercase tracking-wider disabled:opacity-60"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>{isApproving ? 'APPROVING & SENDING EMAIL...' : 'APPROVE & ALLOCATE CODE'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

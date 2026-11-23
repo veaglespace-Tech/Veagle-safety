@@ -13,7 +13,15 @@ import * as settingController from '../controllers/settingController.js';
 import * as referralController from '../controllers/referralController.js';
 import * as couponController from '../controllers/couponController.js';
 import * as donationController from '../controllers/donationController.js';
-import { authenticateToken, optionalAuthToken, requireSuperAdmin, requireActiveSubscription } from '../middleware/auth.js';
+import {
+  authenticateToken,
+  optionalAuthToken,
+  requireSuperAdmin,
+  requireOrganization,
+  requireParent,
+  requirePartner,
+  requireActiveSubscription,
+} from '../middleware/auth.js';
 import { upload } from '../middleware/upload.js';
 import { validate } from '../middleware/validate.js';
 import { registerSchema, loginSchema, verifyEmailSchema } from '../utils/schemas.js';
@@ -108,17 +116,17 @@ router.post('/admin/enquiries/:id/resolve', authenticateToken, requireSuperAdmin
 router.get('/admin/donations', authenticateToken, requireSuperAdmin, donationController.getAllDonations);
 
 // Organization Portal Routes
-router.get('/organization/overview', authenticateToken, organizationController.getOrganizationOverview);
-router.get('/organization/settings', authenticateToken, organizationController.getOrganizationSettings);
-router.delete('/organization/members/:userId', authenticateToken, organizationController.removeMember);
+router.get('/organization/overview', authenticateToken, requireOrganization, organizationController.getOrganizationOverview);
+router.get('/organization/settings', authenticateToken, requireOrganization, organizationController.getOrganizationSettings);
+router.delete('/organization/members/:userId', authenticateToken, requireOrganization, organizationController.removeMember);
 
 // Parent Portal Routes
-router.get('/parent/overview', authenticateToken, parentController.getParentOverview);
-router.post('/parent/link-child', authenticateToken, parentController.linkChild);
-router.delete('/parent/children/:linkId', authenticateToken, parentController.unlinkChild);
-router.post('/parent/ping-checkin', authenticateToken, parentController.pingChildCheckin);
-router.post('/parent/trigger-child-sos', authenticateToken, requireActiveSubscription, parentController.triggerChildSos);
-router.post('/parent/resolve-child-sos', authenticateToken, requireActiveSubscription, parentController.resolveChildSos);
+router.get('/parent/overview', authenticateToken, requireParent, parentController.getParentOverview);
+router.post('/parent/link-child', authenticateToken, requireParent, parentController.linkChild);
+router.delete('/parent/children/:linkId', authenticateToken, requireParent, parentController.unlinkChild);
+router.post('/parent/ping-checkin', authenticateToken, requireParent, parentController.pingChildCheckin);
+router.post('/parent/trigger-child-sos', authenticateToken, requireParent, requireActiveSubscription, parentController.triggerChildSos);
+router.post('/parent/resolve-child-sos', authenticateToken, requireParent, requireActiveSubscription, parentController.resolveChildSos);
 
 // Push Notifications (Web Push & Mobile FCM Device Tokens)
 router.get('/push/vapid-key', pushController.getVapidPublicKey);
@@ -162,6 +170,12 @@ router.post('/upload', authenticateToken, requireSuperAdmin, upload.single('medi
 });
 
 // Referral Partners
+router.post('/partners/apply', referralController.applyPartner); // Public partner application
+router.post('/partners/login', referralController.partnerLogin); // Partner portal login
+router.get('/partners/me', authenticateToken, requirePartner, referralController.getPartnerDashboard); // Partner dashboard refresh
+router.put('/partners/me', authenticateToken, requirePartner, referralController.updatePartnerProfile); // Partner self-profile update
+router.get('/partners/applications', authenticateToken, requireSuperAdmin, referralController.getPartnerApplications);
+router.post('/partners/approve-application/:id', authenticateToken, requireSuperAdmin, referralController.approvePartnerApplication);
 router.post('/partners', authenticateToken, requireSuperAdmin, referralController.createPartner);
 router.get('/partners', authenticateToken, requireSuperAdmin, referralController.getAllPartners);
 router.get('/partners/:id', authenticateToken, requireSuperAdmin, referralController.getPartnerById);

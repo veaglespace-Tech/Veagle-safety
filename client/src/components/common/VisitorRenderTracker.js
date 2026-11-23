@@ -16,6 +16,7 @@ export function VisitorRenderTracker() {
 }
 
 export function FloatingBottomLeftCounter() {
+  const pathname = usePathname();
   const [count, setCount] = useState(null);
 
   useEffect(() => {
@@ -33,6 +34,9 @@ export function FloatingBottomLeftCounter() {
     const interval = setInterval(fetchCount, 15000);
     return () => clearInterval(interval);
   }, []);
+
+  const hiddenOnPaths = ['/admin', '/partner', '/organization', '/parent', '/dashboard'];
+  if (hiddenOnPaths.some((p) => pathname?.startsWith(p))) return null;
 
   if (count === null || count === undefined) return null;
 

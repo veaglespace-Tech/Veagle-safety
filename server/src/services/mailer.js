@@ -1,6 +1,11 @@
 import nodemailer from 'nodemailer';
 import { config } from '../config/index.js';
 import { sendMailWithFailover, getActiveSenderEmail } from './emailFailoverService.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __mailerDirname = path.dirname(fileURLToPath(import.meta.url));
+const USER_GUIDE_PDF_PATH = path.join(__mailerDirname, '..', 'assets', 'veagle-user-guide.pdf');
 
 // Unified transporter proxy that routes through the Hostinger failover pool (sos01 -> sos05)
 const transporter = {
@@ -364,7 +369,14 @@ export const sendWelcomeEmail = async ({ recipientEmail, userName, userPhoto }) 
       from: `"Sakhi Suraksha SOS" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: `🌸 Welcome to Sakhi Suraksha SOS - 24/7 Personal Protection Active`,
-      attachments: avatar.attachments,
+      attachments: [
+        ...avatar.attachments,
+        {
+          filename: 'Sakhi-Suraksha-User-Guide.pdf',
+          path: USER_GUIDE_PDF_PATH,
+          contentType: 'application/pdf',
+        },
+      ],
       html: `
         <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 28px; background-color: #FFF0F3;">
           <div style="text-align: center; margin-bottom: 20px;">
@@ -385,6 +397,12 @@ export const sendWelcomeEmail = async ({ recipientEmail, userName, userPhoto }) 
             <p style="font-size: 13px; color: #555555; line-height: 1.6; margin: 0;">
               Welcome to <strong>Sakhi Suraksha SOS</strong>! Your account is now active with 24/7 encrypted GPS emergency broadcasts and guardian network protection.
             </p>
+            <div style="margin-top: 16px; padding: 14px; background-color: #FFF0F3; border-radius: 10px; border: 1px solid #FFCCE1;">
+              <p style="margin: 0; font-size: 13px; color: #2A0826; font-weight: 700;">📖 User Guide Attached!</p>
+              <p style="margin: 6px 0 0 0; font-size: 12px; color: #555555; line-height: 1.5;">
+                We have attached a <strong>complete User Guide PDF</strong> to this email. It covers how to use the app for both <strong>Users (Girls & Women)</strong> and <strong>Guardians/Parents</strong>. Please read it to get the most out of your Sakhi Suraksha protection.
+              </p>
+            </div>
           </div>
         </div>
       `,
@@ -421,6 +439,99 @@ export const sendPasswordResetEmail = async ({ recipientEmail, userName, resetLi
     });
     return true;
   } catch (err) {
+    return false;
+  }
+};
+
+/**
+ * Send Partner Application Confirmation Email
+ */
+export const sendPartnerApplicationConfirmation = async ({ recipientEmail, applicantName }) => {
+  try {
+    await transporter.sendMail({
+      from: `"Sakhi Suraksha SOS Partner Network" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: `🌸 Partner Application Received — Sakhi Suraksha SOS`,
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 28px; background-color: #FFF0F3;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #2A0826; font-size: 24px; font-weight: 900; margin: 0;">Sakhi Suraksha SOS</h1>
+            <p style="color: #FF5C8A; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;">Referral &amp; Community Partner Network</p>
+          </div>
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 20px; border: 1px solid #FFCCE1;">
+            <p style="font-size: 16px; color: #2A0826; margin: 0 0 12px 0; font-weight: 800;">Dear ${applicantName || 'Partner'},</p>
+            <p style="font-size: 13px; color: #555555; line-height: 1.6; margin: 0 0 16px 0;">
+              Thank you for applying to join the <strong>Sakhi Suraksha Safety Partner Network</strong>! We are thrilled by your interest in championing 24/7 personal safety for women and girls.
+            </p>
+            <div style="background-color: #FFF0F3; border-radius: 10px; padding: 14px; border: 1px solid #FFCCE1; margin-bottom: 16px;">
+              <p style="margin: 0; font-size: 13px; color: #2A0826; font-weight: 800;">📋 What happens next?</p>
+              <ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 12px; color: #555555; line-height: 1.6;">
+                <li>Our team is reviewing your application details.</li>
+                <li>Upon approval, you will receive your unique <strong>Partner Referral Code</strong> and sharable tracking link via email.</li>
+                <li>Your members/audience will get an exclusive discount, and you will receive access to your real-time performance metrics.</li>
+              </ul>
+            </div>
+            <p style="font-size: 12px; color: #888888; margin: 0;">
+              If you have any questions in the meantime, reach us at <a href="mailto:support@sakhisuraksha.veaglespace.com" style="color: #FF2A6D; text-decoration: underline;">support@sakhisuraksha.veaglespace.com</a>.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.warn('[Partner Application Email Error]:', err.message);
+    return false;
+  }
+};
+
+/**
+ * Send Partner Approval & Code Allocation Email
+ */
+export const sendPartnerApplicationApproved = async ({
+  recipientEmail,
+  partnerName,
+  referralCode,
+  referralLink,
+  discountPercentage,
+}) => {
+  try {
+    await transporter.sendMail({
+      from: `"Sakhi Suraksha SOS Partner Network" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: `🎉 Congratulations! Your Sakhi Suraksha Partner Code: ${referralCode}`,
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 2px solid #10B981; border-radius: 16px; padding: 28px; background-color: #ECFDF5;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <span style="background-color: #10B981; color: white; padding: 4px 12px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">PARTNER APPROVED</span>
+            <h1 style="color: #065F46; font-size: 24px; font-weight: 900; margin: 8px 0 0 0;">Welcome to the Partner Network!</h1>
+          </div>
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 20px; border: 1.5px solid #A7F3D0;">
+            <p style="font-size: 16px; color: #065F46; margin: 0 0 12px 0; font-weight: 800;">Dear ${partnerName},</p>
+            <p style="font-size: 13px; color: #555555; line-height: 1.6; margin: 0 0 16px 0;">
+              Your application to become a <strong>Sakhi Suraksha Referral Partner</strong> has been approved! You are now an official safety partner.
+            </p>
+            <div style="background: linear-gradient(135deg, #10B981, #059669); border-radius: 12px; padding: 20px; text-align: center; color: #ffffff; margin-bottom: 16px;">
+              <p style="margin: 0 0 4px 0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">YOUR UNIQUE REFERRAL CODE</p>
+              <p style="font-size: 32px; font-weight: 900; letter-spacing: 6px; margin: 4px 0;">${referralCode}</p>
+              ${discountPercentage ? `<p style="margin: 0; font-size: 12px; opacity: 0.95;">Offers <strong>${discountPercentage}% OFF</strong> to your referrals</p>` : ''}
+            </div>
+            <div style="background-color: #F9FAFB; border-radius: 10px; padding: 14px; border: 1px solid #E5E7EB; margin-bottom: 16px;">
+              <p style="margin: 0 0 6px 0; font-size: 12px; color: #2A0826; font-weight: 800;">🔗 Your Direct Referral Link:</p>
+              <p style="margin: 0; font-size: 12px; word-break: break-all;">
+                <a href="${referralLink}" target="_blank" style="color: #10B981; font-weight: 700; text-decoration: underline;">${referralLink}</a>
+              </p>
+            </div>
+            <p style="font-size: 12px; color: #666666; line-height: 1.5; margin: 0;">
+              Share this link or code with your students, employees, community, or audience. When they sign up, their accounts will automatically be attributed to your network.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.warn('[Partner Approved Email Error]:', err.message);
     return false;
   }
 };

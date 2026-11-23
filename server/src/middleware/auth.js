@@ -64,6 +64,27 @@ export const requireSuperAdmin = (req, res, next) => {
   next();
 };
 
+export const requireOrganization = (req, res, next) => {
+  if (!req.user || (req.user.role !== 'ORGANIZATION' && req.user.role !== 'SUPER_ADMIN')) {
+    return res.status(403).json({ error: 'Access denied. Organization privileges required.' });
+  }
+  next();
+};
+
+export const requireParent = (req, res, next) => {
+  if (!req.user || (req.user.role !== 'PARENT' && req.user.role !== 'SUPER_ADMIN')) {
+    return res.status(403).json({ error: 'Access denied. Guardian / Parent privileges required.' });
+  }
+  next();
+};
+
+export const requirePartner = (req, res, next) => {
+  if (!req.user || (req.user.role !== 'PARTNER' && req.user.role !== 'SUPER_ADMIN')) {
+    return res.status(403).json({ error: 'Access denied. Referral Partner privileges required.' });
+  }
+  next();
+};
+
 export const requireActiveSubscription = async (req, res, next) => {
   if (!req.user || req.user.role === 'SUPER_ADMIN' || req.user.role === 'ORGANIZATION') {
     return next(); // Admins and Organizations bypass subscription checks

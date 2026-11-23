@@ -13,9 +13,12 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('tichi_token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      // Preserve explicit Authorization header if already provided (e.g. partner token)
+      if (!config.headers.Authorization) {
+        const token = localStorage.getItem('partner_token') || localStorage.getItem('tichi_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
       }
     }
     return config;
@@ -30,6 +33,9 @@ apiClient.interceptors.response.use(
     if (typeof window !== 'undefined' && error.response && error.response.status === 401) {
       if (localStorage.getItem('tichi_token')) {
         localStorage.removeItem('tichi_token');
+      }
+      if (localStorage.getItem('partner_token')) {
+        localStorage.removeItem('partner_token');
       }
     }
     return Promise.reject(error);

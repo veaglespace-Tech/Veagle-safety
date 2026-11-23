@@ -2,12 +2,47 @@ import { prisma } from '../config/prisma.js';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/index.js';
 
+/**
+ * Validates that coupon discount does not exceed the active plan price (for flat amount) or 100% (for percentage).
+ */
+const validateCouponDiscount = async (discountType, rawValue) => {
+  if (rawValue === undefined || rawValue === null || rawValue === '') {
+    return { valid: false, message: 'Discount value is required.' };
+  }
+  const numVal = parseFloat(rawValue);
+  if (isNaN(numVal) || numVal <= 0) {
+    return { valid: false, message: 'Discount value must be greater than 0.' };
+  }
+  if (discountType === 'PERCENTAGE' && numVal > 100) {
+    return { valid: false, message: 'Discount percentage cannot exceed 100%.' };
+  }
+  if (discountType === 'FLAT_AMOUNT') {
+    const activePlan = await prisma.plan.findFirst({
+      where: { isActive: true },
+      orderBy: { id: 'asc' },
+    });
+    const maxPlanPrice = activePlan ? Number(activePlan.basePrice || activePlan.totalPrice) : 24;
+    if (numVal > maxPlanPrice) {
+      return {
+        valid: false,
+        message: `Flat discount amount (₹${numVal}) cannot exceed active plan price of ₹${maxPlanPrice}.`,
+      };
+    }
+  }
+  return { valid: true, value: numVal };
+};
+
 export const createCoupon = async (req, res) => {
   try {
     const { code, discountType, discountValue, maxUses, assignedUserId, validFrom, validUntil, applicablePlanCodes } = req.body;
 
     if (!code || !discountType || discountValue === undefined) {
       return res.status(400).json({ success: false, message: 'Code, discountType, and discountValue are required.' });
+    }
+
+    const validation = await validateCouponDiscount(discountType, discountValue);
+    if (!validation.valid) {
+      return res.status(400).json({ success: false, message: validation.message });
     }
 
     const existing = await prisma.coupon.findUnique({ where: { code: code.toUpperCase() } });
@@ -19,7 +54,7 @@ export const createCoupon = async (req, res) => {
       data: {
         code: code.toUpperCase(),
         discountType,
-        discountValue: parseFloat(discountValue),
+        discountValue: validation.value,
         maxUses: maxUses ? parseInt(maxUses) : null,
         assignedUserId: assignedUserId ? parseInt(assignedUserId) : null,
         createdById: req.user.id, // from auth middleware
@@ -59,6 +94,22 @@ export const updateCoupon = async (req, res) => {
     const { code, discountType, discountValue, isActive, validUntil, maxUses, assignedUserId } = req.body;
     const couponId = parseInt(id);
 
+    const oldCoupon = await prisma.coupon.findUnique({ where: { id: couponId } });
+    if (!oldCoupon) {
+      return res.status(404).json({ success: false, message: 'Coupon not found.' });
+    }
+
+    const targetType = discountType || oldCoupon.discountType;
+    let validatedValue = undefined;
+
+    if (discountValue !== undefined && discountValue !== '') {
+      const validation = await validateCouponDiscount(targetType, discountValue);
+      if (!validation.valid) {
+        return res.status(400).json({ success: false, message: validation.message });
+      }
+      validatedValue = validation.value;
+    }
+
     if (code) {
       const existing = await prisma.coupon.findFirst({
         where: { code, NOT: { id: couponId } }
@@ -73,7 +124,7 @@ export const updateCoupon = async (req, res) => {
       data: {
         ...(code && { code }),
         ...(discountType && { discountType }),
-        ...(discountValue !== undefined && { discountValue: parseFloat(discountValue) }),
+        ...(validatedValue !== undefined && { discountValue: validatedValue }),
         ...(isActive !== undefined && { isActive }),
         ...(validUntil !== undefined && { validUntil: validUntil ? new Date(validUntil) : null }),
         ...(maxUses !== undefined && { maxUses: maxUses ? parseInt(maxUses) : null }),

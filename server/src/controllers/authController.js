@@ -407,13 +407,6 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       }
     }
 
-    // Send Welcome Email after successful verification
-    try {
-      await sendWelcomeEmail({ recipientEmail: updatedUser.email, userName: updatedUser.fullName });
-    } catch (welcomeErr) {
-      console.warn('[Welcome Email Notice] Failed to send welcome email:', welcomeErr.message);
-    }
-
     const token = createUserAccessToken(updatedUser);
 
     return res.status(200).json({

@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../../components/layout/AppLayout.js';
 import { AdminHeaderNav } from '../../../components/admin/AdminHeaderNav.js';
 import { couponApi } from '../../../redux/api/couponApi.js';
+import { adminApi } from '../../../redux/api/adminApi.js';
 import { Ticket, Plus, X, Trash2, PowerOff, Power, Edit } from 'lucide-react';
 
 export default function AdminCouponsPage() {
   const [mounted, setMounted] = useState(false);
   const [coupons, setCoupons] = useState([]);
+  const [activePlanPrice, setActivePlanPrice] = useState(24);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null);
 
@@ -45,10 +47,46 @@ export default function AdminCouponsPage() {
   useEffect(() => {
     setMounted(true);
     fetchCoupons();
+
+    const loadPlanPrice = async () => {
+      try {
+        const res = await adminApi.fetchPlans();
+        const plans = res?.plans || res?.data?.plans || [];
+        const active = plans.find((p) => p.isActive) || plans[0];
+        if (active && (active.basePrice || active.totalPrice)) {
+          setActivePlanPrice(Number(active.basePrice || active.totalPrice));
+        }
+      } catch (err) {
+        // Fallback default
+      }
+    };
+    loadPlanPrice();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const val = Number(form.discountValue);
+
+    if (form.discountType === 'FLAT_AMOUNT') {
+      if (val > activePlanPrice) {
+        showToast('error', `Flat discount (₹${val}) cannot exceed active plan price of ₹${activePlanPrice}!`);
+        return;
+      }
+      if (val <= 0 || isNaN(val)) {
+        showToast('error', 'Discount amount must be greater than ₹0.');
+        return;
+      }
+    } else {
+      if (val > 100) {
+        showToast('error', 'Discount percentage cannot exceed 100%!');
+        return;
+      }
+      if (val <= 0 || isNaN(val)) {
+        showToast('error', 'Discount percentage must be greater than 0%.');
+        return;
+      }
+    }
+
     try {
       let res;
       if (isEditMode) {
@@ -331,19 +369,36 @@ export default function AdminCouponsPage() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
-                    Value *
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-black text-[#2A0826] uppercase tracking-wider">
+                      Value *
+                    </label>
+                    {form.discountType === 'FLAT_AMOUNT' && (
+                      <span className="text-[10px] font-bold text-[#FF2A6D] bg-[#FFF0F3] px-2 py-0.5 rounded-full border border-[#FFCCE1]">
+                        Max: ₹{activePlanPrice}
+                      </span>
+                    )}
+                  </div>
                   <input
                     required
                     type="number"
                     step="0.01"
-                    min="0"
+                    min="0.01"
+                    max={form.discountType === 'FLAT_AMOUNT' ? activePlanPrice : 100}
                     value={form.discountValue}
                     onChange={(e) => setForm({ ...form, discountValue: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#FFF0F3]/30 border border-[#FFCCE1] rounded-2xl text-sm font-bold outline-none focus:border-[#FF2A6D]"
-                    placeholder="e.g. 50"
+                    className={`w-full px-4 py-3 bg-[#FFF0F3]/30 border rounded-2xl text-sm font-bold outline-none transition-all ${
+                      form.discountType === 'FLAT_AMOUNT' && Number(form.discountValue) > activePlanPrice
+                        ? 'border-red-500 ring-2 ring-red-400/20 text-red-600'
+                        : 'border-[#FFCCE1] focus:border-[#FF2A6D] text-[#2A0826]'
+                    }`}
+                    placeholder={form.discountType === 'FLAT_AMOUNT' ? `e.g. 5 (Max ₹${activePlanPrice})` : 'e.g. 10 (Max 100%)'}
                   />
+                  {form.discountType === 'FLAT_AMOUNT' && Number(form.discountValue) > activePlanPrice && (
+                    <p className="text-[11px] text-red-600 font-bold animate-pulse">
+                      ⚠️ Flat discount cannot exceed active plan price of ₹{activePlanPrice}!
+                    </p>
+                  )}
                 </div>
               </div>
 

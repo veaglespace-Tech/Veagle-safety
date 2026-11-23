@@ -20,6 +20,7 @@ import {
   User,
   Shield,
   Heart,
+  Network,
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice.js';
@@ -109,6 +110,7 @@ export const PublicNavbar = () => {
     { href: '/pricing', label: 'Pricing', icon: Zap },
     { href: '/about', label: 'About', icon: Info },
     { href: '/gallery', label: 'Gallery', icon: ImageIcon },
+    { href: '/join-partner', label: 'Partner', icon: Network },
     { href: '/contact', label: 'Contact', icon: PhoneCall },
     { href: '/donate', label: 'Donate', icon: Heart },
   ];

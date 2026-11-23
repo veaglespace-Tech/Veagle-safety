@@ -89,6 +89,7 @@ export const createRazorpayOrder = asyncHandler(async (req, res) => {
     const freeTxnId = `FREE_${Date.now()}_${Math.floor(100 + Math.random() * 900)}`;
 
     let activeUser = null;
+    let isNewlyCreatedUser = false;
 
     if (req.user?.id) {
       const updateData = { subscriptionStatus: 'ACTIVE', subscriptionExpiresAt: expiresAt };
@@ -102,9 +103,11 @@ export const createRazorpayOrder = asyncHandler(async (req, res) => {
         where: { id: req.user.id },
         data: updateData,
       });
+      isNewlyCreatedUser = false;
     } else if (decodedRegistration?.email) {
       activeUser = await prisma.user.findUnique({ where: { email: decodedRegistration.email } });
       if (!activeUser) {
+        isNewlyCreatedUser = true;
         activeUser = await prisma.user.create({
           data: {
             fullName: decodedRegistration.fullName,
@@ -188,8 +191,8 @@ export const createRazorpayOrder = asyncHandler(async (req, res) => {
         { expiresIn: config.jwt.expiresIn }
       );
 
-      // Send Welcome Email to newly registered user
-      if (activeUser?.email) {
+      // Send Welcome Email ONLY to newly registered user created in DB
+      if (isNewlyCreatedUser && activeUser?.email) {
         sendWelcomeEmail({
           recipientEmail: activeUser.email,
           userName: activeUser.fullName,

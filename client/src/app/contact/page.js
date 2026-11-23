@@ -30,7 +30,7 @@ export default function ContactSupportPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorNotice, setErrorNotice] = useState(null);
-  const [supportEmail, setSupportEmail] = useState('support@sakhisuraksha.org');
+  const [supportEmail, setSupportEmail] = useState('support@sakhisuraksha.veaglespace.com');
   const [supportPhone, setSupportPhone] = useState('+91 92252 41608');
 
   React.useEffect(() => {

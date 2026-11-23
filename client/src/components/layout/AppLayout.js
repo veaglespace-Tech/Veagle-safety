@@ -45,16 +45,7 @@ export const AppLayout = ({ children, fullScreen = false }) => {
   useEffect(() => {
     if (!mounted) return;
 
-    // Unauthenticated user trying to access /admin routes -> redirect to /auth?mode=login
-    if (pathname.startsWith('/admin') && !hasAuthToken) {
-      if (typeof window !== 'undefined') {
-        window.location.replace('/auth?mode=login');
-      } else {
-        router.push('/auth?mode=login');
-      }
-      return;
-    }
-
+    // 1. Unauthenticated check for all protected routes
     if (isProtected && !hasAuthToken) {
       if (typeof window !== 'undefined') {
         window.location.replace('/auth?mode=login');
@@ -64,65 +55,69 @@ export const AppLayout = ({ children, fullScreen = false }) => {
       return;
     }
 
-    let isSuperAdmin = user?.role === 'SUPER_ADMIN';
-    if (!isSuperAdmin && typeof window !== 'undefined') {
+    if (!hasAuthToken) return;
+
+    // Resolve current user info and role
+    let activeUser = user;
+    if (!activeUser?.id && typeof window !== 'undefined') {
       try {
-        const storedUser = JSON.parse(localStorage.getItem('tichi_user') || '{}');
-        if (storedUser?.role === 'SUPER_ADMIN') {
-          isSuperAdmin = true;
-        }
+        activeUser = JSON.parse(localStorage.getItem('tichi_user') || '{}');
       } catch (e) {}
     }
 
-    // Non-admin trying to access /admin -> redirect to /auth?mode=login
-    if (
-      hasAuthToken &&
-      pathname.startsWith('/admin') &&
-      !isSuperAdmin
-    ) {
-      router.push('/auth?mode=login');
-      return;
-    }
+    const role = activeUser?.role || 'USER';
 
-    // SuperAdmin trying to access member-only pages -> redirect to /admin
-    const memberOnlyPaths = ['/dashboard', '/subscription'];
-    if (
-      hasAuthToken &&
-      isSuperAdmin &&
-      memberOnlyPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))
-    ) {
-      router.push('/admin');
-      return;
-    }
-    // Check for expired subscription
-    let isSubExpired = false;
-    let currentUser = user;
-    if (!currentUser?.id && typeof window !== 'undefined') {
-      try {
-        currentUser = JSON.parse(localStorage.getItem('tichi_user') || '{}');
-      } catch (e) {}
-    }
+    // 2. Strict Role-Based Route Guards:
 
-    if (currentUser?.role === 'USER') {
-      const expDate = currentUser.subscriptionExpiresAt ? new Date(currentUser.subscriptionExpiresAt) : null;
-      if (
-        currentUser.subscriptionStatus !== 'ACTIVE' ||
-        (expDate && expDate < new Date())
-      ) {
-        isSubExpired = true;
+    // SUPER_ADMIN: only allowed in /admin routes, profile, settings
+    if (role === 'SUPER_ADMIN') {
+      const nonAdminAllowed = ['/settings', '/profile'];
+      if (!pathname.startsWith('/admin') && !nonAdminAllowed.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+        router.replace('/admin');
+        return;
       }
     }
 
-    if (
-      isProtected &&
-      hasAuthToken &&
-      isSubExpired &&
-      !pathname.startsWith('/subscription') &&
-      !pathname.startsWith('/payment') &&
-      !pathname.startsWith('/auth')
-    ) {
-      router.push('/pricing');
-      return;
+    // ORGANIZATION: only allowed in /organization routes, settings, profile
+    if (role === 'ORGANIZATION') {
+      const orgAllowed = ['/organization', '/settings', '/profile'];
+      const isAllowed = orgAllowed.some((p) => pathname === p || pathname.startsWith(p + '/'));
+      if (isProtected && !isAllowed) {
+        router.replace('/organization');
+        return;
+      }
+    }
+
+    // PARENT (Guardian): only allowed in /parent routes, settings, profile
+    if (role === 'PARENT') {
+      const parentAllowed = ['/parent', '/settings', '/profile'];
+      const isAllowed = parentAllowed.some((p) => pathname === p || pathname.startsWith(p + '/'));
+      if (isProtected && !isAllowed) {
+        router.replace('/parent');
+        return;
+      }
+    }
+
+    // USER (Standard Safety Member): CANNOT access /admin, /organization, /parent
+    if (role === 'USER') {
+      if (pathname.startsWith('/admin') || pathname.startsWith('/organization') || pathname.startsWith('/parent')) {
+        router.replace('/dashboard');
+        return;
+      }
+
+      // Check for subscription expiry for safety-critical routes
+      const safetyRoutes = ['/active-sos', '/track-journey', '/contacts', '/dashboard'];
+      const isSafetyRoute = safetyRoutes.some((p) => pathname === p || pathname.startsWith(p + '/'));
+
+      const expDate = activeUser?.subscriptionExpiresAt ? new Date(activeUser.subscriptionExpiresAt) : null;
+      const isSubExpired =
+        activeUser?.subscriptionStatus !== 'ACTIVE' ||
+        (expDate && expDate < new Date());
+
+      if (isSafetyRoute && isSubExpired && !pathname.startsWith('/subscription') && !pathname.startsWith('/payment') && !pathname.startsWith('/auth')) {
+        router.replace('/pricing');
+        return;
+      }
     }
   }, [mounted, pathname, hasAuthToken, isProtected, user, router]);
 

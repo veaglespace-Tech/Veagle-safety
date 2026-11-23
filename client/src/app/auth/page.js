@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense, useRef } from 'react';
+import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
@@ -1016,6 +1017,17 @@ function UserAuthForm() {
                 </span>
                 <ArrowRight className="w-4 h-4 text-white" />
               </button>
+
+              {isLogin && (
+                <div className="pt-3 border-t border-[#FFCCE1]/60 text-center">
+                  <p className="text-[11px] font-bold text-[#684E67]">
+                    Are you an institutional or referral partner?{' '}
+                    <Link href="/partner" className="text-[#FF2A6D] hover:underline font-black">
+                      Sign In to Partner Portal →
+                    </Link>
+                  </p>
+                </div>
+              )}
             </form>
           )}
         </div>
