@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -47,7 +47,7 @@ import {
 import { Logo3DFlip } from '../../../components/ui/Logo3DFlip.js';
 import { referralApi } from '../../../redux/api/referralApi.js';
 
-export default function ProtectedPartnerDashboardPage() {
+function PartnerDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -1073,5 +1073,22 @@ export default function ProtectedPartnerDashboardPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function ProtectedPartnerDashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FFF0F3] flex items-center justify-center font-black text-[#FF2A6D]">
+          <div className="text-center space-y-3">
+            <div className="w-12 h-12 border-4 border-[#FF2A6D] border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs uppercase tracking-wider font-black">Loading Partner Command Portal...</p>
+          </div>
+        </div>
+      }
+    >
+      <PartnerDashboardContent />
+    </Suspense>
   );
 }
