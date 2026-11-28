@@ -42,9 +42,6 @@ jobs:
             cd ../server
             npm ci
 
-            echo "Syncing Prisma Database Schema..."
-            npx prisma db push --skip-generate --accept-data-loss
-
             echo "Generating Prisma Client..."
             npx prisma generate
 
