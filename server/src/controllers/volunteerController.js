@@ -77,12 +77,19 @@ export const sendOtp = async (req, res) => {
       });
     }
 
-    // Send email with OTP
-    sendVolunteerOtp({
+    // Send email with OTP and await dispatch
+    const mailSent = await sendVolunteerOtp({
       recipientEmail: email,
       volunteerName: fullName || 'Volunteer',
       otp,
-    }).catch((err) => console.warn('[Volunteer Mailer Notice]:', err.message));
+    });
+
+    if (!mailSent) {
+      return res.status(500).json({
+        success: false,
+        message: 'Could not dispatch verification email right now. Please try again in a moment.',
+      });
+    }
 
     return res.status(200).json({
       success: true,

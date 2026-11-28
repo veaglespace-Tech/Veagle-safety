@@ -542,6 +542,7 @@ export const sendPartnerApplicationApproved = async ({
 export const sendVolunteerOtp = async ({ recipientEmail, volunteerName, otp }) => {
   try {
     await transporter.sendMail({
+      fromName: 'Sakhi Suraksha Volunteer Desk',
       from: `"Sakhi Suraksha Volunteer Desk" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: 'Volunteer Registration OTP - Sakhi Suraksha SOS',
@@ -579,6 +580,7 @@ export const sendVolunteerOtp = async ({ recipientEmail, volunteerName, otp }) =
 export const sendVolunteerApplicationReceived = async ({ recipientEmail, volunteerName, city }) => {
   try {
     await transporter.sendMail({
+      fromName: 'Sakhi Suraksha Volunteer Desk',
       from: `"Sakhi Suraksha Volunteer Desk" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: 'Volunteer Application Received - Sakhi Suraksha SOS',
@@ -617,6 +619,7 @@ export const sendVolunteerApplicationReceived = async ({ recipientEmail, volunte
 export const sendVolunteerApproved = async ({ recipientEmail, volunteerName, volunteerIdCode, city }) => {
   try {
     await transporter.sendMail({
+      fromName: 'Sakhi Suraksha Volunteer Force',
       from: `"Sakhi Suraksha Volunteer Force" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: `🎉 Congratulations! Approved as Sakhi Suraksha Volunteer (ID: ${volunteerIdCode})`,
@@ -664,6 +667,7 @@ export const sendVolunteerApproved = async ({ recipientEmail, volunteerName, vol
 export const sendVolunteerRejected = async ({ recipientEmail, volunteerName, reason }) => {
   try {
     await transporter.sendMail({
+      fromName: 'Sakhi Suraksha Volunteer Desk',
       from: `"Sakhi Suraksha Volunteer Desk" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
       to: recipientEmail,
       subject: 'Update on Your Volunteer Application - Sakhi Suraksha SOS',
