@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { Footer } from '../../components/layout/Footer.js';
+import { fetchPlans } from '../../redux/slices/planSlice.js';
 import {
   Shield,
   Heart,
@@ -24,6 +26,17 @@ import { MagneticButton } from '../../components/ui/MagneticButton.js';
 export const dynamic = 'force-dynamic';
 
 export default function AboutUsPage() {
+  const dispatch = useDispatch();
+  const { plans = [] } = useSelector((state) => state?.plan || {});
+
+  useEffect(() => {
+    dispatch(fetchPlans());
+  }, [dispatch]);
+
+  const activePlan = plans.find((p) => p.isActive !== false) || plans[0];
+  const planPrice = activePlan?.basePrice !== undefined ? Number(activePlan.basePrice) : 24;
+  const durationDays = activePlan?.durationDays || 365;
+
   const pillars = [
     {
       icon: Radio,
@@ -167,7 +180,7 @@ export default function AboutUsPage() {
                 Join Sakhi Suraksha SOS Today
               </h2>
               <p className="text-xs sm:text-sm text-[#684E67] font-bold max-w-xl mx-auto leading-relaxed">
-                Get complete 365-day emergency protection for just ₹24/year (only ₹2/month). Instant
+                Get complete {durationDays}-day emergency protection for just ₹{planPrice}/year. Instant
                 registration in under 2 minutes.
               </p>
             </div>
@@ -177,7 +190,7 @@ export default function AboutUsPage() {
                 href="/auth?mode=register"
                 className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
               >
-                <span>START 365-DAY REGISTRATION</span>
+                <span>START {durationDays}-DAY REGISTRATION</span>
                 <ArrowRight className="w-4 h-4 shrink-0" />
               </Link>
             </div>

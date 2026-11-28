@@ -16,6 +16,7 @@ import {
   clearAuthMessages,
   setShowOtpModal,
 } from '../../redux/slices/authSlice.js';
+import { fetchPlans } from '../../redux/slices/planSlice.js';
 import {
   Eye,
   EyeOff,
@@ -44,19 +45,24 @@ function UserAuthForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const dispatch = useDispatch();
+  const { plans = [] } = useSelector((state) => state?.plan || {});
 
   const [isLogin, setIsLogin] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    dispatch(fetchPlans());
     generateCaptcha();
     if (searchParams && searchParams.get('mode') === 'register') {
       setIsLogin(false);
     } else {
       setIsLogin(true);
     }
-  }, [searchParams]);
+  }, [searchParams, dispatch]);
+
+  const activePlan = plans.find((p) => p.isActive !== false) || plans[0];
+  const planPrice = activePlan?.basePrice !== undefined ? Number(activePlan.basePrice) : 24;
 
   // Registration Fields State
   const [selectedRole, setSelectedRole] = useState('USER'); // USER, ORGANIZATION
@@ -539,7 +545,7 @@ function UserAuthForm() {
                       <span>
                         {selectedRole === 'USER' && (
                           <>
-                            <strong>Individual Safety Member:</strong> 24/7 Live SOS, Trip Tracking, Guardian Alarms & ₹24 Yearly Protection Plan.
+                            <strong>Individual Safety Member:</strong> 24/7 Live SOS, Trip Tracking, Guardian Alarms & ₹{planPrice} Yearly Protection Plan.
                           </>
                         )}
                         {selectedRole === 'ORGANIZATION' && (

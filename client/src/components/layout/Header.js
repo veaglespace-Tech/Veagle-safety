@@ -115,7 +115,7 @@ export const Header = () => {
       : mounted && user?.role === 'ORGANIZATION'
         ? '/organization'
         : isSuperAdmin
-          ? '/admin'
+          ? '/'
           : '/dashboard';
 
   return (

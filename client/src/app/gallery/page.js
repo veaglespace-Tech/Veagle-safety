@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { PublicNavbar } from '../../components/layout/PublicNavbar.js';
 import { Footer } from '../../components/layout/Footer.js';
+import { fetchPlans } from '../../redux/slices/planSlice.js';
 import { Shield, Zap, ArrowRight, Maximize2, X } from 'lucide-react';
 import Link from 'next/link';
 import { AnimatedHeading } from '../../components/common/AnimatedHeading.jsx';
@@ -12,6 +14,8 @@ import { settingApi } from '../../redux/api/settingApi.js';
 export const dynamic = 'force-dynamic';
 
 export default function PlatformGalleryPage() {
+  const dispatch = useDispatch();
+  const { plans = [] } = useSelector((state) => state?.plan || {});
   const [activeTab, setActiveTab] = useState('ALL');
   const [selectedItem, setSelectedItem] = useState(null);
   const [galleryItems, setGalleryItems] = useState([]);
@@ -30,7 +34,12 @@ export default function PlatformGalleryPage() {
 
   useEffect(() => {
     fetchGalleryData();
-  }, []);
+    dispatch(fetchPlans());
+  }, [dispatch]);
+
+  const activePlan = plans.find((p) => p.isActive !== false) || plans[0];
+  const planPrice = activePlan?.basePrice !== undefined ? Number(activePlan.basePrice) : 24;
+  const durationDays = activePlan?.durationDays || 365;
 
   const fetchGalleryData = async () => {
     try {
@@ -173,7 +182,7 @@ export default function PlatformGalleryPage() {
               Ready to Protect Yourself & Your Loved Ones?
             </h2>
             <p className="text-xs text-[#684E67] font-bold max-w-lg mx-auto leading-relaxed">
-              Get complete 365-day emergency SOS protection for just ₹24/year (only ₹2/month). Setup
+              Get complete {durationDays}-day emergency SOS protection for just ₹{planPrice}/year. Setup
               in under 2 minutes.
             </p>
           </div>
@@ -184,7 +193,7 @@ export default function PlatformGalleryPage() {
                 href="/auth?mode=register"
                 className="bg-gradient-to-r from-[#FFF0F3] via-[#FFE6EE] to-[#FFCCE1] border border-[#FF5C8A] text-[#2A0826] hover:bg-gradient-to-r hover:from-[#FF5C8A] hover:to-[#FF2A6D] hover:text-white hover:border-transparent px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center space-x-2 cursor-pointer active:scale-95 whitespace-nowrap group"
               >
-                <span>REGISTER FOR ₹24 YEARLY PLAN</span>
+                <span>REGISTER FOR ₹{planPrice} YEARLY PLAN</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#FF2A6D] group-hover:text-white shrink-0 transition-colors" />
               </Link>
             </MagneticButton>
