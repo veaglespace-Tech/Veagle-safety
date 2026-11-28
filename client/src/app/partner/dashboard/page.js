@@ -298,11 +298,10 @@ function PartnerDashboardContent() {
               <button
                 key={item.id}
                 onClick={() => switchTab(item.id)}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  isActive
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${isActive
                     ? 'bg-gradient-to-r from-[#FF2A6D] to-[#FF5E8E] text-white shadow-md shadow-pink-500/20'
                     : 'text-gray-600 hover:bg-pink-50 hover:text-[#FF2A6D]'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon className="w-4 h-4" />
@@ -310,9 +309,8 @@ function PartnerDashboardContent() {
                 </div>
                 {item.badge !== undefined && (
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-pink-100 text-[#FF2A6D]'
-                    }`}
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-white/20 text-white' : 'bg-pink-100 text-[#FF2A6D]'
+                      }`}
                   >
                     {item.badge}
                   </span>
@@ -377,11 +375,10 @@ function PartnerDashboardContent() {
                   <button
                     key={item.id}
                     onClick={() => switchTab(item.id)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
-                      isActive
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${isActive
                         ? 'bg-gradient-to-r from-[#FF2A6D] to-[#FF5E8E] text-white shadow-md'
                         : 'text-gray-600 hover:bg-pink-50'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <Icon className="w-4 h-4" />
@@ -433,16 +430,14 @@ function PartnerDashboardContent() {
           <div className="flex items-center gap-3">
             {/* Live SOS Community Radar */}
             <div
-              className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${
-                alertMembers.length > 0
+              className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${alertMembers.length > 0
                   ? 'bg-red-50 text-red-700 border-red-200 animate-pulse'
                   : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-              }`}
+                }`}
             >
               <span
-                className={`w-2 h-2 rounded-full ${
-                  alertMembers.length > 0 ? 'bg-red-500' : 'bg-emerald-500'
-                }`}
+                className={`w-2 h-2 rounded-full ${alertMembers.length > 0 ? 'bg-red-500' : 'bg-emerald-500'
+                  }`}
               />
               <span>
                 {alertMembers.length > 0
@@ -616,11 +611,10 @@ function PartnerDashboardContent() {
 
                         <div className="flex items-center gap-3">
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                              user.subscriptionStatus === 'ACTIVE'
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${user.subscriptionStatus === 'ACTIVE'
                                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : 'bg-gray-100 text-gray-600'
-                            }`}
+                              }`}
                           >
                             {user.subscriptionStatus === 'ACTIVE' ? 'Active Plan' : 'Free Member'}
                           </span>
@@ -657,25 +651,22 @@ function PartnerDashboardContent() {
                   <div className="flex bg-gray-100 p-1 rounded-xl text-xs font-bold">
                     <button
                       onClick={() => setUserFilter('ALL')}
-                      className={`px-3 py-1.5 rounded-lg transition-all ${
-                        userFilter === 'ALL' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500'
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg transition-all ${userFilter === 'ALL' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500'
+                        }`}
                     >
                       All ({referredUsers.length})
                     </button>
                     <button
                       onClick={() => setUserFilter('ACTIVE')}
-                      className={`px-3 py-1.5 rounded-lg transition-all ${
-                        userFilter === 'ACTIVE' ? 'bg-white text-emerald-700 shadow-xs' : 'text-gray-500'
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg transition-all ${userFilter === 'ACTIVE' ? 'bg-white text-emerald-700 shadow-xs' : 'text-gray-500'
+                        }`}
                     >
                       Active ({stats.activeSubscribers})
                     </button>
                     <button
                       onClick={() => setUserFilter('FREE')}
-                      className={`px-3 py-1.5 rounded-lg transition-all ${
-                        userFilter === 'FREE' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500'
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg transition-all ${userFilter === 'FREE' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500'
+                        }`}
                     >
                       Free ({referredUsers.length - stats.activeSubscribers})
                     </button>

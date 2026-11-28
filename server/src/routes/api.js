@@ -13,6 +13,7 @@ import * as settingController from '../controllers/settingController.js';
 import * as referralController from '../controllers/referralController.js';
 import * as couponController from '../controllers/couponController.js';
 import * as donationController from '../controllers/donationController.js';
+import * as volunteerController from '../controllers/volunteerController.js';
 import {
   authenticateToken,
   optionalAuthToken,
@@ -191,5 +192,18 @@ router.delete('/coupons/:id', authenticateToken, requireSuperAdmin, couponContro
 router.get('/coupons/assignable-users', authenticateToken, requireSuperAdmin, couponController.getAssignableUsers);
 router.get('/coupons/my-coupons', authenticateToken, couponController.getMyCoupons);
 router.post('/coupons/validate', optionalAuthToken, couponController.validateCoupon);
+
+// Volunteers (Public Application & Verification)
+router.post('/volunteers/send-otp', volunteerController.sendOtp);
+router.post('/volunteers/verify-otp', volunteerController.verifyOtp);
+router.post('/volunteers/apply', volunteerController.applyVolunteer);
+
+// Volunteers (SuperAdmin Management)
+router.get('/admin/volunteers', authenticateToken, requireSuperAdmin, volunteerController.getAllVolunteers);
+router.get('/admin/volunteers/:id', authenticateToken, requireSuperAdmin, volunteerController.getVolunteerById);
+router.post('/admin/volunteers/:id/approve', authenticateToken, requireSuperAdmin, volunteerController.approveVolunteer);
+router.post('/admin/volunteers/:id/reject', authenticateToken, requireSuperAdmin, volunteerController.rejectVolunteer);
+router.put('/admin/volunteers/:id', authenticateToken, requireSuperAdmin, volunteerController.updateVolunteer);
+router.delete('/admin/volunteers/:id', authenticateToken, requireSuperAdmin, volunteerController.deleteVolunteer);
 
 export default router;

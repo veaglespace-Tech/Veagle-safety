@@ -535,3 +535,163 @@ export const sendPartnerApplicationApproved = async ({
     return false;
   }
 };
+
+/**
+ * Send Volunteer Verification OTP
+ */
+export const sendVolunteerOtp = async ({ recipientEmail, volunteerName, otp }) => {
+  try {
+    await transporter.sendMail({
+      from: `"Sakhi Suraksha Volunteer Desk" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: 'Volunteer Registration OTP - Sakhi Suraksha SOS',
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 28px; background-color: #FFF0F3;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <span style="background-color: #FF2A6D; color: white; padding: 4px 12px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">VOLUNTEER FORCE</span>
+            <h1 style="color: #2A0826; font-size: 24px; font-weight: 900; margin: 8px 0 0 0;">Verify Your Email Address</h1>
+          </div>
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 24px; border: 1.5px solid #FFCCE1;">
+            <p style="font-size: 15px; color: #2A0826; margin: 0 0 12px 0;">Namaste <strong>${volunteerName || 'Volunteer'}</strong>,</p>
+            <p style="font-size: 13px; color: #555555; line-height: 1.6; margin: 0 0 16px 0;">
+              Thank you for stepping forward to protect and support women across our communities. Use the following 6-digit verification code to complete your volunteer registration:
+            </p>
+            <div style="background: linear-gradient(135deg, #FF5C8A, #FF2A6D); border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;">
+              <span style="font-size: 36px; font-weight: 900; letter-spacing: 8px; color: #ffffff;">${otp}</span>
+            </div>
+            <p style="font-size: 12px; color: #888888; margin: 0;">
+              ⏰ This OTP is valid for 10 minutes. Please do not share this code with anyone.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.warn('[Volunteer OTP Email Error]:', err.message);
+    return false;
+  }
+};
+
+/**
+ * Send Volunteer Application Confirmation
+ */
+export const sendVolunteerApplicationReceived = async ({ recipientEmail, volunteerName, city }) => {
+  try {
+    await transporter.sendMail({
+      from: `"Sakhi Suraksha Volunteer Desk" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: 'Volunteer Application Received - Sakhi Suraksha SOS',
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 2px solid #FF5C8A; border-radius: 16px; padding: 28px; background-color: #FFF0F3;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <span style="background-color: #FF2A6D; color: white; padding: 4px 12px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">APPLICATION RECEIVED</span>
+            <h1 style="color: #2A0826; font-size: 24px; font-weight: 900; margin: 8px 0 0 0;">Thank You for Stepping Forward!</h1>
+          </div>
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 24px; border: 1.5px solid #FFCCE1;">
+            <p style="font-size: 15px; color: #2A0826; margin: 0 0 12px 0;">Dear <strong>${volunteerName}</strong>,</p>
+            <p style="font-size: 13px; color: #555555; line-height: 1.6; margin: 0 0 16px 0;">
+              We have successfully received your volunteer application for <strong>${city || 'your area'}</strong>. Our administration team is reviewing your details to deploy safety and emergency support in your region.
+            </p>
+            <div style="background-color: #FFF0F3; border-radius: 10px; padding: 14px; border: 1px solid #FFCCE1; margin-bottom: 16px;">
+              <p style="margin: 0; font-size: 12px; color: #2A0826; font-weight: 800;">Status: <span style="color: #E01A4F;">PENDING SUPERADMIN REVIEW</span></p>
+              <p style="margin: 4px 0 0 0; font-size: 11px; color: #684E67;">Once approved, you will receive an official Sakhi Suraksha Volunteer ID code and community deployment guidelines.</p>
+            </div>
+            <p style="font-size: 12px; color: #888888; margin: 0;">
+              If you have any urgent questions, reach out to us at support@veaglespace.com.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.warn('[Volunteer Application Received Email Error]:', err.message);
+    return false;
+  }
+};
+
+/**
+ * Send Volunteer Approval Email
+ */
+export const sendVolunteerApproved = async ({ recipientEmail, volunteerName, volunteerIdCode, city }) => {
+  try {
+    await transporter.sendMail({
+      from: `"Sakhi Suraksha Volunteer Force" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: `🎉 Congratulations! Approved as Sakhi Suraksha Volunteer (ID: ${volunteerIdCode})`,
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 2px solid #10B981; border-radius: 16px; padding: 28px; background-color: #ECFDF5;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <span style="background-color: #10B981; color: white; padding: 4px 12px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">OFFICIAL VOLUNTEER APPROVED</span>
+            <h1 style="color: #065F46; font-size: 24px; font-weight: 900; margin: 8px 0 0 0;">Welcome to Sakhi Suraksha Volunteer Force!</h1>
+          </div>
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 24px; border: 1.5px solid #A7F3D0;">
+            <p style="font-size: 16px; color: #065F46; margin: 0 0 12px 0; font-weight: 800;">Dear ${volunteerName},</p>
+            <p style="font-size: 13px; color: #555555; line-height: 1.6; margin: 0 0 16px 0;">
+              Your application has been reviewed and <strong>APPROVED</strong> by the Sakhi Suraksha SuperAdmin team! You are now an active guardian volunteer representing ${city || 'our community safety initiative'}.
+            </p>
+            <div style="background: linear-gradient(135deg, #10B981, #059669); border-radius: 12px; padding: 20px; text-align: center; color: #ffffff; margin-bottom: 20px;">
+              <p style="margin: 0 0 4px 0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">YOUR OFFICIAL VOLUNTEER ID</p>
+              <p style="font-size: 32px; font-weight: 900; letter-spacing: 4px; margin: 4px 0;">${volunteerIdCode}</p>
+              <p style="margin: 0; font-size: 12px; opacity: 0.95;">Sakhi Suraksha Community Safety Guardian</p>
+            </div>
+            <div style="background-color: #F9FAFB; border-radius: 10px; padding: 14px; border: 1px solid #E5E7EB; margin-bottom: 16px;">
+              <p style="margin: 0 0 6px 0; font-size: 12px; color: #065F46; font-weight: 800;">🛡️ Volunteer Responsibilities:</p>
+              <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: #555555; line-height: 1.6;">
+                <li>Assist local women and community members during emergency or distress calls.</li>
+                <li>Promote 24/7 personal safety awareness across colleges, workplaces, and neighborhoods.</li>
+                <li>Support local rapid response coordination when emergency alerts are triggered.</li>
+              </ul>
+            </div>
+            <p style="font-size: 12px; color: #666666; margin: 0;">
+              Thank you for standing strong for women's safety and emergency protection!
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.warn('[Volunteer Approved Email Error]:', err.message);
+    return false;
+  }
+};
+
+/**
+ * Send Volunteer Rejection Email
+ */
+export const sendVolunteerRejected = async ({ recipientEmail, volunteerName, reason }) => {
+  try {
+    await transporter.sendMail({
+      from: `"Sakhi Suraksha Volunteer Desk" <${config.emailService.user || 'no-reply@sakhisuraksha.org'}>`,
+      to: recipientEmail,
+      subject: 'Update on Your Volunteer Application - Sakhi Suraksha SOS',
+      html: `
+        <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 2px solid #E5E7EB; border-radius: 16px; padding: 28px; background-color: #F9FAFB;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #2A0826; font-size: 22px; font-weight: 900; margin: 8px 0 0 0;">Volunteer Application Update</h1>
+          </div>
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 24px; border: 1px solid #E5E7EB;">
+            <p style="font-size: 15px; color: #2A0826; margin: 0 0 12px 0;">Dear <strong>${volunteerName}</strong>,</p>
+            <p style="font-size: 13px; color: #555555; line-height: 1.6; margin: 0 0 16px 0;">
+              Thank you for your interest in joining the Sakhi Suraksha Volunteer Force. After careful consideration, we regret to inform you that we are unable to approve your application at this time.
+            </p>
+            ${reason ? `
+              <div style="background-color: #F3F4F6; border-radius: 8px; padding: 12px; font-size: 12px; color: #4B5563; margin-bottom: 16px;">
+                <strong>Reason:</strong> ${reason}
+              </div>
+            ` : ''}
+            <p style="font-size: 12px; color: #666666; margin: 0;">
+              We sincerely appreciate your willingness to contribute to our mission and wish you all the best.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.warn('[Volunteer Rejection Email Error]:', err.message);
+    return false;
+  }
+};

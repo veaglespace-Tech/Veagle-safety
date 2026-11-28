@@ -31,6 +31,10 @@ export const Footer = () => {
               Join as Partner
             </Link>
             <span className="text-[#FFCCE1]">|</span>
+            <Link href="/join-volunteer" className="text-[#FF2A6D] hover:underline font-black transition-colors">
+              Join as Volunteer
+            </Link>
+            <span className="text-[#FFCCE1]">|</span>
             <Link href="/partner" className="hover:text-[#FF2A6D] transition-colors">
               Partner Portal
             </Link>

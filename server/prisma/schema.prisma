@@ -305,3 +305,37 @@ model Donation {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
+
+model Volunteer {
+  id                    Int       @id @default(autoincrement())
+  fullName              String
+  email                 String    @unique
+  phone                 String
+  isEmailVerified       Boolean   @default(false)
+  emailOtp              String?
+  emailOtpExpiresAt     DateTime?
+  address               String    @db.Text
+  city                  String
+  state                 String
+  pincode               String
+  country               String    @default("India")
+  gender                String?   // Female, Male, Other
+  dateOfBirth           String?
+  occupation            String?   // Student, Professional, Healthcare, Social Worker, Police/Armed Forces, Homemaker, Other
+  skills                String?   @db.Text // First Aid, Emergency Transport, Counseling, Self-Defense, Community Patrol, Legal Aid, Awareness
+  availability          String?   // Weekends, Evenings, 24/7 Emergency Dispatch, Flexible Hours
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  motivation            String?   @db.Text
+  status                String    @default("PENDING") // PENDING, APPROVED, REJECTED, INACTIVE
+  approvedAt            DateTime?
+  rejectionReason       String?   @db.Text
+  volunteerIdCode       String?   @unique // e.g. VOL-2026-X7Y9
+  notes                 String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([status])
+  @@index([city])
+  @@index([state])
+}

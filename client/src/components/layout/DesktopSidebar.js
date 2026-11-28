@@ -27,6 +27,7 @@ import {
   X,
   Network,
   Ticket,
+  HandHeart,
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout as reduxLogout } from '../../redux/slices/authSlice.js';
@@ -168,6 +169,12 @@ export const DesktopSidebar = () => {
       label: 'Referral Partners',
       icon: Network,
       desc: 'Partner Network & Codes',
+    },
+    {
+      path: '/admin/volunteers',
+      label: 'Volunteer Force',
+      icon: HandHeart,
+      desc: 'Community Guardians & Approvals',
     },
     {
       path: '/admin/payments',
