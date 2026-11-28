@@ -197,7 +197,7 @@ export default function LandingPage() {
               href="/auth?mode=register"
               className="btn-3d-rose-pop w-full sm:w-auto px-6 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 sm:gap-3 whitespace-nowrap"
             >
-              <span>PROTECT YOURSELF NOW</span>
+              <span>REGISTRATION NOW</span>
               <ArrowRight size={16} className="shrink-0" />
             </Link>
 

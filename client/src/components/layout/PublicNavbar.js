@@ -229,7 +229,7 @@ export const PublicNavbar = () => {
                 className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-[11px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-full cursor-pointer shadow-[0_4px_14px_rgba(255,42,109,0.35)] hover:shadow-[0_8px_22px_rgba(255,42,109,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/30 uppercase tracking-wider shrink-0 no-underline"
               >
                 <Zap size={13} className="animate-pulse text-white shrink-0" />
-                <span className="tracking-wide">Protect</span>
+                <span className="tracking-wide">Registration</span>
               </Link>
             </div>
           )}
@@ -347,7 +347,7 @@ export const PublicNavbar = () => {
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-black bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30 no-underline active:scale-95 text-center"
               >
-                <span>Sign Up</span>
+                <span>Registration</span>
                 <ArrowRight size={16} />
               </Link>
             </div>

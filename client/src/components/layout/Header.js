@@ -204,7 +204,7 @@ export const Header = () => {
                 className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF5C8A] via-[#FF2A6D] to-[#E01A4F] text-white text-[10.5px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-full cursor-pointer shadow-[0_4px_16px_rgba(255,42,109,0.35)] hover:shadow-[0_8px_25px_rgba(255,42,109,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 border border-white/40 uppercase tracking-wider shrink-0 no-underline"
               >
                 <Zap size={13} className="animate-pulse text-white shrink-0" />
-                <span className="tracking-wide">Protect</span>
+                <span className="tracking-wide">Registration</span>
               </Link>
 
               <Link
@@ -339,7 +339,7 @@ export const Header = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-black bg-gradient-to-r from-[#FF5C8A] to-[#FF2A6D] text-white shadow-md shadow-[#FF5C8A]/30 no-underline active:scale-95 text-center"
               >
-                <span>Sign Up</span>
+                <span>Registration</span>
                 <Zap size={15} />
               </Link>
             </div>

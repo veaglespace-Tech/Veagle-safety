@@ -177,7 +177,7 @@ export default function AboutUsPage() {
                 href="/auth?mode=register"
                 className="btn-3d-rose-pop px-9 py-4 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-3 whitespace-nowrap"
               >
-                <span>START YOUR 365-DAY PROTECTION</span>
+                <span>START 365-DAY REGISTRATION</span>
                 <ArrowRight className="w-4 h-4 shrink-0" />
               </Link>
             </div>
